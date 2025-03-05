@@ -1,0 +1,22 @@
+version: '3.8'
+
+services:
+  app:
+    build: ./front-end  # Point to the Dockerfile in front-end/
+    container_name: laravel_app
+    working_dir: /var/www
+    volumes:
+      - ./front-end:/var/www  # Map front-end to container
+    depends_on:
+      - nginx
+
+  nginx:
+    image: nginx:latest
+    container_name: laravel_nginx
+    ports:
+      - "80:80"
+    volumes:
+      - ./front-end:/var/www
+      - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - app
