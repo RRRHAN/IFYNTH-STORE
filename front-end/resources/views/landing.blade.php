@@ -156,9 +156,9 @@
                                         <a href="index-2.html#0" class="wishlist"><i
                                                 class="fa-regular fa-heart"></i></a>
                                         <a href="shop-single.html" class="product__image pt-20 d-block">
-                                            <img class="font-image" src="{{ Vite::asset('resources/images/product/product-image1.png') }}"
+                                            <img class="font-image" src="{{ asset('images/product/product-image1.png') }}"
                                                 alt="image">
-                                            <img class="back-image" src="{{ Vite::asset('resources/images/product/product-image3.png') }}"
+                                            <img class="back-image" src="{{ asset('images/product/product-image3.png') }}"
                                                 alt="image">
                                         </a>
                                         <div class="product__content">
