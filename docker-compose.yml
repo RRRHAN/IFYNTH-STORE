@@ -7,6 +7,8 @@ services:
     working_dir: /var/www
     volumes:
       - ./front-end:/var/www  # Map front-end to container
+    environment:
+      APP_PORT: 9000
 
   nginx:
     image: nginx:latest
