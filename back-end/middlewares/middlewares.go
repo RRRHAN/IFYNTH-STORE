@@ -4,7 +4,6 @@ import (
 	"crypto/sha256"
 	"crypto/subtle"
 	"fmt"
-	"log"
 	"net/http"
 	"strings"
 	"time"
@@ -102,12 +101,9 @@ func (m *middlewares) JWT(ctx *gin.Context) {
 	authorization := ctx.Request.Header.Get(constants.AUTHORIZATION)
 	authorizationSplit := strings.Split(authorization, " ")
 	if len(authorizationSplit) < 2 {
-		log.Print("=== authorization '", authorization, "'")
-		log.Print("=== len ", len(authorizationSplit))
 		respond.Error(ctx, apierror.Unauthorized())
 		return
 	}
-	log.Print("=== 1")
 	claims := constants.JWTClaims{}
 	tokenStr := authorizationSplit[1]
 	token, err := jwt.ParseWithClaims(tokenStr, &claims, func(token *jwt.Token) (interface{}, error) {
@@ -115,23 +111,15 @@ func (m *middlewares) JWT(ctx *gin.Context) {
 	})
 	if err != nil || !token.Valid {
 		respond.Error(ctx, apierror.Unauthorized())
-		log.Print("=== 2")
-		// log.Print("=== ", token.Valid)
-		log.Print("=== ", err.Error())
-		log.Print("=== ", tokenStr)
-		log.Print("=== ", authorizationSplit)
 		return
 	}
 
-	log.Print("=== 3")
 	err = m.userService.ValidateToken(ctx, tokenStr)
 	if err != nil {
-		log.Print("=== 4")
 		respond.Error(ctx, apierror.Unauthorized())
 		return
 	}
 
-	log.Print("=== 5")
 	ctx = contextUtil.GinWithCtx(ctx, contextUtil.SetTokenClaims(ctx, constants.Token{
 		Token:  tokenStr,
 		Claims: claims,
