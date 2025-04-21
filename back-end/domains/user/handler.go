@@ -92,11 +92,11 @@ func (h *handler) Register(ctx *gin.Context) {
 		return
 	}
 
-	err = h.service.Register(ctx, input)
+	res, err := h.service.Register(ctx, input)
 	if err != nil {
 		respond.Error(ctx, apierror.FromErr(err))
 		return
 	}
 
-	respond.Success(ctx, http.StatusCreated, nil)
+	respond.Success(ctx, http.StatusCreated, res)
 }

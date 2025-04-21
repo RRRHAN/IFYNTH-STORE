@@ -23,6 +23,10 @@ type Admin struct {
 	PhoneNumber string
 }
 
+func (Admin) TableName() string {
+	return "admin"
+}
+
 type Customer struct {
 	ID          uuid.UUID `gorm:"type:uuid;default:gen_random_uuid();primaryKey"`
 	Name        string
@@ -31,4 +35,8 @@ type Customer struct {
 	Password    string
 	CreatedAt   time.Time
 	UpdatedAt   time.Time
+}
+
+func (Customer) TableName() string {
+	return "customer"
 }
