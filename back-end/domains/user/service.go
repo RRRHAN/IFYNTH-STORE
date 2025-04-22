@@ -34,21 +34,28 @@ func NewService(config *config.Config, db *gorm.DB) Service {
 
 func (s *service) Login(ctx context.Context, input LoginReq) (*LoginRes, error) {
 
+	var err error
 	switch input.Role {
 	case ADMIN:
 		var admin Admin
-		if err := s.db.WithContext(ctx).Where("username = ?", input.Username).First(&admin).Error; err == nil {
+		if err = s.db.WithContext(ctx).Where("username = ?", input.Username).First(&admin).Error; err == nil {
 			if !comparePassword(admin.Password, input.Password) {
 				return nil, apierror.NewWarn(http.StatusUnauthorized, ErrInvalidCredentials)
 			}
 		}
 	case CUSTOMER:
 		var customer Customer
-		if err := s.db.WithContext(ctx).Where("username = ?", input.Username).First(&customer).Error; err == nil {
+		if err = s.db.WithContext(ctx).Where("username = ?", input.Username).First(&customer).Error; err == nil {
 			if !comparePassword(customer.Password, input.Password) {
 				return nil, apierror.NewWarn(http.StatusUnauthorized, ErrInvalidCredentials)
 			}
 		}
+	}
+	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return nil, apierror.NewWarn(http.StatusUnauthorized, ErrInvalidCredentials)
+		}
+		return nil, err
 	}
 
 	expirationTime := time.Now().Add(s.authConfig.JWT.ExpireIn)
