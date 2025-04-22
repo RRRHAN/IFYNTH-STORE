@@ -9,6 +9,7 @@ package wireinject
 import (
 	"github.com/RRRHAN/IFYNTH-STORE/back-end/database"
 	"github.com/RRRHAN/IFYNTH-STORE/back-end/domains/product"
+	"github.com/RRRHAN/IFYNTH-STORE/back-end/domains/cart"
 	"github.com/RRRHAN/IFYNTH-STORE/back-end/domains/user"
 	"github.com/RRRHAN/IFYNTH-STORE/back-end/middlewares"
 	"github.com/RRRHAN/IFYNTH-STORE/back-end/routes"
@@ -28,13 +29,21 @@ func initializeDependency(config2 *config.Config) (*routes.Dependency, error) {
 	if err != nil {
 		return nil, err
 	}
-	service := user.NewService(config2, db)
-	middlewaresMiddlewares := middlewares.NewMiddlewares(config2, service)
+	
+	// Create the services and handlers
+	userService := user.NewService(config2, db)
+	middlewaresMiddleware := middlewares.NewMiddlewares(config2, userService)
 	validate := validator.New()
-	handler := user.NewHandler(service, validate)
+
+	// Handlers
+	userHandler := user.NewHandler(userService, validate)
 	productService := product.NewService(config2, db)
 	productHandler := product.NewHandler(productService, validate)
-	dependency := routes.NewDependency(config2, middlewaresMiddlewares, db, handler, productHandler)
+	cartService := cart.NewService(config2, db)
+	cartHandler := cart.NewCartHandler(cartService, validate)
+
+	// Inject into routes
+	dependency := routes.NewDependency(config2, middlewaresMiddleware, db, userHandler, productHandler, cartHandler)
 	return dependency, nil
 }
 

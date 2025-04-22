@@ -98,5 +98,7 @@ func (h *handler) Register(ctx *gin.Context) {
 		return
 	}
 
-	respond.Success(ctx, http.StatusCreated, nil)
+	respond.Success(ctx, http.StatusCreated, gin.H{
+		"message": "User registered successfully",
+	})
 }

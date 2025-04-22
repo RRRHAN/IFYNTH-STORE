@@ -2,6 +2,7 @@ package product
 
 import (
 	"context"
+	"time"
 
 	"gorm.io/gorm"
 
@@ -10,6 +11,7 @@ import (
 
 type Service interface {
 	GetAllProducts(ctx context.Context, keyword string) ([]Product, error)
+	AddProduct(ctx context.Context, req AddProductRequest) error
 }
 
 type service struct {
@@ -43,4 +45,39 @@ func (s *service) GetAllProducts(ctx context.Context, keyword string) ([]Product
 	}
 
 	return products, nil
+}
+
+func (s *service) AddProduct(ctx context.Context, req AddProductRequest) error {
+	product := Product{
+		Name:        req.Name,
+		Stock:       req.Stock,
+		Description: req.Description,
+		Price:       req.Price,
+		Department:  req.Department, // Menambahkan Department
+		CreatedAt:   time.Now(),
+		UpdatedAt:   time.Now(),
+	}
+
+	// Simpan produk terlebih dahulu
+	if err := s.db.WithContext(ctx).Create(&product).Error; err != nil {
+		return err
+	}
+
+	// Simpan gambar-gambar jika ada
+	var productImages []ProductImage
+	for _, url := range req.Images {
+		productImages = append(productImages, ProductImage{
+			ProductID: product.ID,
+			URL:       url,
+			CreatedAt: time.Now(),
+		})
+	}
+
+	if len(productImages) > 0 {
+		if err := s.db.WithContext(ctx).Create(&productImages).Error; err != nil {
+			return err
+		}
+	}
+
+	return nil
 }

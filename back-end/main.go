@@ -12,6 +12,7 @@ import (
 	"github.com/RRRHAN/IFYNTH-STORE/back-end/utils/logger"
 	wireinject "github.com/RRRHAN/IFYNTH-STORE/back-end/wire"
 	"github.com/go-playground/validator/v10"
+	"github.com/rs/cors"
 )
 
 func main() {
@@ -28,13 +29,26 @@ func main() {
 	}
 	defer dependency.Close()
 
+	// Setup CORS
+	c := cors.New(cors.Options{
+		AllowedOrigins: []string{"http://127.0.0.1:8000"},         // Izinkan origin frontend
+		AllowedHeaders: []string{"Authorization", "Content-Type"}, // Izinkan header Authorization dan Content-Type
+		AllowedMethods: []string{"GET", "POST", "PUT", "DELETE"},  // Metode yang diizinkan
+	})
+
+	// Ambil handler yang sudah disediakan dependency
+	handler := dependency.GetHandler()
+
+	// Apply CORS middleware
+	handlerWithCORS := c.Handler(handler)
+
 	// Create context that listens for the interrupt signal from the OS.
 	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
 	defer stop()
 
 	server := &http.Server{
 		Addr:    fmt.Sprintf("%s:%d", conf.Host, conf.Port),
-		Handler: dependency.GetHandler(),
+		Handler: handlerWithCORS, // Gunakan handler yang sudah di-wrap dengan CORS
 	}
 
 	// Initializing the server in a goroutine so that

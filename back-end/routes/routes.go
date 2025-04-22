@@ -7,6 +7,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 
+	"github.com/RRRHAN/IFYNTH-STORE/back-end/domains/cart"
 	"github.com/RRRHAN/IFYNTH-STORE/back-end/domains/product"
 	"github.com/RRRHAN/IFYNTH-STORE/back-end/domains/user"
 	"github.com/RRRHAN/IFYNTH-STORE/back-end/middlewares"
@@ -21,6 +22,7 @@ func NewDependency(
 	db *gorm.DB,
 	userHandler user.Handler,
 	productHandler product.Handler,
+	cartHandler cart.Handler,
 ) *Dependency {
 
 	if conf.Environment != config.DEVELOPMENT_ENVIRONMENT {
@@ -46,12 +48,23 @@ func NewDependency(
 		user.POST("/login", mw.BasicAuth, userHandler.Login)
 		user.GET("/verify-token", mw.JWT, userHandler.VerifyToken)
 		user.POST("/logout", mw.JWT, userHandler.Logout)
-		user.POST("/register", mw.JWT, userHandler.Register)
+		user.POST("/register", mw.BasicAuth, userHandler.Register)
 	}
 
 	product := router.Group("/product")
 	{
 		product.GET("/", mw.JWT, productHandler.GetAllProducts)
+		// Gunakan RoleMiddleware untuk cek apakah user adalah ADMIN
+		product.POST("/", mw.JWT, mw.RoleMiddleware("ADMIN"), productHandler.AddProduct)
+	}
+
+	cart := router.Group("/cart")
+	{
+		cart.POST("/", mw.JWT, cartHandler.AddToCart)
+		cart.PUT("/update", cartHandler.UpdateCartQuantity)
+		cart.DELETE("/delete", cartHandler.DeleteFromCart)
+		cart.GET("/:user_id", cartHandler.GetCartByUserID)
+
 	}
 
 	router.NoRoute(func(ctx *gin.Context) {

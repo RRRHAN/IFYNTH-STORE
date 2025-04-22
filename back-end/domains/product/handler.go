@@ -12,6 +12,7 @@ import (
 
 type Handler interface {
 	GetAllProducts(ctx *gin.Context)
+	AddProduct(ctx *gin.Context)
 }
 
 type handler struct {
@@ -35,4 +36,25 @@ func (h *handler) GetAllProducts(ctx *gin.Context) {
 	}
 
 	respond.Success(ctx, http.StatusOK, res)
+}
+
+func (h *handler) AddProduct(ctx *gin.Context) {
+	var req AddProductRequest
+
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		respond.Error(ctx, apierror.FromErr(err))
+		return
+	}
+
+	if err := h.validate.Struct(&req); err != nil {
+		respond.Error(ctx, apierror.FromErr(err))
+		return
+	}
+
+	if err := h.service.AddProduct(ctx, req); err != nil {
+		respond.Error(ctx, apierror.FromErr(err))
+		return
+	}
+
+	respond.Success(ctx, http.StatusCreated, gin.H{"message": "Product and images added successfully"})
 }

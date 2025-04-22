@@ -29,6 +29,7 @@ type Middlewares interface {
 	JWT(ctx *gin.Context)
 	Recover(ctx *gin.Context)
 	RateLimiter(ctx *gin.Context)
+	RoleMiddleware(role string) gin.HandlerFunc
 }
 
 type middlewares struct {
@@ -37,6 +38,7 @@ type middlewares struct {
 	userService user.Service
 }
 
+// Constructor untuk middlewares
 func NewMiddlewares(conf *config.Config, userService user.Service) Middlewares {
 	return &middlewares{
 		conf:        conf,
@@ -120,6 +122,10 @@ func (m *middlewares) JWT(ctx *gin.Context) {
 		return
 	}
 
+	// Set role di context setelah validasi token
+	ctx.Set("role", claims.Role)
+
+	// Set token claims di context
 	ctx = contextUtil.GinWithCtx(ctx, contextUtil.SetTokenClaims(ctx, constants.Token{
 		Token:  tokenStr,
 		Claims: claims,
@@ -129,15 +135,12 @@ func (m *middlewares) JWT(ctx *gin.Context) {
 }
 
 func (m *middlewares) Recover(ctx *gin.Context) {
-
 	defer func() {
 		if r := recover(); r != nil {
 			respond.Error(ctx, apierror.NewError(http.StatusInternalServerError, fmt.Sprintf("Panic : %v", r)))
 		}
 	}()
-
 	ctx.Next()
-
 }
 
 func (m *middlewares) RateLimiter(ctx *gin.Context) {
@@ -146,4 +149,29 @@ func (m *middlewares) RateLimiter(ctx *gin.Context) {
 		return
 	}
 	ctx.Next()
+}
+
+// RoleMiddleware untuk memastikan hanya ADMIN yang bisa mengakses endpoint
+func (m *middlewares) RoleMiddleware(requiredRole string) gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		// Ambil user role dari context (yang sebelumnya diset di JWT middleware)
+		userRole, exists := ctx.Get("role")
+
+		// Jika role tidak ditemukan di context, beri respons error Unauthorized
+		if !exists || userRole == "" {
+			respond.Error(ctx, apierror.NewWarn(401, "Unauthorized: Role not found in context"))
+			ctx.Abort() // Hentikan proses request
+			return
+		}
+
+		// Cek apakah role pengguna sesuai dengan yang diinginkan
+		if userRole != requiredRole {
+			respond.Error(ctx, apierror.NewWarn(403, "Forbidden: You don't have permission"))
+			ctx.Abort() // Hentikan proses request
+			return
+		}
+
+		// Lanjutkan ke handler berikutnya jika role sesuai
+		ctx.Next()
+	}
 }
