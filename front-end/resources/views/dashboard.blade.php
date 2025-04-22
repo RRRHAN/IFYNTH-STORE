@@ -46,9 +46,9 @@
                                                 href="#notifications" role="tab">
                                                 <i class="fas fa-bell me-2"></i> Notifications
                                             </a>
-                                            <a class="dash-link" id="billing-tab" data-bs-toggle="pill" href="#billing"
+                                            <a class="dash-link" id="message-tab" data-bs-toggle="pill" href="#message"
                                                 role="tab">
-                                                <i class="fas fa-credit-card me-2"></i> Billing
+                                                <i class="fas fa-messages me-2"></i> Message
                                             </a>
                                             <a class="dash-link" id="my-order-tab" data-bs-toggle="pill"
                                                 href="#my-order" role="tab">
@@ -74,20 +74,20 @@
                                                 <div class="row g-3">
                                                     <div class="col-md-6">
                                                         <label class="form-label">Username</label>
-                                                        <input type="text" class="form-control" value="Alex">
+                                                        <input type="text" class="form-control" value="{{ session('user_name', 'Enter your Username') }}">
                                                     </div>
                                                     <div class="col-md-6">
                                                         <label class="form-label">Phone</label>
                                                         <input type="tel" class="form-control"
-                                                            value="+1 (555) 123-4567">
+                                                            value="{{ session('user_phone', 'Enter your Phone Number') }}">
                                                     </div>
                                                     <div class="col-md-6">
                                                         <label class="form-label">First Name</label>
-                                                        <input type="text" class="form-control" value="Alex">
+                                                        <input type="text" class="form-control" value="{{ session('user_firstname', 'Enter your First Name') }}">
                                                     </div>
                                                     <div class="col-md-6">
                                                         <label class="form-label">Last Name</label>
-                                                        <input type="text" class="form-control" value="">
+                                                        <input type="text" class="form-control" value="{{ session('user_lastname', 'Enter your Last Name') }}">
                                                     </div>
                                                     <div class="col-md-12">
                                                         <label class="form-label">Email</label>
@@ -123,17 +123,6 @@
                                                     </div>
                                                     <button type="submit" class="btn btn-primary">Save Changes</button>
                                                 </form>
-
-                                                <!-- Two-Factor Authentication -->
-                                                <hr class="my-4">
-                                                <h5 class="mb-3">Two-Factor Authentication</h5>
-                                                <p>Enhance security by enabling two-factor authentication.</p>
-                                                <div class="form-check form-switch">
-                                                    <input class="form-check-input" type="checkbox" id="twoFactorAuth"
-                                                        checked>
-                                                    <label class="form-check-label" for="twoFactorAuth">Enable
-                                                        Two-Factor Authentication</label>
-                                                </div>
                                             </div>
 
                                             <!-- Notifications -->
@@ -142,10 +131,10 @@
                                                 <p>Notification settings content goes here...</p>
                                             </div>
 
-                                            <!-- Billing -->
-                                            <div class="tab-pane fade" id="billing" role="tabpanel">
-                                                <h5 class="mb-4">Billing</h5>
-                                                <p>Billing settings content goes here...</p>
+                                            <!-- message -->
+                                            <div class="tab-pane fade" id="message" role="tabpanel">
+                                                <h5 class="mb-4">Message</h5>
+                                                <p>message settings content goes here...</p>
                                             </div>
 
                                             <!-- my-order -->
@@ -160,7 +149,7 @@
                                                     <p class="text-muted small mb-0">Yesterday</p>
                                                 </div>
                                                 <div class="my-order-item">
-                                                    <h6 class="mb-1">Updated billing information</h6>
+                                                    <h6 class="mb-1">Updated message information</h6>
                                                     <p class="text-muted small mb-0">3 days ago</p>
                                                 </div>
                                             </div>

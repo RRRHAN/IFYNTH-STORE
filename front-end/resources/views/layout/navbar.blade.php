@@ -18,21 +18,19 @@
                     </div>
                     <a href="/dashboard" class="acc__cont">
                         <span class="text-white">
-                        {{ session('user_name', 'My Account') }}
+                            {{ session('user_name', 'My Account') }}
                         </span>
                     </a>
                 </div>
                 <div class="cart d-flex align-items-center">
-                    <span class="cart__icon">
+                    <span class="cart__icon"    onclick="window.location.href='/cart'">
                         <i class="fa-regular fa-cart-shopping"></i>
                     </span>
-                    <a href="/cart" class="c__one">
-                        <span class="text-white">
-                            $0.00
-                        </span>
+                    <a href="" class="c__one">
+                        <span class="text-white">Cart</span>
                     </a>
                     <span class="one">
-                        0
+                        {{ Session::get('cart_count', 0) }}
                     </span>
                 </div>
             </div>
@@ -59,13 +57,13 @@
                     <a class="nav-link" href="/landing">Home</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="/IFYcatalog">I Found You</a>
+                    <a class="nav-link" href="/catalog/I Found You">I Found You</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="/NTHcatalog">No Time To Hell</a>
+                    <a class="nav-link" href="/catalog/No Time To Hell">No Time To Hell</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="contact.html">Sell Your Clothes</a>
+                    <a class="nav-link" href="/sellproduct">Sell Your Clothes</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="contact.html">Contact Us</a>
@@ -80,7 +78,7 @@
                         <img src="/assets/images/flag/shipping.png" alt="image">
                     </div>
                     <div class="content">
-                        <p>Free Shipping <br> on order <strong>over $100</strong></p>
+                        <p>Free Shipping on order<br> <strong>over Rp. 200.000</strong></p>
                     </div>
                 </div>
             </div>
@@ -94,7 +92,7 @@
 <div id="targetElement" class="side_bar slideInRight side_bar_hidden">
     <div class="side_bar_overlay"></div>
     <div class="logo mb-30">
-        <img src="/assets/images/logo/logo.svg" alt="logo">
+        <img src="/assets/images/logo/logo.png" alt="logo">
     </div>
     <p class="text-justify">The foundation of any road is the subgrade, which provides a stable base for the road
         layers above. Proper compaction of
@@ -142,7 +140,7 @@
         var loginModal = new bootstrap.Modal(document.getElementById('loginModal'));
 
         document.body.addEventListener("click", function (event) {
-            var target = event.target.closest(".account a"); // Cek jika yang diklik adalah link di dalam .account
+            var target = event.target.closest(".account a") || event.target.closest(".cart a"); // Cek jika yang diklik adalah link di dalam .account
 
             if (target && !userLoggedIn) {
                 event.preventDefault(); // Mencegah navigasi

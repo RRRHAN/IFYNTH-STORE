@@ -1,5 +1,5 @@
     <!-- Footer area start here -->
-    <footer class="footer-area bg-image" data-background="assets/images/footer/footer-bg.jpg">
+    <footer class="footer-area bg-image" data-background="">
         <div class="container">
             <div class="footer__wrp pt-65 pb-65 bor-top bor-bottom">
                 <div class="row g-4">
@@ -55,15 +55,6 @@
                         </div>
                     </div>
                 </div>
-            </div>
-            <div class="footer__copy-text pt-50 pb-50">
-                <a href="index.html" class="logo d-block">
-                    <img src="assets/images/logo/logo.svg" alt="logo">
-                </a>
-                <p>&copy; Copyright 2023 <a href="login.html#0" class="primary-hover">odor</a> All Rights Reserved</p>
-                <a href="login.html#0" class="payment d-block image">
-                    <img src="assets/images/icon/payment.png" alt="icon">
-                </a>
             </div>
         </div>
     </footer>

@@ -557,4 +557,65 @@ CSS TABLE OF CONTENTS
 	// WOW Animatin area start here ***
 	new WOW().init();
 	// WOW Animatin area start here ***
+
+	$(document).ready(function () {
+		const provinces = {
+			"Aceh": ["Banda Aceh", "Lhokseumawe", "Langsa", "Meulaboh"],
+			"Bali": ["Denpasar", "Gianyar", "Tabanan"],
+			"Banten": ["Serang", "Tangerang", "Cilegon", "Lebak"],
+			"Bengkulu": ["Bengkulu", "Mukomuko"],
+			"DI Yogyakarta": ["Yogyakarta", "Bantul", "Gunungkidul"],
+			"DKI Jakarta": ["Jakarta Pusat", "Jakarta Selatan", "Jakarta Barat"],
+			"Gorontalo": ["Gorontalo", "Limboto"],
+			"Jambi": ["Jambi", "Muaro Jambi"],
+			"Jawa Barat": ["Bandung", "Bekasi", "Bogor", "Depok"],
+			"Jawa Tengah": ["Semarang", "Solo", "Tegal", "Magelang"],
+			"Jawa Timur": ["Surabaya", "Malang", "Kediri", "Sidoarjo"],
+			"Kalimantan Barat": ["Pontianak", "Singkawang"],
+			"Kalimantan Selatan": ["Banjarmasin", "Banjarbaru"],
+			"Kalimantan Tengah": ["Palangka Raya", "Sampit"],
+			"Kalimantan Timur": ["Samarinda", "Balikpapan"],
+			"Kalimantan Utara": ["Tanjung Selor"],
+			"Kepulauan Bangka Belitung": ["Pangkal Pinang"],
+			"Kepulauan Riau": ["Tanjung Pinang", "Batam"],
+			"Lampung": ["Bandar Lampung", "Metro"],
+			"Maluku": ["Ambon", "Tual"],
+			"Maluku Utara": ["Ternate", "Tidore"],
+			"Nusa Tenggara Barat": ["Mataram", "Bima"],
+			"Nusa Tenggara Timur": ["Kupang", "Ende"],
+			"Papua": ["Jayapura", "Biak"],
+			"Papua Barat": ["Manokwari", "Sorong"],
+			"Riau": ["Pekanbaru", "Dumai"],
+			"Sulawesi Barat": ["Mamuju"],
+			"Sulawesi Selatan": ["Makassar", "Parepare"],
+			"Sulawesi Tengah": ["Palu", "Poso"],
+			"Sulawesi Tenggara": ["Kendari", "Baubau"],
+			"Sulawesi Utara": ["Manado", "Bitung"],
+			"Sumatera Barat": ["Padang", "Bukittinggi"],
+			"Sumatera Selatan": ["Palembang", "Lubuk Linggau"],
+			"Sumatera Utara": ["Medan", "Binjai"]
+		};
+	
+		const $provinceSelect = $("#province");
+		const $citySelect = $("#city");
+	
+		// Populate province dropdown
+		$.each(provinces, function (province, cities) {
+			$provinceSelect.append($("<option>", { value: province, text: province }));
+		});
+	
+		// Handle province change
+		$provinceSelect.on("change", function () {
+			let selectedProvince = $(this).val();
+			$citySelect.empty().append('<option value="">Select City</option>');
+	
+			if (selectedProvince in provinces) {
+				$.each(provinces[selectedProvince], function (index, city) {
+					$citySelect.append($("<option>", { value: city, text: city }));
+				});
+			}
+		});
+	});
+	
 })(jQuery);
+

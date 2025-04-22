@@ -1,53 +1,23 @@
-# Ignore system files
-.DS_Store
-Thumbs.db
-desktop.ini
-
-# Ignore environment files
+/.phpunit.cache
+/node_modules
+/public/build
+/public/hot
+/public/storage
+/storage/*.key
+/storage/pail
+/vendor
 .env
-.env.*.local
 .env.backup
-
-# Ignore vendor dependencies (Composer)
-vendor/
-node_modules/
-
-# Ignore Laravel cache and logs
-bootstrap/cache/
-storage/*.key
-storage/framework/*
-storage/logs/*
-
-# Ignore IDE and editor files
-.vscode/
-.idea/
-*.sublime-project
-*.sublime-workspace
-
-# Ignore PHPUnit result cache
+.env.production
+.phpactor.json
 .phpunit.result.cache
-
-# Ignore compiled assets
-public/hot
-public/storage
-public/mix-manifest.json
-public/css/
-public/js/
-public/build/
-
-# Ignore deployment files
-Homestead.yaml
 Homestead.json
-.vagrant/
-
-# Ignore npm debug log
+Homestead.yaml
 npm-debug.log
 yarn-error.log
-pnpm-lock.yaml
-
-# Ignore Laravel Telescope logs
-storage/telescope/
-storage/debugbar/
-
-# Ignore docker files (if using Docker)
-docker-compose.override.yml
+/auth.json
+/.fleet
+/.idea
+/.nova
+/.vscode
+/.zed

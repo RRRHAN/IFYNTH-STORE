@@ -4,9 +4,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>IFYNTH Store</title>
     <!-- Favicon img -->
-    <link rel="shortcut icon" href="/assets/images/favicon.png">
+    <link rel="shortcut icon" href="/assets/images/logo/logo.png">
     <!-- Bootstarp min css -->
     <link rel="stylesheet" href="/assets/css/bootstrap.min.css">
     <!-- All min css -->

@@ -12,7 +12,7 @@
                     <div class="row g-4">
                         <div class="col-xxl-8">
                             <div class="login__image">
-                                <img src="/assets/images/login/login-image1.jpg" alt="image">
+                                <img src="/assets/images/login/login-banner.jpg" alt="image">
                                 <div class="btn-wrp">
                                     <a class="active" href="/login">sign in</a>
                                     <a href="/register">create account</a>
@@ -25,7 +25,7 @@
                                 <div class="form-area login__form">
                                     <form action="{{ route('login.process') }}" method="POST">
                                         @csrf
-                                        <input for="" type="text" name="email_or_phone" placeholder="Email / Phone Number">
+                                        <input for="" type="text" name="username" placeholder="Username">
                                         <input class="mt-30" type="password" name="password" placeholder="Enter Password">
                                         <div class="radio-btn mt-30">
                                             <span></span>
