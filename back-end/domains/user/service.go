@@ -17,7 +17,7 @@ type Service interface {
 	Login(ctx context.Context, input LoginReq) (res *LoginRes, err error)
 	Logout(ctx context.Context, input LogoutReq) (res *LogoutRes, err error)
 	ValidateToken(ctx context.Context, token string) (err error)
-	Register(ctx context.Context, input RegisterReq) (err error)
+	Register(ctx context.Context, input RegisterReq) (res *Customer, err error)
 }
 
 type service struct {
@@ -34,21 +34,28 @@ func NewService(config *config.Config, db *gorm.DB) Service {
 
 func (s *service) Login(ctx context.Context, input LoginReq) (*LoginRes, error) {
 
+	var err error
 	switch input.Role {
 	case ADMIN:
 		var admin Admin
-		if err := s.db.WithContext(ctx).Where("username = ?", input.Username).First(&admin).Error; err == nil {
+		if err = s.db.WithContext(ctx).Where("username = ?", input.Username).First(&admin).Error; err == nil {
 			if !comparePassword(admin.Password, input.Password) {
 				return nil, apierror.NewWarn(http.StatusUnauthorized, ErrInvalidCredentials)
 			}
 		}
 	case CUSTOMER:
 		var customer Customer
-		if err := s.db.WithContext(ctx).Where("username = ?", input.Username).First(&customer).Error; err == nil {
+		if err = s.db.WithContext(ctx).Where("username = ?", input.Username).First(&customer).Error; err == nil {
 			if !comparePassword(customer.Password, input.Password) {
 				return nil, apierror.NewWarn(http.StatusUnauthorized, ErrInvalidCredentials)
 			}
 		}
+	}
+	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return nil, apierror.NewWarn(http.StatusUnauthorized, ErrInvalidCredentials)
+		}
+		return nil, err
 	}
 
 	expirationTime := time.Now().Add(s.authConfig.JWT.ExpireIn)
@@ -100,12 +107,12 @@ func (s *service) ValidateToken(ctx context.Context, token string) (err error) {
 	return nil
 }
 
-func (s *service) Register(ctx context.Context, input RegisterReq) (err error) {
+func (s *service) Register(ctx context.Context, input RegisterReq) (res *Customer, err error) {
 
 	// Hash password
 	hashedPassword, err := hashPassword(input.Password)
 	if err != nil {
-		return apierror.FromErr(err)
+		return nil, apierror.FromErr(err)
 	}
 
 	// Build customer object
@@ -120,8 +127,8 @@ func (s *service) Register(ctx context.Context, input RegisterReq) (err error) {
 
 	// Insert into DB
 	if err := s.db.WithContext(ctx).Create(&customer).Error; err != nil {
-		return apierror.FromErr(err)
+		return nil, apierror.FromErr(err)
 	}
 
-	return nil
+	return &customer, nil
 }

@@ -92,13 +92,11 @@ func (h *handler) Register(ctx *gin.Context) {
 		return
 	}
 
-	err = h.service.Register(ctx, input)
+	res, err := h.service.Register(ctx, input)
 	if err != nil {
 		respond.Error(ctx, apierror.FromErr(err))
 		return
 	}
 
-	respond.Success(ctx, http.StatusCreated, gin.H{
-		"message": "User registered successfully",
-	})
+	respond.Success(ctx, http.StatusCreated, res)
 }
