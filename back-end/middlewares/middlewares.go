@@ -151,27 +151,27 @@ func (m *middlewares) RateLimiter(ctx *gin.Context) {
 	ctx.Next()
 }
 
-// RoleMiddleware untuk memastikan hanya ADMIN yang bisa mengakses endpoint
+// RoleMiddleware to ensure only ADMIN can access the endpoint
 func (m *middlewares) RoleMiddleware(requiredRole string) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		// Ambil user role dari context (yang sebelumnya diset di JWT middleware)
+		// Retrieve user role from context (set by JWT middleware earlier)
 		userRole, exists := ctx.Get("role")
 
-		// Jika role tidak ditemukan di context, beri respons error Unauthorized
+		// If role not found in context, return Unauthorized error
 		if !exists || userRole == "" {
 			respond.Error(ctx, apierror.NewWarn(401, "Unauthorized: Role not found in context"))
-			ctx.Abort() // Hentikan proses request
+			ctx.Abort() // Stop processing the request
 			return
 		}
 
-		// Cek apakah role pengguna sesuai dengan yang diinginkan
+		// Check if the user's role matches the required role
 		if userRole != requiredRole {
 			respond.Error(ctx, apierror.NewWarn(403, "Forbidden: You don't have permission"))
-			ctx.Abort() // Hentikan proses request
+			ctx.Abort() // Stop processing the request
 			return
 		}
 
-		// Lanjutkan ke handler berikutnya jika role sesuai
+		// Proceed to the next handler if the role matches
 		ctx.Next()
 	}
 }

@@ -50,37 +50,6 @@
                     </div>
                 </div>
         </section>
-        <!-- Register area end here -->
+        <script type="module" src="/js/user.js"></script>
     </main>
-
-    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-    <script>
-        const registerUrl = "{{ route('user.register') }}";
-    
-        document.getElementById('register-form').addEventListener('submit', function(e) {
-            e.preventDefault();
-    
-            const formData = new FormData(this);
-    
-            // Kirim data ke Laravel route
-            axios.post(registerUrl, {
-                    name: formData.get('name'),
-                    username: formData.get('username'),
-                    phoneNumber: formData.get('phoneNumber'),
-                    password: formData.get('password'),
-                    password_confirmation: formData.get('password_confirmation')
-                }, {
-                    headers: {
-                        'Content-Type': 'application/json'
-                    }
-                })
-                .then(() => {
-                    window.location.reload(); // reload agar pesan dari session tampil (opsional)
-                })
-                .catch(error => {
-                    console.error('Registration error:', error);
-                });
-        });
-    </script>
-    
 @stop

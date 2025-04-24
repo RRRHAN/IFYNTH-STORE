@@ -1,6 +1,6 @@
 CREATE EXTENSION IF NOT EXISTS "pgcrypto";
 
-CREATE TABLE customers (
+CREATE TABLE customer (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     name VARCHAR NOT NULL,
     phone_number VARCHAR NOT NULL,
@@ -10,7 +10,7 @@ CREATE TABLE customers (
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
-CREATE TABLE admins (
+CREATE TABLE admin (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     name VARCHAR NOT NULL,
     username VARCHAR NOT NULL UNIQUE,
@@ -19,23 +19,48 @@ CREATE TABLE admins (
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
+
+INSERT INTO admin (id, name, username, password, phone_number)
+VALUES (
+    gen_random_uuid(),
+    'Super Admin',
+    'admin',
+    crypt('admin123', gen_salt('bf')),
+    '08123456789'
+);
+
 
 CREATE TABLE invalid_token (
     token text PRIMARY KEY,
     expires TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
--- Create product table with department field
 CREATE TABLE IF NOT EXISTS product (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   name VARCHAR NOT NULL,
-  stock DECIMAL,
+  total_stock DECIMAL,
   description TEXT,
   price DECIMAL(10, 2) NOT NULL,
-  department VARCHAR CHECK (department IN ('IFY', 'NTH')) NOT NULL,
+  department VARCHAR NOT NULL,
+  category VARCHAR NOT NULL, -- kategori produk
   updated_at TIMESTAMPTZ DEFAULT NOW(),
   created_at TIMESTAMP DEFAULT NOW()
 );
+
+
+CREATE TABLE IF NOT EXISTS product_stock_detail (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    product_id UUID NOT NULL,
+    size VARCHAR(10) NOT NULL,
+    stock DECIMAL NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_product
+        FOREIGN KEY (product_id)
+        REFERENCES product (id)
+        ON DELETE CASCADE
+);
+
 
 -- Create product_image table
 CREATE TABLE IF NOT EXISTS product_image (
@@ -45,7 +70,7 @@ CREATE TABLE IF NOT EXISTS product_image (
   created_at TIMESTAMP DEFAULT NOW()
 );
 
-CREATE TABLE carts (
+CREATE TABLE IF NOT EXISTS carts (
   id UUID PRIMARY KEY,
   user_id UUID NOT NULL,
   total_price DECIMAL(10, 2) DEFAULT 0,
@@ -53,7 +78,7 @@ CREATE TABLE carts (
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE TABLE cart_items (
+CREATE TABLE IF NOT EXISTS cart_items (
   id UUID PRIMARY KEY,
   cart_id UUID REFERENCES carts(id),
   product_id UUID NOT NULL,

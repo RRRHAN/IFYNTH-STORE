@@ -9,26 +9,32 @@ import (
 type Product struct {
 	ID            uuid.UUID `gorm:"type:uuid;default:gen_random_uuid();primaryKey"`
 	Name          string
-	Stock         float64 `gorm:"type:decimal"`
+	TotalStock    int     `gorm:"type:decimal"`
 	Description   string  `gorm:"type:text"`
 	Price         float64 `gorm:"type:decimal;not null"`
 	Department    string  `gorm:"type:varchar(3);check(department in ('IFY', 'NTH'))"`
+	Category      string  `gorm:"type:varchar(50);not null"`
 	CreatedAt     time.Time
 	UpdatedAt     time.Time
-	ProductImages []ProductImage `gorm:"foreignKey:ProductID"`
-}
-
-type AddProductRequest struct {
-	Name        string   `json:"name" binding:"required"`
-	Stock       float64  `json:"stock" binding:"required"`
-	Description string   `json:"description" binding:"required"`
-	Price       float64  `json:"price" binding:"required"`
-	Department  string   `json:"department" binding:"required,oneof=IFY NTH"`
-	Images      []string `json:"images"`
+	ProductImages []ProductImage       `gorm:"foreignKey:ProductID"`
+	StockDetails  []ProductStockDetail `gorm:"foreignKey:ProductID"`
 }
 
 func (Product) TableName() string {
 	return "product"
+}
+
+type ProductStockDetail struct {
+	ID        uuid.UUID `gorm:"type:uuid;default:gen_random_uuid();primaryKey"`
+	ProductID uuid.UUID `gorm:"type:uuid;not null"`
+	Size      string    `gorm:"type:varchar(10);not null"`
+	Stock     int       `gorm:"type:decimal;not null"`
+	CreatedAt time.Time
+	UpdatedAt time.Time
+}
+
+func (ProductStockDetail) TableName() string {
+	return "product_stock_detail"
 }
 
 type ProductImage struct {

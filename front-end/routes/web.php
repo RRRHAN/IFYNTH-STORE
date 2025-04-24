@@ -9,18 +9,13 @@ use App\Http\Controllers\UserController;
 
 Route::get('/', function () {
     return view('landing');
-});
+})->name('landing');
 
-Route::get('/login', function () {
-    return view('login');
-})->name('login');
+Route::get('/dashboard', function () {
+    return view('dashboard');
+})->name('dashboard');
 
-Route::get('/register', function () {
-    return view('register');
-})->name('register');
-
-Route::get('/login.process', function () {
-    return view('login');
-})->name('login.process');
-
-Route::post('/user/register', [UserController::class, 'register'])->name('user.register');
+// Route user
+Route::get('/register', [UserController::class, 'showRegisterForm'])->name('register');
+Route::get('/login', [UserController::class, 'showLoginForm'])->name('login');
+Route::post('/logout', [UserController::class, 'logout'])->name('logout');

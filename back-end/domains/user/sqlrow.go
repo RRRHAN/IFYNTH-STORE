@@ -16,11 +16,13 @@ func (InvalidToken) TableName() string {
 }
 
 type Admin struct {
-	ID          string
+	ID          uuid.UUID `gorm:"type:uuid;default:gen_random_uuid();primaryKey"`
 	Name        string
-	Username    string
+	Username    string `gorm:"unique"`
 	Password    string
 	PhoneNumber string
+	CreatedAt   time.Time
+	UpdatedAt   time.Time
 }
 
 func (Admin) TableName() string {

@@ -21,6 +21,7 @@
     <link rel="stylesheet" href="/assets/css/nice-select.css">
     <!-- Style css -->
     <link rel="stylesheet" href="/assets/css/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 </head>
 
 <body>
@@ -42,17 +43,6 @@
             </div>
         </div>
     </div>
-
-    <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            var message = @json(session('message'));
-            if (message) {
-                document.getElementById("modalMessage").innerText = message;
-                var notificationModal = new bootstrap.Modal(document.getElementById('notificationModal'));
-                notificationModal.show();
-            }
-        });
-    </script>
 
     <!-- Preloader area start -->
     <div class="loading">
@@ -100,6 +90,8 @@
     <script src="/assets/js/jquery.waypoints.js"></script>
     <!-- Script Js -->
     <script src="/assets/js/script.js"></script>
+    <!-- User Js -->
+    <script type="module" src="/js/user.js"></script>
 </body>
 
 </html>

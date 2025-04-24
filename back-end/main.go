@@ -31,7 +31,7 @@ func main() {
 
 	// Setup CORS
 	c := cors.New(cors.Options{
-		AllowedOrigins: []string{"http://127.0.0.1:8000"},         // Izinkan origin frontend
+		AllowedOrigins: []string{"*"},                             // Izinkan origin frontend
 		AllowedHeaders: []string{"Authorization", "Content-Type"}, // Izinkan header Authorization dan Content-Type
 		AllowedMethods: []string{"GET", "POST", "PUT", "DELETE"},  // Metode yang diizinkan
 	})

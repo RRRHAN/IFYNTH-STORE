@@ -42,6 +42,8 @@ func NewDependency(
 		router.Use(mw.Recover)
 	}
 
+	router.Static("/uploads", "./uploads")
+
 	// domain user
 	user := router.Group("/user")
 	{
