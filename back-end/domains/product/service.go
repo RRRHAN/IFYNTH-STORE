@@ -7,6 +7,7 @@ import (
 	"mime/multipart"
 	"os"
 	"path/filepath"
+	"strings"
 	"time"
 
 	"gorm.io/gorm"
@@ -18,6 +19,7 @@ import (
 type Service interface {
 	GetAllProducts(ctx context.Context, keyword string) ([]Product, error)
 	AddProduct(ctx context.Context, req AddProductRequest, images []*multipart.FileHeader) error
+	DeleteProduct(ctx context.Context, productID string) error
 }
 
 type service struct {
@@ -152,6 +154,46 @@ func (s *service) saveImage(ctx context.Context, file *multipart.FileHeader, pat
 	// Copy the uploaded file to the destination
 	if _, err := io.Copy(dst, src); err != nil {
 		return fmt.Errorf("failed to copy file to disk: %w", err)
+	}
+
+	return nil
+}
+
+func (s *service) DeleteProduct(ctx context.Context, productID string) error {
+	// Find the product by ID to ensure it exists
+	var product Product
+	if err := s.db.WithContext(ctx).First(&product, "id = ?", productID).Error; err != nil {
+		return fmt.Errorf("product not found: %v", err)
+	}
+
+	// Delete related stock details for the product
+	if err := s.db.WithContext(ctx).Where("product_id = ?", productID).Delete(&ProductStockDetail{}).Error; err != nil {
+		return fmt.Errorf("error deleting product stock details: %v", err)
+	}
+
+	// Fetch product images before deleting them
+	var productImages []ProductImage
+	if err := s.db.WithContext(ctx).Where("product_id = ?", productID).Find(&productImages).Error; err != nil {
+		return fmt.Errorf("error fetching product images: %v", err)
+	}
+
+	// Hapus gambar dari disk
+	for _, image := range productImages {
+		cleanFileName := strings.TrimPrefix(image.URL, "/")
+		imagePath := filepath.Join(cleanFileName) // Menggunakan nama file dari database
+		if err := os.Remove(imagePath); err != nil {
+			return fmt.Errorf("error deleting image file %s: %v", image.URL, err)
+		}
+	}
+
+	// Delete related images for the product
+	if err := s.db.WithContext(ctx).Where("product_id = ?", productID).Delete(&ProductImage{}).Error; err != nil {
+		return fmt.Errorf("error deleting product images: %v", err)
+	}
+
+	// Delete the product itself
+	if err := s.db.WithContext(ctx).Delete(&product).Error; err != nil {
+		return fmt.Errorf("error deleting product: %v", err)
 	}
 
 	return nil

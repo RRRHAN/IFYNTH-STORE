@@ -78,3 +78,28 @@ export const getAuthToken = async (): Promise<string | null> => {
     throw new Error("Failed to fetch auth token.");
   }
 };
+
+// Delete a product by ID
+export const deleteProduct = async (productId: string) => {
+  const token = await getAuthToken(); // Ambil token dari AsyncStorage
+  const deleteUrl = `${BASE_URL}/product/${productId}`;
+
+  try {
+    const response = await fetch(deleteUrl, {
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (!response.ok) {
+      const errorResponse = await response.json();
+      throw new Error(errorResponse.errors?.[0] || `Failed to delete product. Status: ${response.status}`);
+    }
+
+    const result = await response.json();
+    return result;
+  } catch (error: any) {
+    throw new Error(error.message || "Something went wrong while deleting the product.");
+  }
+};

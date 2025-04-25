@@ -2,7 +2,6 @@ import { StyleSheet } from 'react-native';
 
 const styles = StyleSheet.create({
     center: {
-      flex: 1,
       justifyContent: "center",
       alignItems: "center",
       textAlign: "center",
@@ -21,6 +20,11 @@ const styles = StyleSheet.create({
       width: 80,
       height: 80,
     },
+    header: {
+      textAlign: 'center',
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
     table: {
       width: "100%",
       borderWidth: 1,
@@ -30,9 +34,6 @@ const styles = StyleSheet.create({
       flexDirection: "row",
       borderBottomWidth: 1,
       borderWidth: 1,
-      borderColor: "#ddd",
-      paddingVertical: 10,
-      paddingHorizontal: 5,
     },
     cell: {
       fontSize: 12,

@@ -56,8 +56,9 @@ func NewDependency(
 	product := router.Group("/product")
 	{
 		product.GET("/", mw.JWT, productHandler.GetAllProducts)
-		// Gunakan RoleMiddleware untuk cek apakah user adalah ADMIN
 		product.POST("/", mw.JWT, mw.RoleMiddleware("ADMIN"), productHandler.AddProduct)
+		product.DELETE("/:id", mw.JWT, mw.RoleMiddleware("ADMIN"), productHandler.DeleteProduct)
+
 	}
 
 	cart := router.Group("/cart")

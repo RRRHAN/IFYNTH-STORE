@@ -58,7 +58,7 @@ CREATE TABLE IF NOT EXISTS product_stock_detail (
     CONSTRAINT fk_product
         FOREIGN KEY (product_id)
         REFERENCES product (id)
-        ON DELETE CASCADE
+        ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 

@@ -19,6 +19,7 @@ import (
 type Handler interface {
 	GetAllProducts(ctx *gin.Context)
 	AddProduct(ctx *gin.Context)
+	DeleteProduct(ctx *gin.Context)
 }
 
 type handler struct {
@@ -134,4 +135,17 @@ func isValidImage(file *multipart.FileHeader) bool {
 	}
 
 	return allowedExt[ext]
+}
+
+func (h *handler) DeleteProduct(ctx *gin.Context) {
+	productID := ctx.Param("id") // Assuming the product ID is passed as a URL parameter
+
+	if err := h.service.DeleteProduct(ctx.Request.Context(), productID); err != nil {
+		log.Printf("Error deleting product: %v\n", err)
+		respond.Error(ctx, apierror.FromErr(err))
+		return
+	}
+
+	log.Println("Product deleted successfully")
+	respond.Success(ctx, http.StatusOK, gin.H{"message": "Product deleted successfully"})
 }

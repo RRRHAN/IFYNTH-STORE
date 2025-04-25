@@ -9,6 +9,7 @@ import styles from "./styles/loginStyles";
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
 import { ThemedTextInput } from "@/components/ThemedTextInput";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function Login() {
   const router = useRouter();
@@ -24,8 +25,14 @@ export default function Login() {
   const handleLogin = async () => {
     const result = await loginAdmin(username, password);
 
+
     if (result.success) {
       setSuccessMessage(result.message);
+      if (rememberMe) {
+        await AsyncStorage.setItem("is_logged_in", "true");
+      } else {
+        await AsyncStorage.setItem("is_logged_in", "false");
+      }
       setVisible(true);
       setIsLoggedIn(true);
     } else {

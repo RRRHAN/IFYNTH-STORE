@@ -13,21 +13,21 @@ export type ThemedTextProps = TextProps & {
 };
 
 export function ThemedTable({ style, lightColor, darkColor, ...otherProps }: ThemedTableProps) {
-  const backgroundColor = useThemeColor({ light: lightColor, dark: darkColor }, "background");
+  const backgroundColor = useThemeColor({ light: lightColor, dark: darkColor }, 'background');
 
   return <View style={[{ backgroundColor }, styles.table, style]} {...otherProps} />;
 }
 
 export function ThemedRow({ style, lightColor, darkColor, ...otherProps }: ThemedTableProps) {
-  const backgroundColor = useThemeColor({ light: lightColor, dark: darkColor }, "rowBackground");
+  const backgroundColor = useThemeColor({ light: lightColor, dark: darkColor }, 'rowBackground');
 
   return <View style={[{ backgroundColor }, styles.row, style]} {...otherProps} />;
 }
 
 export function ThemedHeader({ style, lightColor, darkColor, ...otherProps }: ThemedTableProps) {
-  const backgroundColor = useThemeColor({ light: lightColor, dark: darkColor }, "headerBackground");
+  const backgroundColor = useThemeColor({ light: lightColor, dark: darkColor }, 'headerBackground');
 
-  return <View style={[{ backgroundColor }, styles.header, style]} {...otherProps} />;
+  return <View style={[{ backgroundColor }, style]} {...otherProps} />;
 }
 
 export function ThemedCell({ style, lightColor, darkColor, ...otherProps }: ThemedTextProps) {
@@ -48,8 +48,6 @@ const styles = StyleSheet.create({
     borderColor: "#ddd",
     justifyContent: "center",
     alignItems: "center",
-  },
-  header: {
   },
   cell: {
     fontSize: 12,

@@ -1,18 +1,10 @@
-import { TextInput, type TextProps, StyleSheet, KeyboardTypeOptions } from 'react-native';
+import { TextInput, type TextInputProps, StyleSheet } from 'react-native';
 import { useThemeColor } from '@/hooks/useThemeColor';
 
-export type ThemedTextProps = TextProps & {
+export type ThemedTextProps = TextInputProps & {
   lightColor?: string;
   darkColor?: string;
   type?: 'default' | 'title' | 'defaultSemiBold' | 'subtitle' | 'link';
-  tabIndex?: 0 | -1;
-  placeholder?: string;
-  placeholderTextColor?: string;
-  secureTextEntry?: boolean;
-  value?: string;
-  onChangeText?: (text: string) => void;
-  autoCapitalize?: 'none' | 'sentences' | 'words' | 'characters';
-  keyboardType?: KeyboardTypeOptions; // Use KeyboardTypeOptions here
 };
 
 export function ThemedTextInput({
@@ -20,13 +12,6 @@ export function ThemedTextInput({
   lightColor,
   darkColor,
   type = 'default',
-  placeholder,
-  placeholderTextColor,
-  secureTextEntry,
-  value,
-  onChangeText,
-  autoCapitalize,
-  keyboardType, // Add keyboardType here
   ...rest
 }: ThemedTextProps) {
   const color = useThemeColor({ light: lightColor, dark: darkColor }, 'text');
@@ -42,13 +27,6 @@ export function ThemedTextInput({
         type === 'link' ? styles.link : undefined,
         style,
       ]}
-      placeholder={placeholder}
-      placeholderTextColor={placeholderTextColor}
-      secureTextEntry={secureTextEntry}
-      value={value}
-      onChangeText={onChangeText}
-      autoCapitalize={autoCapitalize}
-      keyboardType={keyboardType} // Pass keyboardType to TextInput here
       {...rest}
     />
   );
