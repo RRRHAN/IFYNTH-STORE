@@ -54,7 +54,7 @@
                                                     href="#my-order" role="tab">
                                                     <i class="fas fa-box me-2"></i> my order
                                                 </a>
-                                                <form id="logout-btn" class="d-inline">
+                                                <form action="{{ route('logout') }}" method="POST" class="d-inline">
                                                     @csrf
                                                     <button type="submit" class="dash-link border-0 bg-transparent">
                                                         <i class="fas fa-right-from-bracket me-2"></i> Logout

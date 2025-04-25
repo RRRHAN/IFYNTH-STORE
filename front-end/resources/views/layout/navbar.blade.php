@@ -17,11 +17,13 @@
                         </a>
                     </div>
                     <a href="/dashboard" class="acc__cont">
-                        <span class="text-white" id="username-span"></span>
+                        <span class="text-white">
+                            {{ session('username', 'My Account') }}
+                        </span>
                     </a>
                 </div>
                 <div class="cart d-flex align-items-center">
-                    <span class="cart__icon" onclick="window.location.href='/cart'">
+                    <span class="cart__icon"    onclick="window.location.href='/cart'">
                         <i class="fa-regular fa-cart-shopping"></i>
                     </span>
                     <a href="" class="c__one">
@@ -52,13 +54,13 @@
             <!-- Main Menu (Tengah) -->
             <ul class="main-menu nav">
                 <li class="nav-item">
-                    <a class="nav-link" href="/">Home</a>
+                    <a class="nav-link" href="/landing">Home</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="/catalog/I Found You">I Found You</a>
+                    <a class="nav-link" href="{{route('products.byDepartment', ['department' => 'IFY'])}}">I Found You</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="/catalog/No Time To Hell">No Time To Hell</a>
+                    <a class="nav-link" href="{{route('products.byDepartment', ['department' => 'NTH'])}}">No Time To Hell</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="/sellproduct">Sell Your Clothes</a>
@@ -133,7 +135,23 @@
 </div>
 
 <script>
-    document.addEventListener("DOMContentLoaded", function() {
+    document.addEventListener("DOMContentLoaded", function () {
+        var userLoggedIn = @json(session('api_token') !== null );
+        var loginModal = new bootstrap.Modal(document.getElementById('loginModal'));
+
+        document.body.addEventListener("click", function (event) {
+            var target = event.target.closest(".account a") || event.target.closest(".cart a"); // Cek jika yang diklik adalah link di dalam .account
+
+            if (target && !userLoggedIn) {
+                event.preventDefault(); // Mencegah navigasi
+                loginModal.show(); // Tampilkan modal
+            }
+        });
+    });
+</script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
         // Ambil semua link di menu
         const menuLinks = document.querySelectorAll(".main-menu .nav-link");
 
@@ -147,4 +165,5 @@
             }
         });
     });
+
 </script>

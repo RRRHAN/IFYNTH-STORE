@@ -3204,6 +3204,7 @@ input {
 }
 .product__content {
   padding: 30px;
+  height: 150px;
 }
 .product__content del,
 .product__content span {
@@ -3215,6 +3216,7 @@ input {
   overflow: hidden;
   position: relative;
   transition: var(--transition);
+  height: 600px;
 }
 .product__item .wishlist {
   width: 35px;
@@ -3610,6 +3612,7 @@ input {
 }
 .shop-single .shop-slider-thumb img {
   cursor: pointer;
+
 }
 .shop-single .shop-slider-thumb .swiper-slide {
   border: 1px solid transparent;
@@ -5045,3 +5048,6 @@ input {
   color: var(--white);
 }
 
+.product-description {
+  white-space: pre-wrap !important;
+}

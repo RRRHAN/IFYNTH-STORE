@@ -56,6 +56,7 @@ func NewDependency(
 	product := router.Group("/product")
 	{
 		product.GET("/", mw.JWT, productHandler.GetAllProducts)
+		product.GET("/detail/:id", mw.JWT, productHandler.GetProductByID)
 		product.POST("/", mw.JWT, mw.RoleMiddleware("ADMIN"), productHandler.AddProduct)
 		product.DELETE("/:id", mw.JWT, mw.RoleMiddleware("ADMIN"), productHandler.DeleteProduct)
 

@@ -11,6 +11,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
+	"github.com/google/uuid"
 
 	apierror "github.com/RRRHAN/IFYNTH-STORE/back-end/utils/api-error"
 	"github.com/RRRHAN/IFYNTH-STORE/back-end/utils/respond"
@@ -20,6 +21,7 @@ type Handler interface {
 	GetAllProducts(ctx *gin.Context)
 	AddProduct(ctx *gin.Context)
 	DeleteProduct(ctx *gin.Context)
+	GetProductByID(ctx *gin.Context)
 }
 
 type handler struct {
@@ -36,13 +38,36 @@ func NewHandler(service Service, validate *validator.Validate) Handler {
 
 func (h *handler) GetAllProducts(ctx *gin.Context) {
 	keyword, _ := ctx.GetQuery("keyword")
-	res, err := h.service.GetAllProducts(ctx, keyword)
+	department, _ := ctx.GetQuery("department")
+
+	res, err := h.service.GetAllProducts(ctx, keyword, department)
 	if err != nil {
 		respond.Error(ctx, apierror.FromErr(err))
 		return
 	}
 
 	respond.Success(ctx, http.StatusOK, res)
+}
+
+func (h *handler) GetProductByID(ctx *gin.Context) {
+	// Ambil parameter id dari URL
+	id := ctx.Param("id")
+
+	// Validasi apakah ID adalah UUID yang valid
+	productID, err := uuid.Parse(id)
+	if err != nil {
+		respond.Error(ctx, apierror.FromErr(err))
+		return
+	}
+
+	// Panggil service untuk mengambil produk berdasarkan UUID
+	product, err := h.service.GetProductByID(ctx, productID)
+	if err != nil {
+		respond.Error(ctx, apierror.FromErr(err))
+		return
+	}
+
+	respond.Success(ctx, http.StatusOK, product)
 }
 
 func (h *handler) AddProduct(ctx *gin.Context) {

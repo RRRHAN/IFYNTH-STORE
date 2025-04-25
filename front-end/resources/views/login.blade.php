@@ -14,8 +14,8 @@
                             <div class="login__image">
                                 <img src="/assets/images/login/login-banner.jpg" alt="image">
                                 <div class="btn-wrp">
-                                    <a class="active" href="/login">sign in</a>
-                                    <a href="/register">create account</a>
+                                    <a class="active" href="#">sign in</a>
+                                    <a href="/registerForm">create account</a>
                                 </div>
                             </div>
                         </div>
@@ -23,7 +23,7 @@
                             <div class="login__content">
                                 <h2 class="text-white mb-65">Welcome</h2>
                                 <div class="form-area login__form">
-                                    <form id="login-form">
+                                    <form action="{{ route('login.proccess') }}" method="POST">
                                         @csrf
                                         <input for="" type="text" name="username" placeholder="Username">
                                         <input class="mt-30" type="password" name="password" placeholder="Enter Password">
@@ -40,7 +40,5 @@
                 </div>
             </div>
         </section>
-        <!-- Login area end here -->
-        <script type="module" src="/js/user.js"></script>
     </main>
 @stop

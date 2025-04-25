@@ -16,8 +16,8 @@
                             <div class="login__image">
                                 <img src="assets/images/register/model2.jpeg" alt="image">
                                 <div class="btn-wrp">
-                                    <a href="/login">sign in</a>
-                                    <a class="active" href="/register">create account</a>
+                                    <a href="/loginForm">sign in</a>
+                                    <a class="active" href="#">create account</a>
                                 </div>
                             </div>
                         </div>
@@ -26,30 +26,25 @@
                                 <h2 class="text-white mb-65">create account</h2>
                                 <div class="form-area login__form">
                                     <!-- Use standard form submission -->
-                                    <form id="register-form">
+                                    <form action="{{ route('register.proccess') }}" method="POST">
                                         @csrf
-                                        <input type="text" id="name" name="name" placeholder="Full Name"
-                                            required>
-                                        <input class="mt-30" type="text" id="username" name="username"
-                                            placeholder="Username" required>
-                                        <input class="mt-30" type="number" id="phoneNumber" name="phoneNumber"
-                                            placeholder="Phone Number" required>
-                                        <input class="mt-30" type="password" id="password" name="password"
-                                            placeholder="Enter Password" required>
-                                        <input class="mt-30" type="password" id="password_confirmation"
-                                            name="password_confirmation" placeholder="Enter Confirm Password" required>
+                                        <input type="text" id="name" name="name" placeholder="Full Name" required>
+                                        <input class="mt-30" type="text" id="username" name="username" placeholder="Username" required>
+                                        <input class="mt-30" type="number" id="phoneNumber" name="phoneNumber" placeholder="Phone Number" required>
+                                        <input class="mt-30" type="password" id="password" name="password" placeholder="Enter Password" required>
+                                        <input class="mt-30" type="password" id="password_confirmation" name="password_confirmation" placeholder="Enter Confirm Password" required>
                                         <div class="radio-btn mt-30">
                                             <span></span>
                                             <p>I accept your terms & conditions</p>
                                         </div>
                                         <button class="mt-30" type="submit">Create Account</button>
                                     </form>
+                                    
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
         </section>
-        <script type="module" src="/js/user.js"></script>
     </main>
 @stop

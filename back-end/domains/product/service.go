@@ -17,7 +17,8 @@ import (
 )
 
 type Service interface {
-	GetAllProducts(ctx context.Context, keyword string) ([]Product, error)
+	GetAllProducts(ctx context.Context, keyword string, department string) ([]Product, error)
+	GetProductByID(ctx context.Context, id uuid.UUID) (*Product, error)
 	AddProduct(ctx context.Context, req AddProductRequest, images []*multipart.FileHeader) error
 	DeleteProduct(ctx context.Context, productID string) error
 }
@@ -34,7 +35,7 @@ func NewService(config *config.Config, db *gorm.DB) Service {
 	}
 }
 
-func (s *service) GetAllProducts(ctx context.Context, keyword string) ([]Product, error) {
+func (s *service) GetAllProducts(ctx context.Context, keyword string, department string) ([]Product, error) {
 	var products []Product
 
 	query := s.db.WithContext(ctx).Model(&Product{}).Preload("ProductImages").Preload("StockDetails")
@@ -48,11 +49,30 @@ func (s *service) GetAllProducts(ctx context.Context, keyword string) ([]Product
 		)
 	}
 
+	if department != "" {
+		// Filter by department if provided
+		query = query.Where("department = ?", department)
+	}
+
 	if err := query.Order("created_at DESC").Find(&products).Error; err != nil {
 		return nil, err
 	}
 
 	return products, nil
+}
+
+func (s *service) GetProductByID(ctx context.Context, id uuid.UUID) (*Product, error) {
+	var product Product
+
+	// Ambil produk berdasarkan product_id
+	if err := s.db.WithContext(ctx).Model(&Product{}).
+		Preload("ProductImages").Preload("StockDetails").
+		Where("id = ?", id). // Menggunakan product_id sebagai kolom referensi
+		First(&product).Error; err != nil {
+		return nil, err
+	}
+
+	return &product, nil
 }
 
 func (s *service) AddProduct(ctx context.Context, req AddProductRequest, images []*multipart.FileHeader) error {
