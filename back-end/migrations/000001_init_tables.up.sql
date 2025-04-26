@@ -82,6 +82,7 @@ CREATE TABLE IF NOT EXISTS cart_items (
   id UUID PRIMARY KEY,
   cart_id UUID REFERENCES carts(id),
   product_id UUID NOT NULL,
+  size string NOT NULL,
   quantity INT NOT NULL,
   price DECIMAL(10, 2) NOT NULL,  -- Harga produk, bisa diambil dari tabel produk jika diperlukan
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,

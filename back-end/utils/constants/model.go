@@ -5,11 +5,13 @@ import (
 	"time"
 
 	"github.com/golang-jwt/jwt/v4"
+	"github.com/google/uuid"
 )
 
 type JWTClaims struct {
-	Username string `json:"username"`
-	Role     string `json:"role"`
+	UserID   uuid.UUID `json:"userID"`
+	Username string    `json:"username"`
+	Role     ROLE      `json:"role"`
 	jwt.RegisteredClaims
 }
 
@@ -46,3 +48,14 @@ type RequestPayload struct {
 	QueryParams url.Values          `json:"queryParams" bson:"queryParams"`
 	Headers     map[string][]string `json:"headers" bson:"headers"`
 }
+
+type ROLE string
+
+func (r ROLE) String() string {
+	return string(r)
+}
+
+const (
+	ADMIN    ROLE = "ADMIN"
+	CUSTOMER ROLE = "CUSTOMER"
+)

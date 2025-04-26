@@ -13,6 +13,7 @@ import (
 	"github.com/RRRHAN/IFYNTH-STORE/back-end/middlewares"
 	apierror "github.com/RRRHAN/IFYNTH-STORE/back-end/utils/api-error"
 	"github.com/RRRHAN/IFYNTH-STORE/back-end/utils/config"
+	"github.com/RRRHAN/IFYNTH-STORE/back-end/utils/constants"
 	"github.com/RRRHAN/IFYNTH-STORE/back-end/utils/respond"
 )
 
@@ -48,26 +49,26 @@ func NewDependency(
 	user := router.Group("/user")
 	{
 		user.POST("/login", mw.BasicAuth, userHandler.Login)
-		user.GET("/verify-token", mw.JWT, userHandler.VerifyToken)
-		user.POST("/logout", mw.JWT, userHandler.Logout)
+		user.GET("/verify-token", mw.JWT(constants.ADMIN, constants.CUSTOMER), userHandler.VerifyToken)
+		user.POST("/logout", mw.JWT(constants.ADMIN, constants.CUSTOMER), userHandler.Logout)
 		user.POST("/register", mw.BasicAuth, userHandler.Register)
 	}
 
 	product := router.Group("/product")
 	{
-		product.GET("/", mw.JWT, productHandler.GetAllProducts)
-		product.GET("/detail/:id", mw.JWT, productHandler.GetProductByID)
-		product.POST("/", mw.JWT, mw.RoleMiddleware("ADMIN"), productHandler.AddProduct)
-		product.DELETE("/:id", mw.JWT, mw.RoleMiddleware("ADMIN"), productHandler.DeleteProduct)
+		product.GET("/", mw.JWT(constants.ADMIN, constants.CUSTOMER), productHandler.GetAllProducts)
+		product.GET("/detail/:id", mw.JWT(constants.ADMIN, constants.CUSTOMER), productHandler.GetProductByID)
+		product.POST("/", mw.JWT(constants.ADMIN), productHandler.AddProduct)
+		product.DELETE("/:id", mw.JWT(constants.ADMIN), productHandler.DeleteProduct)
 
 	}
 
 	cart := router.Group("/cart")
 	{
-		cart.POST("/", mw.JWT, cartHandler.AddToCart)
-		cart.PUT("/update", cartHandler.UpdateCartQuantity)
-		cart.DELETE("/delete", cartHandler.DeleteFromCart)
-		cart.GET("/:user_id", cartHandler.GetCartByUserID)
+		cart.POST("/", mw.JWT(constants.CUSTOMER), cartHandler.AddToCart)
+		cart.PUT("/update", mw.JWT(constants.CUSTOMER), cartHandler.UpdateCartQuantity)
+		cart.DELETE("/delete", mw.JWT(constants.CUSTOMER), cartHandler.DeleteFromCart)
+		cart.GET("/:user_id", mw.JWT(constants.CUSTOMER), cartHandler.GetCartByUserID)
 
 	}
 

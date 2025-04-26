@@ -78,7 +78,7 @@ func (s *service) AddToCart(ctx context.Context, req AddToCartRequest) error {
 	// Cek apakah item sudah ada di cart
 	var existingItem CartItem
 	err = s.db.WithContext(ctx).
-		Where("cart_id = ? AND product_id = ?", cart.ID, productUUID).
+		Where("cart_id = ? AND product_id = ? AND size = ?", cart.ID, productUUID, req.Size).
 		First(&existingItem).Error
 
 	if err == nil {
@@ -96,8 +96,9 @@ func (s *service) AddToCart(ctx context.Context, req AddToCartRequest) error {
 			ID:        uuid.New(),
 			CartID:    cart.ID,
 			ProductID: productUUID,
+			Size:      req.Size, // penting!
 			Quantity:  req.Quantity,
-			Price:     product.Price, // Set harga saat pertama kali
+			Price:     product.Price,
 			CreatedAt: time.Now(),
 			UpdatedAt: time.Now(),
 		}

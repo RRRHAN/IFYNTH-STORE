@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/golang-jwt/jwt/v4"
+	"github.com/google/uuid"
 	"gorm.io/gorm"
 
 	apierror "github.com/RRRHAN/IFYNTH-STORE/back-end/utils/api-error"
@@ -35,20 +36,23 @@ func NewService(config *config.Config, db *gorm.DB) Service {
 func (s *service) Login(ctx context.Context, input LoginReq) (*LoginRes, error) {
 
 	var err error
+	var userID uuid.UUID
 	switch input.Role {
-	case ADMIN:
+	case constants.ADMIN:
 		var admin Admin
 		if err = s.db.WithContext(ctx).Where("username = ?", input.Username).First(&admin).Error; err == nil {
 			if !comparePassword(admin.Password, input.Password) {
 				return nil, apierror.NewWarn(http.StatusUnauthorized, ErrInvalidCredentials)
 			}
+			userID = admin.ID
 		}
-	case CUSTOMER:
+	case constants.CUSTOMER:
 		var customer Customer
 		if err = s.db.WithContext(ctx).Where("username = ?", input.Username).First(&customer).Error; err == nil {
 			if !comparePassword(customer.Password, input.Password) {
 				return nil, apierror.NewWarn(http.StatusUnauthorized, ErrInvalidCredentials)
 			}
+			userID = customer.ID
 		}
 	}
 	if err != nil {
@@ -60,8 +64,9 @@ func (s *service) Login(ctx context.Context, input LoginReq) (*LoginRes, error) 
 
 	expirationTime := time.Now().Add(s.authConfig.JWT.ExpireIn)
 	claims := &constants.JWTClaims{
+		UserID:   userID,
 		Username: input.Username,
-		Role:     input.Role.String(),
+		Role:     input.Role,
 		RegisteredClaims: jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(expirationTime),
 		},

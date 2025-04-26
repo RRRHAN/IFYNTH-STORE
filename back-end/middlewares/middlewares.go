@@ -5,6 +5,7 @@ import (
 	"crypto/subtle"
 	"fmt"
 	"net/http"
+	"slices"
 	"strings"
 	"time"
 
@@ -26,10 +27,9 @@ type Middlewares interface {
 	AddRequestId(ctx *gin.Context)
 	Logging(ctx *gin.Context)
 	BasicAuth(ctx *gin.Context)
-	JWT(ctx *gin.Context)
+	JWT(roles ...constants.ROLE) func(ctx *gin.Context)
 	Recover(ctx *gin.Context)
 	RateLimiter(ctx *gin.Context)
-	RoleMiddleware(role string) gin.HandlerFunc
 }
 
 type middlewares struct {
@@ -99,39 +99,44 @@ func (m *middlewares) BasicAuth(ctx *gin.Context) {
 	respond.Error(ctx, apierror.Unauthorized())
 }
 
-func (m *middlewares) JWT(ctx *gin.Context) {
-	authorization := ctx.Request.Header.Get(constants.AUTHORIZATION)
-	authorizationSplit := strings.Split(authorization, " ")
-	if len(authorizationSplit) < 2 {
-		respond.Error(ctx, apierror.Unauthorized())
-		return
+func (m *middlewares) JWT(roles ...constants.ROLE) func(ctx *gin.Context) {
+	return func(ctx *gin.Context) {
+		authorization := ctx.Request.Header.Get(constants.AUTHORIZATION)
+		authorizationSplit := strings.Split(authorization, " ")
+		if len(authorizationSplit) < 2 {
+			respond.Error(ctx, apierror.Unauthorized())
+			return
+		}
+		claims := constants.JWTClaims{}
+		tokenStr := authorizationSplit[1]
+		token, err := jwt.ParseWithClaims(tokenStr, &claims, func(token *jwt.Token) (interface{}, error) {
+			return []byte(m.conf.Auth.JWT.SecretKey), nil
+		})
+		if err != nil || !token.Valid {
+			respond.Error(ctx, apierror.Unauthorized())
+			return
+		}
+
+		err = m.userService.ValidateToken(ctx, tokenStr)
+		if err != nil {
+			respond.Error(ctx, apierror.Unauthorized())
+			return
+		}
+
+		if !slices.Contains(roles, claims.Role) {
+			respond.Error(ctx, apierror.Unauthorized())
+			return
+		}
+
+		// Set token claims di context
+		ctx = contextUtil.GinWithCtx(ctx, contextUtil.SetTokenClaims(ctx, constants.Token{
+			Token:  tokenStr,
+			Claims: claims,
+		}))
+
+		ctx.Next()
 	}
-	claims := constants.JWTClaims{}
-	tokenStr := authorizationSplit[1]
-	token, err := jwt.ParseWithClaims(tokenStr, &claims, func(token *jwt.Token) (interface{}, error) {
-		return []byte(m.conf.Auth.JWT.SecretKey), nil
-	})
-	if err != nil || !token.Valid {
-		respond.Error(ctx, apierror.Unauthorized())
-		return
-	}
 
-	err = m.userService.ValidateToken(ctx, tokenStr)
-	if err != nil {
-		respond.Error(ctx, apierror.Unauthorized())
-		return
-	}
-
-	// Set role di context setelah validasi token
-	ctx.Set("role", claims.Role)
-
-	// Set token claims di context
-	ctx = contextUtil.GinWithCtx(ctx, contextUtil.SetTokenClaims(ctx, constants.Token{
-		Token:  tokenStr,
-		Claims: claims,
-	}))
-
-	ctx.Next()
 }
 
 func (m *middlewares) Recover(ctx *gin.Context) {
@@ -149,29 +154,4 @@ func (m *middlewares) RateLimiter(ctx *gin.Context) {
 		return
 	}
 	ctx.Next()
-}
-
-// RoleMiddleware to ensure only ADMIN can access the endpoint
-func (m *middlewares) RoleMiddleware(requiredRole string) gin.HandlerFunc {
-	return func(ctx *gin.Context) {
-		// Retrieve user role from context (set by JWT middleware earlier)
-		userRole, exists := ctx.Get("role")
-
-		// If role not found in context, return Unauthorized error
-		if !exists || userRole == "" {
-			respond.Error(ctx, apierror.NewWarn(401, "Unauthorized: Role not found in context"))
-			ctx.Abort() // Stop processing the request
-			return
-		}
-
-		// Check if the user's role matches the required role
-		if userRole != requiredRole {
-			respond.Error(ctx, apierror.NewWarn(403, "Forbidden: You don't have permission"))
-			ctx.Abort() // Stop processing the request
-			return
-		}
-
-		// Proceed to the next handler if the role matches
-		ctx.Next()
-	}
 }

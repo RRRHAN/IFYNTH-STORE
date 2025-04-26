@@ -11,24 +11,6 @@ import (
 	"github.com/RRRHAN/IFYNTH-STORE/back-end/utils/respond"
 )
 
-// AddToCartRequest struktur permintaan untuk menambahkan item ke keranjang
-type AddToCartRequest struct {
-	UserID    string `json:"user_id" validate:"required,uuid4"`
-	ProductID string `json:"product_id" validate:"required,uuid4"`
-	Quantity  int    `json:"quantity" validate:"required,min=1"`
-}
-
-type UpdateCartQuantityRequest struct {
-	UserID    string `json:"user_id" validate:"required,uuid4"`
-	ProductID string `json:"product_id" validate:"required,uuid4"`
-	Quantity  int    `json:"quantity" validate:"required,min=1"`
-}
-
-type DeleteFromCartRequest struct {
-	UserID    string `json:"user_id" validate:"required,uuid4"`
-	ProductID string `json:"product_id" validate:"required,uuid4"`
-}
-
 type Handler interface {
 	AddToCart(ctx *gin.Context)
 	UpdateCartQuantity(ctx *gin.Context)

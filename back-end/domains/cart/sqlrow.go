@@ -19,6 +19,7 @@ type CartItem struct {
 	ID        uuid.UUID `gorm:"type:uuid;default:gen_random_uuid();primaryKey"`
 	CartID    uuid.UUID `gorm:"type:uuid;not null"`
 	ProductID uuid.UUID `gorm:"type:uuid;not null"`
+	Size      string    `gorm:"not null"`
 	Quantity  int       `gorm:"not null"`
 	Price     float64   `gorm:"not null"`
 	CreatedAt time.Time `gorm:"autoCreateTime"`

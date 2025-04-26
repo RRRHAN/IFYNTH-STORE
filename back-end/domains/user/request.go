@@ -1,11 +1,15 @@
 package user
 
-import "time"
+import (
+	"time"
+
+	"github.com/RRRHAN/IFYNTH-STORE/back-end/utils/constants"
+)
 
 type LoginReq struct {
-	Username string `json:"username" validate:"required"`
-	Password string `json:"password" validate:"required"`
-	Role     ROLE   `json:"role" validate:"required,oneof=ADMIN CUSTOMER"`
+	Username string         `json:"username" validate:"required"`
+	Password string         `json:"password" validate:"required"`
+	Role     constants.ROLE `json:"role" validate:"required,oneof=ADMIN CUSTOMER"`
 }
 
 type LogoutReq struct {
