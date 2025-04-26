@@ -29,6 +29,8 @@ services:
       - "${GO_BACKEND_PORT:-7777}:7777"
     depends_on:
       - db
+    env_file:
+      - .env
 
   db:
     image: postgres:15
