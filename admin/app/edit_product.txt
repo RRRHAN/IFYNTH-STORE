@@ -1,0 +1,219 @@
+import React, { useState, useEffect } from "react";
+import { View, TouchableOpacity, Alert, ScrollView, Image } from "react-native";
+import { Picker } from "@react-native-picker/picker";
+import ModalComponent from "../components/ModalComponent";
+import { useColorScheme } from "@/hooks/useColorScheme";
+import { pickImage } from "@/hooks/helpers/pickImage";
+import { handleStockChange } from "@/hooks/helpers/handleStockChange";
+import styles from "./styles/addProductStyles";
+import { updateProduct } from "./api/products"; // Ganti dengan API update
+import { ThemedText } from "@/components/ThemedText";
+import { ThemedTextInput } from "@/components/ThemedTextInput";
+import { IconButton } from "react-native-paper";
+import { useRouter, useLocalSearchParams } from "expo-router";
+
+export default function EditProductScreen() {
+  const router = useRouter();
+  const { item } = useLocalSearchParams(); // Data produk yang ingin diedit
+  const theme = useColorScheme();
+  const isDark = theme === "dark";
+
+  const [name, setName] = useState<string>(item?.name || "");
+  const [description, setDescription] = useState<string>(item?.description || "");
+  const [price, setPrice] = useState<string>(item?.price?.toString() || "");
+  const [department, setDepartment] = useState<string>(item?.department || "IFY");
+  const [category, setCategory] = useState<string>(item?.category || "T-Shirt");
+  const [sizes, setSizes] = useState<{ size: string; stock: number }[]>(item?.sizes || []);
+  const [images, setImages] = useState<any[]>(item?.images || []);
+  const [visible, setVisible] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
+
+  useEffect(() => {
+    if (!item?.sizes) {
+      // Jika belum ada sizes, set default berdasarkan kategori
+      if (category === "T-Shirt" || category === "Hoodie" || category === "Jacket") {
+        setSizes([
+          { size: "S", stock: 0 },
+          { size: "M", stock: 0 },
+          { size: "L", stock: 0 },
+          { size: "XL", stock: 0 },
+        ]);
+      } else if (category === "Pants") {
+        setSizes([
+          { size: "27", stock: 0 },
+          { size: "28", stock: 0 },
+          { size: "29", stock: 0 },
+          { size: "30", stock: 0 },
+          { size: "31", stock: 0 },
+          { size: "32", stock: 0 },
+          { size: "33", stock: 0 },
+          { size: "34", stock: 0 },
+        ]);
+      } else {
+        setSizes([]);
+      }
+    }
+  }, [category]);
+
+  const handleUpdateProduct = async () => {
+    if (!name || !price || !description) {
+      Alert.alert("Validation Error", "All fields are required.");
+      return;
+    }
+
+    const stockDetails = sizes.filter((size) => size.stock > 0);
+
+    if (stockDetails.length === 0) {
+      Alert.alert("Validation Error", "At least one size should have stock greater than 0.");
+      return;
+    }
+
+    const productData = {
+      id: item.id,
+      name,
+      description,
+      price,
+      department,
+      category,
+      sizes: stockDetails,
+      images,
+    };
+
+    try {
+      const result = await updateProduct(productData);
+      if (result.errors === null) {
+        setSuccessMessage("Product updated successfully.");
+        setVisible(true);
+      } else {
+        setErrorMessage(result.errors[0]);
+        setVisible(true);
+      }
+    } catch (error) {
+      console.error("Error updating product:", error);
+      setErrorMessage("Something went wrong");
+      setVisible(true);
+    }
+  };
+
+  const handleRemoveImage = (index: number) => {
+    const updatedImages = images.filter((_, i) => i !== index);
+    setImages(updatedImages);
+  };
+
+  return (
+    <ScrollView
+      style={[styles.container, { backgroundColor: isDark ? "#000" : "#fff" }]}
+      contentContainerStyle={{ paddingBottom: 30 }}
+    >
+      <ModalComponent
+        visible={visible}
+        hideModal={() => setVisible(false)}
+        message={errorMessage || successMessage}
+      />
+
+      <IconButton icon="arrow-left" size={30} onPress={() => router.replace("/products")} />
+      <ThemedText style={[styles.title]}>Edit Product</ThemedText>
+
+      <ThemedTextInput
+        style={[styles.input, { borderColor: isDark ? "#666" : "#ccc" }]}
+        placeholder="Product Name"
+        placeholderTextColor={isDark ? "#aaa" : "#888"}
+        value={name}
+        onChangeText={setName}
+      />
+
+      <ThemedTextInput
+        style={[styles.input, { borderColor: isDark ? "#666" : "#ccc", textAlignVertical: "top" }]}
+        placeholder="Product Description"
+        placeholderTextColor={isDark ? "#aaa" : "#888"}
+        value={description}
+        onChangeText={setDescription}
+        multiline
+        numberOfLines={4}
+      />
+
+      <ThemedTextInput
+        style={[styles.input, { borderColor: isDark ? "#666" : "#ccc" }]}
+        placeholder="Price"
+        placeholderTextColor={isDark ? "#aaa" : "#888"}
+        value={price}
+        onChangeText={(text) => setPrice(text.replace(/[^0-9]/g, ""))}
+        keyboardType="numeric"
+      />
+
+      <View style={styles.pickerContainer}>
+        <View style={styles.pickerWrapper}>
+          <ThemedText style={[styles.inputLabel]}>Department</ThemedText>
+          <Picker
+            selectedValue={department}
+            style={[styles.picker, { backgroundColor: isDark ? "#333" : "#fff", color: isDark ? "#fff" : "#333" }]}
+            onValueChange={(itemValue) => setDepartment(itemValue)}
+          >
+            <Picker.Item label="I Found You" value="IFY" />
+            <Picker.Item label="No Time to Hell" value="NTH" />
+          </Picker>
+        </View>
+
+        <View style={styles.pickerWrapper}>
+          <ThemedText style={[styles.inputLabel]}>Category</ThemedText>
+          <Picker
+            selectedValue={category}
+            style={[styles.picker, { backgroundColor: isDark ? "#333" : "#fff", color: isDark ? "#fff" : "#333" }]}
+            onValueChange={(itemValue) => setCategory(itemValue)}
+          >
+            <Picker.Item label="T-Shirt" value="T-Shirt" />
+            <Picker.Item label="Hoodie" value="Hoodie" />
+            <Picker.Item label="Jacket" value="Jacket" />
+            <Picker.Item label="Pants" value="Pants" />
+            <Picker.Item label="Accessories" value="Accessories" />
+          </Picker>
+        </View>
+      </View>
+
+      <View style={styles.sizeContainer}>
+        {sizes.map((size, index) => (
+          <View key={index} style={styles.sizeWrapper}>
+            <ThemedText style={[styles.sizeText]}>Size: {size.size}</ThemedText>
+            <ThemedTextInput
+              style={[styles.input, { borderColor: isDark ? "#666" : "#ccc" }]}
+              placeholder="Stock"
+              placeholderTextColor={isDark ? "#aaa" : "#888"}
+              value={size.stock.toString()}
+              onChangeText={(value) => handleStockChange(index, value, sizes, setSizes)}
+              keyboardType="numeric"
+            />
+          </View>
+        ))}
+      </View>
+
+      <TouchableOpacity
+        style={[styles.button, { backgroundColor: "#28a745" }]}
+        onPress={() => pickImage(setImages, setErrorMessage, setVisible)}
+      >
+        <ThemedText style={styles.buttonText}>Pick an Image</ThemedText>
+      </TouchableOpacity>
+
+      {images.length > 0 && (
+        <View>
+          <ThemedText>Selected Images:</ThemedText>
+          {images.map((img, index) => (
+            <View key={index} style={styles.imageContainer}>
+              <Image source={{ uri: img.uri }} style={styles.image} />
+              <TouchableOpacity style={styles.removeButton} onPress={() => handleRemoveImage(index)}>
+                <IconButton icon="trash-can" size={24} />
+              </TouchableOpacity>
+            </View>
+          ))}
+        </View>
+      )}
+
+      <TouchableOpacity
+        style={[styles.button, { backgroundColor: "#007bff" }]}
+        onPress={handleUpdateProduct}
+      >
+        <ThemedText style={styles.buttonText}>Update Product</ThemedText>
+      </TouchableOpacity>
+    </ScrollView>
+  );
+}

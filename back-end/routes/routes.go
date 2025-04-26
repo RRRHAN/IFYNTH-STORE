@@ -42,6 +42,8 @@ func NewDependency(
 		router.Use(mw.Recover)
 	}
 
+	router.Static("/uploads", "./uploads")
+
 	// domain user
 	user := router.Group("/user")
 	{
@@ -54,8 +56,10 @@ func NewDependency(
 	product := router.Group("/product")
 	{
 		product.GET("/", mw.JWT, productHandler.GetAllProducts)
-		// Gunakan RoleMiddleware untuk cek apakah user adalah ADMIN
+		product.GET("/detail/:id", mw.JWT, productHandler.GetProductByID)
 		product.POST("/", mw.JWT, mw.RoleMiddleware("ADMIN"), productHandler.AddProduct)
+		product.DELETE("/:id", mw.JWT, mw.RoleMiddleware("ADMIN"), productHandler.DeleteProduct)
+
 	}
 
 	cart := router.Group("/cart")

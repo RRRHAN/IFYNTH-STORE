@@ -1,7 +1,8 @@
-DROP TABLE IF EXISTS admins;
-DROP TABLE IF EXISTS customers;
+DROP TABLE IF EXISTS admin;
+DROP TABLE IF EXISTS customer;
 DROP TABLE IF EXISTS invalid_token;
 DROP TABLE IF EXISTS product_image;
 DROP TABLE IF EXISTS product;
+DROP TABLE IF EXISTS product_stock_detail;
 DROP TABLE IF EXISTS carts;
 DROP TABLE IF EXISTS carts_items;

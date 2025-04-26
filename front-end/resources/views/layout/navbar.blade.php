@@ -18,7 +18,7 @@
                     </div>
                     <a href="/dashboard" class="acc__cont">
                         <span class="text-white">
-                            {{ session('user_name', 'My Account') }}
+                            {{ session('username', 'My Account') }}
                         </span>
                     </a>
                 </div>
@@ -57,10 +57,10 @@
                     <a class="nav-link" href="/landing">Home</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="/catalog/I Found You">I Found You</a>
+                    <a class="nav-link" href="{{route('products.byDepartment', ['department' => 'IFY'])}}">I Found You</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="/catalog/No Time To Hell">No Time To Hell</a>
+                    <a class="nav-link" href="{{route('products.byDepartment', ['department' => 'NTH'])}}">No Time To Hell</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="/sellproduct">Sell Your Clothes</a>
@@ -136,7 +136,7 @@
 
 <script>
     document.addEventListener("DOMContentLoaded", function () {
-        var userLoggedIn = @json(session('user_logged_in', false));
+        var userLoggedIn = @json(session('api_token') !== null );
         var loginModal = new bootstrap.Modal(document.getElementById('loginModal'));
 
         document.body.addEventListener("click", function (event) {

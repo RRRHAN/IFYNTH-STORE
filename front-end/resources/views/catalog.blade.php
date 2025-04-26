@@ -4,11 +4,11 @@
     <!-- Page banner area start here -->
     <section class="page-banner bg-image pt-30" data-background="assets/images/banner/inner-banner.jpg">
         <div class="container">
-            <h2 class="wow fadeInUp mb-15" data-wow-duration="1.1s" data-wow-delay=".1s">{{ $department }} Catalog</h2>
+            <h2 class="wow fadeInUp mb-15" data-wow-duration="1.1s" data-wow-delay=".1s">{{ request('department') }} Catalog</h2>
             <div class="breadcrumb-list wow fadeInUp" data-wow-duration="1.3s" data-wow-delay=".3s">
                 <a href="/landing" class="primary-hover"><i class="fa-solid fa-house me-1"></i> Home <i
                         class="fa-regular text-white fa-angle-right"></i></a>
-                <span>{{ $department }}</span>
+                <span>{{ request('department') }}</span>
             </div>
         </div>
     </section>
@@ -18,7 +18,9 @@
     <section class="product-area pt-30 pb-130">
         <div class="container">
             <div class="pb-20 bor-bottom shop-page-wrp d-flex justify-content-between align-items-center mb-65">
-                <p class="fw-600">Showing 1–12 of 17 results</p>
+                <p class="fw-600">
+                    Showing {{ ($pagination['current_page'] - 1) * $pagination['perPage'] + 1 }}–{{ min($pagination['current_page'] * $pagination['perPage'], $pagination['total']) }} of {{ $pagination['total'] }} results
+                </p>                
                 <div class="short">
                     <select name="shortList" id="shortList">
                         <option value="0">Short by popularity</option>
@@ -31,35 +33,33 @@
                         @foreach ($products as $product)
                             <div class="col-xl-3 col-lg-3 col-md-6">
                                 <div class="product__item bor">
-                                    <a href="{{ route('product.detail', ['product_id' => $product['id']]) }}" class="wishlist"><i
+                                    <a href="{{ route('product.detail', ['id' => $product['ID'] ]) }}" class="wishlist"><i
                                             class="fa-regular fa-heart"></i></a>
 
-                                    <a href="{{ route('product.detail', ['product_id' => $product['id']]) }}" class="product__image pt-20 d-block">
-                                        @if (!empty($product['images']))
-                                            <img class="font-image"
-                                                src="{{ asset($product['images'][0] ?? 'default-image.jpg') }}"
-                                                alt="{{ $product['name'] }}">
-                                            <img class="back-image"
-                                                src="{{ asset($product['images'][1] ?? $product['images'][0] ?? 'default-image.jpg') }}"
-                                                alt="{{ $product['name'] }}">
-                                        @else
-                                            <img class="font-image" src="{{ asset('default-image.jpg') }}" alt="Default Image">
-                                            <img class="back-image" src="{{ asset('default-image.jpg') }}" alt="Default Image">
-                                        @endif
+                                    <a href="{{ route('product.detail', ['id' => $product['ID'] ]) }}" class="product__image pt-20 d-block">
+                                        @php
+                                        $images = $product['ProductImages'] ?? [];
+                                        $frontImage = isset($images[0]['URL']) ? 'http://localhost:7777' . $images[0]['URL'] : asset('default-image.jpg');
+                                        $backImage = isset($images[1]['URL']) ? 'http://localhost:7777' . $images[1]['URL'] : $frontImage;
+                                    @endphp
+                                    
+                                    <img class="font-image" src="{{ $frontImage }}" alt="{{ $product['Name'] }}">
+                                    <img class="back-image" src="{{ $backImage }}" alt="{{ $product['Name'] }}">
+                                    
                                     </a>
 
                                     <div class="product__content">
                                         <h4 class="mb-15">
                                             <a class="primary-hover"
-                                                href="{{ route('product.detail', ['product_id' => $product['id']]) }}">{{ Str::limit($product['name'], 20, '...') }}
+                                                href="{{ route('product.detail', ['id' => $product['ID'] ]) }}">{{ Str::limit($product['Name'], 20, '...') }}
                                                 </a>
                                         </h4>
-                                        <del>Rp {{ number_format($product['price'] + 20000, 0, ',', '.') }}</del>
+                                        <del>Rp {{ number_format($product['Price'] + 20000, 0, ',', '.') }}</del>
                                         <span class="primary-color ml-10">Rp
-                                            {{ number_format($product['price'], 0, ',', '.') }}</span>
+                                            {{ number_format($product['Price'], 0, ',', '.') }}</span>
                                     </div>
 
-                                    <a class="product__cart d-block bor-top" href="{{ route('product.detail', ['product_id' => $product['id']]) }}">
+                                    <a class="product__cart d-block bor-top" href="{{ route('product.detail', ['id' => $product['ID'] ]) }}">
                                         <i class="fa-regular fa-cart-shopping primary-color me-1"></i> <span>Add to
                                             cart</span>
                                     </a>
@@ -68,11 +68,28 @@
                         @endforeach
                     </div>
                     <div class="pagi-wrp mt-65">
-                        <a href="shop-2.html#0" class="pagi-btn">01</a>
-                        <a href="shop-2.html#0" class="pagi-btn active">02</a>
-                        <a href="shop-2.html#0" class="pagi-btn ">03</a>
-                        <a href="shop-2.html#0" class="fa-regular ms-2 primary-hover fa-angle-right"></a>
+                        <!-- Tampilkan jika total halaman lebih dari 1 -->
+                        @if($pagination['total_pages'] > 1)
+                            <!-- Tombol Previous -->
+                            @if($pagination['current_page'] > 1)
+                                <a href="{{ url('catalog') }}?department={{ request('department') }}&page={{ $pagination['current_page'] - 1 }}" class="fa-regular ms-2 primary-hover fa-angle-left"></a>
+                            @endif
+                    
+                            <!-- Paginasi berdasarkan jumlah halaman -->
+                            @foreach(range(1, $pagination['total_pages']) as $page)
+                                <a href="{{ url('catalog') }}?department={{ request('department') }}&page={{ $page }}" class="pagi-btn {{ $pagination['current_page'] == $page ? 'active' : '' }}">
+                                    {{ $page }}
+                                </a>
+                            @endforeach
+                    
+                            <!-- Tombol Next -->
+                            @if($pagination['current_page'] < $pagination['total_pages'])
+                                <a href="{{ url('catalog') }}?department={{ request('department') }}&page={{ $pagination['current_page'] + 1 }}" class="fa-regular ms-2 primary-hover fa-angle-right"></a>
+                            @endif
+                        @endif
                     </div>
+                    
+                    
                 </div>
             </div>
         </div>
