@@ -26,9 +26,9 @@ services:
     container_name: golang_backend
     working_dir: /app
     ports:
-      - "${GO_BACKEND_PORT:-8080}:8080"
-    env_file:
-      - .env
+      - "${GO_BACKEND_PORT:-7777}:7777"
+    volumes:
+      - ./.env:/app/.env
     depends_on:
       - db
 

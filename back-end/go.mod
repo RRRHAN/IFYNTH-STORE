@@ -17,6 +17,7 @@ require (
 )
 
 require (
+	github.com/rs/cors v1.11.1
 	golang.org/x/time v0.5.0
 	gorm.io/driver/postgres v1.5.11
 	gorm.io/gorm v1.25.12
@@ -30,12 +31,8 @@ require (
 	github.com/jackc/puddle/v2 v2.2.1 // indirect
 	github.com/jinzhu/inflection v1.0.0 // indirect
 	github.com/jinzhu/now v1.1.5 // indirect
-	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/rogpeppe/go-internal v1.8.1 // indirect
-	github.com/rs/cors v1.11.1 // indirect
-	golang.org/x/mod v0.8.0 // indirect
 	golang.org/x/sync v0.7.0 // indirect
-	golang.org/x/tools v0.6.0 // indirect
 )
 
 require (
