@@ -2,6 +2,11 @@ name: Deploy to VPS
 
 on:
   workflow_dispatch:
+    inputs:
+      no_cache:
+        description: 'Build without cache? (true/false)'
+        required: false
+        default: 'false'
 
 jobs:
   deploy:
@@ -15,6 +20,10 @@ jobs:
           username: ${{ secrets.VPS_USER }}
           key: ${{ secrets.VPS_SSH_KEY }}
           script: |
-            cd IFYNTH-STORE 
-            docker-compose build --no-cache 
+            cd IFYNTH-STORE
+            if [ "${{ github.event.inputs.no_cache }}" = "true" ]; then
+              docker-compose build --no-cache
+            else
+              docker-compose build
+            fi
             docker-compose up -d
