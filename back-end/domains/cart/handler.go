@@ -1,7 +1,6 @@
 package cart
 
 import (
-	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -91,7 +90,7 @@ func (h *handler) DeleteFromCart(ctx *gin.Context) {
 	}
 
 	// Panggil service untuk menghapus item dari cart
-	if err := h.service.DeleteFromCart(ctx, req.UserID, req.ProductID); err != nil {
+	if err := h.service.DeleteFromCart(ctx, req); err != nil {
 		respond.Error(ctx, apierror.FromErr(err))
 		return
 	}
@@ -103,23 +102,14 @@ func (h *handler) DeleteFromCart(ctx *gin.Context) {
 }
 
 func (h *handler) GetCartByUserID(ctx *gin.Context) {
-	userID := ctx.Param("user_id")
-
-	if userID == "" {
-		respond.Error(ctx, apierror.FromErr(fmt.Errorf("user_id is required")))
-		return
-	}
 
 	// Panggil service untuk mendapatkan data cart dan cart items
-	cart, cartItems, err := h.service.GetCartByUserID(ctx, userID)
+	cart, err := h.service.GetCartByUserID(ctx)
 	if err != nil {
 		respond.Error(ctx, apierror.FromErr(err))
 		return
 	}
 
 	// Kembalikan response dengan data cart dan cartItems
-	respond.Success(ctx, http.StatusOK, gin.H{
-		"cart":       cart,
-		"cart_items": cartItems,
-	})
+	respond.Success(ctx, http.StatusOK, cart)
 }
