@@ -27,8 +27,6 @@ services:
     working_dir: /app
     ports:
       - "${GO_BACKEND_PORT:-7777}:7777"
-    volumes:
-      - ./.env:/app/.env
     depends_on:
       - db
 
