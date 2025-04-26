@@ -15,6 +15,6 @@ jobs:
           username: ${{ secrets.VPS_USER }}
           key: ${{ secrets.VPS_SSH_KEY }}
           script: |
-            cd /path/to/your/project
-            docker-compose build --no-cache
+            cd IFYNTH-STORE 
+            docker-compose build
             docker-compose up -d
