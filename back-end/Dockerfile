@@ -7,11 +7,15 @@ RUN go mod download
 COPY . .
 RUN go build -o app .
 
-# Stage 2: Run
 FROM alpine:latest
 
 WORKDIR /app
+
 COPY --from=builder /app/app .
 
+COPY wait-for-it.sh /wait-for-it.sh
+RUN chmod +x /wait-for-it.sh
+
 EXPOSE 7777
+
 CMD ["./app"]
