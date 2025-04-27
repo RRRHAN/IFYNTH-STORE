@@ -4,9 +4,13 @@ on:
   workflow_dispatch:
     inputs:
       no_cache:
-        description: 'Build without cache? (true/false)'
+        description: 'Build without cache?'
         required: false
         default: 'false'
+        type: choice
+        options:
+          - 'true'
+          - 'false'
 
 jobs:
   deploy:
