@@ -17,7 +17,22 @@ type StockDetailInput struct {
 	Stock int
 }
 
-// DeleteProductRequest represents the structure for deleting a product by ID
+type RemovedImage struct {
+	ProductID string `json:"productID"`
+	URL       string `json:"url"`
+}
+
+type UpdateProductRequest struct {
+	Name          string                  `json:"name"`
+	Description   string                  `json:"description"`
+	Price         float64                 `json:"price"`
+	Department    string                  `json:"department"`
+	Category      string                  `json:"category"`
+	StockDetails  []StockDetailInput      `json:"stockDetails"`
+	RemovedImages []RemovedImage          `json:"removedImages"`
+	Images        []*multipart.FileHeader `json:"images"`
+}
+
 type DeleteProductRequest struct {
 	ProductID string `json:"product_id"`
 }

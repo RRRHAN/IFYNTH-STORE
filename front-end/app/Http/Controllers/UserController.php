@@ -88,7 +88,8 @@ class UserController extends Controller
                         'api_token' => $data['data']['token'],
                         'token_expiry' => $data['data']['expires'],
                         'user_logged_in' => true,
-                        'username' => $validated['username']
+                        'username' => $validated['username'],
+                        'total_cart' => $data['data']['total_cart'],
                     ]);
     
                     // Flash success message dan redirect
@@ -122,6 +123,7 @@ class UserController extends Controller
         Session::forget('token_expiry');
         Session::forget('username');
         Session::forget('user_logged_in');
+        Session::forget('total_cart');
     
         try {
             // Kirim request logout ke API eksternal

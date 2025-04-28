@@ -33,9 +33,6 @@
                         @foreach ($products as $product)
                             <div class="col-xl-3 col-lg-3 col-md-6">
                                 <div class="product__item bor">
-                                    <a href="{{ route('product.detail', ['id' => $product['ID'] ]) }}" class="wishlist"><i
-                                            class="fa-regular fa-heart"></i></a>
-
                                     <a href="{{ route('product.detail', ['id' => $product['ID'] ]) }}" class="product__image pt-20 d-block">
                                         @php
                                         $images = $product['ProductImages'] ?? [];
@@ -60,8 +57,7 @@
                                     </div>
 
                                     <a class="product__cart d-block bor-top" href="{{ route('product.detail', ['id' => $product['ID'] ]) }}">
-                                        <i class="fa-regular fa-cart-shopping primary-color me-1"></i> <span>Add to
-                                            cart</span>
+                                        <i class="primary-color me-1"></i> <span>Detail Product</span>
                                     </a>
                                 </div>
                             </div>

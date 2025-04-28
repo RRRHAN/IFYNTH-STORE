@@ -58,17 +58,17 @@ func NewDependency(
 	{
 		product.GET("/", mw.JWT(constants.ADMIN, constants.CUSTOMER), productHandler.GetAllProducts)
 		product.GET("/detail/:id", mw.JWT(constants.ADMIN, constants.CUSTOMER), productHandler.GetProductByID)
-		product.POST("/", mw.JWT(constants.ADMIN), productHandler.AddProduct)
+		product.POST("/addProduct", mw.JWT(constants.ADMIN), productHandler.AddProduct)
 		product.DELETE("/:id", mw.JWT(constants.ADMIN), productHandler.DeleteProduct)
-
+		product.PUT("/update/:id", mw.JWT(constants.ADMIN), productHandler.UpdateProduct)
 	}
 
 	cart := router.Group("/cart")
 	{
 		cart.POST("/", mw.JWT(constants.CUSTOMER), cartHandler.AddToCart)
-		cart.PUT("/update", mw.JWT(constants.CUSTOMER), cartHandler.UpdateCartQuantity)
+		cart.PUT("/", mw.JWT(constants.CUSTOMER), cartHandler.UpdateCartQuantity)
 		cart.DELETE("/delete", mw.JWT(constants.CUSTOMER), cartHandler.DeleteFromCart)
-		cart.GET("/:user_id", mw.JWT(constants.CUSTOMER), cartHandler.GetCartByUserID)
+		cart.GET("/", mw.JWT(constants.CUSTOMER), cartHandler.GetCartByUserID)
 
 	}
 

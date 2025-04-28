@@ -23,14 +23,14 @@
                     </a>
                 </div>
                 <div class="cart d-flex align-items-center">
-                    <span class="cart__icon"    onclick="window.location.href='/cart'">
+                    <span class="cart__icon"    onclick="window.location.href='{{ route('get.Cart') }}'">
                         <i class="fa-regular fa-cart-shopping"></i>
                     </span>
-                    <a href="" class="c__one">
+                    <a href="{{ route('get.Cart') }}" class="c__one">
                         <span class="text-white">Cart</span>
                     </a>
                     <span class="one">
-                        {{ Session::get('cart_count', 0) }}
+                        {{ Session::get('total_cart', 0) }}
                     </span>
                 </div>
             </div>

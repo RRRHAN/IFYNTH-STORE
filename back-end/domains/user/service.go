@@ -78,9 +78,21 @@ func (s *service) Login(ctx context.Context, input LoginReq) (*LoginRes, error) 
 		return nil, apierror.FromErr(err)
 	}
 
+	var totalQuantity int64
+	result := s.db.WithContext(ctx).
+		Table("carts").
+		Where("user_id = ?", userID).
+		Select("COALESCE(total_quantity, 0)").
+		Scan(&totalQuantity)
+
+	if result.Error != nil {
+		return nil, apierror.FromErr(result.Error)
+	}
+
 	return &LoginRes{
-		Token:   tokenString,
-		Expires: expirationTime,
+		Token:         tokenString,
+		Expires:       expirationTime,
+		TotalQuantity: totalQuantity,
 	}, nil
 }
 

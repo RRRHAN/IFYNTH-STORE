@@ -1,23 +1,31 @@
 import React, { useState, useEffect } from "react";
-import { View, Alert, ScrollView, Image } from "react-native";
+import { View, Alert, ScrollView } from "react-native";
 import ModalComponent from "../components/ModalComponent";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { pickImage } from "@/hooks/helpers/pickImage";
-import { handleStockChange } from "@/hooks/helpers/handleStockChange";
 import styles from "./styles/addProductStyles";
-import { addProduct } from "./api/products";
+import { updateProduct } from "./api/products";
 import { ThemedText } from "@/components/ThemedText";
 import { IconButton } from "react-native-paper";
-import { useRouter } from "expo-router";
+import { useRouter, useLocalSearchParams } from "expo-router";
+import { handleStockChange } from "@/hooks/helpers/handleStockChange";
 import SizeInputItem from "@/components/products/SizeInputItem";
+import { getDefaultSizesByCategory } from "@/hooks/helpers/getDefaultSizesByCategory";
 import ProductFormInputs from "@/components/products/ProductFormInput";
 import ProductPickers from "@/components/products/ProductPickers";
+import CurrentImagesList from "@/components/products/CurrentImagesList";
 import ActionButtons from "@/components/products/ActionButtons";
 import SelectedImagesList from "@/components/products/SelectedImagesList";
-import { useProductForm } from "@/hooks/helpers/useAddProductForm";
+import useProductForm from "@/hooks/helpers/useEditProductForm";
+import useImages from "@/hooks/helpers/useImages";
 
-export default function AddProductScreen() {
+export default function EditProductScreen() {
+  const [isEditing, setIsEditing] = useState(true);
   const router = useRouter();
+  const params = useLocalSearchParams();
+  const item = params.item ? JSON.parse(params.item as string) : null;
+  const theme = useColorScheme();
+  const isDark = theme === "dark";
   const {
     name,
     setName,
@@ -31,92 +39,93 @@ export default function AddProductScreen() {
     setCategory,
     sizes,
     setSizes,
+  } = useProductForm(item);
+  const {
     images,
     setImages,
-  } = useProductForm(); 
-  const theme = useColorScheme();
-  const isDark = theme === "dark";
+    checkedImages,
+    removedImages,
+    handleToggleImage,
+    handleRemoveImage,
+  } = useImages(item?.ProductImages || []);
   const [visible, setVisible] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
 
-  const handleRemoveImage = (index: number) => {
-    const updatedImages = images.filter((_, i) => i !== index);
-    setImages(updatedImages);
-  };
-
-  const handleAddProduct = async () => {
+  const handleUpdateProduct = async () => {
     if (!name || !price || !description) {
       Alert.alert("Validation Error", "All fields are required.");
       return;
     }
 
-    const stockDetails = sizes;
-
-    if (stockDetails.length === 0) {
-      Alert.alert(
-        "Validation Error",
-        "At least one size should have stock greater than 0."
-      );
-      return;
-    }
-
     const productData = {
+      productId: item.ID,
       name,
       description,
       price,
       department,
       category,
-      sizes: stockDetails,
+      sizes,
       images,
+      removedImages: removedImages.map((image) => ({
+        productID: image.productId,
+        url: image.url,
+      })),
     };
 
     try {
-      const result = await addProduct(productData);
+      const result = await updateProduct(productData);
       if (result.errors === null) {
-        setSuccessMessage("Product added successfully.");
+        setSuccessMessage("Product updated successfully.");
         setVisible(true);
-        setName("");
-        setDescription("");
-        setPrice("");
-        setDepartment("");
-        setCategory("");
-        if (
-          category === "T-Shirt" ||
-          category === "Hoodie" ||
-          category === "Jacket"
-        ) {
-          setSizes([
-            { size: "S", stock: 0 },
-            { size: "M", stock: 0 },
-            { size: "L", stock: 0 },
-            { size: "XL", stock: 0 },
-          ]);
-        } else if (category === "Pants") {
-          setSizes([
-            { size: "27", stock: 0 },
-            { size: "28", stock: 0 },
-            { size: "29", stock: 0 },
-            { size: "30", stock: 0 },
-            { size: "31", stock: 0 },
-            { size: "32", stock: 0 },
-            { size: "33", stock: 0 },
-            { size: "34", stock: 0 },
-          ]);
-        } else {
-          setSizes([]);
-        }
-        setImages([]);
       } else {
         setErrorMessage(result.errors[0]);
         setVisible(true);
       }
     } catch (error) {
+      console.error("Error updating product:", error);
       setErrorMessage("Something went wrong");
       setVisible(true);
-      console.error("Error adding product:", error);
     }
   };
+
+  useEffect(() => {
+    console.log(item);
+    if (sizes && sizes.length > 0) {
+      const newSizes = sizes.map((sizeObj) => ({
+        size: sizeObj.size,
+        stock: sizeObj.stock,
+      }));
+
+      // Hanya update sizes jika ada perubahan
+      setSizes((prevSizes) => {
+        if (JSON.stringify(newSizes) !== JSON.stringify(prevSizes)) {
+          return newSizes;
+        }
+        return prevSizes;
+      });
+    } else if (!sizes) {
+      const defaultSizes = getDefaultSizesByCategory(category);
+
+      // Hanya update sizes jika ada perubahan
+      setSizes((prevSizes) => {
+        if (JSON.stringify(defaultSizes) !== JSON.stringify(prevSizes)) {
+          return defaultSizes;
+        }
+        return prevSizes;
+      });
+    }
+  }, [category, item?.StockDetails]);
+
+  const handleModalClose = () => {
+    router.replace("/products");
+  };
+
+  const hideModal = () => {
+    setVisible(false);
+    handleModalClose();
+  };
+
   return (
     <ScrollView
       style={[styles.container, { backgroundColor: isDark ? "#000" : "#fff" }]}
@@ -124,7 +133,7 @@ export default function AddProductScreen() {
     >
       <ModalComponent
         visible={visible}
-        hideModal={() => setVisible(false)}
+        hideModal={hideModal}
         message={errorMessage || successMessage}
       />
       <IconButton
@@ -132,7 +141,7 @@ export default function AddProductScreen() {
         size={30}
         onPress={() => router.replace("/products")}
       />
-      <ThemedText style={[styles.title]}>Add Product</ThemedText>
+      <ThemedText style={[styles.title]}>Edit Product</ThemedText>
 
       <ProductFormInputs
         name={name}
@@ -152,6 +161,7 @@ export default function AddProductScreen() {
         setCategory={setCategory}
         isDark={isDark}
         styles={styles}
+        isEditing={isEditing} 
       />
 
       <View style={styles.sizeContainer}>
@@ -167,6 +177,13 @@ export default function AddProductScreen() {
         ))}
       </View>
 
+      <CurrentImagesList
+        productImages={item?.ProductImages || []}
+        checkedImages={checkedImages}
+        handleToggleImage={(index) => handleToggleImage(index, item)}
+        styles={styles}
+      />
+
       <SelectedImagesList
         images={images}
         handleRemoveImage={handleRemoveImage}
@@ -175,7 +192,7 @@ export default function AddProductScreen() {
 
       <ActionButtons
         pickImage={() => pickImage(setImages, setErrorMessage, setVisible)}
-        handleAddProduct={handleAddProduct}
+        handleUpdateProduct={handleUpdateProduct}
         styles={styles}
       />
     </ScrollView>

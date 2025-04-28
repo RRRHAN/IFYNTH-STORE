@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\CartController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
@@ -36,4 +37,8 @@ Route::post('/logout', [UserController::class, 'logout'])->name('logout');
 Route::get('/catalog', [ProductController::class, 'fetchByDepartment'])->name('products.byDepartment');
 Route::get('/product/detail/{id}', [ProductController::class, 'detailProduct'])->name('product.detail');
 
-
+// Route cart
+Route::post('/addtoCart/{product_id}', [CartController::class,'AddtoCart'])->name('add.Cart');
+Route::get('/getCart', [CartController::class,'getCart'])->name('get.Cart');
+Route::post('/deleteItem/{id}/{quantity}', [CartController::class,'deleteItem'])->name('delete.Item');
+Route::post('/updateCart/{product_id}/{cart_item_id}', [CartController::class,'updateCart'])->name('update.Cart');

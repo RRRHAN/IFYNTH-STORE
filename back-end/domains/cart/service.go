@@ -66,6 +66,19 @@ func (s *service) AddToCart(ctx context.Context, req AddToCartRequest) error {
 		}
 	}
 
+	var stockDetail product.ProductStockDetail
+	err = s.db.WithContext(ctx).
+		Where("product_id = ? AND size = ?", req.ProductID, req.Size).
+		First(&stockDetail).Error
+
+	if err != nil {
+		return fmt.Errorf("stock detail not found for size %s: %w", req.Size, err)
+	}
+
+	if req.Quantity > stockDetail.Stock {
+		return fmt.Errorf("requested quantity exceeds available stock for size %s", req.Size)
+	}
+
 	// Ambil harga produk
 	var product product.Product
 	if err := s.db.WithContext(ctx).Where("id = ?", req.ProductID).First(&product).Error; err != nil {
@@ -93,7 +106,7 @@ func (s *service) AddToCart(ctx context.Context, req AddToCartRequest) error {
 			ID:        uuid.New(),
 			CartID:    cart.ID,
 			ProductID: req.ProductID,
-			Size:      req.Size, // penting!
+			Size:      req.Size,
 			Quantity:  req.Quantity,
 			Price:     product.Price,
 			CreatedAt: time.Now(),
@@ -108,11 +121,19 @@ func (s *service) AddToCart(ctx context.Context, req AddToCartRequest) error {
 
 	// Update total cart
 	var total float64
+	var total_quantity int
+
 	s.db.WithContext(ctx).
 		Model(&CartItem{}).
 		Where("cart_id = ?", cart.ID).
 		Select("SUM(price * quantity)").Scan(&total)
 
+	s.db.WithContext(ctx).
+		Model(&CartItem{}).
+		Where("cart_id = ?", cart.ID).
+		Select("SUM(quantity)").Scan(&total_quantity)
+
+	cart.TotalQuantity = total_quantity
 	cart.TotalPrice = total
 	cart.UpdatedAt = time.Now()
 	if err := s.db.WithContext(ctx).Save(&cart).Error; err != nil {
@@ -123,32 +144,66 @@ func (s *service) AddToCart(ctx context.Context, req AddToCartRequest) error {
 }
 
 func (s *service) UpdateCartQuantity(ctx context.Context, req UpdateCartQuantityRequest) error {
-
 	token, err := contextUtil.GetTokenClaims(ctx)
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to get token claims: %w", err)
+	}
+
+	var stockDetail product.ProductStockDetail
+	err = s.db.WithContext(ctx).
+		Where("product_id = ? AND size = ?", req.ProductID, req.Size).
+		First(&stockDetail).Error
+
+	if err != nil {
+		return fmt.Errorf("stock detail not found for size %s: %w", req.Size, err)
+	}
+
+	if req.Quantity > stockDetail.Stock {
+		return fmt.Errorf("requested quantity exceeds available stock for size %s", req.Size)
 	}
 
 	var cart Cart
 	err = s.db.WithContext(ctx).Where("user_id = ?", token.Claims.UserID).First(&cart).Error
 	if err != nil {
-		return err
+		return fmt.Errorf("cart not found: %w", err)
 	}
 
 	var item CartItem
 	err = s.db.WithContext(ctx).
-		Where("cart_id = ? AND product_id = ?", cart.ID, req.ProductID).
+		Where("cart_id = ? AND id = ?", cart.ID, req.CartItemID).
 		First(&item).Error
 
 	if err != nil {
-		return err
+		return fmt.Errorf("cart item not found: %w", err)
 	}
 
 	item.Quantity = req.Quantity
 	item.UpdatedAt = time.Now()
 
 	if err := s.db.WithContext(ctx).Save(&item).Error; err != nil {
-		return err
+		return fmt.Errorf("failed to update cart item: %w", err)
+	}
+
+	// Update the cart's total price and quantity
+	var total float64
+	var total_quantity int
+
+	s.db.WithContext(ctx).
+		Model(&CartItem{}).
+		Where("cart_id = ?", cart.ID).
+		Select("SUM(price * quantity)").Scan(&total)
+
+	s.db.WithContext(ctx).
+		Model(&CartItem{}).
+		Where("cart_id = ?", cart.ID).
+		Select("SUM(quantity)").Scan(&total_quantity)
+
+	cart.TotalPrice = total
+	cart.TotalQuantity = total_quantity
+	cart.UpdatedAt = time.Now()
+
+	if err := s.db.WithContext(ctx).Save(&cart).Error; err != nil {
+		return fmt.Errorf("failed to update cart totals: %w", err)
 	}
 
 	return nil
@@ -171,19 +226,27 @@ func (s *service) DeleteFromCart(ctx context.Context, req DeleteFromCartRequest)
 
 	// Hapus cart item
 	if err := s.db.WithContext(ctx).
-		Where("cart_id = ? AND product_id = ?", cart.ID, req.ProductID).
+		Where("cart_id = ? AND id = ?", cart.ID, req.CartItemID).
 		Delete(&CartItem{}).Error; err != nil {
 		return fmt.Errorf("failed to delete item: %w", err)
 	}
 
 	// Hitung ulang total cart setelah item dihapus
 	var total float64
+	var total_quantity int
+
 	s.db.WithContext(ctx).
 		Model(&CartItem{}).
 		Where("cart_id = ?", cart.ID).
-		Select("SUM(price)").Scan(&total)
+		Select("SUM(price * quantity)").Scan(&total)
+
+	s.db.WithContext(ctx).
+		Model(&CartItem{}).
+		Where("cart_id = ?", cart.ID).
+		Select("SUM(quantity)").Scan(&total_quantity)
 
 	cart.TotalPrice = total
+	cart.TotalQuantity = total_quantity
 	cart.UpdatedAt = time.Now()
 
 	if err := s.db.WithContext(ctx).Save(&cart).Error; err != nil {
@@ -194,18 +257,15 @@ func (s *service) DeleteFromCart(ctx context.Context, req DeleteFromCartRequest)
 }
 
 func (s *service) GetCartByUserID(ctx context.Context) (*Cart, error) {
-
 	token, err := contextUtil.GetTokenClaims(ctx)
 	if err != nil {
 		return nil, err
 	}
 
-	// Ambil cart berdasarkan userID
 	var cart Cart
 	err = s.db.WithContext(ctx).
 		Where("user_id = ?", token.Claims.UserID).
 		First(&cart).Error
-
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
 			return nil, fmt.Errorf("cart not found for user: %w", err)
@@ -213,16 +273,21 @@ func (s *service) GetCartByUserID(ctx context.Context) (*Cart, error) {
 		return nil, err
 	}
 
-	// Ambil semua cart item terkait dengan cart
 	var cartItems []CartItem
 	err = s.db.WithContext(ctx).
+		Preload("Product", func(db *gorm.DB) *gorm.DB {
+			return db.Select("id", "name")
+		}).
+		Preload("Product.ProductImages", func(db *gorm.DB) *gorm.DB {
+			return db.Select("id", "product_id", "url")
+		}).
 		Where("cart_id = ?", cart.ID).
 		Find(&cartItems).Error
-
 	if err != nil {
 		return nil, err
 	}
 
-	// Kembalikan cart dan cartItems
+	cart.Items = cartItems
+
 	return &cart, nil
 }

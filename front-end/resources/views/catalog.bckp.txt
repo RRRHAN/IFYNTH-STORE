@@ -1,0 +1,222 @@
+@extends('layout.master')
+@section('container')
+    <main>
+        <!-- Page banner area start here -->
+        <section class="page-banner bg-image pt-30" data-background="">
+            <div class="container">
+                <h2 class="wow fadeInUp mb-15" data-wow-duration="1.1s" data-wow-delay=".1s">{{ request('department') }}
+                    Catalog</h2>
+                <div class="breadcrumb-list wow fadeInUp" data-wow-duration="1.3s" data-wow-delay=".3s">
+                    <a href="/landing" class="primary-hover"><i class="fa-solid fa-house me-1"></i> Home <i
+                            class="fa-regular text-white fa-angle-right"></i></a>
+                    <span>{{ request('department') }}</span>
+                </div>
+            </div>
+        </section>
+        <!-- Page banner area end here -->
+
+        <!-- Product area start here -->
+        <section class="product-area pt-30 pb-130">
+            <div class="container">
+                <div class="pb-20 bor-bottom shop-page-wrp d-flex justify-content-between align-items-center mb-65">
+                    <p class="fw-600">
+                        Showing
+                        {{ ($pagination['current_page'] - 1) * $pagination['perPage'] + 1 }}–{{ min($pagination['current_page'] * $pagination['perPage'], $pagination['total']) }}
+                        of {{ $pagination['total'] }} results
+                    </p>
+                    <div class="short">
+                        <select name="shortList" id="shortList">
+                            <option value="0">Short by popularity</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="row g-4">
+                    <div class="col-xl-12 col-lg-8">
+                        <div class="row g-4">
+                            @foreach ($products as $product)
+                                <div class="col-xl-3 col-lg-3 col-md-6">
+                                    <div class="product__item bor">
+                                        <a href="{{ route('product.detail', ['id' => $product['ID']]) }}"
+                                            class="wishlist"><i class="fa-regular fa-heart"></i></a>
+
+                                        <a href="{{ route('product.detail', ['id' => $product['ID']]) }}"
+                                            class="product__image pt-20 d-block">
+                                            @php
+                                                $images = $product['ProductImages'] ?? [];
+                                                $frontImage = isset($images[0]['URL'])
+                                                    ? 'http://localhost:7777' . $images[0]['URL']
+                                                    : asset('default-image.jpg');
+                                                $backImage = isset($images[1]['URL'])
+                                                    ? 'http://localhost:7777' . $images[1]['URL']
+                                                    : $frontImage;
+                                            @endphp
+
+                                            <img class="font-image" src="{{ $frontImage }}" alt="{{ $product['Name'] }}">
+                                            <img class="back-image" src="{{ $backImage }}" alt="{{ $product['Name'] }}">
+
+                                        </a>
+
+                                        <div class="product__content">
+                                            <h4 class="mb-15">
+                                                <a class="primary-hover"
+                                                    href="{{ route('product.detail', ['id' => $product['ID']]) }}">{{ Str::limit($product['Name'], 20, '...') }}
+                                                </a>
+                                            </h4>
+                                            <del>Rp {{ number_format($product['Price'] + 20000, 0, ',', '.') }}</del>
+                                            <span class="primary-color ml-10">Rp
+                                                {{ number_format($product['Price'], 0, ',', '.') }}</span>
+                                        </div>
+                                        <a class="product__cart d-block bor-top" href="#" data-bs-toggle="modal"
+                                            data-bs-target="#addToCartModal" data-id="{{ $product['ID'] }}"
+                                            data-name="{{ $product['Name'] }}" data-price="{{ $product['Price'] }}"
+                                            data-stock='@json($product['StockDetails'])'>
+                                            <i class="fa-regular fa-cart-shopping primary-color me-1"></i> <span>Add to
+                                                cart</span>
+                                        </a>
+
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
+                        <div class="pagi-wrp mt-65">
+                            <!-- Tampilkan jika total halaman lebih dari 1 -->
+                            @if ($pagination['total_pages'] > 1)
+                                <!-- Tombol Previous -->
+                                @if ($pagination['current_page'] > 1)
+                                    <a href="{{ url('catalog') }}?department={{ request('department') }}&page={{ $pagination['current_page'] - 1 }}"
+                                        class="fa-regular ms-2 primary-hover fa-angle-left"></a>
+                                @endif
+
+                                <!-- Paginasi berdasarkan jumlah halaman -->
+                                @foreach (range(1, $pagination['total_pages']) as $page)
+                                    <a href="{{ url('catalog') }}?department={{ request('department') }}&page={{ $page }}"
+                                        class="pagi-btn {{ $pagination['current_page'] == $page ? 'active' : '' }}">
+                                        {{ $page }}
+                                    </a>
+                                @endforeach
+
+                                <!-- Tombol Next -->
+                                @if ($pagination['current_page'] < $pagination['total_pages'])
+                                    <a href="{{ url('catalog') }}?department={{ request('department') }}&page={{ $pagination['current_page'] + 1 }}"
+                                        class="fa-regular ms-2 primary-hover fa-angle-right"></a>
+                                @endif
+                            @endif
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!-- Product area end here -->
+        <!-- Modal -->
+        <div class="modal fade" id="addToCartModal" tabindex="-1" aria-labelledby="addToCartModalLabel" aria-hidden="true" data-ignore-swiper="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="addToCartModalLabel">Add to Cart</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+
+                    <div class="modal-body">
+                        <div class="cart-wrp py-4">
+                            <form id="cart-form" method="POST" action="{{ route('add.Cart', ['product_id']) }}">
+                                @csrf
+                                <!-- Hidden Product ID -->
+                                <input type="hidden" name="product_id" id="product_id">
+                                <!-- Product Info -->
+                                <div class="mb-4">
+                                    <h5 id="productName"></h5>
+                                    <p id="productPrice"></p>
+                                </div>
+
+                                <!-- Size + Quantity Row -->
+                                <div class="d-flex justify-content-center gap-2 align-items-center mb-4">
+                                    <!-- Size Options -->
+                                    <div class="">
+                                        <h4 class="pe-3 mb-1">Select Size:</h4>
+                                        <div class="size-options">
+                                            <select id="sizeSelect" name="size" class="mb-5" required>
+                                                <!-- Options akan diisi lewat JS -->
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <!-- Quantity -->
+                                    <div class="cart-quantity ps-2">
+                                        <h4 class="pe-3 mb-1">Quantity:</h4>
+                                        <div class="d-inline-flex align-items-center">
+                                            <input type="button" value="-"
+                                                class="qtyminus minus btn btn-outline-secondary">
+                                            <input type="text" name="quantity" value="1"
+                                                class="qty text-center mx-2" style="width: 50px;" readonly>
+                                            <input type="button" value="+"
+                                                class="qtyplus plus btn btn-outline-secondary">
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- Submit Button -->
+                                <button type="submit" class="d-block text-center btn-one mt-50 add-to-cart w-100">
+                                    <span><i class="fa-solid fa-basket-shopping pe-2"></i> Add to cart</span>
+                                </button>
+
+                            </form>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+        <script>
+            const addToCartButtons = document.querySelectorAll('[data-bs-toggle="modal"][data-bs-target="#addToCartModal"]');
+        
+            addToCartButtons.forEach(button => {
+                button.addEventListener('click', function(event) {
+                    const productId = event.currentTarget.getAttribute('data-id');
+                    const productName = event.currentTarget.getAttribute('data-name');
+                    const productPrice = event.currentTarget.getAttribute('data-price');
+                    const productStock = event.currentTarget.getAttribute('data-stock');
+        
+                    // Set product information in the modal
+                    document.getElementById('product_id').value = productId;
+                    document.getElementById('productName').innerText = `Product: ${productName}`;
+                    document.getElementById('productPrice').innerText = `Price: Rp ${parseInt(productPrice).toLocaleString()}`;
+        
+                    console.log('productStock RAW:', productStock);
+        
+                    let stockDetails = [];
+                    try {
+                        stockDetails = JSON.parse(productStock || '[]');
+                        console.log('Parsed stock:', stockDetails);
+                    } catch (e) {
+                        console.error('JSON Parse error!', e);
+                    }
+        
+                    const sizeSelect = document.querySelector('#addToCartModal #sizeSelect');
+        
+                    if (sizeSelect) {
+                        // Bersihkan dulu sebelum tambah
+                        sizeSelect.innerHTML = '';
+        
+                        if (stockDetails.length > 0) {
+                            stockDetails.forEach(stock => {
+                                if (stock.Stock > 0) {
+                                    console.log(`Adding Size: ${stock.Size} with Stock: ${stock.Stock}`);
+                                    const option = document.createElement('option');
+                                    option.value = stock.Size;
+                                    option.textContent = `${stock.Size} (${stock.Stock} in stock)`;
+                                    sizeSelect.appendChild(option);
+                                }
+                            });
+                        } else {
+                            const option = document.createElement('option');
+                            option.disabled = true;
+                            option.textContent = 'No stock available';
+                            sizeSelect.appendChild(option);
+                        }
+                    } else {
+                        console.error("sizeSelect not found!");
+                    }
+                });
+            });
+        </script>
+    </main>
+@stop

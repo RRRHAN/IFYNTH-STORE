@@ -17,10 +17,6 @@ class ProductController extends Controller
         $perPage = 12; // Tentukan jumlah item per halaman
         $token = session('api_token');
 
-        if (!$token) {
-            return redirect()->back()->with('error', 'Unauthorized access. Please login.');
-        }
-
         try {
             // Ambil data produk dari API
             $response = Http::withHeaders([

@@ -29,6 +29,8 @@ export default function RootLayout() {
 
         if (isLoggedIn === 'false') {
           router.replace("/login");
+        } else if (!isLoggedIn){
+          router.replace("/login")
         }
       }
     };
@@ -48,6 +50,7 @@ export default function RootLayout() {
         <Stack.Screen name="login" options={{ headerShown: false }} />
         <Stack.Screen name="add_product" options={{ headerShown: false }} />
         <Stack.Screen name="detail_product" options={{ headerShown: false }} />
+        <Stack.Screen name="edit_product" options={{ headerShown: false }} />
       </Stack>
       <StatusBar style="auto" />
     </ThemeProvider>
