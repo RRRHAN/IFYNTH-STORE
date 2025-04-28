@@ -2,6 +2,8 @@ package database
 
 import (
 	"fmt"
+	"log"
+	"time"
 
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -20,12 +22,34 @@ func NewDB(conf *config.Config) (gormDb *gorm.DB, err error) {
 		conf.Database.Name,
 	)
 
-	gormDb, err = gorm.Open(postgres.Open(connStr), &gorm.Config{})
+	var (
+		gormDB *gorm.DB
+	)
+
+	for i := 0; i < 10; i++ {
+		gormDB, err = getGormDB(connStr)
+		if err == nil {
+			break
+		}
+
+		log.Print("Database not ready yet, retrying in 5 seconds...")
+		time.Sleep(5 * time.Second)
+	}
+
 	if err != nil {
 		return nil, err
 	}
 
-	db, err := gormDb.DB()
+	return gormDB, nil
+}
+
+func getGormDB(connStr string) (gormDB *gorm.DB, err error) {
+	gormDB, err = gorm.Open(postgres.Open(connStr), &gorm.Config{})
+	if err != nil {
+		return nil, err
+	}
+
+	db, err := gormDB.DB()
 	if err != nil {
 		return nil, err
 	}
@@ -35,5 +59,5 @@ func NewDB(conf *config.Config) (gormDb *gorm.DB, err error) {
 		return nil, err
 	}
 
-	return gormDb, nil
+	return gormDB, nil
 }

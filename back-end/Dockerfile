@@ -13,9 +13,6 @@ WORKDIR /app
 
 COPY --from=builder /app/app .
 
-COPY wait-for-it.sh /wait-for-it.sh
-RUN chmod +x /wait-for-it.sh
-
 EXPOSE 7777
 
 CMD ["./app"]
