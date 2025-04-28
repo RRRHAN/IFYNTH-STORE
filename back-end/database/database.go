@@ -26,14 +26,14 @@ func NewDB(conf *config.Config) (gormDb *gorm.DB, err error) {
 		gormDB *gorm.DB
 	)
 
-	for i := 0; i < 10; i++ {
+	for i := 0; i < 20; i++ {
 		gormDB, err = getGormDB(connStr)
 		if err == nil {
 			break
 		}
 
-		log.Print("Database not ready yet, retrying in 5 seconds...")
-		time.Sleep(5 * time.Second)
+		log.Print("Database not ready yet, retrying in 10 seconds...")
+		time.Sleep(10 * time.Second)
 	}
 
 	if err != nil {
