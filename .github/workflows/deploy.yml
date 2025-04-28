@@ -25,6 +25,7 @@ jobs:
           key: ${{ secrets.VPS_SSH_KEY }}
           script: |
             cd IFYNTH-STORE
+            git pull
             if [ "${{ github.event.inputs.no_cache }}" = "true" ]; then
               docker-compose build --no-cache
             else
