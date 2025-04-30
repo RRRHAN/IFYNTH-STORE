@@ -72,7 +72,9 @@
     <div class="mouse-cursor cursor-inner"></div>
     <!-- Mouse cursor area end here -->
 
+    @if (session('api_token'))
     @include('layout.navbar')
+    @endif
     @yield('container')
     @include('layout.footer')
 

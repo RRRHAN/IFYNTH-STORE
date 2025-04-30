@@ -52,8 +52,9 @@ func isValidImage(file *multipart.FileHeader) bool {
 func (h *handler) GetAllProducts(ctx *gin.Context) {
 	keyword, _ := ctx.GetQuery("keyword")
 	department, _ := ctx.GetQuery("department")
+	category, _ := ctx.GetQuery("category")
 
-	res, err := h.service.GetAllProducts(ctx, keyword, department)
+	res, err := h.service.GetAllProducts(ctx, keyword, department, category)
 	if err != nil {
 		respond.Error(ctx, apierror.FromErr(err))
 		return
@@ -91,6 +92,7 @@ func (h *handler) AddProduct(ctx *gin.Context) {
 	name := form.Value["name"]
 	description := form.Value["description"]
 	price := form.Value["price"]
+	capital := form.Value["capital"]
 	category := form.Value["category"]
 	department := form.Value["department"]
 	rawStockDetails := form.Value["stock_details"]
@@ -116,6 +118,12 @@ func (h *handler) AddProduct(ctx *gin.Context) {
 		return
 	}
 
+	capitalValue, err := strconv.ParseFloat(capital[0], 64)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid price format"})
+		return
+	}
+
 	var stockDetails []StockDetailInput
 	if err := json.Unmarshal([]byte(rawStockDetails[0]), &stockDetails); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid stock_details format"})
@@ -126,6 +134,7 @@ func (h *handler) AddProduct(ctx *gin.Context) {
 		Name:         name[0],
 		Description:  description[0],
 		Price:        priceValue,
+		Capital:      capitalValue,
 		Department:   department[0],
 		Category:     category[0],
 		Images:       images,
@@ -168,6 +177,7 @@ func (h *handler) UpdateProduct(ctx *gin.Context) {
 	name := form.Value["name"]
 	description := form.Value["description"]
 	price := form.Value["price"]
+	capital := form.Value["capital"]
 	category := form.Value["category"]
 	department := form.Value["department"]
 	rawStockDetails := form.Value["stockDetails"]
@@ -180,6 +190,12 @@ func (h *handler) UpdateProduct(ctx *gin.Context) {
 	}
 
 	priceValue, err := strconv.ParseFloat(price[0], 64)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid price format"})
+		return
+	}
+
+	capitalValue, err := strconv.ParseFloat(capital[0], 64)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid price format"})
 		return
@@ -206,6 +222,7 @@ func (h *handler) UpdateProduct(ctx *gin.Context) {
 		Name:          name[0],
 		Description:   description[0],
 		Price:         priceValue,
+		Capital:       capitalValue,
 		Department:    department[0],
 		Category:      category[0],
 		StockDetails:  stockDetails,

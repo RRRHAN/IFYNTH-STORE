@@ -10,6 +10,7 @@ type AddProductRequest struct {
 	Category     string
 	Images       []*multipart.FileHeader
 	StockDetails []StockDetailInput
+	Capital      float64
 }
 
 type StockDetailInput struct {
@@ -31,6 +32,7 @@ type UpdateProductRequest struct {
 	StockDetails  []StockDetailInput      `json:"stockDetails"`
 	RemovedImages []RemovedImage          `json:"removedImages"`
 	Images        []*multipart.FileHeader `json:"images"`
+	Capital       float64                 `json:"capital"`
 }
 
 type DeleteProductRequest struct {

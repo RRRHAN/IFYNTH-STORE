@@ -19,7 +19,7 @@ import (
 )
 
 type Service interface {
-	GetAllProducts(ctx context.Context, keyword string, department string) ([]Product, error)
+	GetAllProducts(ctx context.Context, keyword string, department string, category string) ([]Product, error)
 	GetProductByID(ctx context.Context, id uuid.UUID) (*Product, error)
 	AddProduct(ctx context.Context, req AddProductRequest, images []*multipart.FileHeader) error
 	UpdateProduct(ctx context.Context, productID string, req UpdateProductRequest, images []*multipart.FileHeader) error
@@ -38,7 +38,7 @@ func NewService(config *config.Config, db *gorm.DB) Service {
 	}
 }
 
-func (s *service) GetAllProducts(ctx context.Context, keyword string, department string) ([]Product, error) {
+func (s *service) GetAllProducts(ctx context.Context, keyword string, department string, category string) ([]Product, error) {
 	var products []Product
 
 	query := s.db.WithContext(ctx).Model(&Product{}).Preload("ProductImages").Preload("StockDetails")
@@ -54,6 +54,10 @@ func (s *service) GetAllProducts(ctx context.Context, keyword string, department
 
 	if department != "" {
 		query = query.Where("department = ?", department)
+	}
+
+	if category != "" {
+		query = query.Where("category = ?", category)
 	}
 
 	if err := query.Order("created_at DESC").Find(&products).Error; err != nil {
@@ -89,6 +93,7 @@ func (s *service) AddProduct(ctx context.Context, req AddProductRequest, images 
 		TotalStock:  totalStock,
 		Description: req.Description,
 		Price:       req.Price,
+		Capital:     req.Capital,
 		Department:  req.Department,
 		Category:    req.Category,
 		CreatedAt:   time.Now(),
@@ -205,6 +210,7 @@ func (s *service) UpdateProduct(ctx context.Context, productID string, req Updat
 	product.TotalStock = totalStock
 	product.Description = req.Description
 	product.Price = req.Price
+	product.Capital = req.Capital
 	product.Department = req.Department
 	product.Category = req.Category
 	product.UpdatedAt = time.Now()

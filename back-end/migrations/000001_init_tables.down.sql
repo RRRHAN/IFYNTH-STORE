@@ -6,3 +6,5 @@ DROP TABLE IF EXISTS product;
 DROP TABLE IF EXISTS product_stock_detail;
 DROP TABLE IF EXISTS carts;
 DROP TABLE IF EXISTS carts_items;
+DROP TABLE IF EXISTS cusproduct;
+DROP TABLE IF EXISTS customer_product_files;

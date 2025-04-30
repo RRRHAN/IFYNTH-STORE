@@ -26,14 +26,11 @@ export default function RootLayout() {
       if (loaded) {
         await SplashScreen.hideAsync();
         const isLoggedIn = await AsyncStorage.getItem("is_logged_in");
-
-        if (isLoggedIn === 'false') {
+        if (isLoggedIn === 'false' || !isLoggedIn) {
           router.replace("/login");
-        } else if (!isLoggedIn){
-          router.replace("/login")
         }
       }
-    };
+    };    
 
     checkLoginStatus();
   }, [loaded]);
@@ -51,6 +48,7 @@ export default function RootLayout() {
         <Stack.Screen name="add_product" options={{ headerShown: false }} />
         <Stack.Screen name="detail_product" options={{ headerShown: false }} />
         <Stack.Screen name="edit_product" options={{ headerShown: false }} />
+        <Stack.Screen name="message" options={{ headerShown: false }} />
       </Stack>
       <StatusBar style="auto" />
     </ThemeProvider>

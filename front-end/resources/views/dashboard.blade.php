@@ -46,13 +46,13 @@
                                                     href="#notifications" role="tab">
                                                     <i class="fas fa-bell me-2"></i> Notifications
                                                 </a>
-                                                <a class="dash-link" id="message-tab" data-bs-toggle="pill" href="#message"
-                                                    role="tab">
-                                                    <i class="fas fa-messages me-2"></i> Message
-                                                </a>
                                                 <a class="dash-link" id="my-order-tab" data-bs-toggle="pill"
                                                     href="#my-order" role="tab">
                                                     <i class="fas fa-box me-2"></i> my order
+                                                </a>
+                                                <a class="dash-link" id="my-offer-tab" data-bs-toggle="pill"
+                                                    href="#my-offer" role="tab">
+                                                    <i class="fas fa-box me-2"></i> my offer
                                                 </a>
                                                 <form action="{{ route('logout') }}" method="POST" class="d-inline">
                                                     @csrf
@@ -103,59 +103,11 @@
                                                         </div>
                                                     </div>
                                                 </div>
-
-                                                <!-- Security -->
-                                                <div class="tab-pane fade" id="security" role="tabpanel">
-                                                    <h5 class="mb-4">Security Settings</h5>
-                                                    <form>
-                                                        <div class="mb-3">
-                                                            <label class="form-label">Current Password</label>
-                                                            <input type="password" class="form-control"
-                                                                placeholder="Enter current password">
-                                                        </div>
-                                                        <div class="mb-3">
-                                                            <label class="form-label">New Password</label>
-                                                            <input type="password" class="form-control"
-                                                                placeholder="Enter new password">
-                                                        </div>
-                                                        <div class="mb-3">
-                                                            <label class="form-label">Confirm New Password</label>
-                                                            <input type="password" class="form-control"
-                                                                placeholder="Confirm new password">
-                                                        </div>
-                                                        <button type="submit" class="btn btn-primary">Save
-                                                            Changes</button>
-                                                    </form>
-                                                </div>
-
-                                                <!-- Notifications -->
-                                                <div class="tab-pane fade" id="notifications" role="tabpanel">
-                                                    <h5 class="mb-4">Notifications</h5>
-                                                    <p>Notification settings content goes here...</p>
-                                                </div>
-
-                                                <!-- message -->
-                                                <div class="tab-pane fade" id="message" role="tabpanel">
-                                                    <h5 class="mb-4">Message</h5>
-                                                    <p>message settings content goes here...</p>
-                                                </div>
-
-                                                <!-- my-order -->
-                                                <div class="tab-pane fade" id="my-order" role="tabpanel">
-                                                    <h5 class="mb-4">Recent my-order</h5>
-                                                    <div class="my-order-item mb-3">
-                                                        <h6 class="mb-1">Updated profile picture</h6>
-                                                        <p class="text-muted small mb-0">2 hours ago</p>
-                                                    </div>
-                                                    <div class="my-order-item mb-3">
-                                                        <h6 class="mb-1">Changed password</h6>
-                                                        <p class="text-muted small mb-0">Yesterday</p>
-                                                    </div>
-                                                    <div class="my-order-item">
-                                                        <h6 class="mb-1">Updated message information</h6>
-                                                        <p class="text-muted small mb-0">3 days ago</p>
-                                                    </div>
-                                                </div>
+                                                @include('components.changePassword')
+                                                @include('components.notifications')
+                                                @include('components.orderData')
+                                                @include('components.tableOffer')
+                                                @include('components.detailOfferModal')
                                             </div>
                                         </div>
                                     </div>

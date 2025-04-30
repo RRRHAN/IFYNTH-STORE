@@ -8,6 +8,8 @@ import (
 	"gorm.io/gorm"
 
 	"github.com/RRRHAN/IFYNTH-STORE/back-end/domains/cart"
+	"github.com/RRRHAN/IFYNTH-STORE/back-end/domains/cusproduct"
+	"github.com/RRRHAN/IFYNTH-STORE/back-end/domains/message"
 	"github.com/RRRHAN/IFYNTH-STORE/back-end/domains/product"
 	"github.com/RRRHAN/IFYNTH-STORE/back-end/domains/user"
 	"github.com/RRRHAN/IFYNTH-STORE/back-end/middlewares"
@@ -24,6 +26,8 @@ func NewDependency(
 	userHandler user.Handler,
 	productHandler product.Handler,
 	cartHandler cart.Handler,
+	cusproductHandler cusproduct.Handler,
+	messageHandler message.Handler,
 ) *Dependency {
 
 	if conf.Environment != config.DEVELOPMENT_ENVIRONMENT {
@@ -52,6 +56,7 @@ func NewDependency(
 		user.GET("/verify-token", mw.JWT(constants.ADMIN, constants.CUSTOMER), userHandler.VerifyToken)
 		user.POST("/logout", mw.JWT(constants.ADMIN, constants.CUSTOMER), userHandler.Logout)
 		user.POST("/register", mw.BasicAuth, userHandler.Register)
+		user.PATCH("/password", mw.JWT(constants.ADMIN, constants.CUSTOMER), userHandler.ChangePassword)
 	}
 
 	product := router.Group("/product")
@@ -70,6 +75,23 @@ func NewDependency(
 		cart.DELETE("/delete", mw.JWT(constants.CUSTOMER), cartHandler.DeleteFromCart)
 		cart.GET("/", mw.JWT(constants.CUSTOMER), cartHandler.GetCartByUserID)
 
+	}
+
+	cusproduct := router.Group("/cusproduct")
+	{
+		cusproduct.POST("/", mw.JWT(constants.CUSTOMER), cusproductHandler.AddProduct)
+		cusproduct.DELETE("/", mw.JWT(constants.CUSTOMER), cusproductHandler.DeleteProduct)
+		cusproduct.GET("/", mw.JWT(constants.CUSTOMER), cusproductHandler.GetProductByUserID)
+		cusproduct.GET("/list", mw.JWT(constants.CUSTOMER), cusproductHandler.GetProductByMessage)
+		cusproduct.GET("/getall", mw.JWT(constants.ADMIN), cusproductHandler.GetAllProducts)
+		cusproduct.PATCH("/status", mw.JWT(constants.ADMIN), cusproductHandler.UpdateProductStatus)
+
+	}
+
+	message := router.Group("/message")
+	{
+		message.POST("/", mw.JWT(constants.CUSTOMER, constants.ADMIN), messageHandler.AddMessage)
+		message.GET("/:product_id", mw.JWT(constants.CUSTOMER, constants.ADMIN), messageHandler.GetMessageByProductID)
 	}
 
 	router.NoRoute(func(ctx *gin.Context) {

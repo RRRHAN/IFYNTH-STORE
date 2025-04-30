@@ -2,6 +2,7 @@ package user
 
 import (
 	"context"
+	"errors"
 	"net/http"
 	"time"
 
@@ -12,6 +13,7 @@ import (
 	apierror "github.com/RRRHAN/IFYNTH-STORE/back-end/utils/api-error"
 	"github.com/RRRHAN/IFYNTH-STORE/back-end/utils/config"
 	"github.com/RRRHAN/IFYNTH-STORE/back-end/utils/constants"
+	contextUtil "github.com/RRRHAN/IFYNTH-STORE/back-end/utils/context"
 )
 
 type Service interface {
@@ -19,6 +21,7 @@ type Service interface {
 	Logout(ctx context.Context, input LogoutReq) (res *LogoutRes, err error)
 	ValidateToken(ctx context.Context, token string) (err error)
 	Register(ctx context.Context, input RegisterReq) (res *Customer, err error)
+	ChangePassword(ctx context.Context, input ChangePasswordReq) error
 }
 
 type service struct {
@@ -148,4 +151,51 @@ func (s *service) Register(ctx context.Context, input RegisterReq) (res *Custome
 	}
 
 	return &customer, nil
+}
+
+func (s *service) ChangePassword(ctx context.Context, input ChangePasswordReq) error {
+	token, err := contextUtil.GetTokenClaims(ctx)
+	if err != nil {
+		return err
+	}
+
+	var userID = token.Claims.UserID
+	hashedPassword, err := hashPassword(input.NewPassword)
+	if err != nil {
+		return apierror.FromErr(err)
+	}
+
+	switch input.Role {
+	case constants.ADMIN:
+		var admin Admin
+		if err = s.db.WithContext(ctx).Where("id = ?", userID).First(&admin).Error; err == nil {
+			if !comparePassword(admin.Password, input.CurrentPassword) {
+				return apierror.NewWarn(http.StatusUnauthorized, ErrInvalidCurPassword)
+			}
+			admin.Password = hashedPassword
+			if err = s.db.WithContext(ctx).Save(&admin).Error; err != nil {
+				return err
+			}
+		}
+	case constants.CUSTOMER:
+		var customer Customer
+		if err = s.db.WithContext(ctx).Where("id = ?", userID).First(&customer).Error; err == nil {
+			if !comparePassword(customer.Password, input.CurrentPassword) {
+				return apierror.NewWarn(http.StatusUnauthorized, ErrInvalidCurPassword)
+			}
+			customer.Password = hashedPassword
+			if err = s.db.WithContext(ctx).Save(&customer).Error; err != nil {
+				return err
+			}
+		}
+	}
+
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return apierror.NewWarn(http.StatusUnauthorized, ErrInvalidCurPassword)
+		}
+		return err
+	}
+
+	return nil
 }

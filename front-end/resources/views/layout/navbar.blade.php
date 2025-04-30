@@ -33,6 +33,11 @@
                         {{ Session::get('total_cart', 0) }}
                     </span>
                 </div>
+                <div class="">
+                    <a href="{{route('fetchList')}}" class="message btn p-0">
+                        <i class="fa-solid fa-message text-white"></i>
+                    </a>
+                </div>                
             </div>
         </div>
     </div>
@@ -57,10 +62,10 @@
                     <a class="nav-link" href="/landing">Home</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="{{route('products.byDepartment', ['department' => 'IFY'])}}">I Found You</a>
+                    <a class="nav-link" href="{{route('products.getAll', ['department' => 'IFY'])}}">I Found You</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="{{route('products.byDepartment', ['department' => 'NTH'])}}">No Time To Hell</a>
+                    <a class="nav-link" href="{{route('products.getAll', ['department' => 'NTH'])}}">No Time To Hell</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="/sellproduct">Sell Your Clothes</a>

@@ -111,7 +111,7 @@
                 @else
                     <p class="text-center text-white">Your cart is empty.</p>
                 @endif
-                @include('shipper-form')
+                @include('components.shipper-form')
                 <div class="totals">
                     <div class="totals-item theme-color float-end mt-3">
                         <span class="fw-bold text-uppercase py-2">Cart total =</span>

@@ -41,8 +41,9 @@ CREATE TABLE IF NOT EXISTS product (
   total_stock DECIMAL,
   description TEXT,
   price DECIMAL(10, 2) NOT NULL,
+  capital DECIMAL NOT NULL,
   department VARCHAR NOT NULL,
-  category VARCHAR NOT NULL, -- kategori produk
+  category VARCHAR NOT NULL,
   updated_at TIMESTAMPTZ DEFAULT NOW(),
   created_at TIMESTAMP DEFAULT NOW()
 );
@@ -88,4 +89,30 @@ CREATE TABLE IF NOT EXISTS cart_items (
   price DECIMAL(10, 2) NOT NULL,  -- Harga produk, bisa diambil dari tabel produk jika diperlukan
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Tabel utama: cusProduct
+CREATE TABLE cusProduct (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID NOT NULL,
+    name VARCHAR(255),
+    description TEXT,
+    price DECIMAL NOT NULL,
+    status VARCHAR(255) DEFAULT 'pending',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY(user_id)
+      REFERENCES customer(id)
+      ON DELETE CASCADE
+);
+
+CREATE TABLE customer_product_files (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    product_id UUID NOT NULL,
+    url VARCHAR(255),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY(product_id) 
+      REFERENCES cusProduct(id)
+      ON DELETE CASCADE
 );

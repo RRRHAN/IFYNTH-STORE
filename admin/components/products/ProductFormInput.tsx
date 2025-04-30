@@ -6,10 +6,12 @@ interface ProductFormInputsProps {
   name: string;
   description: string;
   price: string;
+  capital: string;
   isDark: boolean;
   setName: (text: string) => void;
   setDescription: (text: string) => void;
   setPrice: (text: string) => void;
+  setCapital: (text: string) => void;
   styles: any;
 }
 
@@ -17,10 +19,12 @@ export default function ProductFormInputs({
   name,
   description,
   price,
+  capital,
   isDark,
   setName,
   setDescription,
   setPrice,
+  setCapital,
   styles,
 }: ProductFormInputsProps) {
   return (
@@ -52,6 +56,15 @@ export default function ProductFormInputs({
         placeholderTextColor={isDark ? "#aaa" : "#888"}
         value={price}
         onChangeText={(text) => setPrice(text.replace(/[^0-9]/g, ""))}
+        keyboardType="numeric"
+      />
+
+<ThemedTextInput
+        style={[styles.input, { borderColor: isDark ? "#666" : "#ccc" }]}
+        placeholder="Commodity Capital"
+        placeholderTextColor={isDark ? "#aaa" : "#888"}
+        value={capital}
+        onChangeText={(text) => setCapital(text.replace(/[^0-9]/g, ""))}
         keyboardType="numeric"
       />
     </View>

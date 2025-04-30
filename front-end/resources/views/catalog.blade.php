@@ -1,95 +1,122 @@
 @extends('layout.master')
 @section('container')
-<main>
-    <!-- Page banner area start here -->
-    <section class="page-banner bg-image pt-30" data-background="assets/images/banner/inner-banner.jpg">
-        <div class="container">
-            <h2 class="wow fadeInUp mb-15" data-wow-duration="1.1s" data-wow-delay=".1s">{{ request('department') }} Catalog</h2>
-            <div class="breadcrumb-list wow fadeInUp" data-wow-duration="1.3s" data-wow-delay=".3s">
-                <a href="/landing" class="primary-hover"><i class="fa-solid fa-house me-1"></i> Home <i
-                        class="fa-regular text-white fa-angle-right"></i></a>
-                <span>{{ request('department') }}</span>
-            </div>
-        </div>
-    </section>
-    <!-- Page banner area end here -->
-
-    <!-- Product area start here -->
-    <section class="product-area pt-30 pb-130">
-        <div class="container">
-            <div class="pb-20 bor-bottom shop-page-wrp d-flex justify-content-between align-items-center mb-65">
-                <p class="fw-600">
-                    Showing {{ ($pagination['current_page'] - 1) * $pagination['perPage'] + 1 }}–{{ min($pagination['current_page'] * $pagination['perPage'], $pagination['total']) }} of {{ $pagination['total'] }} results
-                </p>                
-                <div class="short">
-                    <select name="shortList" id="shortList">
-                        <option value="0">Short by popularity</option>
-                    </select>
+    <main>
+        <!-- Page banner area start here -->
+        <section class="page-banner bg-image pt-30" data-background="assets/images/banner/inner-banner.jpg">
+            <div class="container">
+                <h2 class="wow fadeInUp mb-15" data-wow-duration="1.1s" data-wow-delay=".1s">
+                    @if (request('department') == 'IFY')
+                        I Found You
+                    @elseif (request('department') == 'NTH')
+                        No Time to Hell
+                        @else
+                        All Products
+                    @endif Catalog
+                </h2>
+                <div class="breadcrumb-list wow fadeInUp" data-wow-duration="1.3s" data-wow-delay=".3s">
+                    <a href="/landing" class="primary-hover"><i class="fa-solid fa-house me-1"></i> Home <i
+                            class="fa-regular text-white fa-angle-right"></i></a>
+                    <span>
+                        @if (request('department') == 'IFY')
+                            I Found You
+                        @elseif (request('department') == 'NTH')
+                            No Time to Hell
+                            @else
+                            All Products
+                        @endif
+                    </span>
                 </div>
             </div>
-            <div class="row g-4">
-                <div class="col-xl-12 col-lg-8">
-                    <div class="row g-4">
-                        @foreach ($products as $product)
-                            <div class="col-xl-3 col-lg-3 col-md-6">
-                                <div class="product__item bor">
-                                    <a href="{{ route('product.detail', ['id' => $product['ID'] ]) }}" class="product__image pt-20 d-block">
-                                        @php
-                                        $images = $product['ProductImages'] ?? [];
-                                        $frontImage = isset($images[0]['URL']) ? 'http://localhost:7777' . $images[0]['URL'] : asset('default-image.jpg');
-                                        $backImage = isset($images[1]['URL']) ? 'http://localhost:7777' . $images[1]['URL'] : $frontImage;
-                                    @endphp
-                                    
-                                    <img class="font-image" src="{{ $frontImage }}" alt="{{ $product['Name'] }}">
-                                    <img class="back-image" src="{{ $backImage }}" alt="{{ $product['Name'] }}">
-                                    
-                                    </a>
+        </section>
+        <!-- Page banner area end here -->
 
-                                    <div class="product__content">
-                                        <h4 class="mb-15">
-                                            <a class="primary-hover"
-                                                href="{{ route('product.detail', ['id' => $product['ID'] ]) }}">{{ Str::limit($product['Name'], 20, '...') }}
-                                                </a>
-                                        </h4>
-                                        <del>Rp {{ number_format($product['Price'] + 20000, 0, ',', '.') }}</del>
-                                        <span class="primary-color ml-10">Rp
-                                            {{ number_format($product['Price'], 0, ',', '.') }}</span>
-                                    </div>
-
-                                    <a class="product__cart d-block bor-top" href="{{ route('product.detail', ['id' => $product['ID'] ]) }}">
-                                        <i class="primary-color me-1"></i> <span>Detail Product</span>
-                                    </a>
-                                </div>
-                            </div>
-                        @endforeach
+        <!-- Product area start here -->
+        <section class="product-area pt-30 pb-130">
+            <div class="container">
+                <div class="pb-20 bor-bottom shop-page-wrp d-flex justify-content-between align-items-center mb-65">
+                    <p class="fw-600">
+                        Showing
+                        {{ ($pagination['current_page'] - 1) * $pagination['perPage'] + 1 }}–{{ min($pagination['current_page'] * $pagination['perPage'], $pagination['total']) }}
+                        of {{ $pagination['total'] }} results
+                    </p>
+                    <div class="short">
+                        <select name="shortList" id="shortList">
+                            <option value="0">Short by popularity</option>
+                        </select>
                     </div>
-                    <div class="pagi-wrp mt-65">
-                        <!-- Tampilkan jika total halaman lebih dari 1 -->
-                        @if($pagination['total_pages'] > 1)
-                            <!-- Tombol Previous -->
-                            @if($pagination['current_page'] > 1)
-                                <a href="{{ url('catalog') }}?department={{ request('department') }}&page={{ $pagination['current_page'] - 1 }}" class="fa-regular ms-2 primary-hover fa-angle-left"></a>
-                            @endif
-                    
-                            <!-- Paginasi berdasarkan jumlah halaman -->
-                            @foreach(range(1, $pagination['total_pages']) as $page)
-                                <a href="{{ url('catalog') }}?department={{ request('department') }}&page={{ $page }}" class="pagi-btn {{ $pagination['current_page'] == $page ? 'active' : '' }}">
-                                    {{ $page }}
-                                </a>
-                            @endforeach
-                    
-                            <!-- Tombol Next -->
-                            @if($pagination['current_page'] < $pagination['total_pages'])
-                                <a href="{{ url('catalog') }}?department={{ request('department') }}&page={{ $pagination['current_page'] + 1 }}" class="fa-regular ms-2 primary-hover fa-angle-right"></a>
-                            @endif
+                </div>
+                <div class="row g-4">
+                    <div class="col-xl-12 col-lg-8">
+                        @if (count($products) > 0)
+                            <div class="row g-4">
+                                @foreach ($products as $product)
+                                    <div class="col-xl-3 col-lg-3 col-md-6">
+                                        <div class="product__item bor">
+                                            <a href="{{ route('product.detail', ['id' => $product['ID']]) }}" class="product__image pt-20 d-block">
+                                                @php
+                                                    $images = $product['ProductImages'] ?? [];
+                                                    $frontImage = isset($images[0]['URL'])
+                                                        ? 'http://localhost:7777' . $images[0]['URL']
+                                                        : asset('default-image.jpg');
+                                                    $backImage = isset($images[1]['URL'])
+                                                        ? 'http://localhost:7777' . $images[1]['URL']
+                                                        : $frontImage;
+                                                @endphp
+                
+                                                <img class="font-image" src="{{ $frontImage }}" alt="{{ $product['Name'] }}">
+                                                <img class="back-image" src="{{ $backImage }}" alt="{{ $product['Name'] }}">
+                                            </a>
+                
+                                            <div class="product__content">
+                                                <h4 class="mb-15">
+                                                    <a class="primary-hover" href="{{ route('product.detail', ['id' => $product['ID']]) }}">
+                                                        {{ Str::limit($product['Name'], 20, '...') }}
+                                                    </a>
+                                                </h4>
+                                                <del>Rp {{ number_format($product['Price'] + 20000, 0, ',', '.') }}</del>
+                                                <span class="primary-color ml-10">Rp {{ number_format($product['Price'], 0, ',', '.') }}</span>
+                                            </div>
+                
+                                            <a class="product__cart d-block bor-top" href="{{ route('product.detail', ['id' => $product['ID']]) }}">
+                                                <i class="primary-color me-1"></i> <span>Detail Product</span>
+                                            </a>
+                                        </div>
+                                    </div>
+                                @endforeach
+                            </div>
+                
+                            <!-- Pagination -->
+                            <div class="pagi-wrp mt-65">
+                                @if ($pagination['total_pages'] > 1)
+                                    @if ($pagination['current_page'] > 1)
+                                        <a href="{{ url('catalog') }}?department={{ request('department') }}&page={{ $pagination['current_page'] - 1 }}"
+                                            class="fa-regular ms-2 primary-hover fa-angle-left"></a>
+                                    @endif
+                
+                                    @foreach (range(1, $pagination['total_pages']) as $page)
+                                        <a href="{{ url('catalog') }}?department={{ request('department') }}&page={{ $page }}"
+                                            class="pagi-btn {{ $pagination['current_page'] == $page ? 'active' : '' }}">
+                                            {{ $page }}
+                                        </a>
+                                    @endforeach
+                
+                                    @if ($pagination['current_page'] < $pagination['total_pages'])
+                                        <a href="{{ url('catalog') }}?department={{ request('department') }}&page={{ $pagination['current_page'] + 1 }}"
+                                            class="fa-regular ms-2 primary-hover fa-angle-right"></a>
+                                    @endif
+                                @endif
+                            </div>
+                        @else
+                            <div class="text-center py-5">
+                                <h3>No Product Found</h3>
+                                <p>Try adjusting your search or filter to find what you're looking for.</p>
+                            </div>
                         @endif
                     </div>
-                    
-                    
                 </div>
+                
             </div>
-        </div>
-    </section>
-    <!-- Product area end here -->
-</main>
+        </section>
+        <!-- Product area end here -->
+    </main>
 @stop

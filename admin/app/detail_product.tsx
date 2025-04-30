@@ -70,8 +70,11 @@ export default function ProductDetailModal({
           </View>
 
           <View style={styles.priceRow}>
-            <ThemedText style={styles.price}>
-              Rp {product.Price.toLocaleString()}
+            <ThemedText style={styles.price}>Price : Rp {product.Price.toLocaleString()}
+            </ThemedText>
+          </View>
+          <View style={styles.priceRow}>
+            <ThemedText style={styles.price}>Commodity Capital(Modal) : Rp {product.Capital.toLocaleString()}
             </ThemedText>
           </View>
 

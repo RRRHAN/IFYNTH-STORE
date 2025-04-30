@@ -16,6 +16,7 @@ type Handler interface {
 	VerifyToken(ctx *gin.Context)
 	Logout(ctx *gin.Context)
 	Register(ctx *gin.Context)
+	ChangePassword(ctx *gin.Context)
 }
 
 type handler struct {
@@ -99,4 +100,24 @@ func (h *handler) Register(ctx *gin.Context) {
 	}
 
 	respond.Success(ctx, http.StatusCreated, res)
+}
+
+func (h *handler) ChangePassword(ctx *gin.Context) {
+	var input ChangePasswordReq
+	if err := ctx.ShouldBindJSON(&input); err != nil {
+		respond.Error(ctx, apierror.Warn(http.StatusBadRequest, err))
+		return
+	}
+
+	if err := h.validate.Struct(input); err != nil {
+		respond.Error(ctx, apierror.FromErr(err))
+		return
+	}
+
+	if err := h.service.ChangePassword(ctx, input); err != nil {
+		respond.Error(ctx, apierror.FromErr(err))
+		return
+	}
+
+	respond.Success(ctx, http.StatusOK, gin.H{"message": "Password changed successfully"})
 }

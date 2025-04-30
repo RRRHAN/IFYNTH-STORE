@@ -8,17 +8,17 @@ package wireinject
 
 import (
 	"github.com/RRRHAN/IFYNTH-STORE/back-end/database"
-	"github.com/RRRHAN/IFYNTH-STORE/back-end/domains/product"
 	"github.com/RRRHAN/IFYNTH-STORE/back-end/domains/cart"
+	"github.com/RRRHAN/IFYNTH-STORE/back-end/domains/cusproduct"
+	"github.com/RRRHAN/IFYNTH-STORE/back-end/domains/message"
+	"github.com/RRRHAN/IFYNTH-STORE/back-end/domains/product"
 	"github.com/RRRHAN/IFYNTH-STORE/back-end/domains/user"
 	"github.com/RRRHAN/IFYNTH-STORE/back-end/middlewares"
 	"github.com/RRRHAN/IFYNTH-STORE/back-end/routes"
 	"github.com/RRRHAN/IFYNTH-STORE/back-end/utils/config"
 	"github.com/go-playground/validator/v10"
 	"github.com/google/wire"
-)
 
-import (
 	_ "github.com/google/subcommands"
 )
 
@@ -40,10 +40,14 @@ func initializeDependency(config2 *config.Config) (*routes.Dependency, error) {
 	productService := product.NewService(config2, db)
 	productHandler := product.NewHandler(productService, validate)
 	cartService := cart.NewService(config2, db)
-	cartHandler := cart.NewCartHandler(cartService, validate)
+	cartHandler := cart.NewHandler(cartService, validate)
+	cusproductService := cusproduct.NewService(config2, db)
+	cusproductHandler := cusproduct.NewHandler(cusproductService, validate)
+	messageService := message.NewService(config2, db)
+	messageHandler := message.NewHandler(messageService, validate)
 
 	// Inject into routes
-	dependency := routes.NewDependency(config2, middlewaresMiddleware, db, userHandler, productHandler, cartHandler)
+	dependency := routes.NewDependency(config2, middlewaresMiddleware, db, userHandler, productHandler, cartHandler, cusproductHandler, messageHandler)
 	return dependency, nil
 }
 

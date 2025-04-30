@@ -1,12 +1,12 @@
 import { Product } from "../types/product";
-import { BASE_URL } from "./constants";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import { BASE_URL, getAuthToken } from "./constants";
 
 // Define ProductData interface
 interface ProductData {
   name: string;
   description: string;
   price: string;
+  capital: string;
   department: string;
   category: string;
   sizes: { size: string; stock: number }[];
@@ -38,6 +38,7 @@ export const addProduct = async (productData: ProductData) => {
   formData.append("name", productData.name);
   formData.append("description", productData.description);
   formData.append("price", productData.price);
+  formData.append("capital", productData.capital);
   formData.append("department", productData.department);
   formData.append("category", productData.category);
 
@@ -66,16 +67,6 @@ export const addProduct = async (productData: ProductData) => {
     return result;
   } catch (error) {
     throw new Error("Something went wrong while adding the product.");
-  }
-};
-
-// Get Auth token from AsyncStorage
-export const getAuthToken = async (): Promise<string | null> => {
-  try {
-    const token = await AsyncStorage.getItem("auth_token");
-    return token;
-  } catch (error) {
-    throw new Error("Failed to fetch auth token.");
   }
 };
 
@@ -114,6 +105,7 @@ interface UpdateProductData {
   name: string;
   description: string;
   price: string;
+  capital: string;
   department: string;
   category: string;
   sizes: { size: string; stock: number }[];
@@ -128,6 +120,7 @@ export const updateProduct = async (productData: UpdateProductData) => {
   formData.append("name", productData.name);
   formData.append("description", productData.description);
   formData.append("price", productData.price);
+  formData.append("capital", productData.capital);
   formData.append("department", productData.department);
   formData.append("category", productData.category);
 
@@ -148,6 +141,12 @@ export const updateProduct = async (productData: UpdateProductData) => {
   console.log(productData);
   // Stock details
   formData.append("stockDetails", JSON.stringify(productData.sizes));
+
+  console.log("FormData contents:");
+for (const pair of formData.entries()) {
+  console.log(`${pair[0]}:`, pair[1]);
+}
+
 
   try {
     const updateUrl = `${BASE_URL}/product/update/${productData.productId}`;

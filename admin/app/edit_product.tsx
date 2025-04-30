@@ -33,6 +33,8 @@ export default function EditProductScreen() {
     setDescription,
     price,
     setPrice,
+    capital,
+    setCapital,
     department,
     setDepartment,
     category,
@@ -63,6 +65,7 @@ export default function EditProductScreen() {
       name,
       description,
       price,
+      capital,
       department,
       category,
       sizes,
@@ -90,7 +93,6 @@ export default function EditProductScreen() {
   };
 
   useEffect(() => {
-    console.log(item);
     if (sizes && sizes.length > 0) {
       const newSizes = sizes.map((sizeObj) => ({
         size: sizeObj.size,
@@ -150,6 +152,8 @@ export default function EditProductScreen() {
         setDescription={setDescription}
         price={price}
         setPrice={setPrice}
+        capital={capital}
+        setCapital={setCapital}
         isDark={isDark}
         styles={styles}
       />

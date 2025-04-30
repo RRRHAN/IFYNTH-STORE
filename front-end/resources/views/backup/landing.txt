@@ -1,0 +1,69 @@
+                            <div id="top-ratting" class="tab-pane fade">
+                                <div class="row g-4">
+                                    <div class="col-xl-3 col-lg-3 col-md-6">
+                                        <div class="product__item bor">
+                                            <a href="index-2.html#0" class="wishlist"><i
+                                                    class="fa-regular fa-heart"></i></a>
+                                            <a href="shop-single.html" class="product__image pt-20 d-block">
+                                                <img class="font-image" src="/assets/images/product/product-image5.png"
+                                                    alt="image">
+                                                <img class="back-image" src="/assets/images/product/product-image3.png"
+                                                    alt="image">
+                                            </a>
+                                            <div class="product__content">
+                                                <h4 class="mb-15"><a class="primary-hover" href="shop-single.html">Pods
+                                                        Sold
+                                                        Separately</a></h4>
+                                                <del>$74.50</del><span class="primary-color ml-10">$49.50</span>
+                                                <div class="star mt-20">
+                                                    <i class="fa-solid fa-star"></i>
+                                                    <i class="fa-solid fa-star"></i>
+                                                    <i class="fa-solid fa-star"></i>
+                                                    <i class="fa-solid fa-star"></i>
+                                                    <i class="fa-solid fa-star"></i>
+                                                </div>
+
+                                            </div>
+                                            <a class="product__cart d-block bor-top" href="index-2.html#0"><i
+                                                    class="fa-regular fa-cart-shopping primary-color me-1"></i>
+                                                <span>Add to
+                                                    cart</span></a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div id="featured-products" class="tab-pane fade">
+                                <div class="row g-4">
+                                    <div class="col-xl-3 col-lg-3 col-md-6">
+                                        <div class="product__item bor">
+                                            <a href="index-2.html#0" class="wishlist"><i
+                                                    class="fa-regular fa-heart"></i></a>
+                                            <a href="shop-single.html" class="product__image pt-20 d-block">
+                                                <img class="font-image" src="/assets/images/product/product-image4.png"
+                                                    alt="image">
+                                                <img class="back-image" src="/assets/images/product/product-image6.png"
+                                                    alt="image">
+                                            </a>
+                                            <div class="product__content">
+                                                <h4 class="mb-15"><a class="primary-hover"
+                                                        href="shop-single.html">Battery
+                                                        And
+                                                        Charger Kit</a></h4>
+                                                <del>$74.50</del><span class="primary-color ml-10">$49.50</span>
+                                                <div class="star mt-20">
+                                                    <i class="fa-solid fa-star"></i>
+                                                    <i class="fa-solid fa-star"></i>
+                                                    <i class="fa-solid fa-star"></i>
+                                                    <i class="fa-solid fa-star"></i>
+                                                    <i class="fa-solid fa-star"></i>
+                                                </div>
+
+                                            </div>
+                                            <a class="product__cart d-block bor-top" href="index-2.html#0"><i
+                                                    class="fa-regular fa-cart-shopping primary-color me-1"></i>
+                                                <span>Add to
+                                                    cart</span></a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>

@@ -20,7 +20,7 @@
                                     <span class="primary-color text-sm">product thrifting</span>
                                 </h1>
                                 <a class="btn-one wow fadeInUp mt-20" data-wow-delay=".3s"
-                                    href="/catalog/I Found You"><span>Shop
+                                    href="{{route('products.getAll', ['department' => 'IFY'])}}"><span>Shop
                                         Now</span></a>
                             </div>
                         </div>
@@ -35,7 +35,7 @@
                                     <span class="primary-color">our products</span>
                                 </h1>
                                 <a class="btn-one wow fadeInUp mt-20" data-wow-delay=".3s"
-                                    href="/catalog/No Time To Hell"><span>Shop
+                                    href="{{route('products.getAll', ['department' => 'NTH'])}}"><span>Shop
                                         Now</span></a>
                             </div>
                         </div>
@@ -56,68 +56,62 @@
                     <div class="swiper-wrapper">
                         <div class="swiper-slide">
                             <div class="category__item text-center">
-                                <a href="shop.html" class="category__image d-block">
-                                    <img src="/assets/images/category/category-image1.png" alt="image">
+                                <a href="{{route('products.getAll', ['category' => 'Shirt'])}}" class="category__image d-block">
                                     <div class="category-icon">
                                         <img src="/assets/images/category/shirt.png" alt="icon">
                                     </div>
                                 </a>
-                                <h4 class="mt-30"><a href="shop.html">Shirt</a></h4>
+                                <h4 class="mt-30"><a href="{{route('products.getAll', ['category' => 'Shirt'])}}">Shirt</a></h4>
                             </div>
                         </div>
                         <div class="swiper-slide">
                             <div class="category__item text-center">
-                                <a href="shop.html" class="category__image d-block">
-                                    <img src="/assets/images/category/category-image2.png" alt="image">
+                                <a href="{{route('products.getAll', ['category' => 'T-Shirt'])}}" class="category__image d-block">
                                     <div class="category-icon">
                                         <img src="/assets/images/category/tshirt.png" alt="icon">
                                     </div>
                                 </a>
-                                <h4 class="mt-30"><a href="shop.html">T-Shirt</a></h4>
+                                <h4 class="mt-30"><a href="{{route('products.getAll', ['category' => 'T-Shirt'])}}">T-Shirt</a></h4>
                             </div>
                         </div>
                         <div class="swiper-slide">
                             <div class="category__item text-center">
-                                <a href="shop.html" class="category__image d-block">
-                                    <img src="/assets/images/category/category-image3.png" alt="image">
+                                <a href="{{route('products.getAll', ['category' => 'Long Shirt'])}}" class="category__image d-block">
                                     <div class="category-icon">
                                         <img src="/assets/images/category/longshirt.png" alt="icon">
                                     </div>
                                 </a>
-                                <h4 class="mt-30"><a href="shop.html">Long Shirt</a></h4>
+                                <h4 class="mt-30"><a href="{{route('products.getAll', ['category' => 'Long Shirt'])}}">Long Shirt</a></h4>
                             </div>
                         </div>
                         <div class="swiper-slide">
                             <div class="category__item text-center">
-                                <a href="shop.html" class="category__image d-block">
-                                    <img src="/assets/images/category/category-image4.png" alt="image">
+                                <a href="{{route('products.getAll', ['category' => 'Outetwear'])}}" class="category__image d-block">
                                     <div class="category-icon">
                                         <img src="/assets/images/category/outerwear.png" alt="icon">
                                     </div>
                                 </a>
-                                <h4 class="mt-30"><a href="shop.html">Outerwear</a></h4>
+                                <h4 class="mt-30"><a href="{{route('products.getAll', ['category' => 'Outetwear'])}}">Outerwear</a></h4>
                             </div>
                         </div>
                         <div class="swiper-slide">
                             <div class="category__item text-center">
-                                <a href="shop.html" class="category__image d-block">
-                                    <img src="/assets/images/category/category-image5.png" alt="image">
+                                <a href="{{route('products.getAll', ['category' => 'Pants'])}}" class="category__image d-block">
                                     <div class="category-icon">
                                         <img src="/assets/images/category/pants.png" alt="icon">
                                     </div>
                                 </a>
-                                <h4 class="mt-30"><a href="shop.html">Pants</a></h4>
+                                <h4 class="mt-30"><a href="{{route('products.getAll', ['category' => 'Pants'])}}">Pants</a></h4>
                             </div>
                         </div>
                         <div class="swiper-slide">
                             <div class="category__item text-center">
-                                <a href="shop.html" class="category__image d-block">
-                                    <img src="/assets/images/category/category-image6.png" alt="image">
+                                <a href="{{route('products.getAll', ['category' => 'Long Pants'])}}" class="category__image d-block">
                                     <div class="category-icon">
                                         <img src="/assets/images/category/longpants.png" alt="icon">
                                     </div>
                                 </a>
-                                <h4 class="mt-30"><a href="shop.html">Long Pants</a></h4>
+                                <h4 class="mt-30"><a href="{{route('products.getAll', ['category' => 'Long Pants'])}}">Long Pants</a></h4>
                             </div>
                         </div>
                     </div>
@@ -159,109 +153,49 @@
                     <div class="col-xl-12 col-lg-8">
                         <div class="tab-content">
                             <div id="latest-item" class="tab-pane fade show active">
+                                @if (count($products) > 0)
                                 <div class="row g-4">
-                                    <div class="col-xl-3 col-lg-3 col-md-6">
-                                        <div class="product__item bor">
-                                            <a href="index-2.html#0" class="wishlist"><i
-                                                    class="fa-regular fa-heart"></i></a>
-                                            <a href="shop-single.html" class="product__image pt-20 d-block">
-                                                <img class="font-image"
-                                                    src="{{ Vite::asset('resources/images/product/product-image1.png') }}"
-                                                    alt="image">
-                                                <img class="back-image"
-                                                    src="{{ Vite::asset('resources/images/product/product-image3.png') }}"
-                                                    alt="image">
-                                            </a>
-                                            <div class="product__content">
-                                                <h4 class="mb-15"><a class="primary-hover"
-                                                        href="shop-single.html">Menthol
-                                                        E-Cigarette Kit</a></h4>
-                                                <del>$74.50</del><span class="primary-color ml-10">$49.50</span>
-                                                <div class="star mt-20">
-                                                    <i class="fa-solid fa-star"></i>
-                                                    <i class="fa-solid fa-star"></i>
-                                                    <i class="fa-solid fa-star"></i>
-                                                    <i class="fa-solid fa-star"></i>
-                                                    <i class="fa-solid fa-star"></i>
+                                    @foreach ($products as $product)
+                                        <div class="col-xl-3 col-lg-3 col-md-6">
+                                            <div class="product__item bor">
+                                                <a href="{{ route('product.detail', ['id' => $product['ID']]) }}" class="product__image pt-20 d-block">
+                                                    @php
+                                                        $images = $product['ProductImages'] ?? [];
+                                                        $frontImage = isset($images[0]['URL'])
+                                                            ? 'http://localhost:7777' . $images[0]['URL']
+                                                            : asset('default-image.jpg');
+                                                        $backImage = isset($images[1]['URL'])
+                                                            ? 'http://localhost:7777' . $images[1]['URL']
+                                                            : $frontImage;
+                                                    @endphp
+                    
+                                                    <img class="font-image" src="{{ $frontImage }}" alt="{{ $product['Name'] }}">
+                                                    <img class="back-image" src="{{ $backImage }}" alt="{{ $product['Name'] }}">
+                                                </a>
+                    
+                                                <div class="product__content">
+                                                    <h4 class="mb-15">
+                                                        <a class="primary-hover" href="{{ route('product.detail', ['id' => $product['ID']]) }}">
+                                                            {{ Str::limit($product['Name'], 20, '...') }}
+                                                        </a>
+                                                    </h4>
+                                                    <del>Rp {{ number_format($product['Price'] + 20000, 0, ',', '.') }}</del>
+                                                    <span class="primary-color ml-10">Rp {{ number_format($product['Price'], 0, ',', '.') }}</span>
                                                 </div>
-
+                    
+                                                <a class="product__cart d-block bor-top" href="{{ route('product.detail', ['id' => $product['ID']]) }}">
+                                                    <i class="primary-color me-1"></i> <span>Detail Product</span>
+                                                </a>
                                             </div>
-                                            <a class="product__cart d-block bor-top" href="index-2.html#0"><i
-                                                    class="fa-regular fa-cart-shopping primary-color me-1"></i>
-                                                <span>Add to
-                                                    cart</span></a>
                                         </div>
-                                    </div>
+                                    @endforeach
                                 </div>
+                            @else
+                            <div class="text-center py-5">
+                                <h3>No Product Found</h3>
+                                <p>Try adjusting your search or filter to find what you're looking for.</p>
                             </div>
-                            <div id="top-ratting" class="tab-pane fade">
-                                <div class="row g-4">
-                                    <div class="col-xl-3 col-lg-3 col-md-6">
-                                        <div class="product__item bor">
-                                            <a href="index-2.html#0" class="wishlist"><i
-                                                    class="fa-regular fa-heart"></i></a>
-                                            <a href="shop-single.html" class="product__image pt-20 d-block">
-                                                <img class="font-image" src="/assets/images/product/product-image5.png"
-                                                    alt="image">
-                                                <img class="back-image" src="/assets/images/product/product-image3.png"
-                                                    alt="image">
-                                            </a>
-                                            <div class="product__content">
-                                                <h4 class="mb-15"><a class="primary-hover" href="shop-single.html">Pods
-                                                        Sold
-                                                        Separately</a></h4>
-                                                <del>$74.50</del><span class="primary-color ml-10">$49.50</span>
-                                                <div class="star mt-20">
-                                                    <i class="fa-solid fa-star"></i>
-                                                    <i class="fa-solid fa-star"></i>
-                                                    <i class="fa-solid fa-star"></i>
-                                                    <i class="fa-solid fa-star"></i>
-                                                    <i class="fa-solid fa-star"></i>
-                                                </div>
-
-                                            </div>
-                                            <a class="product__cart d-block bor-top" href="index-2.html#0"><i
-                                                    class="fa-regular fa-cart-shopping primary-color me-1"></i>
-                                                <span>Add to
-                                                    cart</span></a>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div id="featured-products" class="tab-pane fade">
-                                <div class="row g-4">
-                                    <div class="col-xl-3 col-lg-3 col-md-6">
-                                        <div class="product__item bor">
-                                            <a href="index-2.html#0" class="wishlist"><i
-                                                    class="fa-regular fa-heart"></i></a>
-                                            <a href="shop-single.html" class="product__image pt-20 d-block">
-                                                <img class="font-image" src="/assets/images/product/product-image4.png"
-                                                    alt="image">
-                                                <img class="back-image" src="/assets/images/product/product-image6.png"
-                                                    alt="image">
-                                            </a>
-                                            <div class="product__content">
-                                                <h4 class="mb-15"><a class="primary-hover"
-                                                        href="shop-single.html">Battery
-                                                        And
-                                                        Charger Kit</a></h4>
-                                                <del>$74.50</del><span class="primary-color ml-10">$49.50</span>
-                                                <div class="star mt-20">
-                                                    <i class="fa-solid fa-star"></i>
-                                                    <i class="fa-solid fa-star"></i>
-                                                    <i class="fa-solid fa-star"></i>
-                                                    <i class="fa-solid fa-star"></i>
-                                                    <i class="fa-solid fa-star"></i>
-                                                </div>
-
-                                            </div>
-                                            <a class="product__cart d-block bor-top" href="index-2.html#0"><i
-                                                    class="fa-regular fa-cart-shopping primary-color me-1"></i>
-                                                <span>Add to
-                                                    cart</span></a>
-                                        </div>
-                                    </div>
-                                </div>
+                        @endif
                             </div>
                         </div>
                     </div>

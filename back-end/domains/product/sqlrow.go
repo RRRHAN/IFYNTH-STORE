@@ -12,6 +12,7 @@ type Product struct {
 	TotalStock    int     `gorm:"type:decimal"`
 	Description   string  `gorm:"type:text"`
 	Price         float64 `gorm:"type:decimal;not null"`
+	Capital       float64 `gorm:"type:decimal;not null"`
 	Department    string  `gorm:"type:varchar(3);check(department in ('IFY', 'NTH'))"`
 	Category      string  `gorm:"type:varchar(50);not null"`
 	CreatedAt     time.Time
