@@ -11,6 +11,7 @@ import (
 	"github.com/RRRHAN/IFYNTH-STORE/back-end/domains/cusproduct"
 	"github.com/RRRHAN/IFYNTH-STORE/back-end/domains/message"
 	"github.com/RRRHAN/IFYNTH-STORE/back-end/domains/product"
+	"github.com/RRRHAN/IFYNTH-STORE/back-end/domains/transaction"
 	"github.com/RRRHAN/IFYNTH-STORE/back-end/domains/user"
 	"github.com/RRRHAN/IFYNTH-STORE/back-end/middlewares"
 	apierror "github.com/RRRHAN/IFYNTH-STORE/back-end/utils/api-error"
@@ -28,6 +29,7 @@ func NewDependency(
 	cartHandler cart.Handler,
 	cusproductHandler cusproduct.Handler,
 	messageHandler message.Handler,
+	transactionHandler transaction.Handler,
 ) *Dependency {
 
 	if conf.Environment != config.DEVELOPMENT_ENVIRONMENT {
@@ -57,6 +59,7 @@ func NewDependency(
 		user.POST("/logout", mw.JWT(constants.ADMIN, constants.CUSTOMER), userHandler.Logout)
 		user.POST("/register", mw.BasicAuth, userHandler.Register)
 		user.PATCH("/password", mw.JWT(constants.ADMIN, constants.CUSTOMER), userHandler.ChangePassword)
+		user.GET("/get-personal", mw.JWT(constants.ADMIN, constants.CUSTOMER), userHandler.GetPersonal)
 	}
 
 	product := router.Group("/product")
@@ -92,6 +95,14 @@ func NewDependency(
 	{
 		message.POST("/", mw.JWT(constants.CUSTOMER, constants.ADMIN), messageHandler.AddMessage)
 		message.GET("/:product_id", mw.JWT(constants.CUSTOMER, constants.ADMIN), messageHandler.GetMessageByProductID)
+	}
+
+	transaction := router.Group("/transaction")
+	{
+		transaction.POST("/", mw.JWT(constants.CUSTOMER), transactionHandler.AddTransaction)
+		transaction.GET("/", mw.JWT(constants.CUSTOMER), transactionHandler.GetTransactionsByUserID)
+		transaction.GET("/all", mw.JWT(constants.ADMIN), transactionHandler.GetAllTransaction)
+		transaction.PATCH("/status", mw.JWT(constants.ADMIN), transactionHandler.UpdateTransactionStatus)
 	}
 
 	router.NoRoute(func(ctx *gin.Context) {

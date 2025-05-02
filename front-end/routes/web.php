@@ -2,9 +2,9 @@
 
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\CustomerProductController;
+use App\Http\Controllers\OngkirController;
+use App\Http\Controllers\TransactionController;
 use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\HomeController;
@@ -52,3 +52,7 @@ Route::post('/storeMessage', [MessageController::class, 'storeMessage'])->name('
 Route::get('/getProductMessages/{productId}', [MessageController::class, 'getProductMessages']);
 
 
+Route::get('/search-destination', [OngkirController::class, 'searchDestination']);
+Route::post('/check-tariff', [OngkirController::class, 'getShippingCost']);
+
+Route::post('/checkout', [TransactionController::class, 'addTransaction']);

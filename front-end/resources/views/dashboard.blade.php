@@ -13,7 +13,7 @@
                         <div class="profile-header position-relative mt-5">
                             <div class="text-center">
                                 <div class="position-relative d-inline-block">
-                                    <img src="https://randomuser.me/api/portraits/men/40.jpg"
+                                    <img src="https://assets-a1.kompasiana.com/items/album/2021/03/24/blank-profile-picture-973460-1280-605aadc08ede4874e1153a12.png?t=o&v=1200"
                                         class="rounded-circle profile-pic" alt="Profile Picture">
                                     <button class="btn btn-primary btn-sm position-absolute bottom-0 end-0 rounded-circle">
                                         <i class="fas fa-camera"></i>
@@ -68,41 +68,7 @@
                                     <div class="col-lg-9">
                                         <div class="p-4">
                                             <div class="tab-content" id="settings-content">
-                                                <!-- Personal Information -->
-                                                <div class="tab-pane fade show active" id="personal" role="tabpanel">
-                                                    <h5 class="mb-4">Personal Information</h5>
-                                                    <div class="row g-3">
-                                                        <div class="col-md-6">
-                                                            <label class="form-label">Username</label>
-                                                            <input type="text" class="form-control"
-                                                                value="{{ session('user_name', 'Enter your Username') }}">
-                                                        </div>
-                                                        <div class="col-md-6">
-                                                            <label class="form-label">Phone</label>
-                                                            <input type="tel" class="form-control"
-                                                                value="{{ session('user_phone', 'Enter your Phone Number') }}">
-                                                        </div>
-                                                        <div class="col-md-6">
-                                                            <label class="form-label">First Name</label>
-                                                            <input type="text" class="form-control"
-                                                                value="{{ session('user_firstname', 'Enter your First Name') }}">
-                                                        </div>
-                                                        <div class="col-md-6">
-                                                            <label class="form-label">Last Name</label>
-                                                            <input type="text" class="form-control"
-                                                                value="{{ session('user_lastname', 'Enter your Last Name') }}">
-                                                        </div>
-                                                        <div class="col-md-12">
-                                                            <label class="form-label">Email</label>
-                                                            <input type="email" class="form-control"
-                                                                value="{{ session('user_email', 'Enter your Email') }}">
-                                                        </div>
-                                                        <div class="col-12">
-                                                            <label class="form-label">Bio</label>
-                                                            <textarea class="form-control" rows="4">Product designer with 5+ years of experience in creating user-centered digital solutions. Passionate about solving complex problems through simple and elegant designs.</textarea>
-                                                        </div>
-                                                    </div>
-                                                </div>
+                                                @include('components.personal')
                                                 @include('components.changePassword')
                                                 @include('components.notifications')
                                                 @include('components.orderData')

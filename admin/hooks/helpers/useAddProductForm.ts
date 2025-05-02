@@ -5,6 +5,7 @@ export const useProductForm = () => {
   const [description, setDescription] = useState<string>("");
   const [price, setPrice] = useState<string>("");
   const [capital, setCapital] = useState<string>("");
+  const [weight, setWeight] = useState<string>("");
   const [department, setDepartment] = useState<string>("IFY");
   const [category, setCategory] = useState<string>("T-Shirt");
   const [sizes, setSizes] = useState<{ size: string; stock: number }[]>([]);
@@ -44,6 +45,8 @@ export const useProductForm = () => {
     setPrice,
     capital,
     setCapital,
+    weight,
+    setWeight,
     department,
     setDepartment,
     category,

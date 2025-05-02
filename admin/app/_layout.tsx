@@ -11,7 +11,6 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { MyLightTheme, MyDarkTheme } from "@/constants/Theme";
 
-// Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
@@ -22,6 +21,7 @@ export default function RootLayout() {
   });
 
   useEffect(() => {
+    
     const checkLoginStatus = async () => {
       if (loaded) {
         await SplashScreen.hideAsync();

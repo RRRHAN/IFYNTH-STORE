@@ -13,10 +13,8 @@ class CustomerProductController extends Controller
 
     public function AddOffer(Request $request)
     {
-        // Get the token from session
         $token = session('api_token');
 
-        // Validate the request data
         $validatedData = $request->validate([
             'name' => 'required',
             'price' => 'required|numeric',
@@ -25,7 +23,6 @@ class CustomerProductController extends Controller
             'files.*' => 'mimes:jpeg,png,jpg,gif,mp4,avi,mov,mkv,flv,webm',
         ]);
 
-        // Prepare files for upload
         $files = [];
         foreach ($validatedData['files'] as $file) {
             $files[] = [
@@ -35,19 +32,9 @@ class CustomerProductController extends Controller
             ];
         }
 
-        // Log the request data to check what we are sending
-        \Log::info('Request Data:', [
-            'name' => $validatedData['name'],
-            'price' => $validatedData['price'],
-            'description' => $validatedData['description'],
-            'files' => $files // You can check the actual file data as well
-        ]);
-
         try {
-            // Initialize Guzzle client
             $client = new Client();
 
-            // Send the request with multipart form-data
             $response = $client->post('http://localhost:7777/cusproduct', [
                 'headers' => [
                     'Authorization' => 'Bearer ' . $token,
@@ -89,10 +76,7 @@ class CustomerProductController extends Controller
 
     public function fetchOffers(Request $request)
     {
-        \Log::info('tes');
         $keyword = $request->query('keyword');
-        $page = $request->query('page', 1);
-        $perPage = 4;
         $token = session('api_token');
         
         try {
@@ -108,30 +92,15 @@ class CustomerProductController extends Controller
             if ($response->successful() && $response->json('errors') === null) {
                 $allProducts = collect($response->json('data'));
         
-                $total = $allProducts->count();
-                $products = $allProducts->slice(($page - 1) * $perPage, $perPage)->values();
-                $totalPages = ceil($total / $perPage);
-        
-                $pagination = [
-                    'total_pages' => $totalPages,
-                    'current_page' => $page,
-                    'perPage' => $perPage,
-                    'total' => $total,
-                ];
-        
-                // Mengembalikan koleksi data produk dan informasi pagination
                 return collect([
-                    'products' => $products,
-                    'pagination' => $pagination,
+                    'products' => $allProducts,
                 ]);
             } else {
-                // Jika gagal, mengembalikan koleksi error
                 return collect([
                     'error' => 'Failed to fetch products.'
                 ]);
             }
         } catch (\Exception $e) {
-            // Jika terjadi exception, mengembalikan koleksi error
             return collect([
                 'error' => 'An error occurred while fetching products.'
             ]);

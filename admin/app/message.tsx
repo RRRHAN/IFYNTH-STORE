@@ -74,7 +74,7 @@ export default function ChatScreen() {
 
     interval = setInterval(() => {
       loadMessages();
-    }, 10000);
+    }, 3000);
 
     return () => clearInterval(interval);
   }, [selectedItem]);

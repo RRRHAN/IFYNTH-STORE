@@ -18,7 +18,7 @@
         <section class="product-area pt-30 pb-130">
             <div class="container">
                 <div class="pb-20 bor-bottom shop-page-wrp d-flex justify-content-between align-items-center mb-65">
-                    <p class="fw-600">Add a New Product</p>
+                    <p class="fw-600">Add a New Offer</p>
                 </div>
                 <div class="row g-4">
                     <div class="col-xl-12 col-lg-8">
@@ -29,7 +29,7 @@
                                     <!-- Nama Produk -->
                                     <div class="col-md-8 mt-2">
                                         <div class="form-group">
-                                            <label for="productName">Nama Produk</label>
+                                            <label for="productName">Product Name</label>
                                             <input type="text" id="productName" name="name" class="form-control"
                                                 required>
                                         </div>
@@ -38,7 +38,7 @@
                                     <!-- Harga Produk -->
                                     <div class="col-md-8 mt-2">
                                         <div class="form-group">
-                                            <label for="productPrice">Harga Produk</label>
+                                            <label for="productPrice">Price</label>
                                             <input type="number" id="productPrice" name="price"
                                                 class="form-control" required>
                                         </div>
@@ -47,8 +47,7 @@
                                     <!-- Foto/Video Produk -->
                                     <div class="col-md-8 mt-2">
                                         <div class="form-group">
-                                            <label for="productMedia">Foto / Video Produk (Upload lebih dari satu
-                                                file)</label>
+                                            <label for="productMedia">Product Photos / Videos (Can upload more than one file)</label>
                                             <input type="file" id="productMedia" name="files[]"
                                                 class="form-control" multiple required>
                                         </div>
@@ -57,7 +56,7 @@
                                     <!-- Deskripsi Produk -->
                                     <div class="col-md-8 mt-2">
                                         <div class="form-group">
-                                            <label for="productDescription">Deskripsi Produk</label>
+                                            <label for="productDescription">Description</label>
                                             <textarea id="productDescription" name="description" class="form-control" rows="4" required></textarea>
                                         </div>
                                     </div>

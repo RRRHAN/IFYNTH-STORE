@@ -1,197 +1,242 @@
-<div id="shipperForm" class="shipper-form" style="display: none;">
-    <form id="formShip" action="" method="POST">
+<meta name="csrf-token" content="{{ csrf_token() }}">
+<div id="shipperForm" class="shipper-form mt-2" style="display: none;">
+    <form id="formShip" action="/checkout" method="POST" enctype="multipart/form-data">
         @csrf
         <div class="mb-3">
             <label for="name" class="form-label">Full Name</label>
-            <input type="text" class="form-control" id="name" name="name" required>
+            <input type="text" class="form-control" id="name" name="name"
+                value="{{ session('user')['Name'] ?? 'Enter your Full Name' }}" required>
+        </div>
+        <div class="mb-3">
+            <label for="phone" class="form-label">Phone Number</label>
+            <input type="text" class="form-control" id="phone" name="phone_number"
+                value="{{ session('user')['PhoneNumber'] ?? 'Enter your Phone Number' }}" required>
         </div>
         <div class="mb-3">
             <label for="address" class="form-label">Shipping Address</label>
             <textarea class="form-control" id="address" name="address" rows="3" required></textarea>
         </div>
-        <div class="mb-3">
-            <label for="zip_code" class="form-label">Zip Code</label>
-            <input type="text" class="form-control" id="zip_code" name="zip_code" required>
+        <div class="mb-3 row">
+            <div class="col-md-8">
+                <label for="searchDestinaton" class="form-label">Search Destination (Kota, Distrik, Kecamatan / Kode
+                    Pos)</label>
+                <input type="text" class="form-control" id="searchDestinaton" placeholder="e.g., Surabaya"
+                    autocomplete="off" name="destination_label">
+                <input type="hidden" id="destination_id">
+                <ul id="suggestions" class="list-group position-absolute w-50 mt-1"
+                    style="z-index: 1000; max-height: 200px; overflow-y: auto;"></ul>
+            </div>
+            <div class="col-md-4">
+                <label for="zip_code" class="form-label">Zip Code</label>
+                <input type="text" class="form-control" id="zip_code" name="zip_code" maxlength="5"
+                    inputmode="numeric" pattern="\d{5}" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+            </div>
         </div>
-        <div class="mb-3">
-            <label for="province" class="form-label">Province</label>
-            <select class="form-select" id="province" name="province" required>
-                <option value="">Select Province</option>
-                <!-- Provinsi akan diisi oleh JavaScript -->
+        <div id="shippingTariff" class="mb-3" style="display: none;">
+            <label for="tariff" class="form-label">Courir</label>
+            <select class="form-control" id="tariff" name="courir">
+                <option value="">Courir</option>
             </select>
+            <input type="hidden" id="shipping_cost" name="shipping_cost">
+            <input type="hidden" id="grandtotal">
         </div>
-        <div class="mb-3">
-            <label for="city" class="form-label">City</label>
-            <select class="form-select" id="city" name="city" required>
-                <option value="">Select City</option>
-                <!-- Kota akan diisi berdasarkan provinsi yang dipilih -->
-            </select>
-        </div>
-        <div class="mb-3">
-            <label for="phone" class="form-label">Phone Number</label>
-            <input type="text" class="form-control" id="phone" name="phone" required>
+        <div id="uploadProofContainer" class="mb-3" style="display: none;">
+            <h5>Bank Transfer :</h5>
+            <h5>BCA 1702321312 a/n Razzan</h5>
+            <label for="transfer_proof" class="form-label">
+                Upload Bukti Transfer</label>
+            <input type="file" class="form-control" id="transfer_proof" name="payment_proof" accept="image/*"
+                required>
         </div>
     </form>
 </div>
-
 <script>
-    // Data Provinsi dan Kota
-    const data = {
-    "provinsi": [
-        {"id": "1", "name": "Aceh"},
-        {"id": "2", "name": "Bali"},
-        {"id": "3", "name": "Banten"},
-        {"id": "4", "name": "Bengkulu"},
-        {"id": "5", "name": "Gorontalo"},
-        {"id": "6", "name": "Jakarta"},
-        {"id": "7", "name": "Jambi"},
-        {"id": "8", "name": "Jawa Barat"},
-        {"id": "9", "name": "Jawa Tengah"},
-        {"id": "10", "name": "Jawa Timur"},
-        {"id": "11", "name": "Kalimantan Barat"},
-        {"id": "12", "name": "Kalimantan Selatan"},
-        {"id": "13", "name": "Kalimantan Tengah"},
-        {"id": "14", "name": "Kalimantan Timur"},
-        {"id": "15", "name": "Kepulauan Riau"},
-        {"id": "16", "name": "Lampung"},
-        {"id": "17", "name": "Maluku"},
-        {"id": "18", "name": "Maluku Utara"},
-        {"id": "19", "name": "Nusa Tenggara Barat"},
-        {"id": "20", "name": "Nusa Tenggara Timur"},
-        {"id": "21", "name": "Papua"},
-        {"id": "22", "name": "Papua Barat"},
-        {"id": "23", "name": "Riau"},
-        {"id": "24", "name": "Sulawesi Barat"},
-        {"id": "25", "name": "Sulawesi Selatan"},
-        {"id": "26", "name": "Sulawesi Tengah"},
-        {"id": "27", "name": "Sulawesi Tenggara"},
-        {"id": "28", "name": "Sulawesi Utara"},
-        {"id": "29", "name": "Sumatera Barat"},
-        {"id": "30", "name": "Sumatera Selatan"},
-        {"id": "31", "name": "Sumatera Utara"}
-    ],
-    "kota": {
-        "1": [ // Aceh
-            {"id": "1", "name": "Banda Aceh"},
-            {"id": "2", "name": "Lhokseumawe"},
-            {"id": "3", "name": "Langsa"},
-            {"id": "4", "name": "Sabang"}
-        ],
-        "2": [ // Bali
-            {"id": "1", "name": "Denpasar"},
-            {"id": "2", "name": "Badung"},
-            {"id": "3", "name": "Gianyar"},
-            {"id": "4", "name": "Buleleng"}
-        ],
-        "3": [ // Banten
-            {"id": "1", "name": "Serang"},
-            {"id": "2", "name": "Tangerang"},
-            {"id": "3", "name": "Cilegon"},
-            {"id": "4", "name": "Pandeglang"}
-        ],
-        "4": [ // Bengkulu
-            {"id": "1", "name": "Bengkulu"},
-            {"id": "2", "name": "Kota Bengkulu"},
-            {"id": "3", "name": "Rejang Lebong"}
-        ],
-        "5": [ // Gorontalo
-            {"id": "1", "name": "Gorontalo"},
-            {"id": "2", "name": "Bone Bolango"},
-            {"id": "3", "name": "Pohuwato"}
-        ],
-        "6": [ // Jakarta
-            {"id": "1", "name": "Central Jakarta"},
-            {"id": "2", "name": "East Jakarta"},
-            {"id": "3", "name": "North Jakarta"},
-            {"id": "4", "name": "West Jakarta"},
-            {"id": "5", "name": "South Jakarta"}
-        ],
-        "7": [ // Jambi
-            {"id": "1", "name": "Jambi"},
-            {"id": "2", "name": "Muaro Jambi"},
-            {"id": "3", "name": "Tanjung Jabung Barat"}
-        ],
-        "8": [ // Jawa Barat
-            {"id": "1", "name": "Bandung"},
-            {"id": "2", "name": "Bekasi"},
-            {"id": "3", "name": "Bogor"},
-            {"id": "4", "name": "Cirebon"},
-            {"id": "5", "name": "Tasikmalaya"}
-        ],
-        "9": [ // Jawa Tengah
-            {"id": "1", "name": "Semarang"},
-            {"id": "2", "name": "Solo"},
-            {"id": "3", "name": "Salatiga"},
-            {"id": "4", "name": "Magelang"},
-            {"id": "5", "name": "Pekalongan"}
-        ],
-        "10": [ // Jawa Timur
-            {"id": "1", "name": "Surabaya"},
-            {"id": "2", "name": "Malang"},
-            {"id": "3", "name": "Madiun"},
-            {"id": "4", "name": "Banyuwangi"}
-        ],
-        "11": [ // Kalimantan Barat
-            {"id": "1", "name": "Pontianak"},
-            {"id": "2", "name": "Singkawang"},
-            {"id": "3", "name": "Sambas"}
-        ],
-        "12": [ // Kalimantan Selatan
-            {"id": "1", "name": "Banjarmasin"},
-            {"id": "2", "name": "Banjarbaru"},
-            {"id": "3", "name": "Martapura"}
-        ],
-        "13": [ // Kalimantan Tengah
-            {"id": "1", "name": "Palangka Raya"},
-            {"id": "2", "name": "Kuala Kapuas"},
-            {"id": "3", "name": "Sampit"}
-        ],
-        "14": [ // Kalimantan Timur
-            {"id": "1", "name": "Samarinda"},
-            {"id": "2", "name": "Balikpapan"},
-            {"id": "3", "name": "Kutai Kartanegara"}
-        ],
-        "15": [ // Kepulauan Riau
-            {"id": "1", "name": "Tanjung Pinang"},
-            {"id": "2", "name": "Batam"},
-            {"id": "3", "name": "Karimun"}
-        ],
-        // Tambahkan data kota lainnya untuk provinsi yang tersisa sesuai kebutuhan
-    }
-}
-    // Fungsi untuk mengisi dropdown provinsi
-    function populateProvinces() {
-        const provinceSelect = document.getElementById('province');
-        data.provinsi.forEach(prov => {
-            const option = document.createElement('option');
-            option.value = prov.id;
-            option.textContent = prov.name;
-            provinceSelect.appendChild(option);
-        });
-    }
-
-    // Fungsi untuk mengisi dropdown kota berdasarkan provinsi yang dipilih
-    function populateCities(provinceId) {
-        const citySelect = document.getElementById('city');
-        citySelect.innerHTML = '<option value="">Select City</option>'; // Clear previous cities
-
-        if (provinceId && data.kota[provinceId]) {
-            data.kota[provinceId].forEach(city => {
-                const option = document.createElement('option');
-                option.value = city.id;
-                option.textContent = city.name;
-                citySelect.appendChild(option);
-            });
+    document.getElementById("transfer_proof").addEventListener("change", function(e) {
+        const file = e.target.files[0];
+        if (!file.type.startsWith("image/")) {
+            alert("Only image files are allowed!");
+            e.target.value = "";
         }
-    }
+    });
+</script>
+<script>
+    // Ambil elemen yang diperlukan
+    const searchInput = document.getElementById('searchDestinaton');
+    const zipCodeInput = document.getElementById('zip_code');
+    const suggestionBox = document.getElementById('suggestions');
+    const tariffDropdown = document.getElementById('tariff');
+    const shippingTariffDiv = document.getElementById('shippingTariff');
+    const shippingCostInput = document.getElementById('shipping_cost');
+    const grandTotalInput = document.getElementById('grandtotal');
 
-    // Event listener untuk menangani perubahan provinsi
-    document.getElementById('province').addEventListener('change', function() {
-        populateCities(this.value);
+    let debounceTimer;
+
+    // Event listener untuk input pencarian
+    searchInput.addEventListener('input', function() {
+        const query = this.value.trim();
+        clearTimeout(debounceTimer);
+
+        if (query.length < 3) {
+            suggestionBox.innerHTML = '';
+            return;
+        }
+
+        debounceTimer = setTimeout(() => {
+            fetch(`/search-destination?q=${encodeURIComponent(query)}&limit=5&offset=0`)
+                .then(res => res.json())
+                .then(data => {
+                    console.log('API Response:', data);
+                    suggestionBox.innerHTML = '';
+
+                    if (data.data && data.data.length > 0) {
+                        data.data.forEach(item => {
+                            const li = document.createElement('li');
+                            li.className = 'list-group-item list-group-item-action';
+                            li.textContent =
+                                `${item.subdistrict_name}, ${item.district_name}, ${item.city_name}, ${item.province_name}`;
+                            li.dataset.zip = item.zip_code || '';
+                            li.dataset.id = item.id;
+                            suggestionBox.appendChild(li);
+                        });
+                    } else {
+                        const li = document.createElement('li');
+                        li.className = 'list-group-item disabled';
+                        li.textContent = 'No results found';
+                        suggestionBox.appendChild(li);
+                    }
+                })
+                .catch(err => {
+                    console.error('Fetch error:', err);
+                    suggestionBox.innerHTML =
+                        '<li class="list-group-item disabled">Error loading</li>';
+                });
+        }, 300);
     });
 
-    // Panggil fungsi untuk mengisi provinsi saat halaman dimuat
-    document.addEventListener('DOMContentLoaded', function() {
-        populateProvinces();
+    // Event listener untuk memilih suggestion dari daftar
+    suggestionBox.addEventListener('click', function(e) {
+        if (e.target && e.target.matches('li.list-group-item-action')) {
+            searchInput.value = e.target.textContent;
+            zipCodeInput.value = e.target.dataset.zip;
+            document.getElementById('destination_id').value = e.target.dataset.id;
+
+            console.log('Selected Destination ID:', e.target.dataset.id);
+
+            const receiverDestinationId = document.getElementById('destination_id').value;
+            const weight = parseFloat(
+                "{{ isset($cartItems['TotalWeight']) ? number_format($cartItems['TotalWeight'] / 1000, 2, '.', '') : 0 }}"
+                );
+            const itemValue = {{ isset($cartItems['TotalPrice']) ? $cartItems['TotalPrice'] : 0 }};
+
+            if (!receiverDestinationId || !weight || !itemValue) {
+                console.error("Missing required fields!");
+                return;
+            }
+
+            fetch('/check-tariff', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute(
+                            'content')
+                    },
+                    body: JSON.stringify({
+                        receiver_destination_id: receiverDestinationId,
+                        weight: weight,
+                        item_value: itemValue
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    console.log('Shipping Cost Response:', data);
+
+                    // Kosongkan isi dropdown tarif
+                    tariffDropdown.innerHTML = '<option value="">Select a Courir</option>';
+
+                    const tarifList = [];
+
+                    if (data.data) {
+                        const {
+                            calculate_reguler = [], calculate_cargo = []
+                        } = data.data;
+
+                        // Menambahkan tarif reguler
+                        calculate_reguler.forEach((item, index) => {
+                            tarifList.push({
+                                ...item,
+                                type: 'Reguler',
+                                index
+                            });
+                        });
+
+                        // Menambahkan tarif cargo
+                        calculate_cargo.forEach((item, index) => {
+                            tarifList.push({
+                                ...item,
+                                type: 'Cargo',
+                                index
+                            });
+                        });
+                    }
+
+                    if (tarifList.length > 0) {
+                        shippingTariffDiv.style.display = 'block';
+
+                        tarifList.forEach(item => {
+                            const option = document.createElement('option');
+                            option.value =
+                                `${item.shipping_name}-${item.service_name}-${item.type}-${item.index}`;
+                            option.textContent =
+                                `${item.shipping_name} ${item.service_name} (${item.type}) - Rp${item.shipping_cost.toLocaleString()} - ETA: ${item.etd}`;
+                            option.dataset.shipping = JSON.stringify(item);
+                            tariffDropdown.appendChild(option);
+                        });
+                    } else {
+                        shippingTariffDiv.style.display = 'none';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching shipping cost:', error);
+                });
+
+            suggestionBox.innerHTML = '';
+        }
+    });
+
+    // Event listener untuk perubahan pilihan tarif
+    tariffDropdown.addEventListener('change', function() {
+        const selectedOption = tariffDropdown.options[tariffDropdown.selectedIndex];
+        if (selectedOption) {
+            const shippingCost = JSON.parse(selectedOption.dataset.shipping).shipping_cost;
+            const grandTotal = JSON.parse(selectedOption.dataset.shipping).grandtotal;
+            // Menyimpan biaya pengiriman di input tersembunyi
+            shippingCostInput.value = shippingCost;
+            grandTotalInput.value = grandTotal;
+
+            // Menampilkan biaya pengiriman di frontend
+            const shippingCostDisplay = document.getElementById('shippingCostDisplay');
+            const shippingCostAmount = document.getElementById('shippingCostAmount');
+            shippingCostAmount.textContent =
+                `Rp.${shippingCost.toLocaleString()}`;
+            shippingCostDisplay.style.display = 'block';
+
+            // Menampilkan biaya pengiriman di frontend
+            const grandTotalDisplay = document.getElementById('grandTotalDisplay');
+            const grandTotalAmount = document.getElementById('grandTotalAmount');
+            grandTotalAmount.textContent =
+                `Rp.${grandTotal.toLocaleString()}`;
+            grandTotalDisplay.style.display = 'block';
+
+            document.getElementById('uploadProofContainer').style.display = 'block';
+
+            console.log('Selected Shipping Cost:', shippingCost);
+        }
+    });
+
+    // Menutup suggestion box jika klik di luar elemen pencarian
+    document.addEventListener('click', function(e) {
+        if (!searchInput.contains(e.target) && !suggestionBox.contains(e.target)) {
+            suggestionBox.innerHTML = '';
+        }
     });
 </script>

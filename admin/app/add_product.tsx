@@ -27,6 +27,8 @@ export default function AddProductScreen() {
     setPrice,
     capital,
     setCapital,
+    weight,
+    setWeight,
     department,
     setDepartment,
     category,
@@ -68,6 +70,7 @@ export default function AddProductScreen() {
       description,
       price,
       capital,
+      weight,
       department,
       category,
       sizes: stockDetails,
@@ -83,6 +86,7 @@ export default function AddProductScreen() {
         setDescription("");
         setPrice("");
         setCapital("");
+        setWeight("");
         setDepartment("");
         setCategory("");
         if (
@@ -145,6 +149,8 @@ export default function AddProductScreen() {
         setDescription={setDescription}
         price={price}
         setPrice={setPrice}
+        weight={weight}
+        setWeight={setWeight}
         capital={capital}
         setCapital={setCapital}
         isDark={isDark}

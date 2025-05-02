@@ -2,10 +2,7 @@ package product
 
 import (
 	"context"
-	"crypto/rand"
 	"fmt"
-	"io"
-	"math/big"
 	"mime/multipart"
 	"os"
 	"path/filepath"
@@ -93,6 +90,7 @@ func (s *service) AddProduct(ctx context.Context, req AddProductRequest, images 
 		TotalStock:  totalStock,
 		Description: req.Description,
 		Price:       req.Price,
+		Weight:      req.Weight,
 		Capital:     req.Capital,
 		Department:  req.Department,
 		Category:    req.Category,
@@ -210,6 +208,7 @@ func (s *service) UpdateProduct(ctx context.Context, productID string, req Updat
 	product.TotalStock = totalStock
 	product.Description = req.Description
 	product.Price = req.Price
+	product.Weight = req.Weight
 	product.Capital = req.Capital
 	product.Department = req.Department
 	product.Category = req.Category
@@ -308,37 +307,6 @@ func (s *service) UpdateProduct(ctx context.Context, productID string, req Updat
 				return fmt.Errorf("error updating stock detail: %v", err)
 			}
 		}
-	}
-
-	return nil
-}
-
-// func helper
-func generateImageName(productID string) (string, error) {
-	imageID, err := rand.Int(rand.Reader, big.NewInt(1000000))
-	if err != nil {
-		return "", fmt.Errorf("error generating random number: %v", err)
-	}
-	filename := fmt.Sprintf("%s_%d", productID, imageID.Int64())
-
-	return filename, nil
-}
-
-func (s *service) saveImage(ctx context.Context, file *multipart.FileHeader, path string) error {
-	src, err := file.Open()
-	if err != nil {
-		return fmt.Errorf("failed to open uploaded file: %w", err)
-	}
-	defer src.Close()
-
-	dst, err := os.Create(path)
-	if err != nil {
-		return fmt.Errorf("failed to create file on disk: %w", err)
-	}
-	defer dst.Close()
-
-	if _, err := io.Copy(dst, src); err != nil {
-		return fmt.Errorf("failed to copy file to disk: %w", err)
 	}
 
 	return nil

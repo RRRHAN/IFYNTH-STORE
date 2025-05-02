@@ -145,13 +145,11 @@ func (h *handler) AddProduct(ctx *gin.Context) {
 func (h *handler) DeleteProduct(ctx *gin.Context) {
 	var req DeleteProductRequest
 
-	// Bind JSON body ke struct
 	if err := ctx.ShouldBindJSON(&req); err != nil {
 		respond.Error(ctx, apierror.FromErr(err))
 		return
 	}
 
-	// Kirim struct req, bukan string
 	if err := h.service.DeleteProduct(ctx.Request.Context(), req); err != nil {
 		respond.Error(ctx, apierror.FromErr(err))
 		return

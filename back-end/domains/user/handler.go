@@ -17,6 +17,7 @@ type Handler interface {
 	Logout(ctx *gin.Context)
 	Register(ctx *gin.Context)
 	ChangePassword(ctx *gin.Context)
+	GetPersonal(ctx *gin.Context)
 }
 
 type handler struct {
@@ -29,6 +30,15 @@ func NewHandler(service Service, validate *validator.Validate) Handler {
 		service:  service,
 		validate: validate,
 	}
+}
+func (h *handler) GetPersonal(ctx *gin.Context) {
+	res, err := h.service.GetPersonal(ctx)
+	if err != nil {
+		respond.Error(ctx, apierror.FromErr(err))
+		return
+	}
+
+	respond.Success(ctx, http.StatusOK, res)
 }
 
 func (h *handler) Login(ctx *gin.Context) {

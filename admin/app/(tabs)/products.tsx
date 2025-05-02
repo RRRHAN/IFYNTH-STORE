@@ -23,7 +23,7 @@ import {
 } from "@/components/ThemedTable";
 import { deleteProduct } from "@/app/api/products";
 import ModalComponent from "@/components/ModalComponent";
-import ProductDetailModal from "../detail_product";
+import ProductDetailModal from "../../components/detail_product";
 
 const ProductsScreen = () => {
   const screenWidth = Dimensions.get("window").width;

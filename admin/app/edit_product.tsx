@@ -35,6 +35,8 @@ export default function EditProductScreen() {
     setPrice,
     capital,
     setCapital,
+    weight,
+    setWeight,
     department,
     setDepartment,
     category,
@@ -66,6 +68,7 @@ export default function EditProductScreen() {
       description,
       price,
       capital,
+      weight,
       department,
       category,
       sizes,
@@ -152,6 +155,8 @@ export default function EditProductScreen() {
         setDescription={setDescription}
         price={price}
         setPrice={setPrice}
+        weight={weight}
+        setWeight={setWeight}
         capital={capital}
         setCapital={setCapital}
         isDark={isDark}

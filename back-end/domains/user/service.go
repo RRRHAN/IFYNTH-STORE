@@ -22,6 +22,7 @@ type Service interface {
 	ValidateToken(ctx context.Context, token string) (err error)
 	Register(ctx context.Context, input RegisterReq) (res *Customer, err error)
 	ChangePassword(ctx context.Context, input ChangePasswordReq) error
+	GetPersonal(ctx context.Context) (interface{}, error)
 }
 
 type service struct {
@@ -33,6 +34,34 @@ func NewService(config *config.Config, db *gorm.DB) Service {
 	return &service{
 		authConfig: config.Auth,
 		db:         db,
+	}
+}
+
+func (s *service) GetPersonal(ctx context.Context) (interface{}, error) {
+	token, err := contextUtil.GetTokenClaims(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	switch token.Claims.Role {
+	case "ADMIN":
+		var admin Admin
+		err = s.db.WithContext(ctx).Where("id = ?", token.Claims.UserID).First(&admin).Error
+		if err != nil {
+			return nil, err
+		}
+		return &admin, nil
+
+	case "CUSTOMER":
+		var customer Customer
+		err = s.db.WithContext(ctx).Where("id = ?", token.Claims.UserID).First(&customer).Error
+		if err != nil {
+			return nil, err
+		}
+		return &customer, nil
+
+	default:
+		return nil, errors.New("invalid role")
 	}
 }
 
@@ -58,6 +87,7 @@ func (s *service) Login(ctx context.Context, input LoginReq) (*LoginRes, error) 
 			userID = customer.ID
 		}
 	}
+
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
 			return nil, apierror.NewWarn(http.StatusUnauthorized, ErrInvalidCredentials)

@@ -13,6 +13,7 @@ import (
 	"github.com/RRRHAN/IFYNTH-STORE/back-end/domains/cusproduct"
 	"github.com/RRRHAN/IFYNTH-STORE/back-end/domains/message"
 	"github.com/RRRHAN/IFYNTH-STORE/back-end/domains/product"
+	"github.com/RRRHAN/IFYNTH-STORE/back-end/domains/transaction"
 	"github.com/RRRHAN/IFYNTH-STORE/back-end/domains/user"
 	"github.com/RRRHAN/IFYNTH-STORE/back-end/middlewares"
 	"github.com/RRRHAN/IFYNTH-STORE/back-end/routes"
@@ -44,6 +45,11 @@ var messageSet = wire.NewSet(
 	message.NewHandler,
 )
 
+var transactionSet = wire.NewSet(
+	transaction.NewService,
+	transaction.NewHandler,
+)
+
 func initializeDependency(config *config.Config) (*routes.Dependency, error) {
 
 	wire.Build(
@@ -56,6 +62,7 @@ func initializeDependency(config *config.Config) (*routes.Dependency, error) {
 		cartSet,
 		cusproductSet,
 		messageSet,
+		transactionSet,
 	)
 
 	return nil, nil

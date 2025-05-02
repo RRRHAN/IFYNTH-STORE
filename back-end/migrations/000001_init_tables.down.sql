@@ -8,3 +8,7 @@ DROP TABLE IF EXISTS carts;
 DROP TABLE IF EXISTS carts_items;
 DROP TABLE IF EXISTS cusproduct;
 DROP TABLE IF EXISTS customer_product_files;
+DROP TABLE IF EXISTS message;
+DROP TABLE IF EXISTS transactions;
+DROP TABLE IF EXISTS shipping_address;
+DROP TABLE IF EXISTS transaction_details;

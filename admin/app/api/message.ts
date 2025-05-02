@@ -1,11 +1,6 @@
 import { Message } from "../types/message";
 import { BASE_URL, getAuthToken } from "./constants";
-
-interface MessageData {
-    ProductID: string;
-    Message: string;
-    Role: string;
-  }
+import { MessageData } from "../request/messageReq";
 
   export const addMessage = async (MessageData: MessageData) => {
     const authToken = await getAuthToken();

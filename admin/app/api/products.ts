@@ -1,17 +1,6 @@
 import { Product } from "../types/product";
 import { BASE_URL, getAuthToken } from "./constants";
-
-// Define ProductData interface
-interface ProductData {
-  name: string;
-  description: string;
-  price: string;
-  capital: string;
-  department: string;
-  category: string;
-  sizes: { size: string; stock: number }[];
-  images: any[];
-}
+import { ProductData, UpdateProductData } from "../request/productReq";
 
 export const fetchProducts = async (): Promise<Product[]> => {
   const token = await getAuthToken();
@@ -39,10 +28,10 @@ export const addProduct = async (productData: ProductData) => {
   formData.append("description", productData.description);
   formData.append("price", productData.price);
   formData.append("capital", productData.capital);
+  formData.append("weight", productData.weight);
   formData.append("department", productData.department);
   formData.append("category", productData.category);
 
-  // Menambahkan gambar jika ada
   if (productData.images.length > 0) {
     for (const [index, img] of productData.images.entries()) {
       const imageUri = img.uri;
@@ -52,7 +41,6 @@ export const addProduct = async (productData: ProductData) => {
     }
   }
 
-  // Menambahkan stock_details meskipun ada stok 0
   formData.append("stock_details", JSON.stringify(productData.sizes));
 
   try {
@@ -70,7 +58,6 @@ export const addProduct = async (productData: ProductData) => {
   }
 };
 
-// Delete a product by ID
 export const deleteProduct = async (productId: string) => {
   const token = await getAuthToken();
   const deleteUrl = `${BASE_URL}/product/${productId}`;
@@ -100,19 +87,6 @@ export const deleteProduct = async (productId: string) => {
   }
 };
 
-interface UpdateProductData {
-  productId: string;
-  name: string;
-  description: string;
-  price: string;
-  capital: string;
-  department: string;
-  category: string;
-  sizes: { size: string; stock: number }[];
-  images: any[];
-  removedImages: { productID: string; url: string }[];
-}
-
 export const updateProduct = async (productData: UpdateProductData) => {
   const authToken = await getAuthToken();
   const formData = new FormData();
@@ -121,10 +95,10 @@ export const updateProduct = async (productData: UpdateProductData) => {
   formData.append("description", productData.description);
   formData.append("price", productData.price);
   formData.append("capital", productData.capital);
+  formData.append("weight", productData.weight);
   formData.append("department", productData.department);
   formData.append("category", productData.category);
 
-  // Upload new images (if any)
   if (productData.images.length > 0) {
     for (const [index, img] of productData.images.entries()) {
       const imageUri = img.uri;
@@ -139,7 +113,6 @@ export const updateProduct = async (productData: UpdateProductData) => {
   }
   
   console.log(productData);
-  // Stock details
   formData.append("stockDetails", JSON.stringify(productData.sizes));
 
   console.log("FormData contents:");

@@ -3,7 +3,7 @@
     <div class="container">
         <div class="top__wrapper d-flex justify-content-between align-items-center">
             <a href="index.html" class="main__logo">
-                <img src="/assets/images/logo/logo.png" alt="logo__image" style="width: 250px">
+                <img src="/assets/images/logo/logo.png" alt="logo__image" style="width: 220px">
             </a>
             <div class="search__wrp">
                 <input placeholder="Search for" aria-label="Search">
@@ -23,7 +23,7 @@
                     </a>
                 </div>
                 <div class="cart d-flex align-items-center">
-                    <span class="cart__icon"    onclick="window.location.href='{{ route('get.Cart') }}'">
+                    <span class="cart__icon" onclick="window.location.href='{{ route('get.Cart') }}'">
                         <i class="fa-regular fa-cart-shopping"></i>
                     </span>
                     <a href="{{ route('get.Cart') }}" class="c__one">
@@ -34,10 +34,10 @@
                     </span>
                 </div>
                 <div class="">
-                    <a href="{{route('fetchList')}}" class="message btn p-0">
+                    <a href="{{ route('fetchList') }}" class="message btn p-0">
                         <i class="fa-solid fa-message text-white"></i>
                     </a>
-                </div>                
+                </div>
             </div>
         </div>
     </div>
@@ -62,20 +62,16 @@
                     <a class="nav-link" href="/landing">Home</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="{{route('products.getAll', ['department' => 'IFY'])}}">I Found You</a>
+                    <a class="nav-link" href="{{ route('products.getAll', ['department' => 'IFY']) }}">I Found You</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="{{route('products.getAll', ['department' => 'NTH'])}}">No Time To Hell</a>
+                    <a class="nav-link" href="{{ route('products.getAll', ['department' => 'NTH']) }}">No Time To
+                        Hell</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="/sellproduct">Sell Your Clothes</a>
                 </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="contact.html">Contact Us</a>
-                </li>
             </ul>
-
-
             <!-- Shipping Info (Kanan) -->
             <div class="shipping__item d-none d-sm-flex align-items-center">
                 <div class="menu__right d-flex align-items-center">
@@ -99,27 +95,28 @@
     <div class="logo mb-30">
         <img src="/assets/images/logo/logo.png" alt="logo">
     </div>
-    <p class="text-justify">The foundation of any road is the subgrade, which provides a stable base for the road
-        layers above. Proper compaction of
-        the subgrade is crucial to prevent settling and ensure long-term road stability.</p>
+    <p class="text-justify">We are a local clothing store dedicated to streetwear and youth culture. Our collection
+        features original designs, limited drops, and high-quality materials that speak your style. Whether you're into
+        bold graphics or minimal classics, we’ve got something that fits your vibe. Support local, wear proud.</p>
     <ul class="info py-4 mt-65 bor-top bor-bottom">
-        <li><i class="fa-solid primary-color fa-location-dot"></i> <a href="index-2.html#0">example@example.com</a>
+        <li><i class="fa-solid primary-color fa-location-dot"></i> <a href="">example@example.com</a>
         </li>
         <li class="py-4"><i class="fa-solid primary-color fa-phone-volume"></i> <a href="tel:+912659302003">+91 2659
                 302 003</a>
         </li>
-        <li><i class="fa-solid primary-color fa-paper-plane"></i> <a href="index-2.html#0">info.company@gmail.com</a>
+        <li><i class="fa-solid primary-color fa-paper-plane"></i> <a href="">info.company@gmail.com</a>
         </li>
     </ul>
     <div class="social-icon mt-65">
-        <a href="index-2.html#0"><i class="fa-brands fa-facebook-f"></i></a>
-        <a href="index-2.html#0"><i class="fa-brands fa-twitter"></i></a>
-        <a href="index-2.html#0"><i class="fa-brands fa-linkedin-in"></i></a>
-        <a href="index-2.html#0"><i class="fa-brands fa-instagram"></i></a>
+        <a href=""><i class="fa-brands fa-facebook-f"></i></a>
+        <a href=""><i class="fa-brands fa-twitter"></i></a>
+        <a href=""><i class="fa-brands fa-linkedin-in"></i></a>
+        <a href=""><i class="fa-brands fa-instagram"></i></a>
     </div>
     <button id="closeButton" class="text-white"><i class="fa-solid fa-xmark"></i></button>
 </div>
 <!-- Sidebar area end here -->
+
 <!-- Modal Notifikasi -->
 <div class="modal fade" id="loginModal" tabindex="-1" aria-labelledby="loginModalLabel" aria-hidden="true">
     <div class="modal-dialog">
@@ -140,35 +137,33 @@
 </div>
 
 <script>
-    document.addEventListener("DOMContentLoaded", function () {
-        var userLoggedIn = @json(session('api_token') !== null );
+    document.addEventListener("DOMContentLoaded", function() {
+        var userLoggedIn = @json(session('api_token') !== null);
         var loginModal = new bootstrap.Modal(document.getElementById('loginModal'));
 
-        document.body.addEventListener("click", function (event) {
-            var target = event.target.closest(".account a") || event.target.closest(".cart a"); // Cek jika yang diklik adalah link di dalam .account
+        document.body.addEventListener("click", function(event) {
+            var target = event.target.closest(".account a") || event.target.closest(
+            ".cart a");
 
             if (target && !userLoggedIn) {
-                event.preventDefault(); // Mencegah navigasi
-                loginModal.show(); // Tampilkan modal
+                event.preventDefault();
+                loginModal.show();
             }
         });
     });
 </script>
-
 <script>
-    document.addEventListener("DOMContentLoaded", function () {
-        // Ambil semua link di menu
+    document.addEventListener("DOMContentLoaded", function() {
         const menuLinks = document.querySelectorAll(".main-menu .nav-link");
 
-        // Ambil URL saat ini
-        const currentUrl = window.location.pathname;
+        const currentUrl = window.location.href;
 
-        // Loop semua link dan cek apakah URL-nya cocok dengan halaman saat ini
         menuLinks.forEach(link => {
-            if (link.getAttribute("href") === currentUrl) {
+            const linkUrl = link.getAttribute("href");
+
+            if (currentUrl.includes(linkUrl)) {
                 link.classList.add("active");
             }
         });
     });
-
 </script>

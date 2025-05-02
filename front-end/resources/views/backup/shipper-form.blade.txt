@@ -1,0 +1,83 @@
+<div id="shipperForm" class="shipper-form" style="display: none;">
+    <form id="formShip" action="" method="POST">
+        @csrf
+        <div class="mb-3">
+            <label for="name" class="form-label">Full Name</label>
+            <input type="text" class="form-control" id="name" name="name" required>
+        </div>
+        <div class="mb-3">
+            <label for="phone" class="form-label">Phone Number</label>
+            <input type="text" class="form-control" id="phone" name="phone" required>
+        </div>
+        <div class="mb-3">
+            <label for="searchDestinaton" class="form-label">Search Destination</label>
+            <small id="enterHint" class="text-white"><br> Type and press <strong>Enter</strong> to search.</small>
+            <input type="text" class="form-control" id="searchDestinaton" placeholder="e.g., Surabaya">
+        </div>
+        <div class="mb-3 row">
+            <div class="col-md-8">
+                <label for="destination" class="form-label">Destination</label>
+                <select class="form-select" id="destination" name="destination">
+                    <option value="">None</option>
+                </select>                
+            </div>
+            <div class="col-md-4">
+                <label for="zip_code" class="form-label">Zip Code</label>
+                <input type="text" class="form-control" id="zip_code" name="zip_code" maxlength="5" inputmode="numeric" pattern="\d{5}" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+            </div>
+        </div>
+        <div class="mb-3">
+            <label for="address" class="form-label">Full Address</label>
+            <input type="text" class="form-control" id="address" name="address" required>
+        </div>
+    </form>
+</div>
+<script>
+    const destinationSelect = document.getElementById('destination');
+    const zipCodeInput = document.getElementById('zip_code');
+
+    document.getElementById('searchDestinaton').addEventListener('keydown', function(event) {
+        if (event.key === 'Enter') {
+            event.preventDefault(); // Mencegah form submit
+            const searchQuery = this.value;
+
+            if (searchQuery.length < 3) {
+                destinationSelect.innerHTML = '<option value="">Type at least 3 characters</option>';
+                return;
+            }
+
+            // Tampilkan teks "Select Destination"
+            destinationSelect.innerHTML = '<option value="">Select Destination</option>';
+
+            fetch(`/search-destination?q=${encodeURIComponent(searchQuery)}&limit=5&offset=0`)
+                .then(res => res.json())
+                .then(data => {
+                    console.log('Response from API:', data);
+
+                    if (data.error) {
+                        destinationSelect.innerHTML = `<option value="">Error: ${data.error}</option>`;
+                        return;
+                    }
+
+                    data.data.forEach(item => {
+                        const option = document.createElement('option');
+                        option.value = item.id;
+                        option.textContent = `${item.city_name}, ${item.district_name}, ${item.province_name}`;
+                        option.setAttribute('data-label', item.label);
+                        option.setAttribute('data-zip', item.zip_code || '');
+                        destinationSelect.appendChild(option);
+                    });
+                })
+                .catch(err => {
+                    console.error('Error searching city:', err);
+                    destinationSelect.innerHTML = '<option value="">Error loading</option>';
+                });
+        }
+    });
+
+    destinationSelect.addEventListener('change', function () {
+        const selectedOption = destinationSelect.options[destinationSelect.selectedIndex];
+        const zipCode = selectedOption.getAttribute('data-zip') || '';
+        zipCodeInput.value = zipCode;
+    });
+</script>

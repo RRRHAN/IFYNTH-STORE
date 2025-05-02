@@ -8,11 +8,11 @@ import {
   View,
   Modal,
 } from "react-native";
-import { IconButton, Tooltip } from "react-native-paper";
+import { IconButton } from "react-native-paper";
 import { useRouter } from "expo-router";
-import styles from "../styles/productStyles";
+import styles from "../styles/cusProductStyles";
 import { cusProduct } from "../types/product";
-import { fetchOffers, handleStatusChange } from "@/app/api/cusoffers";
+import { fetchOffers, handleStatusChange, Status } from "@/app/api/cusoffers";
 import { ThemedView } from "@/components/ThemedView";
 import { ThemedText } from "@/components/ThemedText";
 import {
@@ -21,9 +21,13 @@ import {
   ThemedHeader,
   ThemedCell,
 } from "@/components/ThemedTable";
-import ModalComponent from "@/components/ModalComponent";
 import OfferDetailModal from "../detail_offer";
 import { Picker } from "@react-native-picker/picker";
+import Video from 'react-native-video';
+
+type StatusMap = {
+  [id: string]: Status;
+};
 
 const userOffers = () => {
   const screenWidth = Dimensions.get("window").width;
@@ -58,9 +62,7 @@ const userOffers = () => {
   );
   const [visible, setVisible] = useState(false);
   const [isProductModalVisible, setIsProductModalVisible] = useState(false);
-  const [successMessage, setSuccessMessage] = useState("");
-  const [errorMessage, setErrorMessage] = useState("");
-  const [selectedStatus, setSelectedStatus] = useState("");
+  const [selectedStatus, setSelectedStatus] = useState<StatusMap>({});
 
   const getData = async () => {
     try {
@@ -129,10 +131,13 @@ const userOffers = () => {
       </ThemedCell>
       <ThemedCell style={[{ width: columnWidths.status }]}>
         <Picker
-          selectedValue={selectedStatus !== "pending" ? item.Status : selectedStatus}
-          onValueChange={(newStatus) => {
-            setSelectedStatus(newStatus);
+          selectedValue={selectedStatus[item.ID] || item.Status}
+          onValueChange={(newStatus: Status) => {
             handleStatusChange(newStatus, item.ID);
+            setSelectedStatus((prev) => ({
+              ...prev,
+              [item.ID]: newStatus,
+            }));
           }}
           style={{ height: 50, width: "100%" }}
         >
@@ -156,7 +161,8 @@ const userOffers = () => {
           icon="message"
           size={20}
           iconColor="#4169E1"
-          onPress={() => {setSelectedProduct(item);
+          onPress={() => {
+            setSelectedProduct(item);
             router.push({
               pathname: "/message",
               params: { item: JSON.stringify(item) },
@@ -169,7 +175,6 @@ const userOffers = () => {
 
   return (
     <ThemedView style={[styles.center]}>
-      {/* Modal untuk menampilkan ProductDetailScreen */}
       <Modal
         animationType="slide"
         transparent={true}
@@ -184,7 +189,6 @@ const userOffers = () => {
             backgroundColor: "rgba(0, 0, 0, 0.7)",
           }}
         >
-          {/* Tombol silang dengan React Native Paper */}
           <IconButton
             icon="close"
             size={24}
@@ -201,14 +205,8 @@ const userOffers = () => {
           <OfferDetailModal product={selectedProduct} />
         </View>
       </Modal>
-      <ModalComponent
-        visible={visible}
-        hideModal={() => setVisible(false)}
-        message={errorMessage || successMessage}
-      />
       <ThemedView style={styles.headerContainer}>
         <ThemedText style={[styles.title]}>LIST USER ADVERTISEMENT</ThemedText>
-        <IconButton icon="plus" size={24} />
       </ThemedView>
       <ScrollView horizontal>
         <ThemedTable>

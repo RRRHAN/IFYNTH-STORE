@@ -185,5 +185,31 @@ class UserController extends Controller
         }
     }
     
+    public function getPersonal() {
+        $token = session('api_token');
+    
+        try {
+            $response = Http::withHeaders([
+                'Authorization' => 'Bearer ' . $token,
+            ])->get('http://localhost:7777/user/get-personal');
+    
+            if ($response->successful()) {
+                $data = collect($response->json()); 
+    
+                if ($data->has('data')) {
+                    $user = $data->get('data');
+                    session(['user' => $user]);
+                    return collect($user);
+                } else {
+                    return collect([]);
+                }
+            } else {
+                return collect([]);
+            }
+        } catch (\Exception $e) {
+            // Jika ada exception
+            return collect(['error' => 'Error occurred: ' . $e->getMessage()]);
+        }
+    }    
     
 }

@@ -7,7 +7,7 @@
         <!-- cart page area start here -->
         <section class="cart-page pt-30 pb-130">
             <div class="container">
-                @if (count($cartItems) > 0)
+                @if (!empty($cartItems) && count($cartItems) > 0)
                     <!-- Shopping Cart - Desktop -->
                     <div class="shopping-cart radius-10 bor sub-bg">
                         <div
@@ -112,17 +112,35 @@
                     <p class="text-center text-white">Your cart is empty.</p>
                 @endif
                 @include('components.shipper-form')
+                @if (!empty($cartItems) && isset($cartItems['TotalPrice']))
                 <div class="totals">
                     <div class="totals-item theme-color float-end mt-3">
+                        <!-- Cart Total -->
                         <span class="fw-bold text-uppercase py-2">Cart total =</span>
-                        <div class="totals-value d-inline py-2 pe-2">
-                            Rp.{{ number_format($cartItems['TotalPrice']) }}</div>
+                        <div id="totalDisplay" class="totals-value d-inline py-2 pe-2">
+                            Rp.{{ number_format($cartItems['TotalPrice']) }}
+                        </div>
+            
+                        <!-- Shipping Cost -->
+                        <div id="shippingCostDisplay" style="display:none;">
+                            <span class="fw-bold text-uppercase py-2">Shipping Cost =</span>
+                            <div id="shippingCostAmount" class="totals-value d-inline py-2 pe-2"></div>
+                        </div>
+            
+                        <!-- Grand Total -->
+                        <div id="grandTotalDisplay" style="display:none;">
+                            <span class="fw-bold text-uppercase py-2">GRANDTOTAL =</span>
+                            <div id="grandTotalAmount" class="totals-value d-inline py-2 pe-2"></div>
+                        </div>
+            
+                        <!-- Checkout Button -->
                         <a href="#" id="checkoutBtn" class="btn-one py-2 px-4" data-bs-toggle="modal"
                             data-bs-target="#shippingModal">
                             <span>Checkout</span>
                         </a>
                     </div>
                 </div>
+            @endif            
             </div>
         </section>
         <!-- cart page area end here -->
@@ -158,16 +176,13 @@
         document.addEventListener("DOMContentLoaded", function() {
             const checkoutBtn = document.getElementById("checkoutBtn");
             const shipperForm = document.getElementById("shipperForm");
-            const form = document.getElementById("formShip");// Menangkap elemen form di dalam shipperForm
-
+            const form = document.getElementById("formShip");
             checkoutBtn.addEventListener("click", function(e) {
-                e.preventDefault(); // Mencegah aksi default tombol (link)
+                e.preventDefault();
 
                 if (shipperForm.style.display === "block") {
-                    // Jika form sudah ditampilkan, kirimkan form
                     form.submit();
                 } else {
-                    // Jika form belum ditampilkan, tampilkan form
                     shipperForm.style.display = "block";
                 }
             });

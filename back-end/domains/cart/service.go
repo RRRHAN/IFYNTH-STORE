@@ -108,6 +108,7 @@ func (s *service) AddToCart(ctx context.Context, req AddToCartRequest) error {
 			ProductID: req.ProductID,
 			Size:      req.Size,
 			Quantity:  req.Quantity,
+			Weight:    product.Weight,
 			Price:     product.Price,
 			CreatedAt: time.Now(),
 			UpdatedAt: time.Now(),
@@ -122,6 +123,7 @@ func (s *service) AddToCart(ctx context.Context, req AddToCartRequest) error {
 	// Update total cart
 	var total float64
 	var total_quantity int
+	var total_weight float64
 
 	s.db.WithContext(ctx).
 		Model(&CartItem{}).
@@ -133,8 +135,14 @@ func (s *service) AddToCart(ctx context.Context, req AddToCartRequest) error {
 		Where("cart_id = ?", cart.ID).
 		Select("SUM(quantity)").Scan(&total_quantity)
 
+	s.db.WithContext(ctx).
+		Model(&CartItem{}).
+		Where("cart_id = ?", cart.ID).
+		Select("SUM(quantity * weight)").Scan(&total_weight)
+
 	cart.TotalQuantity = total_quantity
 	cart.TotalPrice = total
+	cart.TotalWeight = total_weight
 	cart.UpdatedAt = time.Now()
 	if err := s.db.WithContext(ctx).Save(&cart).Error; err != nil {
 		return err
@@ -187,6 +195,7 @@ func (s *service) UpdateCartQuantity(ctx context.Context, req UpdateCartQuantity
 	// Update the cart's total price and quantity
 	var total float64
 	var total_quantity int
+	var total_weight float64
 
 	s.db.WithContext(ctx).
 		Model(&CartItem{}).
@@ -198,8 +207,14 @@ func (s *service) UpdateCartQuantity(ctx context.Context, req UpdateCartQuantity
 		Where("cart_id = ?", cart.ID).
 		Select("SUM(quantity)").Scan(&total_quantity)
 
+	s.db.WithContext(ctx).
+		Model(&CartItem{}).
+		Where("cart_id = ?", cart.ID).
+		Select("SUM(weight * quantity)").Scan(&total_weight)
+
 	cart.TotalPrice = total
 	cart.TotalQuantity = total_quantity
+	cart.TotalWeight = total_weight
 	cart.UpdatedAt = time.Now()
 
 	if err := s.db.WithContext(ctx).Save(&cart).Error; err != nil {
@@ -234,6 +249,7 @@ func (s *service) DeleteFromCart(ctx context.Context, req DeleteFromCartRequest)
 	// Hitung ulang total cart setelah item dihapus
 	var total float64
 	var total_quantity int
+	var total_weight float64
 
 	s.db.WithContext(ctx).
 		Model(&CartItem{}).
@@ -245,8 +261,14 @@ func (s *service) DeleteFromCart(ctx context.Context, req DeleteFromCartRequest)
 		Where("cart_id = ?", cart.ID).
 		Select("SUM(quantity)").Scan(&total_quantity)
 
+	s.db.WithContext(ctx).
+		Model(&CartItem{}).
+		Where("cart_id = ?", cart.ID).
+		Select("SUM(weight * quantity)").Scan(&total_weight)
+
 	cart.TotalPrice = total
 	cart.TotalQuantity = total_quantity
+	cart.TotalWeight = total_weight
 	cart.UpdatedAt = time.Now()
 
 	if err := s.db.WithContext(ctx).Save(&cart).Error; err != nil {

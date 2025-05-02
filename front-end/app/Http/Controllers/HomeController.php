@@ -4,8 +4,6 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Session;
 
 class HomeController extends Controller
 {
@@ -62,17 +60,23 @@ class HomeController extends Controller
     {
         $keyword = $request->query('keyword');
         $token = session('api_token');
-    
+        
         $cusproductController = new CustomerProductController();
         $result = $cusproductController->fetchOffers($request);
-    
-        // Ambil elemen dari koleksi
         $products = $result->get('products');
-        $pagination = $result->get('pagination');
+    
+        $userController = new UserController();
+        $user = $userController->getPersonal();
+    
+        $transactionController = new TransactionController();
+        $transactionsResponse = $transactionController->getTransaction();
+    
+        $transactions = $transactionsResponse->getData(true)['transactions'] ?? [];
     
         return view('dashboard', [
             'products' => $products,
-            'pagination' => $pagination,
+            'user' => $user,
+            'transactions' => $transactions,
         ]);
     }
     

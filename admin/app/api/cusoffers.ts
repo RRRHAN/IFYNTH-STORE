@@ -19,7 +19,12 @@ export const fetchOffers = async (): Promise<cusProduct[]> => {
   return result.data;
 };
 
-export const handleStatusChange = async (newStatus: string, productId: string) => {
+export type Status = "pending" | "approved" | "rejected";
+
+export const handleStatusChange = async (
+  newStatus: Status,
+  productId: string
+): Promise<any> => {
   const token = await getAuthToken();
   const updateStatus = `${BASE_URL}/cusproduct/status`;
 

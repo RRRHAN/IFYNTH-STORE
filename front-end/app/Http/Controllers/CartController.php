@@ -59,8 +59,7 @@ class CartController extends Controller
                 return view('cart', ['cartItems' => $cart]);
             } else {
                 $errors = $response->json()['errors'] ?? ['Failed to get cart'];
-                session()->flash('error', $errors[0]);
-                return redirect()->back();
+                return view('cart');
             }
         } catch (\Exception $e) {
             return redirect()->back()->with('error', $e->getMessage());

@@ -1,0 +1,143 @@
+<div id="shipperForm" class="shipper-form" style="display: none;">
+    <form id="formShip" action="" method="POST">
+        @csrf
+        <div class="mb-3">
+            <label for="name" class="form-label">Full Name</label>
+            <input type="text" class="form-control" id="name" name="name" required>
+        </div>
+        <div class="mb-3">
+            <label for="phone" class="form-label">Phone Number</label>
+            <input type="text" class="form-control" id="phone" name="phone" required>
+        </div>
+        <div class="mb-3">
+            <label for="address" class="form-label">Shipping Address</label>
+            <textarea class="form-control" id="address" name="address" rows="3" required></textarea>
+        </div>
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <label for="province" class="form-label">Province</label>
+                <select class="form-select" id="province" name="province" required>
+                    <option value="">Select Province</option>
+                </select>
+            </div>
+            <div class="col-md-6 mb-3">
+                <label for="city" class="form-label">City</label>
+                <select class="form-select" id="city" name="city" required>
+                    <option value="">Select City</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <label for="subdistrict" class="form-label">Subdistrict (Kecamatan)</label>
+                <select class="form-select" id="subdistrict" name="subdistrict" required>
+                    <option value="">Select Subdistrict</option>
+                </select>
+            </div>
+            <div class="col-md-6 mb-3">
+                <label for="zip_code" class="form-label">Zip Code</label>
+                <input type="text" class="form-control" id="zip_code" name="zip_code" maxlength="5"
+                    inputmode="numeric" pattern="\d{5}" oninput="this.value = this.value.replace(/[^0-9]/g, '')"
+                    required>
+            </div>
+        </div>
+    </form>
+</div>
+<script>
+    const API_KEY = '818bf489bb52eace7ba79ad9b9716b93f7649387a9e4ea4c64ea58a5ae18d366'
+
+    async function populateProvinces() {
+        const provinceSelect = document.getElementById('province');
+
+        try {
+            const res = await fetch(`https://api.binderbyte.com/wilayah/provinsi?api_key=${API_KEY}`);
+            const json = await res.json();
+
+            if (json.code === "200") {
+                json.value.forEach(prov => {
+                    const option = document.createElement('option');
+                    option.value = prov.id;
+                    option.textContent = prov.name;
+                    provinceSelect.appendChild(option);
+                });
+            } else {
+                console.error('Response error:', json);
+                alert("Failed to load provinces: " + (json.messages || 'Unknown error'));
+            }
+        } catch (error) {
+            console.error("Error fetching provinces:", error);
+            alert("Network error while loading provinces.");
+        }
+    }
+
+    async function populateCities(provinceId) {
+        const citySelect = document.getElementById('city');
+        citySelect.innerHTML = '<option value="">Select City</option>';
+
+        try {
+            const res = await fetch(
+                `https://api.binderbyte.com/wilayah/kabupaten?api_key=${API_KEY}&id_provinsi=${provinceId}`);
+            const json = await res.json();
+
+            if (json.code === "200") {
+                json.value.forEach(city => {
+                    const option = document.createElement('option');
+                    option.value = city.id;
+                    option.textContent = city.name;
+                    citySelect.appendChild(option);
+                });
+            } else {
+                console.error('Response error:', json);
+                alert("Failed to load cities: " + (json.messages || 'Unknown error'));
+            }
+        } catch (error) {
+            console.error("Error fetching cities:", error);
+            alert("Network error while loading cities.");
+        }
+    }
+
+    async function populateSubdistricts(cityId) {
+        const subdistrictSelect = document.getElementById('subdistrict');
+        subdistrictSelect.innerHTML = '<option value="">Select Subdistrict</option>';
+
+        try {
+            const res = await fetch(
+                `https://api.binderbyte.com/wilayah/kecamatan?api_key=${API_KEY}&id_kabupaten=${cityId}`);
+            const json = await res.json();
+
+            if (json.code === "200") {
+                json.value.forEach(subdistrict => {
+                    const option = document.createElement('option');
+                    option.value = subdistrict.id;
+                    option.textContent = subdistrict.name;
+                    subdistrictSelect.appendChild(option);
+                });
+            } else {
+                console.error('Response error:', json);
+                alert("Failed to load subdistricts: " + (json.messages || 'Unknown error'));
+            }
+        } catch (error) {
+            console.error("Error fetching subdistricts:", error);
+            alert("Network error while loading subdistricts.");
+        }
+    }
+
+    document.getElementById('province').addEventListener('change', function() {
+        const selectedProvinceId = this.value;
+        if (selectedProvinceId) {
+            populateCities(selectedProvinceId);
+        }
+    });
+
+    document.getElementById('city').addEventListener('change', function() {
+        const selectedCityId = this.value;
+        if (selectedCityId) {
+            populateSubdistricts(selectedCityId);
+        }
+    });
+
+    document.addEventListener('DOMContentLoaded', function() {
+        populateProvinces();
+    });
+</script>

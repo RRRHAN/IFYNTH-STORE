@@ -37,7 +37,6 @@ export default function OfferDetailModal({
   return (
     <ScrollView contentContainerStyle={{ paddingBottom: 40 }}>
       <View style={styles.imageDetailRow}>
-        {/* Gambar utama + thumbnail */}
         <View style={styles.imageSection}>
           <Image source={{ uri: selectedImage! }} style={styles.mainImage} />
           <ScrollView
