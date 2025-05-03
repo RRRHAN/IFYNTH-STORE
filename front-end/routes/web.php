@@ -23,36 +23,52 @@ Route::get('/listmessages', function () {
 })->name('listmessages');
 
 // Route Home
-Route::get('/landing', [HomeController::class, 'landing'])->name('landing');
-Route::get('/dashboard', [HomeController::class, 'dashboard'])->name('dashboard');
+Route::controller(HomeController::class)->group(function () {
+    Route::get('/landing', 'landing')->name('landing');
+    Route::get('/dashboard', 'dashboard')->name('dashboard');
+});
+
 // Route user
-Route::get('/registerForm', [UserController::class, 'showRegisterForm'])->name('register');
-Route::post('/register', [UserController::class, 'register'])->name('register.proccess');
-Route::post('/changePassword', [UserController::class, 'changePassword'])->name('change.password');
-Route::get('/loginForm', [UserController::class, 'showLoginForm'])->name('login');
-Route::post('/login', [UserController::class, 'login'])->name('login.proccess');
-Route::post('/logout', [UserController::class, 'logout'])->name('logout');
+Route::controller(UserController::class)->group(function () {
+    Route::get('/registerForm', 'showRegisterForm')->name('register');
+    Route::post('/register', 'register')->name('register.proccess');
+    Route::post('/changePassword', 'changePassword')->name('change.password');
+    Route::get('/loginForm', 'showLoginForm')->name('login');
+    Route::post('/login', 'login')->name('login.proccess');
+    Route::post('/logout', 'logout')->name('logout');
+});
 
 // Route product
-Route::get('/catalog', [ProductController::class, 'fetchAll'])->name('products.getAll');
-Route::get('/product/detail/{id}', [ProductController::class, 'detailProduct'])->name('product.detail');
+Route::controller(ProductController::class)->group(function () {
+    Route::get('/catalog', 'fetchAll')->name('products.getAll');
+    Route::get('/product/detail/{id}', 'detailProduct')->name('product.detail');
+});
 
 // Route cart
-Route::post('/addtoCart/{product_id}', [CartController::class,'AddtoCart'])->name('add.Cart');
-Route::get('/getCart', [CartController::class,'getCart'])->name('get.Cart');
-Route::post('/deleteItem/{id}/{quantity}', [CartController::class,'deleteItem'])->name('delete.Item');
-Route::post('/updateCart/{product_id}/{cart_item_id}', [CartController::class,'updateCart'])->name('update.Cart');
-
-Route::post('/offer-product', [CustomerProductController::class, 'AddOffer'])->name('offer.product');
-Route::post('/deleteOffer/{id}', [CustomerProductController::class,'deleteOffer'])->name('delete.offer');
-
-
-Route::get('/messages/list', [MessageController::class, 'fetchList'])->name('fetchList');
-Route::post('/storeMessage', [MessageController::class, 'storeMessage'])->name('store.message');
-Route::get('/getProductMessages/{productId}', [MessageController::class, 'getProductMessages']);
+Route::controller(CartController::class)->group(function () {
+    Route::post('/addtoCart/{product_id}', 'AddtoCart')->name('add.Cart');
+    Route::get('/getCart', 'getCart')->name('get.Cart');
+    Route::post('/deleteItem/{id}/{quantity}', 'deleteItem')->name('delete.Item');
+    Route::post('/updateCart/{product_id}/{cart_item_id}', 'updateCart')->name('update.Cart');
+});
 
 
-Route::get('/search-destination', [OngkirController::class, 'searchDestination']);
-Route::post('/check-tariff', [OngkirController::class, 'getShippingCost']);
+Route::controller(CustomerProductController::class)->group(function () {
+    Route::post('/offer-product', 'AddOffer')->name('offer.product');
+    Route::post('/deleteOffer/{id}', 'deleteOffer')->name('delete.offer');
+});
 
-Route::post('/checkout', [TransactionController::class, 'addTransaction']);
+Route::controller(MessageController::class)->group(function () {
+    Route::get('/messages/list', 'fetchList')->name('fetchList');
+    Route::post('/storeMessage', 'storeMessage')->name('store.message');
+    Route::get('/getProductMessages/{productId}', 'getProductMessages');
+});
+
+Route::controller(OngkirController::class)->group(function () {
+    Route::get('/search-destination', 'searchDestination');
+    Route::post('/check-tariff', 'getShippingCost');
+});
+
+Route::controller(TransactionController::class)->group(function () {
+    Route::post('/checkout', 'addTransaction');
+});
