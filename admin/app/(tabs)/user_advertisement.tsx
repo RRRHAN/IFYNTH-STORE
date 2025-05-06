@@ -23,11 +23,7 @@ import {
 } from "@/components/ThemedTable";
 import OfferDetailModal from "../detail_offer";
 import { Picker } from "@react-native-picker/picker";
-import Video from 'react-native-video';
-
-type StatusMap = {
-  [id: string]: Status;
-};
+import Video from "react-native-video";
 
 const userOffers = () => {
   const screenWidth = Dimensions.get("window").width;
@@ -60,14 +56,18 @@ const userOffers = () => {
   const [selectedProduct, setSelectedProduct] = useState<cusProduct | null>(
     null
   );
-  const [visible, setVisible] = useState(false);
   const [isProductModalVisible, setIsProductModalVisible] = useState(false);
-  const [selectedStatus, setSelectedStatus] = useState<StatusMap>({});
+  const [selectedStatus, setSelectedStatus] = useState<{
+    [key: string]: Status;
+  }>({});
+
+  const [thumbnailUrls, setThumbnailUrls] = useState<{ [key: string]: string }>(
+    {}
+  ); // State for storing thumbnail URLs
 
   const getData = async () => {
     try {
       const data = await fetchOffers();
-
       if (data && data.length > 0) {
         setOffers(data);
       } else {
@@ -81,6 +81,19 @@ const userOffers = () => {
     }
   };
 
+  const getVideoThumbnail = async (videoUrl: string) => {
+    try {
+      const response = await fetch(
+        `http://localhost:7777/get-video-thumbnail?videoUrl=${videoUrl}`
+      );
+      const data = await response.json();
+      return data.thumbnailUrl; // Menyediakan URL thumbnail video
+    } catch (error) {
+      console.error("Error fetching video thumbnail:", error);
+      return "https://via.placeholder.com/80"; // Kembalikan placeholder jika gagal
+    }
+  };
+
   useEffect(() => {
     getData();
     const subscription = Dimensions.addEventListener("change", ({ window }) => {
@@ -91,6 +104,25 @@ const userOffers = () => {
     return () => subscription?.remove();
   }, []);
 
+  // Update thumbnailUrls after offers are fetched
+  useEffect(() => {
+    offers.forEach((item) => {
+      if (item.Files && item.Files.length > 0) {
+        const fileUrl = item.Files[0].URL;
+        if (/\.(mp4|webm|ogg)$/i.test(fileUrl)) {
+          getVideoThumbnail(`http://localhost:7777${fileUrl}`).then((url) =>
+            setThumbnailUrls((prev) => ({ ...prev, [item.ID]: url }))
+          );
+        } else {
+          setThumbnailUrls((prev) => ({
+            ...prev,
+            [item.ID]: `http://localhost:7777${fileUrl}`,
+          }));
+        }
+      }
+    });
+  }, [offers]); // This will trigger when the offers data is loaded
+
   if (loading) {
     return (
       <ThemedView style={styles.center}>
@@ -99,79 +131,84 @@ const userOffers = () => {
     );
   }
 
-  const renderItem = ({ item }: { item: cusProduct }) => (
-    <ThemedRow>
-      {!isMobile && (
-        <ThemedCell
-          style={[
-            {
-              width: columnWidths.image,
-            },
-          ]}
-        >
-          <Image
-            style={styles.image}
-            source={{
-              uri:
-                item.Files && item.Files.length > 0
-                  ? `http://localhost:7777${item.Files[0].URL}`
-                  : "https://via.placeholder.com/80",
+  const renderItem = ({ item }: { item: cusProduct }) => {
+    const thumbnailUrl =
+      thumbnailUrls[item.ID] || "https://via.placeholder.com/80";
+
+    return (
+      <ThemedRow>
+        {!isMobile && (
+          <ThemedCell style={[{ width: columnWidths.image }]}>
+            {/\.(mp4|webm|ogg)$/i.test(thumbnailUrl) ? (
+              <Video
+                source={{ uri: thumbnailUrl }}
+                style={styles.image}
+                resizeMode="cover"
+                paused
+              />
+            ) : (
+              <Image
+                style={styles.image}
+                source={{
+                  uri: thumbnailUrl || "https://via.placeholder.com/80",
+                }}
+              />
+            )}
+          </ThemedCell>
+        )}
+        <ThemedCell style={[{ width: columnWidths.name }]}>
+          {item.customer_name}
+        </ThemedCell>
+        <ThemedCell style={[{ width: columnWidths.name }]}>
+          {item.Name}
+        </ThemedCell>
+        <ThemedCell style={[{ width: columnWidths.price }]}>
+          Rp {item.Price.toLocaleString()}
+        </ThemedCell>
+        <ThemedCell style={[{ width: columnWidths.status }]}>
+          <Picker
+            selectedValue={selectedStatus[item.ID] || item.Status}
+            onValueChange={(newStatus: Status) => {
+              handleStatusChange(newStatus, item.ID);
+              setSelectedStatus((prev) => ({
+                ...prev,
+                [item.ID]: newStatus,
+              }));
+            }}
+            style={{ height: 50, width: "100%" }}
+          >
+            <Picker.Item label="Pending" value="pending" />
+            <Picker.Item label="Approved" value="approved" />
+            <Picker.Item label="Rejected" value="rejected" />
+          </Picker>
+        </ThemedCell>
+
+        <ThemedCell style={[{ width: columnWidths.action }]}>
+          <IconButton
+            icon="eye"
+            size={20}
+            iconColor="#00FFFF"
+            onPress={() => {
+              setSelectedProduct(item);
+              setIsProductModalVisible(true);
+            }}
+          />
+          <IconButton
+            icon="message"
+            size={20}
+            iconColor="#4169E1"
+            onPress={() => {
+              setSelectedProduct(item);
+              router.push({
+                pathname: "/message",
+                params: { item: JSON.stringify(item) },
+              });
             }}
           />
         </ThemedCell>
-      )}
-      <ThemedCell style={[{ width: columnWidths.name }]}>
-        {item.customer_name}
-      </ThemedCell>
-      <ThemedCell style={[{ width: columnWidths.name }]}>
-        {item.Name}
-      </ThemedCell>
-      <ThemedCell style={[{ width: columnWidths.price }]}>
-        Rp {item.Price.toLocaleString()}
-      </ThemedCell>
-      <ThemedCell style={[{ width: columnWidths.status }]}>
-        <Picker
-          selectedValue={selectedStatus[item.ID] || item.Status}
-          onValueChange={(newStatus: Status) => {
-            handleStatusChange(newStatus, item.ID);
-            setSelectedStatus((prev) => ({
-              ...prev,
-              [item.ID]: newStatus,
-            }));
-          }}
-          style={{ height: 50, width: "100%" }}
-        >
-          <Picker.Item label="Pending" value="pending" />
-          <Picker.Item label="Approved" value="approved" />
-          <Picker.Item label="Rejected" value="rejected" />
-        </Picker>
-      </ThemedCell>
-
-      <ThemedCell style={[{ width: columnWidths.action }]}>
-        <IconButton
-          icon="eye"
-          size={20}
-          iconColor="#00FFFF"
-          onPress={() => {
-            setSelectedProduct(item);
-            setIsProductModalVisible(true);
-          }}
-        />
-        <IconButton
-          icon="message"
-          size={20}
-          iconColor="#4169E1"
-          onPress={() => {
-            setSelectedProduct(item);
-            router.push({
-              pathname: "/message",
-              params: { item: JSON.stringify(item) },
-            });
-          }}
-        />
-      </ThemedCell>
-    </ThemedRow>
-  );
+      </ThemedRow>
+    );
+  };
 
   return (
     <ThemedView style={[styles.center]}>
@@ -272,4 +309,5 @@ const userOffers = () => {
     </ThemedView>
   );
 };
+
 export default userOffers;

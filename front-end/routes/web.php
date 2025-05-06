@@ -52,22 +52,25 @@ Route::controller(CartController::class)->group(function () {
     Route::post('/updateCart/{product_id}/{cart_item_id}', 'updateCart')->name('update.Cart');
 });
 
-
+// Route Offer
 Route::controller(CustomerProductController::class)->group(function () {
     Route::post('/offer-product', 'AddOffer')->name('offer.product');
     Route::post('/deleteOffer/{id}', 'deleteOffer')->name('delete.offer');
 });
 
+// Route message
 Route::controller(MessageController::class)->group(function () {
     Route::get('/messages/list', 'fetchList')->name('fetchList');
     Route::post('/storeMessage', 'storeMessage')->name('store.message');
     Route::get('/getProductMessages/{productId}', 'getProductMessages');
 });
 
+// Route ongkir
 Route::controller(OngkirController::class)->group(function () {
     Route::get('/search-destination', 'searchDestination');
     Route::post('/check-tariff', 'getShippingCost');
 });
+
 
 Route::controller(TransactionController::class)->group(function () {
     Route::post('/checkout', 'addTransaction');

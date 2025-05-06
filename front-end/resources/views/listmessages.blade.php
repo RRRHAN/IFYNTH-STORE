@@ -25,16 +25,64 @@
                                                 @if (isset($list) && $list->isNotEmpty())
                                                     @foreach ($list as $product)
                                                         <li class="p-2 product-item border mb-2 rounded"
-                                                            data-product-id="{{ $product['ID'] }}">
+                                                            data-product-id="{{ $product['ID'] }}"
+                                                            data-product-status="{{ $product['Status'] }}">
                                                             <a href="#!" class="d-flex justify-content-between">
                                                                 <div class="d-flex flex-row">
                                                                     <div>
                                                                         @if (isset($product['Files'][0]['URL']))
-                                                                            <img src="{{ url('http://localhost:7777' . $product['Files'][0]['URL']) }}"
-                                                                                alt="avatar"
-                                                                                class="d-flex align-self-center me-3"
-                                                                                width="70" height="70"
-                                                                                style="border-radius: 50%; object-fit: cover;">
+                                                                            <?php
+                                                                            $fileUrl = $product['Files'][0]['URL'];
+                                                                            $fileExtension = pathinfo($fileUrl, PATHINFO_EXTENSION);
+                                                                            ?>
+
+                                                                            @if (in_array(strtolower($fileExtension), ['mp4', 'webm', 'ogg']))
+                                                                                <!-- Display Video Thumbnail -->
+                                                                                <img id="video-thumbnail-{{ $product['ID'] }}"
+                                                                                    src="" alt="video thumbnail"
+                                                                                    class="d-flex align-self-center me-3"
+                                                                                    width="70" height="70"
+                                                                                    style="border-radius: 50%; object-fit: cover;">
+                                                                                <script>
+                                                                                    const videoUrl = "{{ url('http://localhost:7777' . $fileUrl) }}";
+                                                                                    const videoElement = document.createElement('video');
+                                                                                    videoElement.src = videoUrl;
+                                                                                    videoElement.onloadeddata = function() {
+                                                                                        console.log('Video loaded successfully'); // Debugging line
+
+                                                                                        const canvas = document.createElement('canvas');
+                                                                                        const context = canvas.getContext('2d');
+                                                                                        canvas.width = videoElement.videoWidth / 4; // Resize for thumbnail
+                                                                                        canvas.height = videoElement.videoHeight / 4;
+
+                                                                                        videoElement.currentTime = 1; // Seek to 1 second to get a frame
+
+                                                                                        videoElement.onseeked = function() {
+                                                                                            console.log('Frame captured at 1 second'); // Debugging line
+                                                                                            context.drawImage(videoElement, 0, 0, canvas.width, canvas.height);
+
+                                                                                            const thumbnailUrl = canvas.toDataURL(); // Convert to base64 image
+
+                                                                                            console.log('Generated Thumbnail:', thumbnailUrl); // Debugging line
+
+                                                                                            const thumbnailImg = document.getElementById('video-thumbnail-{{ $product['ID'] }}');
+                                                                                            if (thumbnailImg) {
+                                                                                                thumbnailImg.src = thumbnailUrl;
+                                                                                            }
+                                                                                        };
+                                                                                    };
+
+                                                                                    videoElement.onerror = function() {
+                                                                                        console.log('Error loading video'); // Debugging line
+                                                                                    };
+                                                                                </script>
+                                                                            @else
+                                                                                <img src="{{ url('http://localhost:7777' . $fileUrl) }}"
+                                                                                    alt="avatar"
+                                                                                    class="d-flex align-self-center me-3"
+                                                                                    width="70" height="70"
+                                                                                    style="border-radius: 50%; object-fit: cover;">
+                                                                            @endif
                                                                         @else
                                                                             <p class="text-muted">No image available</p>
                                                                         @endif
@@ -49,7 +97,7 @@
                                                                 </div>
                                                                 <div class="pt-1">
                                                                     <p class="small text-muted mb-1">
-                                                                        {{ $product['Description'] }}</p>
+                                                                        {{ $product['Status'] }}</p>
                                                                 </div>
                                                             </a>
                                                         </li>
@@ -80,13 +128,16 @@
                                         style="border: 1px solid #3b3b3b;">
                                         <img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava6-bg.webp"
                                             alt="avatar 3" style="width: 40px; height: 100%;">
+
                                         <input type="text" class="form-control mx-2 border" id="chatInput"
                                             placeholder="Type message" data-product-id=""
                                             style="border: 1px solid #3b3b3b;">
+
                                         <a class="ms-3 text-muted" href="#!" id="sendBtn">
                                             <i class="fa-solid fa-paper-plane"></i>
                                         </a>
                                     </div>
+
                                 </div>
                                 <!-- End Chat Window -->
                             </div>
@@ -99,7 +150,6 @@
     <script>
         let currentProductId = null;
 
-        // Fungsi ambil pesan
         function fetchChatMessages(productId) {
             fetch(`/getProductMessages/${productId}`)
                 .then(response => response.json())
@@ -231,7 +281,24 @@
         document.querySelectorAll('.product-item').forEach(item => {
             item.addEventListener('click', function() {
                 const productId = this.getAttribute('data-product-id');
-                document.getElementById('chatInput').setAttribute('data-product-id', productId);
+                const productStatus = this.getAttribute('data-product-status');
+
+                currentProductId = productId;
+
+                const chatInput = document.getElementById('chatInput');
+                const sendBtn = document.getElementById('sendBtn');
+
+                chatInput.setAttribute('data-product-id', productId);
+
+                if (productStatus === 'rejected') {
+                    chatInput.disabled = true;
+                    sendBtn.classList.add('disabled');
+                } else {
+                    chatInput.disabled = false;
+                    sendBtn.classList.remove('disabled');
+                }
+
+                fetchChatMessages(productId);
             });
         });
     </script>

@@ -18,9 +18,22 @@
                     <tr class="text-center align-middle">
                         <th scope="row">{{ $index + 1 }}</th>
                         <td>
-                            @if (!empty($product['Files']) && is_array($product['Files']) && isset($product['Files'][0]['URL']))
-                                <img src="{{ url('http://localhost:7777' . $product['Files'][0]['URL']) }}" alt="image"
-                                    width="80" height="80" style="object-fit: cover; border-radius: 8px;">
+                            @php
+                                $file = $product['Files'][0]['URL'] ?? null;
+                                $isVideo = $file && preg_match('/\.(mp4|webm|ogg)$/i', $file);
+                            @endphp
+                            @if ($file)
+                                @if ($isVideo)
+                                    <video width="80" height="80"
+                                        style="object-fit: cover; border-radius: 8px; pointer-events: none;" muted
+                                        preload="metadata">
+                                        <source src="{{ url('http://localhost:7777' . $file) }}" type="video/mp4">
+                                        Your browser does not support the video tag.
+                                    </video>
+                                @else
+                                    <img src="{{ url('http://localhost:7777' . $file) }}" alt="image" width="80"
+                                        height="80" style="object-fit: cover; border-radius: 8px;">
+                                @endif
                             @else
                                 <p>No image available</p>
                             @endif

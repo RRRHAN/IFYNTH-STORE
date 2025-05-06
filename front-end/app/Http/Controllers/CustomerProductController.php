@@ -23,6 +23,8 @@ class CustomerProductController extends Controller
             'files.*' => 'mimes:jpeg,png,jpg,gif,mp4,avi,mov,mkv,flv,webm',
         ]);
 
+
+
         $files = [];
         foreach ($validatedData['files'] as $file) {
             $files[] = [

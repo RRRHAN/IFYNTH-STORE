@@ -9,6 +9,7 @@ import {
 import { ThemedText } from "@/components/ThemedText";
 import styles from "./styles/detailProductStyles";
 import { cusProduct } from "./types/product";
+import Video from "react-native-video"; // Import Video component
 
 type OfferDetailModalProps = {
   product: cusProduct | null;
@@ -16,9 +17,7 @@ type OfferDetailModalProps = {
 
 const { width } = Dimensions.get("window");
 
-export default function OfferDetailModal({
-  product,
-}: OfferDetailModalProps) {
+export default function OfferDetailModal({ product }: OfferDetailModalProps) {
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
   useEffect(() => {
@@ -34,18 +33,39 @@ export default function OfferDetailModal({
   const thumbnails =
     product.Files?.map((img) => `http://localhost:7777${img.URL}`) || [];
 
+  // Function to check if file is a video
+  const isVideo = (url: string) => {
+    return /\.(mp4|webm|ogg)$/i.test(url);
+  };
+
   return (
     <ScrollView contentContainerStyle={{ paddingBottom: 40 }}>
       <View style={styles.imageDetailRow}>
         <View style={styles.imageSection}>
-          <Image source={{ uri: selectedImage! }} style={styles.mainImage} />
+          {isVideo(selectedImage!) ? (
+            <Video
+              source={{
+                uri: selectedImage || "https://via.placeholder.com/300",
+              }}
+              style={styles.mainImage}
+              resizeMode="cover"
+              paused={false}
+              controls={true}
+            />
+          ) : (
+            <Image source={{ uri: selectedImage! }} style={styles.mainImage} />
+          )}
+
           <ScrollView
             horizontal
             showsHorizontalScrollIndicator={false}
             contentContainerStyle={styles.thumbnailContainer}
           >
             {thumbnails.map((uri, index) => (
-              <TouchableOpacity key={index} onPress={() => setSelectedImage(uri)}>
+              <TouchableOpacity
+                key={index}
+                onPress={() => setSelectedImage(uri)}
+              >
                 <Image
                   source={{ uri }}
                   style={[
@@ -62,14 +82,21 @@ export default function OfferDetailModal({
         <View style={styles.details}>
           <View style={styles.header}>
             <View>
-              <ThemedText style={styles.title}>Product Name : {product.Name}</ThemedText>
-              <ThemedText style={styles.subtitle}>Customer Name : {product.customer_name}</ThemedText>
-              <ThemedText style={styles.subtitle}>Status : {product.Status}</ThemedText>
+              <ThemedText style={styles.title}>
+                Product Name : {product.Name}
+              </ThemedText>
+              <ThemedText style={styles.subtitle}>
+                Customer Name : {product.customer_name}
+              </ThemedText>
+              <ThemedText style={styles.subtitle}>
+                Status : {product.Status}
+              </ThemedText>
             </View>
           </View>
 
           <View style={styles.priceRow}>
-            <ThemedText style={styles.price}>Price : Rp {product.Price.toLocaleString()}
+            <ThemedText style={styles.price}>
+              Price : Rp {product.Price.toLocaleString()}
             </ThemedText>
           </View>
           <ThemedText style={styles.description}>

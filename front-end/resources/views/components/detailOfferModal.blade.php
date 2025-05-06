@@ -1,4 +1,20 @@
-<div class="modal fade" id="productDetailModal" tabindex="-1" aria-labelledby="productDetailModalLabel" aria-hidden="true">
+<!-- Modal Fullscreen Media -->
+<div class="modal fade" id="fullscreenMediaModal" tabindex="-1" aria-hidden="true"
+style="z-index: 1080;">
+    <div class="modal-dialog modal-fullscreen modal-dialog-centered">
+        <div class="modal-content bg-black">
+            <div class="modal-body d-flex justify-content-center align-items-center p-0" id="fullscreenMediaContainer">
+                <!-- media element will be injected here -->
+            </div>
+            <button type="button" class="btn-close btn-close-white position-absolute top-0 end-0 m-3"
+                data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Product Detail -->
+<div class="modal fade" id="productDetailModal" tabindex="-1" aria-labelledby="productDetailModalLabel"
+    aria-hidden="true">
     <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
         <div class="modal-content">
             <div class="modal-header">
@@ -33,18 +49,17 @@
                         </div>
                         <div class="row">
                             <div class="col-lg-8">
-                                <div class="details-area">
-                                </div>
+                                <div class="details-area"></div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-
         </div>
     </div>
 </div>
-</div>
+
+<!-- JavaScript -->
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         const detailButtons = document.querySelectorAll('.view-detail-btn');
@@ -65,31 +80,55 @@
                 document.getElementById('modalProductDescription').innerHTML = description
                     .replace(/\n/g, '<br>');
 
-                // Isi Gambar
+                // Isi Swiper Main
                 const mainSwiper = document.getElementById('modalSwiperMain');
                 mainSwiper.innerHTML = '';
 
                 images.forEach(url => {
                     const slide = document.createElement('div');
                     slide.className = 'swiper-slide';
-                    slide.innerHTML = `<img src="${url}" alt="${name}">`;
+
+                    if (/\.(mp4|webm|ogg)$/i.test(url)) {
+                        slide.innerHTML = `
+                            <video controls style="width: 100%; max-height: 400px; cursor: pointer;">
+                                <source src="${url}" type="video/mp4">
+                                Browser Anda tidak mendukung tag video.
+                            </video>`;
+                    } else {
+                        slide.innerHTML =
+                            `<img src="${url}" alt="${name}" style="width: 100%; max-height: 400px; object-fit: cover; cursor: pointer;">`;
+                    }
+
                     mainSwiper.appendChild(slide);
                 });
 
+                // Isi Swiper Thumb
                 const thumbSwiper = document.getElementById('modalSwiperThumb');
                 thumbSwiper.innerHTML = '';
 
                 images.forEach(url => {
                     const slide = document.createElement('div');
                     slide.className = 'swiper-slide slide-smoll';
-                    slide.innerHTML = `<img src="${url}" alt="${name}">`;
+
+                    if (/\.(mp4|webm|ogg)$/i.test(url)) {
+                        slide.innerHTML = `
+                            <video muted style="width: 100%; height: 100px; object-fit: cover;">
+                                <source src="${url}" type="video/mp4">
+                            </video>`;
+                    } else {
+                        slide.innerHTML =
+                            `<img src="${url}" alt="${name}" style="width: 100%; height: 100px; object-fit: cover;">`;
+                    }
+
                     thumbSwiper.appendChild(slide);
                 });
 
                 // Reinitialize Swiper
                 setTimeout(() => {
-                    if (window.shopSingleSlide) shopSingleSlide.destroy(true, true);
-                    if (window.shopSliderThumb) shopSliderThumb.destroy(true, true);
+                    if (window.shopSingleSlide) window.shopSingleSlide.destroy(true,
+                        true);
+                    if (window.shopSliderThumb) window.shopSliderThumb.destroy(true,
+                        true);
 
                     window.shopSliderThumb = new Swiper(".shop-slider-thumb", {
                         slidesPerView: 4,
@@ -104,8 +143,60 @@
                             swiper: window.shopSliderThumb,
                         },
                     });
+
+                    // Tambahkan klik event ke gambar/video
+                    mainSwiper.querySelectorAll('img, video').forEach(el => {
+                        el.addEventListener('click', () => openFullscreenMedia(
+                            el.src));
+                    });
+
                 }, 100);
             });
         });
     });
+
+function openFullscreenMedia(url) {
+    const container = document.getElementById('fullscreenMediaContainer');
+    container.innerHTML = ''; 
+
+    let mediaElement;
+
+    if (/\.(mp4|webm|ogg)$/i.test(url)) {
+        mediaElement = document.createElement('video');
+        mediaElement.src = url;
+        mediaElement.controls = true;
+        mediaElement.autoplay = true;
+        mediaElement.style.width = '100%';
+        mediaElement.style.maxHeight = '100vh';
+        mediaElement.style.objectFit = 'contain';
+
+        // Menambahkan video ke dalam container tanpa modal fullscreen
+        container.appendChild(mediaElement);
+    } else {
+
+        mediaElement = document.createElement('img');
+        mediaElement.src = url;
+        mediaElement.alt = 'Fullscreen Media';
+        mediaElement.style.maxWidth = '100%';
+        mediaElement.style.maxHeight = '100vh';
+        mediaElement.style.objectFit = 'contain';
+
+        mediaElement.addEventListener('click', function () {
+            if (mediaElement.requestFullscreen) {
+                mediaElement.requestFullscreen();
+            } else if (mediaElement.mozRequestFullScreen) { 
+                mediaElement.mozRequestFullScreen();
+            } else if (mediaElement.webkitRequestFullscreen) {
+                mediaElement.webkitRequestFullscreen();
+            } else if (mediaElement.msRequestFullscreen) {
+                mediaElement.msRequestFullscreen();
+            }
+        });
+
+        const fullscreenModal = new bootstrap.Modal(document.getElementById('fullscreenMediaModal'));
+        container.appendChild(mediaElement);
+        fullscreenModal.show();
+    }
+}
+
 </script>

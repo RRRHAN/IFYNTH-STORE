@@ -1,6 +1,14 @@
 @extends('layout.master')
 @section('container')
     <main>
+        @if ($errors->any())
+            <ul>
+                @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        @endif
+
         <!-- Page banner area start here -->
         <section class="page-banner bg-image pt-30" data-background="assets/images/banner/inner-banner.jpg">
             <div class="container">
@@ -39,17 +47,18 @@
                                     <div class="col-md-8 mt-2">
                                         <div class="form-group">
                                             <label for="productPrice">Price</label>
-                                            <input type="number" id="productPrice" name="price"
-                                                class="form-control" required>
+                                            <input type="number" id="productPrice" name="price" class="form-control"
+                                                required>
                                         </div>
                                     </div>
 
                                     <!-- Foto/Video Produk -->
                                     <div class="col-md-8 mt-2">
                                         <div class="form-group">
-                                            <label for="productMedia">Product Photos / Videos (Can upload more than one file)</label>
-                                            <input type="file" id="productMedia" name="files[]"
-                                                class="form-control" multiple required>
+                                            <label for="productMedia">Product Photos / Videos (Can upload more than one
+                                                file)</label>
+                                            <input type="file" id="productMedia" name="files[]" class="form-control"
+                                                multiple required>
                                         </div>
                                     </div>
 
