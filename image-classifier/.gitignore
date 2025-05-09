@@ -1,3 +1,6 @@
 dataset/
 image_classifier.keras
 classes.json
+predict.spec
+build/
+dist/

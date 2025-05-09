@@ -1,45 +1,49 @@
 import sys
-import os
-import json
+import tensorflow as tf
 import numpy as np
 from PIL import Image
-import tensorflow as tf
+import json
+import os
 
-tf.get_logger().setLevel('ERROR')
-
-# Helper to get the correct path for bundled resources (e.g., PyInstaller)
 def resource_path(relative_path):
     try:
-        base_path = sys._MEIPASS  # PyInstaller temporary folder
+        base_path = sys._MEIPASS 
     except AttributeError:
         base_path = os.path.abspath(".")
     return os.path.join(base_path, relative_path)
 
-# Load the model
-model = tf.keras.models.load_model(resource_path("image_classifier.keras")) 
+model = tf.keras.models.load_model(resource_path("image_classifier.keras"))
 
-# Load the class names from the JSON file
-with open(resource_path("classes.json"), "r") as f:
+with open(resource_path("classes.json")) as f:
     class_names = json.load(f)
 
-# Preprocess the input image to match model input size (224x224 for example)
-def preprocess_image(img_path):
-    img = Image.open(img_path).convert("RGB").resize((224, 224))
-    img_array = np.array(img) / 255.0  # Normalize pixel values to [0, 1]
-    return np.expand_dims(img_array, axis=0)  # Add batch dimension
+def predict_image(path):
+    img = Image.open(path).convert("RGB").resize((224, 224))
+    img = np.array(img) / 255.0
+    img = np.expand_dims(img, axis=0)
+    predictions = model.predict(img, verbose=0)
+    predicted_index = np.argmax(predictions[0])
+    predicted_label = class_names[predicted_index]
+    return predicted_label
+
+def handle_predictions():
+    print("Model loaded. Waiting for image paths... Type 'exit' to terminate.") 
+        
+    while True:
+        image_path = input()
+        image_path = image_path.strip()
+        
+        if image_path.lower() == "exit":
+            break
+        
+        if os.path.exists(image_path):
+            try:
+                predicted_label = predict_image(image_path)
+                print(predicted_label)
+            except Exception as e:
+                print(f"error processing image: {e}")
+        else:
+            print(f"error image path {image_path} not found!")
 
 if __name__ == "__main__":
-    # Get the image file path from the command line argument
-    img_path = sys.argv[1]
-
-    # Preprocess the image
-    img_tensor = preprocess_image(img_path)
-
-    # Make the prediction
-    prediction = model.predict(img_tensor,verbose=0)[0]
-
-    # Get the predicted class index (highest probability)
-    predicted_index = int(np.argmax(prediction))
-
-    # Output the predicted class
-    print(class_names[predicted_index])
+    handle_predictions()
