@@ -8,6 +8,7 @@ import (
 	"gorm.io/gorm"
 
 	"github.com/RRRHAN/IFYNTH-STORE/back-end/domains/cart"
+	imageclassifier "github.com/RRRHAN/IFYNTH-STORE/back-end/domains/image-classifier"
 	"github.com/RRRHAN/IFYNTH-STORE/back-end/domains/product"
 	"github.com/RRRHAN/IFYNTH-STORE/back-end/domains/user"
 	"github.com/RRRHAN/IFYNTH-STORE/back-end/middlewares"
@@ -21,6 +22,7 @@ func NewDependency(
 	conf *config.Config,
 	mw middlewares.Middlewares,
 	db *gorm.DB,
+	predictor imageclassifier.Predictor,
 	userHandler user.Handler,
 	productHandler product.Handler,
 	cartHandler cart.Handler,
@@ -81,8 +83,9 @@ func NewDependency(
 	})
 
 	return &Dependency{
-		handler: router,
-		db:      db,
+		handler:   router,
+		db:        db,
+		predictor: predictor,
 	}
 }
 

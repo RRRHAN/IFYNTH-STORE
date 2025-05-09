@@ -7,12 +7,14 @@ import (
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 
+	imageclassifier "github.com/RRRHAN/IFYNTH-STORE/back-end/domains/image-classifier"
 	"github.com/RRRHAN/IFYNTH-STORE/back-end/utils/logger"
 )
 
 type Dependency struct {
-	handler *gin.Engine
-	db      *gorm.DB
+	handler   *gin.Engine
+	db        *gorm.DB
+	predictor imageclassifier.Predictor
 }
 
 func (d *Dependency) Close() {
@@ -20,6 +22,10 @@ func (d *Dependency) Close() {
 
 	if err := d.GetDB().Close(); err != nil {
 		logger.Error(ctx, "Errror closing database: %v", err)
+	}
+
+	if err := d.predictor.Close(); err != nil {
+		logger.Error(ctx, "Errror closing predictor: %v", err)
 	}
 
 }

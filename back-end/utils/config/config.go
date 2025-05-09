@@ -18,6 +18,7 @@ type Config struct {
 	Logger      Logger      `envconfig:"logger"`
 	Auth        Auth        `envconfig:"auth"`
 	RateLimiter RateLimiter `envconfig:"rate_limiter"`
+	FeatureFlag FeatureFlag `envconfig:"feature_flag"`
 }
 
 type Database struct {
@@ -52,6 +53,10 @@ type Basic struct {
 type RateLimiter struct {
 	Rps    int `envconfig:"rps" default:"10"`
 	Bursts int `envconfig:"bursts" default:"5"`
+}
+
+type FeatureFlag struct {
+	ImageClassifier bool `envconfig:"image_classifier" default:"false"`
 }
 
 var config *Config
