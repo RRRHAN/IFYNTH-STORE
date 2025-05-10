@@ -10,8 +10,8 @@ import (
 
 	"github.com/RRRHAN/IFYNTH-STORE/back-end/database"
 	"github.com/RRRHAN/IFYNTH-STORE/back-end/domains/cart"
-	imageclassifier "github.com/RRRHAN/IFYNTH-STORE/back-end/domains/image-classifier"
 	"github.com/RRRHAN/IFYNTH-STORE/back-end/domains/cusproduct"
+	imageclassifier "github.com/RRRHAN/IFYNTH-STORE/back-end/domains/image-classifier"
 	"github.com/RRRHAN/IFYNTH-STORE/back-end/domains/message"
 	"github.com/RRRHAN/IFYNTH-STORE/back-end/domains/product"
 	"github.com/RRRHAN/IFYNTH-STORE/back-end/domains/transaction"
@@ -40,7 +40,7 @@ var imageClassifierSet = wire.NewSet(
 	imageclassifier.NewPredictor,
 	imageclassifier.NewService,
 	imageclassifier.NewHandler,
-}
+)
 
 var cusproductSet = wire.NewSet(
 	cusproduct.NewService,

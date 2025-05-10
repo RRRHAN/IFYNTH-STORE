@@ -9,18 +9,20 @@ package wireinject
 import (
 	"github.com/RRRHAN/IFYNTH-STORE/back-end/database"
 	"github.com/RRRHAN/IFYNTH-STORE/back-end/domains/cart"
-	"github.com/RRRHAN/IFYNTH-STORE/back-end/domains/image-classifier"
 	"github.com/RRRHAN/IFYNTH-STORE/back-end/domains/cusproduct"
+	"github.com/RRRHAN/IFYNTH-STORE/back-end/domains/image-classifier"
 	"github.com/RRRHAN/IFYNTH-STORE/back-end/domains/message"
 	"github.com/RRRHAN/IFYNTH-STORE/back-end/domains/product"
-	"github.com/RRRHAN/IFYNTH-STORE/back-end/domains/user"
 	"github.com/RRRHAN/IFYNTH-STORE/back-end/domains/transaction"
+	"github.com/RRRHAN/IFYNTH-STORE/back-end/domains/user"
 	"github.com/RRRHAN/IFYNTH-STORE/back-end/middlewares"
 	"github.com/RRRHAN/IFYNTH-STORE/back-end/routes"
 	"github.com/RRRHAN/IFYNTH-STORE/back-end/utils/config"
 	"github.com/go-playground/validator/v10"
 	"github.com/google/wire"
+)
 
+import (
 	_ "github.com/google/subcommands"
 )
 
@@ -45,16 +47,13 @@ func initializeDependency(config2 *config.Config) (*routes.Dependency, error) {
 	cartHandler := cart.NewHandler(cartService, validate)
 	imageclassifierService := imageclassifier.NewService(db, predictor)
 	imageclassifierHandler := imageclassifier.NewHandler(imageclassifierService, validate)
-	dependency := routes.NewDependency(config2, middlewaresMiddlewares, db, predictor, handler, productHandler, cartHandler, imageclassifierHandler)
 	cusproductService := cusproduct.NewService(config2, db)
 	cusproductHandler := cusproduct.NewHandler(cusproductService, validate)
 	messageService := message.NewService(config2, db)
 	messageHandler := message.NewHandler(messageService, validate)
 	transactionService := transaction.NewService(config2, db)
 	transactionHandler := transaction.NewHandler(transactionService, validate)
-
-	// Inject into routes
-	dependency := routes.NewDependency(config2, middlewaresMiddleware, db, userHandler, productHandler, cartHandler, cusproductHandler, messageHandler, transactionHandler)
+	dependency := routes.NewDependency(config2, middlewaresMiddlewares, db, predictor, handler, productHandler, cartHandler, imageclassifierHandler, cusproductHandler, messageHandler, transactionHandler)
 	return dependency, nil
 }
 
@@ -67,3 +66,9 @@ var productSet = wire.NewSet(product.NewService, product.NewHandler)
 var cartSet = wire.NewSet(cart.NewService, cart.NewHandler)
 
 var imageClassifierSet = wire.NewSet(imageclassifier.NewPredictor, imageclassifier.NewService, imageclassifier.NewHandler)
+
+var cusproductSet = wire.NewSet(cusproduct.NewService, cusproduct.NewHandler)
+
+var messageSet = wire.NewSet(message.NewService, message.NewHandler)
+
+var transactionSet = wire.NewSet(transaction.NewService, transaction.NewHandler)
