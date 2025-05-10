@@ -26,6 +26,7 @@ func NewDependency(
 	userHandler user.Handler,
 	productHandler product.Handler,
 	cartHandler cart.Handler,
+	imageClassifierHandler imageclassifier.Handler,
 ) *Dependency {
 
 	if conf.Environment != config.DEVELOPMENT_ENVIRONMENT {
@@ -71,6 +72,12 @@ func NewDependency(
 		cart.PUT("/update", mw.JWT(constants.CUSTOMER), cartHandler.UpdateCartQuantity)
 		cart.DELETE("/delete", mw.JWT(constants.CUSTOMER), cartHandler.DeleteFromCart)
 		cart.GET("/:user_id", mw.JWT(constants.CUSTOMER), cartHandler.GetCartByUserID)
+
+	}
+
+	imageClassifier := router.Group("/image-classifier")
+	{
+		imageClassifier.POST("/predict", mw.JWT(constants.ADMIN, constants.CUSTOMER), imageClassifierHandler.Predict)
 
 	}
 

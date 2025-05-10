@@ -2,6 +2,7 @@ package imageclassifier
 
 import (
 	"bufio"
+	"context"
 	"fmt"
 	"net/http"
 	"os/exec"
@@ -13,7 +14,7 @@ import (
 )
 
 type Predictor interface {
-	Predict(imagePath string) (string, error)
+	Predict(ctx context.Context, imagePath string) (string, error)
 	Close() error
 }
 
@@ -73,7 +74,7 @@ func NewPredictor(config *config.Config) (Predictor, error) {
 }
 
 // Predict sends an image path and returns the predicted label.
-func (p *predictor) Predict(imagePath string) (string, error) {
+func (p *predictor) Predict(ctx context.Context, imagePath string) (string, error) {
 	p.mutex.Lock()
 	defer p.mutex.Unlock()
 
@@ -104,7 +105,7 @@ func (p *predictor) Close() error {
 
 type emptyPredictor struct{}
 
-func (p *emptyPredictor) Predict(imagePath string) (string, error) {
+func (p *emptyPredictor) Predict(ctx context.Context, imagePath string) (string, error) {
 	return "", apierror.NewWarn(http.StatusServiceUnavailable, "image classifier is disabled")
 }
 
