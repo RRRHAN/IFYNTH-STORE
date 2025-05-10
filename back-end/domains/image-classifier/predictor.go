@@ -29,7 +29,7 @@ type predictor struct {
 
 // NewPredictor starts the predict executable and waits until the model is loaded.
 func NewPredictor(config *config.Config) (Predictor, error) {
-	if config.FeatureFlag.ImageClassifier {
+	if !config.FeatureFlag.ImageClassifier {
 		return &emptyPredictor{}, nil
 	}
 
