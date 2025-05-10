@@ -1,39 +1,77 @@
 <?php
 
+use App\Http\Controllers\CartController;
+use App\Http\Controllers\CustomerProductController;
+use App\Http\Controllers\OngkirController;
+use App\Http\Controllers\TransactionController;
 use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\HomeController;
+use App\Http\Controllers\MessageController;
 
 Route::get('/', function () {
-    return view('landing');
-})->name('landing');
-Route::get('/landing', function () {
-    return view('landing');
-});
+    return view('login');
+})->name('login');
 
-Route::get('/dashboard', function () {
-    return view('dashboard');
-})->name('dashboard');
+Route::get('/sellproduct', function () {
+    return view('sellproduct');
+})->name('sellproduct');
 
-// routes/web.php
-Route::get('/catalog/{department}', function ($department) {
-    return view('catalog', ['department' => $department]);
+Route::get('/listmessages', function () {
+    return view('listmessages');
+})->name('listmessages');
+
+// Route Home
+Route::controller(HomeController::class)->group(function () {
+    Route::get('/landing', 'landing')->name('landing');
+    Route::get('/dashboard', 'dashboard')->name('dashboard');
 });
-Route::get('/product/detail/{id}', function ($id) {
-    return view('detail_product');
-})->name('product.detail');
 
 // Route user
-Route::get('/registerForm', [UserController::class, 'showRegisterForm'])->name('register');
-Route::post('/register', [UserController::class, 'register'])->name('register.proccess');
-Route::get('/loginForm', [UserController::class, 'showLoginForm'])->name('login');
-Route::post('/login', [UserController::class, 'login'])->name('login.proccess');
-Route::post('/logout', [UserController::class, 'logout'])->name('logout');
+Route::controller(UserController::class)->group(function () {
+    Route::get('/registerForm', 'showRegisterForm')->name('register');
+    Route::post('/register', 'register')->name('register.proccess');
+    Route::post('/changePassword', 'changePassword')->name('change.password');
+    Route::get('/loginForm', 'showLoginForm')->name('login');
+    Route::post('/login', 'login')->name('login.proccess');
+    Route::post('/logout', 'logout')->name('logout');
+});
 
 // Route product
-Route::get('/catalog', [ProductController::class, 'fetchByDepartment'])->name('products.byDepartment');
-Route::get('/product/detail/{id}', [ProductController::class, 'detailProduct'])->name('product.detail');
+Route::controller(ProductController::class)->group(function () {
+    Route::get('/catalog', 'fetchAll')->name('products.getAll');
+    Route::get('/product/detail/{id}', 'detailProduct')->name('product.detail');
+});
+
+// Route cart
+Route::controller(CartController::class)->group(function () {
+    Route::post('/addtoCart/{product_id}', 'AddtoCart')->name('add.Cart');
+    Route::get('/getCart', 'getCart')->name('get.Cart');
+    Route::post('/deleteItem/{id}/{quantity}', 'deleteItem')->name('delete.Item');
+    Route::post('/updateCart/{product_id}/{cart_item_id}', 'updateCart')->name('update.Cart');
+});
+
+// Route Offer
+Route::controller(CustomerProductController::class)->group(function () {
+    Route::post('/offer-product', 'AddOffer')->name('offer.product');
+    Route::post('/deleteOffer/{id}', 'deleteOffer')->name('delete.offer');
+});
+
+// Route message
+Route::controller(MessageController::class)->group(function () {
+    Route::get('/messages/list', 'fetchList')->name('fetchList');
+    Route::post('/storeMessage', 'storeMessage')->name('store.message');
+    Route::get('/getProductMessages/{productId}', 'getProductMessages');
+});
+
+// Route ongkir
+Route::controller(OngkirController::class)->group(function () {
+    Route::get('/search-destination', 'searchDestination');
+    Route::post('/check-tariff', 'getShippingCost');
+});
 
 
+Route::controller(TransactionController::class)->group(function () {
+    Route::post('/checkout', 'addTransaction');
+});

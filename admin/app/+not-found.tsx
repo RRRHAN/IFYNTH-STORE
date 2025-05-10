@@ -1,32 +1,35 @@
-import { Link, Stack } from 'expo-router';
-import { StyleSheet } from 'react-native';
-
-import { ThemedText } from '@/components/ThemedText';
-import { ThemedView } from '@/components/ThemedView';
+import { View, Button, Alert, Text, StyleSheet } from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useRouter } from "expo-router";
 
 export default function NotFoundScreen() {
+  const router = useRouter();
+
+  const handleClearStorage = async () => {
+    await AsyncStorage.clear();
+    Alert.alert("Cleared", "AsyncStorage has been cleared.");
+  };
+
   return (
-    <>
-      <Stack.Screen options={{ title: 'Oops!' }} />
-      <ThemedView style={styles.container}>
-        <ThemedText type="title">This screen doesn't exist.</ThemedText>
-        <Link href="/" style={styles.link}>
-          <ThemedText type="link">Go to home screen!</ThemedText>
-        </Link>
-      </ThemedView>
-    </>
+    <View style={styles.container}>
+      <Text style={styles.title}>404 - Page Not Found</Text>
+      <Button title="Go Back Home" onPress={() => router.replace("/login")} />
+      <View style={{ height: 20 }} />
+      <Button title="🧹 Clear AsyncStorage" onPress={handleClearStorage} />
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: 20,
+    justifyContent: "center",
+    alignItems: "center",
+    paddingHorizontal: 24,
   },
-  link: {
-    marginTop: 15,
-    paddingVertical: 15,
+  title: {
+    fontSize: 24,
+    marginBottom: 24,
+    fontWeight: "bold",
   },
 });

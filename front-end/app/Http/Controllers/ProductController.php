@@ -17,10 +17,6 @@ class ProductController extends Controller
         $perPage = 12; // Tentukan jumlah item per halaman
         $token = session('api_token');
 
-        if (!$token) {
-            return redirect()->back()->with('error', 'Unauthorized access. Please login.');
-        }
-
         try {
             // Ambil data produk dari API
             $response = Http::withHeaders([
@@ -55,6 +51,53 @@ class ProductController extends Controller
             return redirect()->back()->with('error', 'An error occurred while fetching products.');
         }
     }
+
+    public function fetchAll(Request $request)
+{
+    $keyword = $request->query('keyword');
+    $department = $request->query('department');
+    $category = $request->query('category');
+    $page = $request->query('page', 1);
+    $perPage = 12;
+    $token = session('api_token');
+
+    try {
+        // Siapkan query parameters, hanya kirim yang tidak kosong
+        $queryParams = array_filter([
+            'keyword' => $keyword,
+            'department' => $department,
+            'category' => $category,
+        ]);
+
+        $response = Http::withHeaders([
+            'Authorization' => 'Bearer ' . $token
+        ])->get('http://localhost:7777/product', $queryParams);
+
+        if ($response->successful() && $response->json('errors') === null) {
+            $allProducts = collect($response->json('data'));
+
+            $total = $allProducts->count();
+            $products = $allProducts->slice(($page - 1) * $perPage, $perPage)->values();
+            $totalPages = ceil($total / $perPage);
+
+            $pagination = [
+                'total_pages' => $totalPages,
+                'current_page' => $page,
+                'perPage' => $perPage,
+                'total' => $total,
+            ];
+
+            return view('catalog', [
+                'products' => $products,
+                'pagination' => $pagination,
+            ]);
+        } else {
+            return redirect()->back()->with('error', 'Failed to fetch products.');
+        }
+    } catch (\Exception $e) {
+        return redirect()->back()->with('error', 'An error occurred while fetching products.');
+    }
+}
 
     public function detailProduct($id)
     {

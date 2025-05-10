@@ -6,7 +6,6 @@ import {
   Dimensions,
   ScrollView,
   View,
-  Button,
   Modal,
 } from "react-native";
 import { IconButton } from "react-native-paper";
@@ -24,9 +23,37 @@ import {
 } from "@/components/ThemedTable";
 import { deleteProduct } from "@/app/api/products";
 import ModalComponent from "@/components/ModalComponent";
-import ProductDetailModal from "../detail_product";
+import ProductDetailModal from "../../components/detail_product";
 
 const ProductsScreen = () => {
+  const screenWidth = Dimensions.get("window").width;
+  const [isMobile, setIsMobile] = useState(screenWidth < 768);
+  const columnWidths = isMobile
+    ? {
+        name: screenWidth * 0.3,
+        price: screenWidth * 0.15,
+        stock: screenWidth * 0.1,
+        category: screenWidth * 0.1,
+        department: screenWidth * 0.15,
+        action: screenWidth * 0.12,
+      }
+    : {
+        image: screenWidth * 0.15,
+        name: screenWidth * 0.15,
+        price: screenWidth * 0.15,
+        stock: screenWidth * 0.15,
+        category: screenWidth * 0.1,
+        department: screenWidth * 0.1,
+        action: screenWidth * 0.1,
+      };
+
+      const [fontSizeTitle, setFontSizeTitle] = useState(
+        screenWidth < 768 ? 20 : 28
+      );
+      const [fontSizeHeader, setFontSizeHeader] = useState(
+        screenWidth < 768 ? 14 : 18
+      );
+
   const router = useRouter();
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
@@ -49,6 +76,12 @@ const ProductsScreen = () => {
 
   useEffect(() => {
     getData();
+    const subscription = Dimensions.addEventListener("change", ({ window }) => {
+      setIsMobile(window.width < 768);
+      setFontSizeTitle(window.width < 768 ? 20 : 28);
+      setFontSizeHeader(window.width < 768 ? 14 : 18);
+    });
+    return () => subscription?.remove();
   }, []);
 
   const handleDelete = async (productId: string) => {
@@ -75,56 +108,38 @@ const ProductsScreen = () => {
 
   const renderItem = ({ item }: { item: Product }) => (
     <ThemedRow>
-      <ThemedCell
-        style={[
-          {
-            width: columnWidths.image,
-          },
-        ]}
-      >
-        <Image
-          style={styles.image}
-          source={{
-            uri:
-              item.ProductImages && item.ProductImages.length > 0
-                ? `http://localhost:7777${item.ProductImages[0].URL}`
-                : "https://via.placeholder.com/80", // fallback image
-          }}
-        />
-      </ThemedCell>
-      <ThemedCell
-        style={[
-          { width: columnWidths.name }, // Menggunakan warna teks dari tema
-        ]}
-      >
+      {!isMobile && (
+        <ThemedCell
+          style={[
+            {
+              width: columnWidths.image,
+            },
+          ]}
+        >
+          <Image
+            style={styles.image}
+            source={{
+              uri:
+                item.ProductImages && item.ProductImages.length > 0
+                  ? `http://localhost:7777${item.ProductImages[0].URL}`
+                  : "https://via.placeholder.com/80",
+            }}
+          />
+        </ThemedCell>
+      )}
+      <ThemedCell style={[{ width: columnWidths.name }]}>
         {item.Name}
       </ThemedCell>
-      <ThemedCell
-        style={[
-          { width: columnWidths.price }, // Menggunakan warna teks dari tema
-        ]}
-      >
+      <ThemedCell style={[{ width: columnWidths.price }]}>
         Rp {item.Price.toLocaleString()}
       </ThemedCell>
-      <ThemedCell
-        style={[
-          { width: columnWidths.stock }, // Menggunakan warna teks dari tema
-        ]}
-      >
+      <ThemedCell style={[{ width: columnWidths.stock }]}>
         {item.TotalStock}
       </ThemedCell>
-      <ThemedCell
-        style={[
-          { width: columnWidths.category }, // Menggunakan warna teks dari tema
-        ]}
-      >
+      <ThemedCell style={[{ width: columnWidths.category }]}>
         {item.Category}
       </ThemedCell>
-      <ThemedCell
-        style={[
-          { width: columnWidths.department }, // Menggunakan warna teks dari tema
-        ]}
-      >
+      <ThemedCell style={[{ width: columnWidths.department }]}>
         {item.Department === "IFY" ? "I Found You" : "No Time to Hell"}
       </ThemedCell>
       <ThemedCell style={[{ width: columnWidths.action }]}>
@@ -141,7 +156,12 @@ const ProductsScreen = () => {
           icon="pencil"
           size={20}
           iconColor="#4169E1"
-          onPress={() => console.log("Edit")}
+          onPress={() => {setSelectedProduct(item);
+            router.push({
+              pathname: "/edit_product",
+              params: { item: JSON.stringify(item) },
+            });
+          }}
         />
         <IconButton
           icon="delete"
@@ -205,38 +225,40 @@ const ProductsScreen = () => {
       <ScrollView horizontal>
         <ThemedTable>
           <ThemedHeader style={[styles.row]}>
-            <ThemedHeader style={[{ width: columnWidths.image }]}>
-              <ThemedText type="subtitle" style={[styles.header]}>
-                Product Images
-              </ThemedText>
-            </ThemedHeader>
+            {!isMobile && (
+              <ThemedHeader style={[{ width: columnWidths.image }]}>
+                <ThemedText type="subtitle" style={[styles.header, { fontSize: fontSizeHeader }]}>
+                  Product Images
+                </ThemedText>
+              </ThemedHeader>
+            )}
             <ThemedHeader style={[{ width: columnWidths.name }]}>
-              <ThemedText type="subtitle" style={[styles.header]}>
+              <ThemedText type="subtitle" style={[styles.header, { fontSize: fontSizeHeader }]}>
                 Product Name
               </ThemedText>
             </ThemedHeader>
             <ThemedHeader style={[{ width: columnWidths.price }]}>
-              <ThemedText type="subtitle" style={[styles.header]}>
+              <ThemedText type="subtitle" style={[styles.header, { fontSize: fontSizeHeader }]}>
                 Price
               </ThemedText>
             </ThemedHeader>
             <ThemedHeader style={[{ width: columnWidths.stock }]}>
-              <ThemedText type="subtitle" style={[styles.header]}>
+              <ThemedText type="subtitle" style={[styles.header, { fontSize: fontSizeHeader }]}>
                 Total Stock
               </ThemedText>
             </ThemedHeader>
             <ThemedHeader style={[{ width: columnWidths.category }]}>
-              <ThemedText type="subtitle" style={[styles.header]}>
+              <ThemedText type="subtitle" style={[styles.header, { fontSize: fontSizeHeader }]}>
                 Category
               </ThemedText>
             </ThemedHeader>
             <ThemedHeader style={[{ width: columnWidths.department }]}>
-              <ThemedText type="subtitle" style={[styles.header]}>
+              <ThemedText type="subtitle" style={[styles.header, { fontSize: fontSizeHeader }]}>
                 Department
               </ThemedText>
             </ThemedHeader>
             <ThemedHeader style={[{ width: columnWidths.action }]}>
-              <ThemedText type="subtitle" style={[styles.header]}>
+              <ThemedText type="subtitle" style={[styles.header, { fontSize: fontSizeHeader }]}>
                 Action
               </ThemedText>
             </ThemedHeader>
@@ -252,15 +274,3 @@ const ProductsScreen = () => {
   );
 };
 export default ProductsScreen;
-
-const screenWidth = Dimensions.get("window").width;
-const columnWidths = {
-  image: screenWidth * 0.15,
-  name: screenWidth * 0.15,
-  description: screenWidth * 0.1,
-  price: screenWidth * 0.15,
-  stock: screenWidth * 0.15,
-  category: screenWidth * 0.1,
-  department: screenWidth * 0.1,
-  action: screenWidth * 0.1,
-};

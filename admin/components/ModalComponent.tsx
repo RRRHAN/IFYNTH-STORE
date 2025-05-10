@@ -29,7 +29,7 @@ const ModalComponent: React.FC<ModalProps> = ({ visible, hideModal, message }) =
           <Button 
             title="Close" 
             onPress={hideModal} 
-            color={buttonColor}  // Menggunakan warna tombol berdasarkan tema
+            color={buttonColor}
           />
         </View>
       </View>
@@ -42,7 +42,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.3)',  // Default opacity background for light mode
+    backgroundColor: 'rgba(0, 0, 0, 0.3)', 
   },
   modalContainer: {
     width: 300,

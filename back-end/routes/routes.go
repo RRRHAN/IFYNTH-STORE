@@ -8,8 +8,11 @@ import (
 	"gorm.io/gorm"
 
 	"github.com/RRRHAN/IFYNTH-STORE/back-end/domains/cart"
+	"github.com/RRRHAN/IFYNTH-STORE/back-end/domains/cusproduct"
 	imageclassifier "github.com/RRRHAN/IFYNTH-STORE/back-end/domains/image-classifier"
+	"github.com/RRRHAN/IFYNTH-STORE/back-end/domains/message"
 	"github.com/RRRHAN/IFYNTH-STORE/back-end/domains/product"
+	"github.com/RRRHAN/IFYNTH-STORE/back-end/domains/transaction"
 	"github.com/RRRHAN/IFYNTH-STORE/back-end/domains/user"
 	"github.com/RRRHAN/IFYNTH-STORE/back-end/middlewares"
 	apierror "github.com/RRRHAN/IFYNTH-STORE/back-end/utils/api-error"
@@ -27,6 +30,9 @@ func NewDependency(
 	productHandler product.Handler,
 	cartHandler cart.Handler,
 	imageClassifierHandler imageclassifier.Handler,
+	cusproductHandler cusproduct.Handler,
+	messageHandler message.Handler,
+	transactionHandler transaction.Handler,
 ) *Dependency {
 
 	if conf.Environment != config.DEVELOPMENT_ENVIRONMENT {
@@ -55,23 +61,26 @@ func NewDependency(
 		user.GET("/verify-token", mw.JWT(constants.ADMIN, constants.CUSTOMER), userHandler.VerifyToken)
 		user.POST("/logout", mw.JWT(constants.ADMIN, constants.CUSTOMER), userHandler.Logout)
 		user.POST("/register", mw.BasicAuth, userHandler.Register)
+		user.PATCH("/password", mw.JWT(constants.ADMIN, constants.CUSTOMER), userHandler.ChangePassword)
+		user.GET("/get-personal", mw.JWT(constants.ADMIN, constants.CUSTOMER), userHandler.GetPersonal)
 	}
 
 	product := router.Group("/product")
 	{
 		product.GET("/", mw.JWT(constants.ADMIN, constants.CUSTOMER), productHandler.GetAllProducts)
 		product.GET("/detail/:id", mw.JWT(constants.ADMIN, constants.CUSTOMER), productHandler.GetProductByID)
-		product.POST("/", mw.JWT(constants.ADMIN), productHandler.AddProduct)
+		product.POST("/addProduct", mw.JWT(constants.ADMIN), productHandler.AddProduct)
 		product.DELETE("/:id", mw.JWT(constants.ADMIN), productHandler.DeleteProduct)
-
+		product.PUT("/update/:id", mw.JWT(constants.ADMIN), productHandler.UpdateProduct)
+		product.GET("/count", mw.JWT(constants.ADMIN), productHandler.GetProductCountByDepartment)
 	}
 
 	cart := router.Group("/cart")
 	{
 		cart.POST("/", mw.JWT(constants.CUSTOMER), cartHandler.AddToCart)
-		cart.PUT("/update", mw.JWT(constants.CUSTOMER), cartHandler.UpdateCartQuantity)
+		cart.PUT("/", mw.JWT(constants.CUSTOMER), cartHandler.UpdateCartQuantity)
 		cart.DELETE("/delete", mw.JWT(constants.CUSTOMER), cartHandler.DeleteFromCart)
-		cart.GET("/:user_id", mw.JWT(constants.CUSTOMER), cartHandler.GetCartByUserID)
+		cart.GET("/", mw.JWT(constants.CUSTOMER), cartHandler.GetCartByUserID)
 
 	}
 
@@ -79,6 +88,31 @@ func NewDependency(
 	{
 		imageClassifier.POST("/predict", mw.JWT(constants.ADMIN, constants.CUSTOMER), imageClassifierHandler.Predict)
 
+	}
+
+	cusproduct := router.Group("/cusproduct")
+	{
+		cusproduct.POST("/", mw.JWT(constants.CUSTOMER), cusproductHandler.AddProduct)
+		cusproduct.DELETE("/", mw.JWT(constants.CUSTOMER), cusproductHandler.DeleteProduct)
+		cusproduct.GET("/", mw.JWT(constants.CUSTOMER), cusproductHandler.GetProductByUserID)
+		cusproduct.GET("/list", mw.JWT(constants.CUSTOMER), cusproductHandler.GetProductByMessage)
+		cusproduct.GET("/getall", mw.JWT(constants.ADMIN), cusproductHandler.GetAllProducts)
+		cusproduct.PATCH("/status", mw.JWT(constants.ADMIN), cusproductHandler.UpdateProductStatus)
+
+	}
+
+	message := router.Group("/message")
+	{
+		message.POST("/", mw.JWT(constants.CUSTOMER, constants.ADMIN), messageHandler.AddMessage)
+		message.GET("/:product_id", mw.JWT(constants.CUSTOMER, constants.ADMIN), messageHandler.GetMessageByProductID)
+	}
+
+	transaction := router.Group("/transaction")
+	{
+		transaction.POST("/", mw.JWT(constants.CUSTOMER), transactionHandler.AddTransaction)
+		transaction.GET("/", mw.JWT(constants.CUSTOMER), transactionHandler.GetTransactionsByUserID)
+		transaction.GET("/all", mw.JWT(constants.ADMIN), transactionHandler.GetAllTransaction)
+		transaction.PATCH("/status", mw.JWT(constants.ADMIN), transactionHandler.UpdateTransactionStatus)
 	}
 
 	router.NoRoute(func(ctx *gin.Context) {

@@ -1,12 +1,11 @@
 package product
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
-	"log"
-	"mime/multipart"
+	"io"
 	"net/http"
-	"path/filepath"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
@@ -22,6 +21,8 @@ type Handler interface {
 	AddProduct(ctx *gin.Context)
 	DeleteProduct(ctx *gin.Context)
 	GetProductByID(ctx *gin.Context)
+	UpdateProduct(ctx *gin.Context)
+	GetProductCountByDepartment(ctx *gin.Context)
 }
 
 type handler struct {
@@ -39,8 +40,9 @@ func NewHandler(service Service, validate *validator.Validate) Handler {
 func (h *handler) GetAllProducts(ctx *gin.Context) {
 	keyword, _ := ctx.GetQuery("keyword")
 	department, _ := ctx.GetQuery("department")
+	category, _ := ctx.GetQuery("category")
 
-	res, err := h.service.GetAllProducts(ctx, keyword, department)
+	res, err := h.service.GetAllProducts(ctx, keyword, department, category)
 	if err != nil {
 		respond.Error(ctx, apierror.FromErr(err))
 		return
@@ -50,17 +52,14 @@ func (h *handler) GetAllProducts(ctx *gin.Context) {
 }
 
 func (h *handler) GetProductByID(ctx *gin.Context) {
-	// Ambil parameter id dari URL
 	id := ctx.Param("id")
 
-	// Validasi apakah ID adalah UUID yang valid
 	productID, err := uuid.Parse(id)
 	if err != nil {
 		respond.Error(ctx, apierror.FromErr(err))
 		return
 	}
 
-	// Panggil service untuk mengambil produk berdasarkan UUID
 	product, err := h.service.GetProductByID(ctx, productID)
 	if err != nil {
 		respond.Error(ctx, apierror.FromErr(err))
@@ -71,37 +70,32 @@ func (h *handler) GetProductByID(ctx *gin.Context) {
 }
 
 func (h *handler) AddProduct(ctx *gin.Context) {
-	// Log permintaan mulai
-	log.Println("Received request to add product")
 
-	// Ambil data form
 	form, err := ctx.MultipartForm()
 	if err != nil {
-		log.Printf("Error getting multipart form: %v\n", err)
 		respond.Error(ctx, apierror.FromErr(err))
 		return
 	}
 
-	// Ambil nilai dari form
 	name := form.Value["name"]
 	description := form.Value["description"]
 	price := form.Value["price"]
+	weight := form.Value["weight"]
+	capital := form.Value["capital"]
 	category := form.Value["category"]
 	department := form.Value["department"]
 	rawStockDetails := form.Value["stock_details"]
 	images := form.File["images"]
 
-	// Validasi field dasar
-	if len(name) == 0 || len(description) == 0 || len(price) == 0 || len(category) == 0 || len(department) == 0 || len(rawStockDetails) == 0 || len(images) == 0 {
-		log.Println("Missing required fields")
+	// Check if any required fields are missing
+	if len(name) == 0 || len(description) == 0 || len(price) == 0 || len(category) == 0 || len(department) == 0 || len(rawStockDetails) == 0 || len(images) == 0 || len(weight) == 0 {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": "One or more required fields are missing"})
 		return
 	}
 
-	// Validasi format gambar
+	// Validate image files
 	for _, file := range images {
-		if !isValidImage(file) { // Panggil isValidImage di sini
-			log.Printf("Invalid image format: %s\n", file.Filename)
+		if !isValidImage(file) {
 			ctx.JSON(http.StatusBadRequest, gin.H{
 				"error": fmt.Sprintf("Invalid image format: %s", file.Filename),
 			})
@@ -109,68 +103,158 @@ func (h *handler) AddProduct(ctx *gin.Context) {
 		}
 	}
 
-	// Konversi harga
+	// Parse price and capital as float64
 	priceValue, err := strconv.ParseFloat(price[0], 64)
 	if err != nil {
-		log.Printf("Error parsing price: %v\n", err)
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid price format"})
 		return
 	}
 
-	// Parsing stock details
+	capitalValue, err := strconv.ParseFloat(capital[0], 64)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid capital format"})
+		return
+	}
+
+	weightValue, err := strconv.ParseFloat(weight[0], 64)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid weight format"})
+		return
+	}
+
+	// Parse the stock details from JSON
 	var stockDetails []StockDetailInput
 	if err := json.Unmarshal([]byte(rawStockDetails[0]), &stockDetails); err != nil {
-		log.Printf("Error parsing stock_details: %v\n", err)
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid stock_details format"})
 		return
 	}
 
-	// Isi struct AddProductRequest
+	// Create the AddProductRequest
 	req := AddProductRequest{
 		Name:         name[0],
 		Description:  description[0],
 		Price:        priceValue,
+		Weight:       weightValue,
+		Capital:      capitalValue,
 		Department:   department[0],
 		Category:     category[0],
 		Images:       images,
 		StockDetails: stockDetails,
 	}
 
-	// Panggil service untuk menambahkan produk
+	// Call the service to add the product
 	if err := h.service.AddProduct(ctx.Request.Context(), req, images); err != nil {
-		log.Printf("Error in AddProduct service: %v\n", err)
 		respond.Error(ctx, apierror.FromErr(err))
 		return
 	}
 
-	// Log sukses
-	log.Println("Product and images added successfully")
+	// Return success response
 	respond.Success(ctx, http.StatusCreated, gin.H{"message": "Product and images added successfully"})
 }
 
-// Fungsi untuk memvalidasi tipe file gambar
-func isValidImage(file *multipart.FileHeader) bool {
-	// Cek ekstensi file
-	ext := filepath.Ext(file.Filename)
-	allowedExt := map[string]bool{
-		".jpg":  true,
-		".jpeg": true,
-		".png":  true,
-		".gif":  true,
-	}
-
-	return allowedExt[ext]
-}
-
 func (h *handler) DeleteProduct(ctx *gin.Context) {
-	productID := ctx.Param("id") // Assuming the product ID is passed as a URL parameter
-
+	productID := ctx.Param("id")
 	if err := h.service.DeleteProduct(ctx.Request.Context(), productID); err != nil {
-		log.Printf("Error deleting product: %v\n", err)
 		respond.Error(ctx, apierror.FromErr(err))
 		return
 	}
 
-	log.Println("Product deleted successfully")
 	respond.Success(ctx, http.StatusOK, gin.H{"message": "Product deleted successfully"})
+}
+
+func (h *handler) UpdateProduct(ctx *gin.Context) {
+	bodyBytes, err := io.ReadAll(ctx.Request.Body)
+	if err != nil {
+		respond.Error(ctx, apierror.FromErr(fmt.Errorf("error reading request body")))
+		return
+	}
+
+	ctx.Request.Body = io.NopCloser(bytes.NewReader(bodyBytes))
+
+	form, err := ctx.MultipartForm()
+	if err != nil {
+		respond.Error(ctx, apierror.FromErr(err))
+		return
+	}
+
+	name := form.Value["name"]
+	description := form.Value["description"]
+	price := form.Value["price"]
+	weight := form.Value["weight"]
+	capital := form.Value["capital"]
+	category := form.Value["category"]
+	department := form.Value["department"]
+	rawStockDetails := form.Value["stockDetails"]
+	removedImages := form.Value["removedImages"]
+	newImages := form.File["images"]
+
+	if len(name) == 0 || len(description) == 0 || len(price) == 0 || len(category) == 0 || len(department) == 0 || len(rawStockDetails) == 0 || len(weight) == 0 {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "One or more required fields are missing"})
+		return
+	}
+
+	priceValue, err := strconv.ParseFloat(price[0], 64)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid price format"})
+		return
+	}
+
+	weightValue, err := strconv.ParseFloat(weight[0], 64)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid weight format"})
+		return
+	}
+
+	capitalValue, err := strconv.ParseFloat(capital[0], 64)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid price format"})
+		return
+	}
+
+	var stockDetails []StockDetailInput
+	if err := json.Unmarshal([]byte(rawStockDetails[0]), &stockDetails); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid stockDetails format"})
+		return
+	}
+
+	var removedImagesParsed []RemovedImage
+	if err := json.Unmarshal([]byte(removedImages[0]), &removedImagesParsed); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid removedImages format"})
+		return
+	}
+
+	for _, img := range removedImagesParsed {
+		fmt.Println(img.ProductID)
+		fmt.Println(img.URL)
+	}
+
+	req := UpdateProductRequest{
+		Name:          name[0],
+		Description:   description[0],
+		Price:         priceValue,
+		Weight:        weightValue,
+		Capital:       capitalValue,
+		Department:    department[0],
+		Category:      category[0],
+		StockDetails:  stockDetails,
+		RemovedImages: removedImagesParsed,
+		Images:        newImages,
+	}
+
+	if err := h.service.UpdateProduct(ctx.Request.Context(), ctx.Param("id"), req, newImages); err != nil {
+		respond.Error(ctx, apierror.FromErr(err))
+		return
+	}
+
+	respond.Success(ctx, http.StatusOK, gin.H{"message": "Product updated successfully"})
+}
+
+func (h *handler) GetProductCountByDepartment(ctx *gin.Context) {
+	res, err := h.service.GetProductCountByDepartment(ctx)
+	if err != nil {
+		respond.Error(ctx, apierror.FromErr(err))
+		return
+	}
+
+	respond.Success(ctx, http.StatusOK, res)
 }

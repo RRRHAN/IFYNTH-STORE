@@ -11,7 +11,6 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { MyLightTheme, MyDarkTheme } from "@/constants/Theme";
 
-// Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
@@ -22,16 +21,16 @@ export default function RootLayout() {
   });
 
   useEffect(() => {
+    
     const checkLoginStatus = async () => {
       if (loaded) {
         await SplashScreen.hideAsync();
         const isLoggedIn = await AsyncStorage.getItem("is_logged_in");
-
-        if (isLoggedIn === 'false') {
+        if (isLoggedIn === 'false' || !isLoggedIn) {
           router.replace("/login");
         }
       }
-    };
+    };    
 
     checkLoginStatus();
   }, [loaded]);
@@ -48,6 +47,8 @@ export default function RootLayout() {
         <Stack.Screen name="login" options={{ headerShown: false }} />
         <Stack.Screen name="add_product" options={{ headerShown: false }} />
         <Stack.Screen name="detail_product" options={{ headerShown: false }} />
+        <Stack.Screen name="edit_product" options={{ headerShown: false }} />
+        <Stack.Screen name="message" options={{ headerShown: false }} />
       </Stack>
       <StatusBar style="auto" />
     </ThemeProvider>

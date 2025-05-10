@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { View, TouchableOpacity, Alert, ScrollView, Image } from "react-native";
-import { Picker } from "@react-native-picker/picker";
+import { View, Alert, ScrollView, Image } from "react-native";
 import ModalComponent from "../components/ModalComponent";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { pickImage } from "@/hooks/helpers/pickImage";
@@ -8,59 +7,47 @@ import { handleStockChange } from "@/hooks/helpers/handleStockChange";
 import styles from "./styles/addProductStyles";
 import { addProduct } from "./api/products";
 import { ThemedText } from "@/components/ThemedText";
-import { ThemedTextInput } from "@/components/ThemedTextInput";
 import { IconButton } from "react-native-paper";
 import { useRouter } from "expo-router";
+import SizeInputItem from "@/components/products/SizeInputItem";
+import ProductFormInputs from "@/components/products/ProductFormInput";
+import ProductPickers from "@/components/products/ProductPickers";
+import ActionButtons from "@/components/products/ActionButtons";
+import SelectedImagesList from "@/components/products/SelectedImagesList";
+import { useProductForm } from "@/hooks/helpers/useAddProductForm";
 
 export default function AddProductScreen() {
   const router = useRouter();
-  const [name, setName] = useState<string>("");
-  const [description, setDescription] = useState<string>("");
-  const [price, setPrice] = useState<string>("");
-  const [department, setDepartment] = useState<string>("IFY");
-  const [category, setCategory] = useState<string>("T-Shirt");
-  const [sizes, setSizes] = useState<{ size: string; stock: number }[]>([]);
-  const [images, setImages] = useState<any[]>([]);
+  const {
+    name,
+    setName,
+    description,
+    setDescription,
+    price,
+    setPrice,
+    capital,
+    setCapital,
+    weight,
+    setWeight,
+    department,
+    setDepartment,
+    category,
+    setCategory,
+    sizes,
+    setSizes,
+    images,
+    setImages,
+  } = useProductForm(); 
   const theme = useColorScheme();
   const isDark = theme === "dark";
   const [visible, setVisible] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
 
-  // Fungsi untuk menghapus gambar
   const handleRemoveImage = (index: number) => {
     const updatedImages = images.filter((_, i) => i !== index);
     setImages(updatedImages);
   };
-
-  useEffect(() => {
-    // Ubah ukuran berdasarkan kategori yang dipilih
-    if (
-      category === "T-Shirt" ||
-      category === "Hoodie" ||
-      category === "Jacket"
-    ) {
-      setSizes([
-        { size: "S", stock: 0 },
-        { size: "M", stock: 0 },
-        { size: "L", stock: 0 },
-        { size: "XL", stock: 0 },
-      ]);
-    } else if (category === "Pants") {
-      setSizes([
-        { size: "27", stock: 0 },
-        { size: "28", stock: 0 },
-        { size: "29", stock: 0 },
-        { size: "30", stock: 0 },
-        { size: "31", stock: 0 },
-        { size: "32", stock: 0 },
-        { size: "33", stock: 0 },
-        { size: "34", stock: 0 },
-      ]);
-    } else {
-      setSizes([]);
-    }
-  }, [category]);
 
   const handleAddProduct = async () => {
     if (!name || !price || !description) {
@@ -68,7 +55,7 @@ export default function AddProductScreen() {
       return;
     }
 
-    const stockDetails = sizes.filter((size) => size.stock > 0);
+    const stockDetails = sizes;
 
     if (stockDetails.length === 0) {
       Alert.alert(
@@ -82,6 +69,8 @@ export default function AddProductScreen() {
       name,
       description,
       price,
+      capital,
+      weight,
       department,
       category,
       sizes: stockDetails,
@@ -96,6 +85,8 @@ export default function AddProductScreen() {
         setName("");
         setDescription("");
         setPrice("");
+        setCapital("");
+        setWeight("");
         setDepartment("");
         setCategory("");
         if (
@@ -144,143 +135,62 @@ export default function AddProductScreen() {
         hideModal={() => setVisible(false)}
         message={errorMessage || successMessage}
       />
-      {/* Back Button */}
       <IconButton
         icon="arrow-left"
         size={30}
         onPress={() => router.replace("/products")}
       />
-      <ThemedText style={[styles.title]}>Add New Product</ThemedText>
+      <ThemedText style={[styles.title]}>Add Product</ThemedText>
 
-      <ThemedTextInput
-        style={[styles.input, { borderColor: isDark ? "#666" : "#ccc" }]}
-        placeholder="Product Name"
-        placeholderTextColor={isDark ? "#aaa" : "#888"}
-        value={name}
-        onChangeText={setName}
+      <ProductFormInputs
+        name={name}
+        setName={setName}
+        description={description}
+        setDescription={setDescription}
+        price={price}
+        setPrice={setPrice}
+        weight={weight}
+        setWeight={setWeight}
+        capital={capital}
+        setCapital={setCapital}
+        isDark={isDark}
+        styles={styles}
       />
 
-      <ThemedTextInput
-        style={[
-          styles.input,
-          { borderColor: isDark ? "#666" : "#ccc", textAlignVertical: "top" },
-        ]}
-        placeholder="Product Description"
-        placeholderTextColor={isDark ? "#aaa" : "#888"}
-        value={description}
-        onChangeText={setDescription}
-        multiline
-        numberOfLines={4}
+      <ProductPickers
+        department={department}
+        setDepartment={setDepartment}
+        category={category}
+        setCategory={setCategory}
+        isDark={isDark}
+        styles={styles}
+        isEditing={false}
       />
 
-      <ThemedTextInput
-        style={[styles.input, { borderColor: isDark ? "#666" : "#ccc" }]}
-        placeholder="Price"
-        placeholderTextColor={isDark ? "#aaa" : "#888"}
-        value={price}
-        onChangeText={(text) => setPrice(text.replace(/[^0-9]/g, ""))}
-        keyboardType="numeric"
-      />
-
-      {/* Department and Category side by side */}
-      <View style={styles.pickerContainer}>
-        {/* Department Picker */}
-        <View style={styles.pickerWrapper}>
-          <ThemedText style={[styles.inputLabel]}>Department</ThemedText>
-          <Picker
-            selectedValue={department}
-            style={[
-              styles.picker,
-              {
-                backgroundColor: isDark ? "#333" : "#fff",
-                color: isDark ? "#fff" : "#333",
-              },
-            ]}
-            onValueChange={(itemValue) => setDepartment(itemValue)}
-          >
-            <Picker.Item label="I Found You" value="IFY" />
-            <Picker.Item label="No Time to Hell" value="NTH" />
-          </Picker>
-        </View>
-
-        {/* Category Picker */}
-        <View style={styles.pickerWrapper}>
-          <ThemedText style={[styles.inputLabel]}>Category</ThemedText>
-          <Picker
-            selectedValue={category}
-            style={[
-              styles.picker,
-              {
-                backgroundColor: isDark ? "#333" : "#fff",
-                color: isDark ? "#fff" : "#333",
-              },
-            ]}
-            onValueChange={(itemValue) => setCategory(itemValue)}
-          >
-            <Picker.Item label="T-Shirt" value="T-Shirt" />
-            <Picker.Item label="Hoodie" value="Hoodie" />
-            <Picker.Item label="Jacket" value="Jacket" />
-            <Picker.Item label="Pants" value="Pants" />
-            <Picker.Item label="Accessories" value="Accessories" />
-          </Picker>
-        </View>
-      </View>
-
-      {/* Stock per size side by side */}
       <View style={styles.sizeContainer}>
         {sizes.map((size, index) => (
-          <View key={index} style={styles.sizeWrapper}>
-            <ThemedText style={[styles.sizeText]}>Size: {size.size}</ThemedText>
-            <ThemedTextInput
-              style={[styles.input, { borderColor: isDark ? "#666" : "#ccc" }]}
-              placeholder="Stock"
-              placeholderTextColor={isDark ? "#aaa" : "#888"}
-              value={size.stock.toString()}
-              onChangeText={(value) =>
-                handleStockChange(index, value, sizes, setSizes)
-              }
-              keyboardType="numeric"
-            />
-          </View>
+          <SizeInputItem
+            key={index}
+            size={size.size}
+            stock={size.stock}
+            onStockChange={(value) =>
+              handleStockChange(index, value, sizes, setSizes)
+            }
+          />
         ))}
       </View>
 
-      {/* Image Picker */}
-      <TouchableOpacity
-        style={[styles.button, { backgroundColor: "#28a745" }]}
-        onPress={() => pickImage(setImages, setErrorMessage, setVisible)}
-      >
-        <ThemedText style={styles.buttonText}>Pick an Image</ThemedText>
-      </TouchableOpacity>
+      <SelectedImagesList
+        images={images}
+        handleRemoveImage={handleRemoveImage}
+        styles={styles}
+      />
 
-      {/* Display Selected Images */}
-      {images.length > 0 && (
-        <View>
-          <ThemedText>Selected Images:</ThemedText>
-          {images.map((img, index) => (
-            <View key={index} style={styles.imageContainer}>
-              <Image source={{ uri: img.uri }} style={styles.image} />
-              {/* Tombol sampah untuk menghapus gambar */}
-              <TouchableOpacity
-                style={styles.removeButton}
-                onPress={() => handleRemoveImage(index)}
-              >
-                <IconButton
-                  icon="trash-can" // Ikon sampah dari react-native-paper
-                  size={24}
-                />
-              </TouchableOpacity>
-            </View>
-          ))}
-        </View>
-      )}
-
-      <TouchableOpacity
-        style={[styles.button, { backgroundColor: "#007bff" }]}
-        onPress={handleAddProduct}
-      >
-        <ThemedText style={styles.buttonText}>Add Product</ThemedText>
-      </TouchableOpacity>
+      <ActionButtons
+        pickImage={() => pickImage(setImages, setErrorMessage, setVisible)}
+        handleAddProduct={handleAddProduct}
+        styles={styles}
+      />
     </ScrollView>
   );
 }

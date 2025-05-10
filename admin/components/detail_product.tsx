@@ -7,8 +7,8 @@ import {
   Dimensions,
 } from "react-native";
 import { ThemedText } from "@/components/ThemedText";
-import styles from "./styles/detailProductStyles";
-import { Product, StockDetail } from "./types/product";
+import styles from "../app/styles/detailProductStyles";
+import { Product, StockDetail } from "../app/types/product";
 
 type ProductDetailModalProps = {
   product: Product | null;
@@ -70,8 +70,11 @@ export default function ProductDetailModal({
           </View>
 
           <View style={styles.priceRow}>
-            <ThemedText style={styles.price}>
-              Rp {product.Price.toLocaleString()}
+            <ThemedText style={styles.price}>Price : Rp {product.Price.toLocaleString()}
+            </ThemedText>
+          </View>
+          <View style={styles.priceRow}>
+            <ThemedText style={styles.price}>Commodity Capital(Modal) : Rp {product.Capital.toLocaleString()}
             </ThemedText>
           </View>
 

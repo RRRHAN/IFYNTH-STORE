@@ -31,9 +31,9 @@ func main() {
 
 	// Setup CORS
 	c := cors.New(cors.Options{
-		AllowedOrigins: []string{"*"},                             // Izinkan origin frontend
-		AllowedHeaders: []string{"Authorization", "Content-Type"}, // Izinkan header Authorization dan Content-Type
-		AllowedMethods: []string{"GET", "POST", "PUT", "DELETE"},  // Metode yang diizinkan
+		AllowedOrigins: []string{"*"},                                     // Izinkan origin frontend
+		AllowedHeaders: []string{"Authorization", "Content-Type"},         // Izinkan header Authorization dan Content-Type
+		AllowedMethods: []string{"GET", "POST", "PUT", "DELETE", "PATCH"}, // Metode yang diizinkan
 	})
 
 	// Ambil handler yang sudah disediakan dependency

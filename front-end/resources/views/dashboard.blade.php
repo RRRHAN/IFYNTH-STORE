@@ -13,7 +13,7 @@
                         <div class="profile-header position-relative mt-5">
                             <div class="text-center">
                                 <div class="position-relative d-inline-block">
-                                    <img src="https://randomuser.me/api/portraits/men/40.jpg"
+                                    <img src="https://assets-a1.kompasiana.com/items/album/2021/03/24/blank-profile-picture-973460-1280-605aadc08ede4874e1153a12.png?t=o&v=1200"
                                         class="rounded-circle profile-pic" alt="Profile Picture">
                                     <button class="btn btn-primary btn-sm position-absolute bottom-0 end-0 rounded-circle">
                                         <i class="fas fa-camera"></i>
@@ -46,13 +46,13 @@
                                                     href="#notifications" role="tab">
                                                     <i class="fas fa-bell me-2"></i> Notifications
                                                 </a>
-                                                <a class="dash-link" id="message-tab" data-bs-toggle="pill" href="#message"
-                                                    role="tab">
-                                                    <i class="fas fa-messages me-2"></i> Message
-                                                </a>
                                                 <a class="dash-link" id="my-order-tab" data-bs-toggle="pill"
                                                     href="#my-order" role="tab">
                                                     <i class="fas fa-box me-2"></i> my order
+                                                </a>
+                                                <a class="dash-link" id="my-offer-tab" data-bs-toggle="pill"
+                                                    href="#my-offer" role="tab">
+                                                    <i class="fas fa-box me-2"></i> my offer
                                                 </a>
                                                 <form action="{{ route('logout') }}" method="POST" class="d-inline">
                                                     @csrf
@@ -68,94 +68,12 @@
                                     <div class="col-lg-9">
                                         <div class="p-4">
                                             <div class="tab-content" id="settings-content">
-                                                <!-- Personal Information -->
-                                                <div class="tab-pane fade show active" id="personal" role="tabpanel">
-                                                    <h5 class="mb-4">Personal Information</h5>
-                                                    <div class="row g-3">
-                                                        <div class="col-md-6">
-                                                            <label class="form-label">Username</label>
-                                                            <input type="text" class="form-control"
-                                                                value="{{ session('user_name', 'Enter your Username') }}">
-                                                        </div>
-                                                        <div class="col-md-6">
-                                                            <label class="form-label">Phone</label>
-                                                            <input type="tel" class="form-control"
-                                                                value="{{ session('user_phone', 'Enter your Phone Number') }}">
-                                                        </div>
-                                                        <div class="col-md-6">
-                                                            <label class="form-label">First Name</label>
-                                                            <input type="text" class="form-control"
-                                                                value="{{ session('user_firstname', 'Enter your First Name') }}">
-                                                        </div>
-                                                        <div class="col-md-6">
-                                                            <label class="form-label">Last Name</label>
-                                                            <input type="text" class="form-control"
-                                                                value="{{ session('user_lastname', 'Enter your Last Name') }}">
-                                                        </div>
-                                                        <div class="col-md-12">
-                                                            <label class="form-label">Email</label>
-                                                            <input type="email" class="form-control"
-                                                                value="{{ session('user_email', 'Enter your Email') }}">
-                                                        </div>
-                                                        <div class="col-12">
-                                                            <label class="form-label">Bio</label>
-                                                            <textarea class="form-control" rows="4">Product designer with 5+ years of experience in creating user-centered digital solutions. Passionate about solving complex problems through simple and elegant designs.</textarea>
-                                                        </div>
-                                                    </div>
-                                                </div>
-
-                                                <!-- Security -->
-                                                <div class="tab-pane fade" id="security" role="tabpanel">
-                                                    <h5 class="mb-4">Security Settings</h5>
-                                                    <form>
-                                                        <div class="mb-3">
-                                                            <label class="form-label">Current Password</label>
-                                                            <input type="password" class="form-control"
-                                                                placeholder="Enter current password">
-                                                        </div>
-                                                        <div class="mb-3">
-                                                            <label class="form-label">New Password</label>
-                                                            <input type="password" class="form-control"
-                                                                placeholder="Enter new password">
-                                                        </div>
-                                                        <div class="mb-3">
-                                                            <label class="form-label">Confirm New Password</label>
-                                                            <input type="password" class="form-control"
-                                                                placeholder="Confirm new password">
-                                                        </div>
-                                                        <button type="submit" class="btn btn-primary">Save
-                                                            Changes</button>
-                                                    </form>
-                                                </div>
-
-                                                <!-- Notifications -->
-                                                <div class="tab-pane fade" id="notifications" role="tabpanel">
-                                                    <h5 class="mb-4">Notifications</h5>
-                                                    <p>Notification settings content goes here...</p>
-                                                </div>
-
-                                                <!-- message -->
-                                                <div class="tab-pane fade" id="message" role="tabpanel">
-                                                    <h5 class="mb-4">Message</h5>
-                                                    <p>message settings content goes here...</p>
-                                                </div>
-
-                                                <!-- my-order -->
-                                                <div class="tab-pane fade" id="my-order" role="tabpanel">
-                                                    <h5 class="mb-4">Recent my-order</h5>
-                                                    <div class="my-order-item mb-3">
-                                                        <h6 class="mb-1">Updated profile picture</h6>
-                                                        <p class="text-muted small mb-0">2 hours ago</p>
-                                                    </div>
-                                                    <div class="my-order-item mb-3">
-                                                        <h6 class="mb-1">Changed password</h6>
-                                                        <p class="text-muted small mb-0">Yesterday</p>
-                                                    </div>
-                                                    <div class="my-order-item">
-                                                        <h6 class="mb-1">Updated message information</h6>
-                                                        <p class="text-muted small mb-0">3 days ago</p>
-                                                    </div>
-                                                </div>
+                                                @include('components.personal')
+                                                @include('components.changePassword')
+                                                @include('components.notifications')
+                                                @include('components.orderData')
+                                                @include('components.tableOffer')
+                                                @include('components.detailOfferModal')
                                             </div>
                                         </div>
                                     </div>

@@ -9,24 +9,26 @@
                             <div class="image img">
                                 <div class="swiper shop-single-slide">
                                     @if (isset($product['ProductImages']) && count($product['ProductImages']) > 0)
-                                    <div class="swiper-wrapper">
-                                        @foreach ($product['ProductImages'] as $image)
-                                            <div class="swiper-slide">
-                                                <img src="{{ url('http://localhost:7777'. $image['URL']) }}" alt="{{ $product['Name'] }}">
-                                            </div>
-                                        @endforeach
-                                    </div>
-                                @else
-                                    <p>No images available.</p>
-                                @endif
-                                
+                                        <div class="swiper-wrapper">
+                                            @foreach ($product['ProductImages'] as $image)
+                                                <div class="swiper-slide">
+                                                    <img src="{{ url('http://localhost:7777' . $image['URL']) }}"
+                                                        alt="{{ $product['Name'] }}">
+                                                </div>
+                                            @endforeach
+                                        </div>
+                                    @else
+                                        <p>No images available.</p>
+                                    @endif
+
                                 </div>
                                 <div class="mt-3 swiper shop-slider-thumb">
                                     <div class="swiper-wrapper">
                                         @if (isset($product['ProductImages']) && count($product['ProductImages']) > 0)
                                             @foreach ($product['ProductImages'] as $image)
                                                 <div class="swiper-slide slide-smoll">
-                                                    <img src="{{ url('http://localhost:7777'. $image['URL']) }}" alt="{{ $product['Name'] }}">
+                                                    <img src="{{ url('http://localhost:7777' . $image['URL']) }}"
+                                                        alt="{{ $product['Name'] }}">
                                                 </div>
                                             @endforeach
                                         @else
@@ -57,22 +59,32 @@
                                         </div>
                                         <div class="category flex-wrap d-flex py-3 bor-top bor-bottom">
                                             <h4 class="pe-3">Department :</h4>
-                                            <a href="#" class="primary-hover">{{ $product['Department'] }}</a>
+                                            <a href="#" class="primary-hover">
+                                                <p>
+                                                    @if ($product['Department'] == 'IFY')
+                                                        I Found You
+                                                    @elseif ($product['Department'] == 'NTH')
+                                                        No Time to Hell
+                                                    @else
+                                                        Department not Found
+                                                    @endif
+                                                </p>
+                                            </a>
                                         </div>
 
                                         <div class="cart-wrp py-4">
                                             <div class="cart-quantity">
-                                                <form id='cart-form' method='POST' action="">
+                                                <form id='cart-form' method='POST'
+                                                    action="{{ route('add.Cart', ['product_id' => $product['ID']]) }}">
                                                     @csrf
                                                     <div class="cart-wrp py-4">
                                                         <div class="cart-quantity">
                                                             <input type='button' value='-' class='qtyminus minus'>
                                                             <input type='text' name='quantity' value='1'
-                                                                class='qty'>
+                                                                class='qty' readonly>
                                                             <input type='button' value='+' class='qtyplus plus'>
                                                         </div>
                                                     </div>
-                                                    <!-- Opsi Pilihan Ukuran -->
                                                     <!-- Opsi Pilihan Ukuran -->
                                                     <div class="size-options">
                                                         <h4 class="pe-3 mb-1">Select Size:</h4>
@@ -138,7 +150,7 @@
 
             document.body.addEventListener("click", function(event) {
                 var target = event.target.closest(
-                ".add-to-cart"); // Cek jika yang diklik adalah tombol Add to Cart
+                    ".add-to-cart"); // Cek jika yang diklik adalah tombol Add to Cart
 
                 if (target && !userLoggedIn) {
                     event.preventDefault(); // Mencegah submit form
@@ -171,5 +183,4 @@
             });
         });
     </script>
-
 @stop

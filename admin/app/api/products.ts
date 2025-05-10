@@ -1,21 +1,9 @@
-import { Product } from "../types/product";
-import { BASE_URL } from "./constants";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import { DepartentCount, Product } from "../types/product";
+import { BASE_URL, getAuthToken } from "./constants";
+import { ProductData, UpdateProductData } from "../request/productReq";
 
-// Define ProductData interface
-interface ProductData {
-  name: string;
-  description: string;
-  price: string;
-  department: string;
-  category: string;
-  sizes: { size: string; stock: number }[];
-  images: any[];
-}
-
-// Fetch products
 export const fetchProducts = async (): Promise<Product[]> => {
-  const token = await getAuthToken(); // Get token from AsyncStorage
+  const token = await getAuthToken();
   const getAllUrl = `${BASE_URL}/product`;
 
   const response = await fetch(getAllUrl, {
@@ -32,14 +20,15 @@ export const fetchProducts = async (): Promise<Product[]> => {
   return result.data;
 };
 
-// Add a new product
 export const addProduct = async (productData: ProductData) => {
-  const authToken = await getAuthToken(); // Get token from AsyncStorage
+  const authToken = await getAuthToken();
   const formData = new FormData();
 
   formData.append("name", productData.name);
   formData.append("description", productData.description);
   formData.append("price", productData.price);
+  formData.append("capital", productData.capital);
+  formData.append("weight", productData.weight);
   formData.append("department", productData.department);
   formData.append("category", productData.category);
 
@@ -55,7 +44,7 @@ export const addProduct = async (productData: ProductData) => {
   formData.append("stock_details", JSON.stringify(productData.sizes));
 
   try {
-    const PostProduct = `${BASE_URL}/product`;
+    const PostProduct = `${BASE_URL}/product/addProduct`;
     const response = await fetch(PostProduct, {
       method: "POST",
       headers: { Authorization: `Bearer ${authToken}` },
@@ -69,19 +58,8 @@ export const addProduct = async (productData: ProductData) => {
   }
 };
 
-// Get Auth token from AsyncStorage
-export const getAuthToken = async (): Promise<string | null> => {
-  try {
-    const token = await AsyncStorage.getItem("auth_token");
-    return token;
-  } catch (error) {
-    throw new Error("Failed to fetch auth token.");
-  }
-};
-
-// Delete a product by ID
 export const deleteProduct = async (productId: string) => {
-  const token = await getAuthToken(); // Ambil token dari AsyncStorage
+  const token = await getAuthToken();
   const deleteUrl = `${BASE_URL}/product/${productId}`;
 
   try {
@@ -94,12 +72,88 @@ export const deleteProduct = async (productId: string) => {
 
     if (!response.ok) {
       const errorResponse = await response.json();
-      throw new Error(errorResponse.errors?.[0] || `Failed to delete product. Status: ${response.status}`);
+      throw new Error(
+        errorResponse.errors?.[0] ||
+          `Failed to delete product. Status: ${response.status}`
+      );
     }
 
     const result = await response.json();
     return result;
   } catch (error: any) {
-    throw new Error(error.message || "Something went wrong while deleting the product.");
+    throw new Error(
+      error.message || "Something went wrong while deleting the product."
+    );
   }
+};
+
+export const updateProduct = async (productData: UpdateProductData) => {
+  const authToken = await getAuthToken();
+  const formData = new FormData();
+
+  formData.append("name", productData.name);
+  formData.append("description", productData.description);
+  formData.append("price", productData.price);
+  formData.append("capital", productData.capital);
+  formData.append("weight", productData.weight);
+  formData.append("department", productData.department);
+  formData.append("category", productData.category);
+
+  if (productData.images.length > 0) {
+    for (const [index, img] of productData.images.entries()) {
+      const imageUri = img.uri;
+      const response = await fetch(imageUri);
+      const blob = await response.blob();
+      formData.append("images", blob, img.name || `image${index}.jpg`);
+    }
+  }
+
+  if (productData.removedImages) {
+    formData.append("removedImages", JSON.stringify(productData.removedImages));
+  }
+  
+  console.log(productData);
+  formData.append("stockDetails", JSON.stringify(productData.sizes));
+
+  console.log("FormData contents:");
+for (const pair of formData.entries()) {
+  console.log(`${pair[0]}:`, pair[1]);
+}
+
+
+  try {
+    const updateUrl = `${BASE_URL}/product/update/${productData.productId}`;
+    const response = await fetch(updateUrl, {
+      method: "PUT",
+      headers: {
+        Authorization: `Bearer ${authToken}`,
+      },
+      body: formData,
+    });
+
+    const result = await response.json();
+    return result;
+  } catch (error: any) {
+    throw new Error(
+      error.message || "Something went wrong while updating the product."
+    );
+  }
+};
+
+export const fetchProductCount = async (): Promise<DepartentCount[]> => {
+  const token = await getAuthToken();
+  const getAllUrl = `${BASE_URL}/product/count`;
+
+  const response = await fetch(getAllUrl, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  if (!response.ok) {
+    throw new Error(`HTTP error! status: ${response.status}`);
+  }
+
+  const result = await response.json();
+  return result.data;
 };

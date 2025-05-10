@@ -11,7 +11,10 @@ import (
 	"github.com/RRRHAN/IFYNTH-STORE/back-end/database"
 	"github.com/RRRHAN/IFYNTH-STORE/back-end/domains/cart"
 	imageclassifier "github.com/RRRHAN/IFYNTH-STORE/back-end/domains/image-classifier"
+	"github.com/RRRHAN/IFYNTH-STORE/back-end/domains/cusproduct"
+	"github.com/RRRHAN/IFYNTH-STORE/back-end/domains/message"
 	"github.com/RRRHAN/IFYNTH-STORE/back-end/domains/product"
+	"github.com/RRRHAN/IFYNTH-STORE/back-end/domains/transaction"
 	"github.com/RRRHAN/IFYNTH-STORE/back-end/domains/user"
 	"github.com/RRRHAN/IFYNTH-STORE/back-end/middlewares"
 	"github.com/RRRHAN/IFYNTH-STORE/back-end/routes"
@@ -37,6 +40,21 @@ var imageClassifierSet = wire.NewSet(
 	imageclassifier.NewPredictor,
 	imageclassifier.NewService,
 	imageclassifier.NewHandler,
+}
+
+var cusproductSet = wire.NewSet(
+	cusproduct.NewService,
+	cusproduct.NewHandler,
+)
+
+var messageSet = wire.NewSet(
+	message.NewService,
+	message.NewHandler,
+)
+
+var transactionSet = wire.NewSet(
+	transaction.NewService,
+	transaction.NewHandler,
 )
 
 func initializeDependency(config *config.Config) (*routes.Dependency, error) {
@@ -50,6 +68,9 @@ func initializeDependency(config *config.Config) (*routes.Dependency, error) {
 		productSet,
 		cartSet,
 		imageClassifierSet,
+		cusproductSet,
+		messageSet,
+		transactionSet,
 	)
 
 	return nil, nil

@@ -18,6 +18,14 @@ const styles = StyleSheet.create({
       borderWidth: 1,
       borderRadius: 5,
     },
+    desc: {
+      height: 100,
+      marginVertical: 10,
+      paddingHorizontal: 10,
+      borderWidth: 1,
+      borderRadius: 5,
+      textAlignVertical: "top",
+    },
     button: {
       height: 45,
       justifyContent: "center",

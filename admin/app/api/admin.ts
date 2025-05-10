@@ -1,4 +1,3 @@
-// src/services/authService.ts
 import { BASE_URL } from "./constants";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
@@ -24,7 +23,7 @@ export const loginAdmin = async (username: string, password: string) => {
       return { success: false, message: data.errors[0] };
     } else {
       const { token, expires } = data.data;
-      // Save token and expiration date to AsyncStorage
+
       await AsyncStorage.setItem("auth_token", token);
       await AsyncStorage.setItem("expires_at", expires);
 
@@ -43,21 +42,20 @@ export const logoutAdmin = async () => {
       return { success: false, message: 'No token found, already logged out.' };
     }
 
-    // Mengirim permintaan logout ke backend
     const response = await fetch(`${BASE_URL}/user/logout`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`, // Sertakan token dalam header untuk validasi
+        Authorization: `Bearer ${token}`,
       },
     });
 
     const data = await response.json();
 
     if (response.ok || data.success) {
-      // Hapus token dan data lainnya setelah logout berhasil
       await AsyncStorage.removeItem('auth_token');
       await AsyncStorage.removeItem('expires_at');
+
       return { success: true, message: 'Logout Successfully!' };
     } else {
       return { success: false, message: data.message || 'An error occurred during logout. Please try again.' };

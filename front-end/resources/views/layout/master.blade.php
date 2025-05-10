@@ -22,6 +22,12 @@
     <!-- Style css -->
     <link rel="stylesheet" href="/assets/css/style.css">
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <!-- Skrip umum lainnya -->
+    <!-- Skrip umum lainnya -->
+    @if (!Route::is('get.Cart'))
+        <!-- Cek apakah ini bukan halaman dengan route name 'shipper-form' -->
+        <script src="/assets/js/swiper-bundle.min.js"></script>
+    @endif
 </head>
 
 <body>
@@ -66,7 +72,9 @@
     <div class="mouse-cursor cursor-inner"></div>
     <!-- Mouse cursor area end here -->
 
+    @if (session('api_token'))
     @include('layout.navbar')
+    @endif
     @yield('container')
     @include('layout.footer')
 
@@ -74,8 +82,6 @@
     <script src="/assets/js/jquery-3.7.1.min.js"></script>
     <!-- Bootstrap min Js -->
     <script src="/assets/js/bootstrap.min.js"></script>
-    <!-- Swiper bundle min Js -->
-    <script src="/assets/js/swiper-bundle.min.js"></script>
     <!-- Counterup min Js -->
     <script src="/assets/js/jquery.counterup.min.js"></script>
     <!-- Wow min Js -->
@@ -93,14 +99,13 @@
     <!-- Script Js -->
     <script src="/assets/js/script.js"></script>
     <!-- Menampilkan Modal saat halaman dimuat -->
-<script>
-    // Jika ada pesan sukses atau error di sesi, tampilkan modal
-    @if (session('success') || session('error'))
-        var myModal = new bootstrap.Modal(document.getElementById('notificationModal'));
-        myModal.show();
-    @endif
-</script>
-
+    <script>
+        // Jika ada pesan sukses atau error di sesi, tampilkan modal
+        @if (session('success') || session('error'))
+            var myModal = new bootstrap.Modal(document.getElementById('notificationModal'));
+            myModal.show();
+        @endif
+    </script>
 </body>
 
 </html>

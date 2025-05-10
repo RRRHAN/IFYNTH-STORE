@@ -18,7 +18,6 @@ export default function TabLayout() {
     if (result.success) {
       console.log(result.message);
       router.replace('/login');
-      // Lakukan navigasi ke halaman login atau halaman lainnya
     } else {
       console.error(result.message);
     }
@@ -49,11 +48,11 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="explore"
+        name="transaction"
         options={{
-          title: "Explore",
+          title: "Transactions",
           tabBarIcon: ({ color }) => (
-            <Icon source="magnify" size={28} color={color} />
+            <Icon source="file-document" size={28} color={color} />
           ),
         }}
       />
@@ -63,6 +62,15 @@ export default function TabLayout() {
           title: "Product Management",
           tabBarIcon: ({ color }) => (
             <Icon source="package-variant" size={28} color={color} />
+          ),
+        }}
+      />
+            <Tabs.Screen
+        name="user_advertisement"
+        options={{
+          title: "User Advertisement",
+          tabBarIcon: ({ color }) => (
+            <Icon source="bullhorn" size={28} color={color} />
           ),
         }}
       />

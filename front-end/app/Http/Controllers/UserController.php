@@ -6,59 +6,61 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Session;
+use Illuminate\Validation\ValidationException;
 
 class UserController extends Controller
 {
 
-    // Menampilkan form login
     public function showLoginForm()
     {
-        return view('login'); // Menampilkan halaman login.blade.php
+        return view('login');
     }
-    // Menampilkan form login
     public function showRegisterForm()
     {
-        return view('register'); // Menampilkan halaman login.blade.php
+        return view('register');
     }
+
     public function register(Request $request)
     {
-        // Validate the incoming request
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'username' => 'required|string|unique:users,username',
-            'phoneNumber' => 'required|string',
-            'password' => 'required|string',
-            'password_confirmation' => 'required|string|same:password',
-        ]);
-
         try {
+            // Validate the incoming request
+            $validated = $request->validate([
+                'name' => 'required|string|max:255',
+                'username' => 'required|string|unique:users,username',
+                'phoneNumber' => 'required|string',
+                'password' => 'required|string',
+                'password_confirmation' => 'required|string|same:password',
+            ]);
+    
             $response = Http::withHeaders([
                 'Authorization' => 'Basic ' . base64_encode('admin:admin'),
                 'Content-Type' => 'application/json'
             ])->post('http://localhost:7777/user/register', [
-                        'name' => $validated['name'],
-                        'username' => $validated['username'],
-                        'phoneNumber' => $validated['phoneNumber'],
-                        'password' => $validated['password'],
-                    ]);
-
+                'name' => $validated['name'],
+                'username' => $validated['username'],
+                'phoneNumber' => $validated['phoneNumber'],
+                'password' => $validated['password'],
+            ]);
+    
             if ($response->successful()) {
-                // Flash success message
                 session()->flash('success', 'User registered successfully!');
                 return redirect()->route('loginForm');
             } else {
-                // Handle errors from the external API
                 $errors = $response->json()['errors'] ?? ['Failed to register'];
-                session()->flash('error', $errors[0]); // Gunakan flash untuk error
-                return redirect()->back();
+                session()->flash('error', $errors[0]);
+                return redirect()->back()->withInput();
             }
+    
+        } catch (ValidationException $e) {
+            session()->flash('error', $e->validator->errors()->first());
+            return redirect()->back()->withInput();
         } catch (\Exception $e) {
             Log::error('Registration failed: ' . $e->getMessage());
             session()->flash('error', 'An error occurred during registration');
-            return redirect()->back();
+            return redirect()->back()->withInput();
         }
     }
-
+    
     public function login(Request $request)
     {
         // Validasi input
@@ -88,11 +90,10 @@ class UserController extends Controller
                         'api_token' => $data['data']['token'],
                         'token_expiry' => $data['data']['expires'],
                         'user_logged_in' => true,
-                        'username' => $validated['username']
+                        'username' => $validated['username'],
+                        'total_cart' => $data['data']['total_cart'],
                     ]);
     
-                    // Flash success message dan redirect
-                    session()->flash('success', 'Login successfully');
                     return redirect()->route('landing');
                 }
     
@@ -122,6 +123,7 @@ class UserController extends Controller
         Session::forget('token_expiry');
         Session::forget('username');
         Session::forget('user_logged_in');
+        Session::forget('total_cart');
     
         try {
             // Kirim request logout ke API eksternal
@@ -132,7 +134,7 @@ class UserController extends Controller
             if ($response->successful()) {
                 // Flash pesan sukses dan redirect
                 session()->flash('success', 'Logout successful!');
-                return redirect()->route('landing');
+                return redirect()->route('login');
             } else {
                 // Flash error jika gagal
                 session()->flash('error', 'Failed to logout.');
@@ -143,5 +145,71 @@ class UserController extends Controller
             return redirect()->back();
         }
     }
+
+    public function changePassword(Request $request)
+    {
+        $token = session('api_token');
+    
+        try {
+            // Validate the incoming request
+            $validated = $request->validate([
+                'current_password' => 'required|string',
+                'new_password' => 'required|string',
+                'password_confirmation' => 'required|string|same:new_password',
+            ]);
+    
+            $response = Http::withHeaders([
+                'Authorization' => 'Bearer ' . $token,
+            ])->patch('http://localhost:7777/user/password', [
+                'current_password' => $validated['current_password'],
+                'new_password' => $validated['new_password'],
+                'role' => "CUSTOMER",
+            ]);
+    
+            if ($response->successful()) {
+                session()->flash('success', 'Changed password successfully!');
+                return redirect()->route('dashboard');
+            } else {
+                $errors = $response->json()['errors'] ?? ['Failed to change password'];
+                session()->flash('error', $errors[0]);
+                return redirect()->back();
+            }
+    
+        } catch (ValidationException $e) {
+            session()->flash('error', $e->validator->errors()->first());
+            return redirect()->back()->withInput();
+        } catch (\Exception $e) {
+            Log::error('Password change failed: ' . $e->getMessage());
+            session()->flash('error', 'An error occurred while changing the password');
+            return redirect()->back();
+        }
+    }
+    
+    public function getPersonal() {
+        $token = session('api_token');
+    
+        try {
+            $response = Http::withHeaders([
+                'Authorization' => 'Bearer ' . $token,
+            ])->get('http://localhost:7777/user/get-personal');
+    
+            if ($response->successful()) {
+                $data = collect($response->json()); 
+    
+                if ($data->has('data')) {
+                    $user = $data->get('data');
+                    session(['user' => $user]);
+                    return collect($user);
+                } else {
+                    return collect([]);
+                }
+            } else {
+                return collect([]);
+            }
+        } catch (\Exception $e) {
+            // Jika ada exception
+            return collect(['error' => 'Error occurred: ' . $e->getMessage()]);
+        }
+    }    
     
 }

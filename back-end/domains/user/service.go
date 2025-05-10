@@ -2,6 +2,7 @@ package user
 
 import (
 	"context"
+	"errors"
 	"net/http"
 	"time"
 
@@ -12,6 +13,7 @@ import (
 	apierror "github.com/RRRHAN/IFYNTH-STORE/back-end/utils/api-error"
 	"github.com/RRRHAN/IFYNTH-STORE/back-end/utils/config"
 	"github.com/RRRHAN/IFYNTH-STORE/back-end/utils/constants"
+	contextUtil "github.com/RRRHAN/IFYNTH-STORE/back-end/utils/context"
 )
 
 type Service interface {
@@ -19,6 +21,8 @@ type Service interface {
 	Logout(ctx context.Context, input LogoutReq) (res *LogoutRes, err error)
 	ValidateToken(ctx context.Context, token string) (err error)
 	Register(ctx context.Context, input RegisterReq) (res *Customer, err error)
+	ChangePassword(ctx context.Context, input ChangePasswordReq) error
+	GetPersonal(ctx context.Context) (interface{}, error)
 }
 
 type service struct {
@@ -30,6 +34,34 @@ func NewService(config *config.Config, db *gorm.DB) Service {
 	return &service{
 		authConfig: config.Auth,
 		db:         db,
+	}
+}
+
+func (s *service) GetPersonal(ctx context.Context) (interface{}, error) {
+	token, err := contextUtil.GetTokenClaims(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	switch token.Claims.Role {
+	case "ADMIN":
+		var admin Admin
+		err = s.db.WithContext(ctx).Where("id = ?", token.Claims.UserID).First(&admin).Error
+		if err != nil {
+			return nil, err
+		}
+		return &admin, nil
+
+	case "CUSTOMER":
+		var customer Customer
+		err = s.db.WithContext(ctx).Where("id = ?", token.Claims.UserID).First(&customer).Error
+		if err != nil {
+			return nil, err
+		}
+		return &customer, nil
+
+	default:
+		return nil, errors.New("invalid role")
 	}
 }
 
@@ -55,6 +87,7 @@ func (s *service) Login(ctx context.Context, input LoginReq) (*LoginRes, error) 
 			userID = customer.ID
 		}
 	}
+
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
 			return nil, apierror.NewWarn(http.StatusUnauthorized, ErrInvalidCredentials)
@@ -78,9 +111,21 @@ func (s *service) Login(ctx context.Context, input LoginReq) (*LoginRes, error) 
 		return nil, apierror.FromErr(err)
 	}
 
+	var totalQuantity int64
+	result := s.db.WithContext(ctx).
+		Table("carts").
+		Where("user_id = ?", userID).
+		Select("COALESCE(total_quantity, 0)").
+		Scan(&totalQuantity)
+
+	if result.Error != nil {
+		return nil, apierror.FromErr(result.Error)
+	}
+
 	return &LoginRes{
-		Token:   tokenString,
-		Expires: expirationTime,
+		Token:         tokenString,
+		Expires:       expirationTime,
+		TotalQuantity: totalQuantity,
 	}, nil
 }
 
@@ -136,4 +181,51 @@ func (s *service) Register(ctx context.Context, input RegisterReq) (res *Custome
 	}
 
 	return &customer, nil
+}
+
+func (s *service) ChangePassword(ctx context.Context, input ChangePasswordReq) error {
+	token, err := contextUtil.GetTokenClaims(ctx)
+	if err != nil {
+		return err
+	}
+
+	var userID = token.Claims.UserID
+	hashedPassword, err := hashPassword(input.NewPassword)
+	if err != nil {
+		return apierror.FromErr(err)
+	}
+
+	switch input.Role {
+	case constants.ADMIN:
+		var admin Admin
+		if err = s.db.WithContext(ctx).Where("id = ?", userID).First(&admin).Error; err == nil {
+			if !comparePassword(admin.Password, input.CurrentPassword) {
+				return apierror.NewWarn(http.StatusUnauthorized, ErrInvalidCurPassword)
+			}
+			admin.Password = hashedPassword
+			if err = s.db.WithContext(ctx).Save(&admin).Error; err != nil {
+				return err
+			}
+		}
+	case constants.CUSTOMER:
+		var customer Customer
+		if err = s.db.WithContext(ctx).Where("id = ?", userID).First(&customer).Error; err == nil {
+			if !comparePassword(customer.Password, input.CurrentPassword) {
+				return apierror.NewWarn(http.StatusUnauthorized, ErrInvalidCurPassword)
+			}
+			customer.Password = hashedPassword
+			if err = s.db.WithContext(ctx).Save(&customer).Error; err != nil {
+				return err
+			}
+		}
+	}
+
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return apierror.NewWarn(http.StatusUnauthorized, ErrInvalidCurPassword)
+		}
+		return err
+	}
+
+	return nil
 }
