@@ -8,8 +8,9 @@ package wireinject
 
 import (
 	"github.com/RRRHAN/IFYNTH-STORE/back-end/database"
-	"github.com/RRRHAN/IFYNTH-STORE/back-end/domains/product"
 	"github.com/RRRHAN/IFYNTH-STORE/back-end/domains/cart"
+	"github.com/RRRHAN/IFYNTH-STORE/back-end/domains/image-classifier"
+	"github.com/RRRHAN/IFYNTH-STORE/back-end/domains/product"
 	"github.com/RRRHAN/IFYNTH-STORE/back-end/domains/user"
 	"github.com/RRRHAN/IFYNTH-STORE/back-end/middlewares"
 	"github.com/RRRHAN/IFYNTH-STORE/back-end/routes"
@@ -29,21 +30,21 @@ func initializeDependency(config2 *config.Config) (*routes.Dependency, error) {
 	if err != nil {
 		return nil, err
 	}
-	
-	// Create the services and handlers
-	userService := user.NewService(config2, db)
-	middlewaresMiddleware := middlewares.NewMiddlewares(config2, userService)
+	service := user.NewService(config2, db)
+	middlewaresMiddlewares := middlewares.NewMiddlewares(config2, service)
+	predictor, err := imageclassifier.NewPredictor(config2)
+	if err != nil {
+		return nil, err
+	}
 	validate := validator.New()
-
-	// Handlers
-	userHandler := user.NewHandler(userService, validate)
+	handler := user.NewHandler(service, validate)
 	productService := product.NewService(config2, db)
 	productHandler := product.NewHandler(productService, validate)
 	cartService := cart.NewService(config2, db)
-	cartHandler := cart.NewCartHandler(cartService, validate)
-
-	// Inject into routes
-	dependency := routes.NewDependency(config2, middlewaresMiddleware, db, userHandler, productHandler, cartHandler)
+	cartHandler := cart.NewHandler(cartService, validate)
+	imageclassifierService := imageclassifier.NewService(db, predictor)
+	imageclassifierHandler := imageclassifier.NewHandler(imageclassifierService, validate)
+	dependency := routes.NewDependency(config2, middlewaresMiddlewares, db, predictor, handler, productHandler, cartHandler, imageclassifierHandler)
 	return dependency, nil
 }
 
@@ -52,3 +53,7 @@ func initializeDependency(config2 *config.Config) (*routes.Dependency, error) {
 var userSet = wire.NewSet(user.NewService, user.NewHandler)
 
 var productSet = wire.NewSet(product.NewService, product.NewHandler)
+
+var cartSet = wire.NewSet(cart.NewService, cart.NewHandler)
+
+var imageClassifierSet = wire.NewSet(imageclassifier.NewPredictor, imageclassifier.NewService, imageclassifier.NewHandler)

@@ -19,7 +19,7 @@ type handler struct {
 	validate *validator.Validate
 }
 
-func NewCartHandler(service Service, validate *validator.Validate) Handler {
+func NewHandler(service Service, validate *validator.Validate) Handler {
 	return &handler{
 		service:  service,
 		validate: validate,

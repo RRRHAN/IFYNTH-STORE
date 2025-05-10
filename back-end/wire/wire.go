@@ -9,6 +9,8 @@ import (
 	"github.com/google/wire"
 
 	"github.com/RRRHAN/IFYNTH-STORE/back-end/database"
+	"github.com/RRRHAN/IFYNTH-STORE/back-end/domains/cart"
+	imageclassifier "github.com/RRRHAN/IFYNTH-STORE/back-end/domains/image-classifier"
 	"github.com/RRRHAN/IFYNTH-STORE/back-end/domains/product"
 	"github.com/RRRHAN/IFYNTH-STORE/back-end/domains/user"
 	"github.com/RRRHAN/IFYNTH-STORE/back-end/middlewares"
@@ -26,6 +28,17 @@ var productSet = wire.NewSet(
 	product.NewHandler,
 )
 
+var cartSet = wire.NewSet(
+	cart.NewService,
+	cart.NewHandler,
+)
+
+var imageClassifierSet = wire.NewSet(
+	imageclassifier.NewPredictor,
+	imageclassifier.NewService,
+	imageclassifier.NewHandler,
+)
+
 func initializeDependency(config *config.Config) (*routes.Dependency, error) {
 
 	wire.Build(
@@ -35,6 +48,8 @@ func initializeDependency(config *config.Config) (*routes.Dependency, error) {
 		routes.NewDependency,
 		userSet,
 		productSet,
+		cartSet,
+		imageClassifierSet,
 	)
 
 	return nil, nil
