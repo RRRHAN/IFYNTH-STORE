@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"context"
 	"fmt"
+	"log"
 	"net/http"
 	"os/exec"
 	"strings"
@@ -32,6 +33,7 @@ func NewPredictor(config *config.Config) (Predictor, error) {
 		return &emptyPredictor{}, nil
 	}
 
+	log.Print("running predictor....")
 	cmd := exec.Command("./predict")
 
 	stdinPipe, err := cmd.StdinPipe()
@@ -69,7 +71,9 @@ func NewPredictor(config *config.Config) (Predictor, error) {
 		}
 	}()
 
+	log.Print("waiting loading model to predictor")
 	<-p.ready
+	log.Print("predictor running succesfully")
 	return p, nil
 }
 
