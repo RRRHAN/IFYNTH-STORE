@@ -69,6 +69,7 @@ func NewDependency(
 		product.POST("/addProduct", mw.JWT(constants.ADMIN), productHandler.AddProduct)
 		product.DELETE("/:id", mw.JWT(constants.ADMIN), productHandler.DeleteProduct)
 		product.PUT("/update/:id", mw.JWT(constants.ADMIN), productHandler.UpdateProduct)
+		product.GET("/count", mw.JWT(constants.ADMIN), productHandler.GetProductCountByDepartment)
 	}
 
 	cart := router.Group("/cart")

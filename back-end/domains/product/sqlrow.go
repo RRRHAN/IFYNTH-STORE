@@ -49,3 +49,8 @@ type ProductImage struct {
 func (ProductImage) TableName() string {
 	return "product_image"
 }
+
+type DepartmentCount struct {
+	Department string
+	Count      int64
+}

@@ -22,6 +22,7 @@ type Handler interface {
 	DeleteProduct(ctx *gin.Context)
 	GetProductByID(ctx *gin.Context)
 	UpdateProduct(ctx *gin.Context)
+	GetProductCountByDepartment(ctx *gin.Context)
 }
 
 type handler struct {
@@ -246,4 +247,14 @@ func (h *handler) UpdateProduct(ctx *gin.Context) {
 	}
 
 	respond.Success(ctx, http.StatusOK, gin.H{"message": "Product updated successfully"})
+}
+
+func (h *handler) GetProductCountByDepartment(ctx *gin.Context) {
+	res, err := h.service.GetProductCountByDepartment(ctx)
+	if err != nil {
+		respond.Error(ctx, apierror.FromErr(err))
+		return
+	}
+
+	respond.Success(ctx, http.StatusOK, res)
 }

@@ -21,6 +21,7 @@ type Service interface {
 	AddProduct(ctx context.Context, req AddProductRequest, images []*multipart.FileHeader) error
 	UpdateProduct(ctx context.Context, productID string, req UpdateProductRequest, images []*multipart.FileHeader) error
 	DeleteProduct(ctx context.Context, productID string) error
+	GetProductCountByDepartment(ctx context.Context) ([]DepartmentCount, error)
 }
 
 type service struct {
@@ -310,4 +311,18 @@ func (s *service) UpdateProduct(ctx context.Context, productID string, req Updat
 	}
 
 	return nil
+}
+
+func (s *service) GetProductCountByDepartment(ctx context.Context) ([]DepartmentCount, error) {
+	var results []DepartmentCount
+
+	if err := s.db.WithContext(ctx).
+		Model(&Product{}).
+		Select("department, COUNT(*) as count").
+		Group("department").
+		Scan(&results).Error; err != nil {
+		return nil, err
+	}
+
+	return results, nil
 }
