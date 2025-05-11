@@ -13,6 +13,9 @@ WORKDIR /app
 
 COPY --from=builder /app/app .
 
+COPY --from=builder /app/predict /app/predict
+COPY --from=builder /app/classes.json /app/classes.json
+
 EXPOSE 7777
 
 CMD ["./app"]
