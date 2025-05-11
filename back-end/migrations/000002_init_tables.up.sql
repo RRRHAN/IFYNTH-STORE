@@ -34,7 +34,7 @@ CREATE TABLE IF NOT EXISTS cart_items (
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE TABLE cusProduct (
+CREATE TABLE cus_product (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     user_id UUID NOT NULL,
     name VARCHAR(255),
@@ -55,7 +55,7 @@ CREATE TABLE customer_product_files (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
       FOREIGN KEY(product_id) 
-      REFERENCES cusProduct(id)
+      REFERENCES cus_product(id)
       ON DELETE CASCADE
 );
 
@@ -67,7 +67,7 @@ CREATE TABLE message (
     role VARCHAR(255),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
       FOREIGN KEY(product_id) 
-      REFERENCES cusProduct(id)
+      REFERENCES cus_product(id)
       ON DELETE CASCADE,
 );
 
