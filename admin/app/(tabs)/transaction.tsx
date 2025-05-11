@@ -9,8 +9,8 @@ import {
 import { IconButton } from "react-native-paper";
 import { useRouter } from "expo-router";
 import styles from "../styles/transactionStyles";
-import { fetchTransactions, handleStatusChange, TransactionStatus } from "../api/transaction";
-import { Transaction } from "../types/transaction";
+import { fetchTransactions, handleStatusChange, TransactionStatus } from "@/src/api/transaction";
+import { Transaction } from "@/src/types/transaction";
 import { ThemedView } from "@/components/ThemedView";
 import { ThemedText } from "@/components/ThemedText";
 import {

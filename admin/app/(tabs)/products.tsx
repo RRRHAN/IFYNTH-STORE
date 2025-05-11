@@ -11,8 +11,8 @@ import {
 import { IconButton } from "react-native-paper";
 import { useRouter } from "expo-router";
 import styles from "../styles/productStyles";
-import { Product } from "../types/product";
-import { fetchProducts } from "@/app/api/products";
+import { Product } from "@/src/types/product";
+import { fetchProducts } from "@/src/api/products";
 import { ThemedView } from "@/components/ThemedView";
 import { ThemedText } from "@/components/ThemedText";
 import {
@@ -21,9 +21,9 @@ import {
   ThemedHeader,
   ThemedCell,
 } from "@/components/ThemedTable";
-import { deleteProduct } from "@/app/api/products";
+import { deleteProduct } from "@/src/api/products";
 import ModalComponent from "@/components/ModalComponent";
-import ProductDetailModal from "../../components/detail_product";
+import ProductDetailModal from "@/app/detail_product";
 
 const ProductsScreen = () => {
   const screenWidth = Dimensions.get("window").width;

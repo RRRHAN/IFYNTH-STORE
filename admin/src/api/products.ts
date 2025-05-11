@@ -1,4 +1,4 @@
-import { DepartentCount, Product } from "../types/product";
+import {  Product } from "../types/product";
 import { BASE_URL, getAuthToken } from "./constants";
 import { ProductData, UpdateProductData } from "../request/productReq";
 
@@ -138,22 +138,4 @@ for (const pair of formData.entries()) {
       error.message || "Something went wrong while updating the product."
     );
   }
-};
-
-export const fetchProductCount = async (): Promise<DepartentCount[]> => {
-  const token = await getAuthToken();
-  const getAllUrl = `${BASE_URL}/product/count`;
-
-  const response = await fetch(getAllUrl, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  });
-
-  if (!response.ok) {
-    throw new Error(`HTTP error! status: ${response.status}`);
-  }
-
-  const result = await response.json();
-  return result.data;
 };

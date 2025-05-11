@@ -11,8 +11,8 @@ import {
 import { IconButton } from "react-native-paper";
 import { useRouter } from "expo-router";
 import styles from "../styles/cusProductStyles";
-import { cusProduct } from "../types/product";
-import { fetchOffers, handleStatusChange, Status } from "@/app/api/cusoffers";
+import { cusProduct } from "@/src/types/product";
+import { fetchOffers, handleStatusChange, Status } from "@/src/api/cusoffers";
 import { ThemedView } from "@/components/ThemedView";
 import { ThemedText } from "@/components/ThemedText";
 import {

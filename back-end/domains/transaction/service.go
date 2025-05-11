@@ -22,6 +22,7 @@ type Service interface {
 	GetTransactionsByUserID(ctx context.Context) ([]Transaction, error)
 	GetAllTransaction(ctx context.Context) ([]Transaction, error)
 	UpdateStatus(ctx context.Context, req UpdateStatusRequest) error
+	GetTransactionCountByStatus(ctx context.Context) ([]StatusCount, error)
 }
 
 type service struct {
@@ -215,4 +216,18 @@ func (s *service) UpdateStatus(ctx context.Context, req UpdateStatusRequest) err
 	}
 
 	return nil
+}
+
+func (s *service) GetTransactionCountByStatus(ctx context.Context) ([]StatusCount, error) {
+	var results []StatusCount
+
+	if err := s.db.WithContext(ctx).
+		Model(&Transaction{}).
+		Select("status, COUNT(*) as count").
+		Group("status").
+		Scan(&results).Error; err != nil {
+		return nil, err
+	}
+
+	return results, nil
 }

@@ -17,6 +17,7 @@ type Handler interface {
 	GetTransactionsByUserID(c *gin.Context)
 	GetAllTransaction(ctx *gin.Context)
 	UpdateTransactionStatus(ctx *gin.Context)
+	GetTransactionCountByStatus(ctx *gin.Context)
 }
 
 type handler struct {
@@ -127,4 +128,14 @@ func (h *handler) UpdateTransactionStatus(ctx *gin.Context) {
 	}
 
 	respond.Success(ctx, http.StatusOK, gin.H{"message": "status updated successfully"})
+}
+
+func (h *handler) GetTransactionCountByStatus(ctx *gin.Context) {
+	res, err := h.service.GetTransactionCountByStatus(ctx)
+	if err != nil {
+		respond.Error(ctx, apierror.FromErr(err))
+		return
+	}
+
+	respond.Success(ctx, http.StatusOK, res)
 }

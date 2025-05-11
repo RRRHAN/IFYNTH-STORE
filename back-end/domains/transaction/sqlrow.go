@@ -56,3 +56,8 @@ type ShippingAddress struct {
 func (ShippingAddress) TableName() string {
 	return "shipping_address"
 }
+
+type StatusCount struct {
+	Status string
+	Count  int64
+}

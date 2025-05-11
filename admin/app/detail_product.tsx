@@ -7,8 +7,8 @@ import {
   Dimensions,
 } from "react-native";
 import { ThemedText } from "@/components/ThemedText";
-import styles from "../app/styles/detailProductStyles";
-import { Product, StockDetail } from "../app/types/product";
+import styles from "./styles/detailProductStyles";
+import { Product, StockDetail } from "@/src/types/product";
 
 type ProductDetailModalProps = {
   product: Product | null;

@@ -16,8 +16,8 @@ import { ThemedView } from "@/components/ThemedView";
 import { ThemedTextInput } from "@/components/ThemedTextInput";
 import { ThemedText } from "@/components/ThemedText";
 import styles from "./styles/messageStyles";
-import { addMessage, fetchMessage } from "./api/message";
-import { Message } from "./types/message";
+import { addMessage, fetchMessage } from "@/src/api/message";
+import { Message } from "@/src/types/message";
 
 export default function ChatScreen() {
   const router = useRouter();

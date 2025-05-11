@@ -113,6 +113,7 @@ func NewDependency(
 		transaction.GET("/", mw.JWT(constants.CUSTOMER), transactionHandler.GetTransactionsByUserID)
 		transaction.GET("/all", mw.JWT(constants.ADMIN), transactionHandler.GetAllTransaction)
 		transaction.PATCH("/status", mw.JWT(constants.ADMIN), transactionHandler.UpdateTransactionStatus)
+		transaction.GET("/count", mw.JWT(constants.ADMIN), transactionHandler.GetTransactionCountByStatus)
 	}
 
 	router.NoRoute(func(ctx *gin.Context) {

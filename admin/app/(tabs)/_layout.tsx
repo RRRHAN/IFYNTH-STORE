@@ -6,7 +6,7 @@ import TabBarBackground from "@/components/ui/TabBarBackground";
 import { Colors } from "@/constants/Colors";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { Icon } from "react-native-paper";
-import { logoutAdmin } from "../api/admin";
+import { logoutAdmin } from "@/src/api/admin";
 import { useRouter } from "expo-router";
 
 export default function TabLayout() {

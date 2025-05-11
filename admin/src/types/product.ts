@@ -47,8 +47,3 @@ export type ProductImage = {
     URL: string;
     CreatedAt: string;
   };
-
-  export type DepartentCount = {
-    Department: string;
-    Count: Int32Array;
-  };
