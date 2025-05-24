@@ -61,3 +61,8 @@ type StatusCount struct {
 	Status string
 	Count  int64
 }
+
+type Result struct {
+	Date        time.Time
+	TotalAmount float64
+}

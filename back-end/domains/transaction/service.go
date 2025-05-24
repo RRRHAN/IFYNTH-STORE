@@ -23,6 +23,8 @@ type Service interface {
 	GetAllTransaction(ctx context.Context) ([]Transaction, error)
 	UpdateStatus(ctx context.Context, req UpdateStatusRequest) error
 	GetTransactionCountByStatus(ctx context.Context) ([]StatusCount, error)
+	GetTotalAmountByDate(ctx context.Context) ([]Result, error)
+	GetTotalIncome(ctx context.Context) (float64, error)
 }
 
 type service struct {
@@ -230,4 +232,35 @@ func (s *service) GetTransactionCountByStatus(ctx context.Context) ([]StatusCoun
 	}
 
 	return results, nil
+}
+
+func (s *service) GetTotalAmountByDate(ctx context.Context) ([]Result, error) {
+	var results []Result
+
+	err := s.db.WithContext(ctx).
+		Model(&Transaction{}).
+		Select("DATE(created_at) as date, SUM(total_amount) as total_amount").
+		Where("status NOT IN ?", []string{"pending", "cancelled"}).
+		Group("DATE(created_at)").
+		Order("DATE(created_at)").
+		Scan(&results).Error
+
+	if err != nil {
+		return nil, err
+	}
+
+	return results, nil
+}
+
+func (s *service) GetTotalIncome(ctx context.Context) (float64, error) {
+	var totalIncome float64
+
+	if err := s.db.WithContext(ctx).
+		Model(&Transaction{}).
+		Select("COALESCE(SUM(total_amount), 0)").
+		Scan(&totalIncome).Error; err != nil {
+		return 0, err
+	}
+
+	return totalIncome, nil
 }

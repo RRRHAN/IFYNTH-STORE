@@ -73,6 +73,7 @@ func NewDependency(
 		product.DELETE("/:id", mw.JWT(constants.ADMIN), productHandler.DeleteProduct)
 		product.PUT("/update/:id", mw.JWT(constants.ADMIN), productHandler.UpdateProduct)
 		product.GET("/count", mw.JWT(constants.ADMIN), productHandler.GetProductCountByDepartment)
+		product.GET("/totalCapital", mw.JWT(constants.ADMIN), productHandler.GetTotalCapital)
 	}
 
 	cart := router.Group("/cart")
@@ -114,6 +115,8 @@ func NewDependency(
 		transaction.GET("/all", mw.JWT(constants.ADMIN), transactionHandler.GetAllTransaction)
 		transaction.PATCH("/status", mw.JWT(constants.ADMIN), transactionHandler.UpdateTransactionStatus)
 		transaction.GET("/count", mw.JWT(constants.ADMIN), transactionHandler.GetTransactionCountByStatus)
+		transaction.GET("/report", mw.JWT(constants.ADMIN), transactionHandler.GetTotalAmountByDate)
+		transaction.GET("/totalIncome", mw.JWT(constants.ADMIN), transactionHandler.GetTotalIncome)
 	}
 
 	router.NoRoute(func(ctx *gin.Context) {

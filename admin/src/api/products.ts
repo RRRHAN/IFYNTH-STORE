@@ -17,6 +17,7 @@ export const fetchProducts = async (): Promise<Product[]> => {
   }
 
   const result = await response.json();
+  console.log("Fetched product data:", result.data);
   return result.data;
 };
 

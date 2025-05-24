@@ -63,7 +63,7 @@ const userOffers = () => {
 
   const [thumbnailUrls, setThumbnailUrls] = useState<{ [key: string]: string }>(
     {}
-  ); // State for storing thumbnail URLs
+  );
 
   const getData = async () => {
     try {

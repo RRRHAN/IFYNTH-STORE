@@ -9,6 +9,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\MessageController;
+use App\Http\Controllers\TryonController;
 
 Route::get('/', function () {
     return view('login');
@@ -76,25 +77,8 @@ Route::controller(TransactionController::class)->group(function () {
     Route::post('/checkout', 'addTransaction');
 });
 
+Route::post('/tryon', [TryonController::class, 'tryon']);
+
 Route::get('/tryon-form', function () {
-    $clothes = Http::get('http://localhost:8001/clothes')->json();
-    return view('virtual_tryon', ['clothes' => $clothes['clothes']]);
-});
-
-Route::post('/try-on', function (\Illuminate\Http\Request $request) {
-    // Upload foto ke backend Python
-    $response = Http::attach('file', file_get_contents($request->file('photo')), $request->file('photo')->getClientOriginalName())
-        ->post('http://localhost:8001/upload-photo');
-
-    $photoName = $response->json()['filename'];
-
-    // Kirim request try-on
-    $result = Http::asForm()->post('http://localhost:8001/try-on', [
-        'photo_name' => $photoName,
-        'clothes_name' => $request->input('clothes'),
-    ]);
-
-    return view('tryon_result', [
-        'result_url' => 'http://localhost:8001/results/' . basename($result->json()['result_url']),
-    ]);
-});
+    return view('tryon');
+})->name('tryon-form');

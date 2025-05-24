@@ -2,6 +2,7 @@ package product
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"mime/multipart"
 	"os"
@@ -22,6 +23,7 @@ type Service interface {
 	UpdateProduct(ctx context.Context, productID string, req UpdateProductRequest, images []*multipart.FileHeader) error
 	DeleteProduct(ctx context.Context, productID string) error
 	GetProductCountByDepartment(ctx context.Context) ([]DepartmentCount, error)
+	GetTotalCapital(ctx context.Context) (float64, error)
 }
 
 type service struct {
@@ -39,7 +41,7 @@ func NewService(config *config.Config, db *gorm.DB) Service {
 func (s *service) GetAllProducts(ctx context.Context, keyword string, department string, category string) ([]Product, error) {
 	var products []Product
 
-	query := s.db.WithContext(ctx).Model(&Product{}).Preload("ProductImages").Preload("StockDetails")
+	query := s.db.WithContext(ctx).Model(&Product{}).Preload("ProductImages").Preload("StockDetails").Preload("ProductCapital")
 
 	if keyword != "" {
 		// Search name OR description
@@ -69,7 +71,7 @@ func (s *service) GetProductByID(ctx context.Context, id uuid.UUID) (*Product, e
 	var product Product
 
 	if err := s.db.WithContext(ctx).Model(&Product{}).
-		Preload("ProductImages").Preload("StockDetails").
+		Preload("ProductImages").Preload("StockDetails").Preload("ProductCapital").
 		Where("id = ?", id).
 		First(&product).Error; err != nil {
 		return nil, err
@@ -84,7 +86,6 @@ func (s *service) AddProduct(ctx context.Context, req AddProductRequest, images 
 		totalStock += int(detail.Stock)
 	}
 
-	// Product entry
 	product := Product{
 		ID:          uuid.New(),
 		Name:        req.Name,
@@ -92,7 +93,6 @@ func (s *service) AddProduct(ctx context.Context, req AddProductRequest, images 
 		Description: req.Description,
 		Price:       req.Price,
 		Weight:      req.Weight,
-		Capital:     req.Capital,
 		Department:  req.Department,
 		Category:    req.Category,
 		CreatedAt:   time.Now(),
@@ -102,6 +102,21 @@ func (s *service) AddProduct(ctx context.Context, req AddProductRequest, images 
 	// save to db
 	if err := s.db.Create(&product).Error; err != nil {
 		return err
+	}
+
+	// Save capital info to ProductCapital table
+	productCapital := ProductCapital{
+		ID:             uuid.New(),
+		ProductID:      product.ID,
+		TotalStock:     totalStock,
+		CapitalPerItem: req.Capital,
+		TotalCapital:   float64(totalStock) * req.Capital,
+		CreatedAt:      time.Now(),
+		UpdatedAt:      time.Now(),
+	}
+
+	if err := s.db.Create(&productCapital).Error; err != nil {
+		return fmt.Errorf("failed to save capital: %w", err)
 	}
 
 	// save img if exist
@@ -121,7 +136,6 @@ func (s *service) AddProduct(ctx context.Context, req AddProductRequest, images 
 			return fmt.Errorf("failed to create directory: %w", err)
 		}
 
-		// save img to disk
 		if err := s.saveImage(ctx, file, path); err != nil {
 			return err
 		}
@@ -133,7 +147,6 @@ func (s *service) AddProduct(ctx context.Context, req AddProductRequest, images 
 		})
 	}
 
-	// save img to db
 	if len(productImages) > 0 {
 		if err := s.db.Create(&productImages).Error; err != nil {
 			return err
@@ -210,7 +223,6 @@ func (s *service) UpdateProduct(ctx context.Context, productID string, req Updat
 	product.Description = req.Description
 	product.Price = req.Price
 	product.Weight = req.Weight
-	product.Capital = req.Capital
 	product.Department = req.Department
 	product.Category = req.Category
 	product.UpdatedAt = time.Now()
@@ -238,6 +250,38 @@ func (s *service) UpdateProduct(ctx context.Context, productID string, req Updat
 			return fmt.Errorf("error deleting image from database: %v", err)
 		}
 
+	}
+
+	var capital ProductCapital
+	err := s.db.WithContext(ctx).First(&capital, "product_id = ?", product.ID).Error
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+
+			capital = ProductCapital{
+				ID:             uuid.New(),
+				ProductID:      product.ID,
+				TotalStock:     totalStock,
+				CapitalPerItem: req.Capital,
+				TotalCapital:   req.Capital * float64(totalStock),
+				CreatedAt:      time.Now(),
+				UpdatedAt:      time.Now(),
+			}
+			if err := s.db.Create(&capital).Error; err != nil {
+				return fmt.Errorf("error creating product capital: %v", err)
+			}
+		} else {
+			return fmt.Errorf("error finding product capital: %v", err)
+		}
+	} else {
+
+		capital.TotalStock = totalStock
+		capital.CapitalPerItem = req.Capital
+		capital.TotalCapital = req.Capital * float64(totalStock)
+		capital.UpdatedAt = time.Now()
+
+		if err := s.db.Save(&capital).Error; err != nil {
+			return fmt.Errorf("error updating product capital: %v", err)
+		}
 	}
 
 	var productImages []ProductImage
@@ -325,4 +369,17 @@ func (s *service) GetProductCountByDepartment(ctx context.Context) ([]Department
 	}
 
 	return results, nil
+}
+
+func (s *service) GetTotalCapital(ctx context.Context) (float64, error) {
+	var totalCapital float64
+
+	if err := s.db.WithContext(ctx).
+		Model(&ProductCapital{}).
+		Select("COALESCE(SUM(total_capital), 0)").
+		Scan(&totalCapital).Error; err != nil {
+		return 0, err
+	}
+
+	return totalCapital, nil
 }
