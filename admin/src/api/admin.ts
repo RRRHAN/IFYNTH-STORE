@@ -3,7 +3,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export const loginAdmin = async (username: string, password: string) => {
   try {
-    const loginUrl = `${BASE_URL}/user/login`;
+    const loginUrl = `${BASE_URL}/api/user/login`;
     const response = await fetch(loginUrl, {
       method: "POST",
       headers: {
@@ -42,7 +42,7 @@ export const logoutAdmin = async () => {
       return { success: false, message: 'No token found, already logged out.' };
     }
 
-    const response = await fetch(`${BASE_URL}/user/logout`, {
+    const response = await fetch(`${BASE_URL}/api/user/logout`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

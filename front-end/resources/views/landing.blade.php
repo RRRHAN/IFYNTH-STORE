@@ -162,10 +162,10 @@
                                                     @php
                                                         $images = $product['ProductImages'] ?? [];
                                                         $frontImage = isset($images[0]['URL'])
-                                                            ? 'http://localhost:7777' . $images[0]['URL']
+                                                            ? config('app.back_end_base_url').'/api' . $images[0]['URL']
                                                             : asset('default-image.jpg');
                                                         $backImage = isset($images[1]['URL'])
-                                                            ? 'http://localhost:7777' . $images[1]['URL']
+                                                            ? config('app.back_end_base_url').'/api' . $images[1]['URL']
                                                             : $frontImage;
                                                     @endphp
                     

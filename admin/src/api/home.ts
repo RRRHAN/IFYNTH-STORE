@@ -3,7 +3,7 @@ import { DepartentCount, TotalTransactionUser, TransactionCount, TransactionRepo
 
 export const fetchProductCount = async (): Promise<DepartentCount[]> => {
   const token = await getAuthToken();
-  const getAllUrl = `${BASE_URL}/product/count`;
+  const getAllUrl = `${BASE_URL}/api/product/count`;
 
   const response = await fetch(getAllUrl, {
     headers: {
@@ -21,7 +21,7 @@ export const fetchProductCount = async (): Promise<DepartentCount[]> => {
 
 export const fetchTransactionCount = async (): Promise<TransactionCount[]> => {
   const token = await getAuthToken();
-  const getAllUrl = `${BASE_URL}/transaction/count`;
+  const getAllUrl = `${BASE_URL}/api/transaction/count`;
 
   const response = await fetch(getAllUrl, {
     headers: {
@@ -39,7 +39,7 @@ export const fetchTransactionCount = async (): Promise<TransactionCount[]> => {
 
 export const fetchTransactionReports = async (): Promise<TransactionReport[]> => {
   const token = await getAuthToken();
-  const getAllUrl = `${BASE_URL}/transaction/report`;
+  const getAllUrl = `${BASE_URL}/api/transaction/report`;
 
   const response = await fetch(getAllUrl, {
     headers: {
@@ -57,7 +57,7 @@ export const fetchTransactionReports = async (): Promise<TransactionReport[]> =>
 
 export const fetchTotalCapital = async (): Promise<number> => {
   const token = await getAuthToken();
-  const getAllUrl = `${BASE_URL}/product/totalCapital`;
+  const getAllUrl = `${BASE_URL}/api/product/totalCapital`;
 
   const response = await fetch(getAllUrl, {
     headers: {
@@ -75,7 +75,7 @@ export const fetchTotalCapital = async (): Promise<number> => {
 
 export const fetchTotalIncome = async (): Promise<number> => {
   const token = await getAuthToken();
-  const getAllUrl = `${BASE_URL}/transaction/totalIncome`;
+  const getAllUrl = `${BASE_URL}/api/transaction/totalIncome`;
 
   const response = await fetch(getAllUrl, {
     headers: {
@@ -93,7 +93,7 @@ export const fetchTotalIncome = async (): Promise<number> => {
 
 export const fetchTotalTransactionUser = async (): Promise<TotalTransactionUser[]> => {
   const token = await getAuthToken();
-  const getAllUrl = `${BASE_URL}/transaction/totalTransactionUser`;
+  const getAllUrl = `${BASE_URL}/api/transaction/totalTransactionUser`;
 
   const response = await fetch(getAllUrl, {
     headers: {

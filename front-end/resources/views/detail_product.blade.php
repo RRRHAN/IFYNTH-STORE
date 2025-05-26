@@ -12,7 +12,7 @@
                                         <div class="swiper-wrapper">
                                             @foreach ($product['ProductImages'] as $image)
                                                 <div class="swiper-slide">
-                                                    <img src="{{ url('http://localhost:7777' . $image['URL']) }}"
+                                                    <img src="{{ url(config('app.back_end_base_url').'/api' . $image['URL']) }}"
                                                         alt="{{ $product['Name'] }}">
                                                 </div>
                                             @endforeach
@@ -27,7 +27,7 @@
                                         @if (isset($product['ProductImages']) && count($product['ProductImages']) > 0)
                                             @foreach ($product['ProductImages'] as $image)
                                                 <div class="swiper-slide slide-smoll">
-                                                    <img src="{{ url('http://localhost:7777' . $image['URL']) }}"
+                                                    <img src="{{ url(config('app.back_end_base_url').'/api' . $image['URL']) }}"
                                                         alt="{{ $product['Name'] }}">
                                                 </div>
                                             @endforeach

@@ -35,7 +35,7 @@ class UserController extends Controller
             $response = Http::withHeaders([
                 'Authorization' => 'Basic ' . base64_encode('admin:admin'),
                 'Content-Type' => 'application/json'
-            ])->post('http://localhost:7777/user/register', [
+            ])->post(config('app.back_end_base_url').'/api/user/register', [
                 'name' => $validated['name'],
                 'username' => $validated['username'],
                 'phoneNumber' => $validated['phoneNumber'],
@@ -74,7 +74,7 @@ class UserController extends Controller
             $response = Http::withHeaders([
                 'Authorization' => 'Basic ' . base64_encode('admin:admin'),
                 'Content-Type' => 'application/json'
-            ])->post('http://localhost:7777/user/login', [
+            ])->post(config('app.back_end_base_url').'/api/user/login', [
                 'username' => $validated['username'],
                 'password' => $validated['password'],
                 'role' => 'CUSTOMER',
@@ -129,7 +129,7 @@ class UserController extends Controller
             // Kirim request logout ke API eksternal
             $response = Http::withHeaders([
                 'Authorization' => 'Bearer ' . $token,
-            ])->post('http://localhost:7777/user/logout');
+            ])->post(config('app.back_end_base_url').'/api/user/logout');
     
             if ($response->successful()) {
                 // Flash pesan sukses dan redirect
@@ -160,7 +160,7 @@ class UserController extends Controller
     
             $response = Http::withHeaders([
                 'Authorization' => 'Bearer ' . $token,
-            ])->patch('http://localhost:7777/user/password', [
+            ])->patch(config('app.back_end_base_url').'/api/user/password', [
                 'current_password' => $validated['current_password'],
                 'new_password' => $validated['new_password'],
                 'role' => "CUSTOMER",
@@ -191,7 +191,7 @@ class UserController extends Controller
         try {
             $response = Http::withHeaders([
                 'Authorization' => 'Bearer ' . $token,
-            ])->get('http://localhost:7777/user/get-personal');
+            ])->get(config('app.back_end_base_url').'/api/user/get-personal');
     
             if ($response->successful()) {
                 $data = collect($response->json()); 

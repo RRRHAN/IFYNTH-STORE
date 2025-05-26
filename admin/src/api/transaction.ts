@@ -4,7 +4,7 @@ import { BASE_URL, getAuthToken } from "./constants";
 export const fetchTransactions = async (): Promise<Transaction[]> => {
   try {
     const token = await getAuthToken();
-    const getAllUrl = `${BASE_URL}/transaction/all`;
+    const getAllUrl = `${BASE_URL}/api/transaction/all`;
 
     const response = await fetch(getAllUrl, {
       headers: {
@@ -34,7 +34,7 @@ export const handleStatusChange = async (
   TransactionId: string
 ): Promise<any> => {
   const token = await getAuthToken();
-  const updateStatus = `${BASE_URL}/transaction/status`;
+  const updateStatus = `${BASE_URL}/api/transaction/status`;
 
   try {
     const response = await fetch(updateStatus, {

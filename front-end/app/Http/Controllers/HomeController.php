@@ -26,7 +26,7 @@ class HomeController extends Controller
     
             $response = Http::withHeaders([
                 'Authorization' => 'Bearer ' . $token
-            ])->get('http://localhost:7777/product', $queryParams);
+            ])->get(config('app.back_end_base_url').'/api/product', $queryParams);
     
             if ($response->successful() && $response->json('errors') === null) {
                 $allProducts = collect($response->json('data'))

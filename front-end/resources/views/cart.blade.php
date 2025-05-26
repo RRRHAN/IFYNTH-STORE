@@ -26,7 +26,7 @@
                                         !empty($item['Product']['ProductImages']) &&
                                             is_array($item['Product']['ProductImages']) &&
                                             isset($item['Product']['ProductImages'][0]['URL']))
-                                        <img src="{{ url('http://localhost:7777' . $item['Product']['ProductImages'][0]['URL']) }}"
+                                        <img src="{{ url(config('app.back_end_base_url').'/api' . $item['Product']['ProductImages'][0]['URL']) }}"
                                             alt="image">
                                     @else
                                         <p>No image available</p>
@@ -72,7 +72,7 @@
                                         !empty($item['Product']['ProductImages']) &&
                                             is_array($item['Product']['ProductImages']) &&
                                             isset($item['Product']['ProductImages'][0]['URL']))
-                                        <img src="{{ url('http://localhost:7777' . $item['Product']['ProductImages'][0]['URL']) }}"
+                                        <img src="{{ url(config('app.back_end_base_url').'/api' . $item['Product']['ProductImages'][0]['URL']) }}"
                                             alt="image">
                                     @else
                                         <p>No image available</p>

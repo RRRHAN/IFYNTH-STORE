@@ -3,7 +3,7 @@ import { BASE_URL, getAuthToken } from "./constants";
 
 export const fetchOffers = async (): Promise<cusProduct[]> => {
   const token = await getAuthToken();
-  const getAllUrl = `${BASE_URL}/cusproduct/getall`;
+  const getAllUrl = `${BASE_URL}/api/cusproduct/getall`;
 
   const response = await fetch(getAllUrl, {
     headers: {
@@ -26,7 +26,7 @@ export const handleStatusChange = async (
   productId: string
 ): Promise<any> => {
   const token = await getAuthToken();
-  const updateStatus = `${BASE_URL}/cusproduct/status`;
+  const updateStatus = `${BASE_URL}/api/cusproduct/status`;
 
   try {
     const response = await fetch(updateStatus, {
