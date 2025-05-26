@@ -19,8 +19,12 @@ const ProductCountTable: React.FC<ProductCountTableProps> = ({
   const headerBackgroundColor = colorScheme === "dark" ? "#ffffff" : "#111827";
   const headerTextColor = colorScheme === "dark" ? "#000" : "#fff";
   return (
-    <ThemedView style={[styles.table, { backgroundColor: headerBackgroundColor } ]}>
-      <ThemedText style={[styles.tableTitle, { color: headerTextColor }]}>Product</ThemedText>
+    <ThemedView
+      style={[styles.table, { backgroundColor: headerBackgroundColor }]}
+    >
+      <ThemedText style={[styles.tableTitle, { color: headerTextColor }]}>
+        Product
+      </ThemedText>
 
       {/* Header */}
       <ThemedView style={styles.row}>
@@ -62,7 +66,7 @@ const styles = StyleSheet.create({
         : width < 1000
         ? width - 40
         : width < 1500
-        ? width - 700
+        ? width - 850
         : width - 1100,
   },
   tableTitle: {

@@ -21,7 +21,7 @@ class ProductController extends Controller
             // Ambil data produk dari API
             $response = Http::withHeaders([
                 'Authorization' => 'Bearer ' . $token
-            ])->get('http://localhost:7777/product', [
+            ])->get($this->goApiUrl. '/product', [
                         'department' => $department
                     ]);
 
@@ -71,7 +71,7 @@ class ProductController extends Controller
 
         $response = Http::withHeaders([
             'Authorization' => 'Bearer ' . $token
-        ])->get('http://localhost:7777/product', $queryParams);
+        ])->get($this->goApiUrl. '/product', $queryParams);
 
         if ($response->successful() && $response->json('errors') === null) {
             $allProducts = collect($response->json('data'));
@@ -105,11 +105,11 @@ class ProductController extends Controller
         $token = session('api_token');
 
         try {
-            $url = 'http://localhost:7777/product/detail/' . $id;
+            $url = $this->goApiUrl. '/product/detail/' . $id;
             Log::info('Memanggil URL:', ['url' => $url]);
             $response = Http::withHeaders([
                 'Authorization' => 'Bearer ' . $token
-            ])->get('http://localhost:7777/product/detail/' . $id);
+            ])->get($this->goApiUrl. '/product/detail/' . $id);
 
             // Cek apakah HTTP status 200
             if ($response->successful() && $response->json('errors') === null) {

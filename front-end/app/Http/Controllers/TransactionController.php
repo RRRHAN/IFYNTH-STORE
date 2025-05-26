@@ -71,7 +71,7 @@ class TransactionController extends Controller
 
             $client = new \GuzzleHttp\Client();
 
-            $response = $client->request('POST', 'http://localhost:7777/transaction', [
+            $response = $client->request('POST', $this->goApiUrl . '/transaction', [
                 'headers' => [
                     'Authorization' => 'Bearer ' . $token,
                 ],
@@ -97,7 +97,7 @@ class TransactionController extends Controller
         try {
             $response = Http::withHeaders([
                 'Authorization' => 'Bearer ' . $token,
-            ])->get('http://localhost:7777/transaction');
+            ])->get($this->goApiUrl . '/transaction');
     
             if ($response->successful()) {
                 $transactions = collect($response->json('data'));

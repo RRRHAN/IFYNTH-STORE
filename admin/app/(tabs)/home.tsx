@@ -209,23 +209,6 @@ export default function HomeScreen() {
                     />
                   </View>
                 )}
-                {totalTransactionUser && (
-                  <View
-                    style={[
-                      styles.totalTablesContainer,
-                      {
-                        top:
-                          Platform.OS === "web"
-                            ? 0
-                            : -(contentTotalHeight - 1100),
-                      },
-                    ]}
-                  >
-                    <TotalTransactionUserTable
-                      totalTransactionUser={totalTransactionUser}
-                    />
-                  </View>
-                )}
                 <View
                   style={{
                     flex: 1,

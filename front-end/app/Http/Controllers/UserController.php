@@ -35,7 +35,7 @@ class UserController extends Controller
             $response = Http::withHeaders([
                 'Authorization' => 'Basic ' . base64_encode('admin:admin'),
                 'Content-Type' => 'application/json'
-            ])->post('http://localhost:7777/user/register', [
+            ])->post($this->goApiUrl . '/user/register', [
                 'name' => $validated['name'],
                 'username' => $validated['username'],
                 'phoneNumber' => $validated['phoneNumber'],
@@ -70,11 +70,10 @@ class UserController extends Controller
         ]);
     
         try {
-            // Kirim request ke API eksternal
             $response = Http::withHeaders([
                 'Authorization' => 'Basic ' . base64_encode('admin:admin'),
                 'Content-Type' => 'application/json'
-            ])->post('http://localhost:7777/user/login', [
+            ])->post($this->goApiUrl . '/user/login', [
                 'username' => $validated['username'],
                 'password' => $validated['password'],
                 'role' => 'CUSTOMER',
@@ -97,12 +96,10 @@ class UserController extends Controller
                     return redirect()->route('landing');
                 }
     
-                // Flash error jika token tidak ditemukan
                 session()->flash('error', 'Token not received, login failed');
                 return redirect()->back();
             }
     
-            // Flash error dari API
             $error = $response->json()['errors'][0] ?? 'Login failed.';
             session()->flash('error', $error);
             return redirect()->back();
@@ -129,7 +126,7 @@ class UserController extends Controller
             // Kirim request logout ke API eksternal
             $response = Http::withHeaders([
                 'Authorization' => 'Bearer ' . $token,
-            ])->post('http://localhost:7777/user/logout');
+            ])->post($this->goApiUrl . '/user/logout');
     
             if ($response->successful()) {
                 // Flash pesan sukses dan redirect
@@ -160,7 +157,7 @@ class UserController extends Controller
     
             $response = Http::withHeaders([
                 'Authorization' => 'Bearer ' . $token,
-            ])->patch('http://localhost:7777/user/password', [
+            ])->patch($this->goApiUrl . '/user/password', [
                 'current_password' => $validated['current_password'],
                 'new_password' => $validated['new_password'],
                 'role' => "CUSTOMER",
@@ -191,7 +188,7 @@ class UserController extends Controller
         try {
             $response = Http::withHeaders([
                 'Authorization' => 'Bearer ' . $token,
-            ])->get('http://localhost:7777/user/get-personal');
+            ])->get($this->goApiUrl . '/user/get-personal');
     
             if ($response->successful()) {
                 $data = collect($response->json()); 

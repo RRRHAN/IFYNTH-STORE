@@ -37,7 +37,7 @@ class CustomerProductController extends Controller
         try {
             $client = new Client();
 
-            $response = $client->post('http://localhost:7777/cusproduct', [
+            $response = $client->post($this->goApiUrl . '/cusproduct', [
                 'headers' => [
                     'Authorization' => 'Bearer ' . $token,
                 ],
@@ -89,7 +89,7 @@ class CustomerProductController extends Controller
         
             $response = Http::withHeaders([
                 'Authorization' => 'Bearer ' . $token
-            ])->get('http://localhost:7777/cusproduct', $queryParams);
+            ])->get($this->goApiUrl . '/cusproduct', $queryParams);
         
             if ($response->successful() && $response->json('errors') === null) {
                 $allProducts = collect($response->json('data'));
@@ -117,7 +117,7 @@ class CustomerProductController extends Controller
         try {
             $response = Http::withHeaders([
                 'Authorization' => 'Bearer ' . $token
-            ])->delete('http://localhost:7777/cusproduct', ['product_id' => $productId]);
+            ])->delete($this->goApiUrl . '/cusproduct', ['product_id' => $productId]);
 
             if ($response->successful() && $response->json('errors') === null) {
 

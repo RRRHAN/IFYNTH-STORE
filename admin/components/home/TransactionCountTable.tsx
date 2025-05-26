@@ -58,7 +58,7 @@ const styles = StyleSheet.create({
         : width < 1000
         ? width - 40
         : width < 1500
-        ? width - 700
+        ? width - 850
         : width - 1100,
   },
   tableTitle: {

@@ -22,7 +22,7 @@ class MessageController extends Controller
 
             $response = Http::withHeaders([
                 'Authorization' => 'Bearer ' . $token
-            ])->get('http://localhost:7777/cusproduct/list', $queryParams);
+            ])->get($this->goApiUrl . '/cusproduct/list', $queryParams);
 
             if ($response->successful() && $response->json('errors') === null) {
                 $list = collect($response->json('data'));
@@ -50,7 +50,7 @@ class MessageController extends Controller
         // Ambil pesan untuk produk dari API atau database
         $response = Http::withHeaders([
             'Authorization' => 'Bearer ' . $token
-        ])->get('http://localhost:7777/message/' . $productId);
+        ])->get($this->goApiUrl . '/message/' . $productId);
 
         if ($response->successful()) {
             $messages = collect($response->json());
@@ -87,7 +87,7 @@ class MessageController extends Controller
             // Kirim data sebagai JSON langsung
             $response = Http::withHeaders([
                 'Authorization' => 'Bearer ' . $token
-            ])->post('http://localhost:7777/message/', [
+            ])->post($this->goApiUrl . '/message/', [
                 'product_id' => $validated['product_id'],
                 'message' => $validated['message'],
                 'role' => "CUSTOMER",
