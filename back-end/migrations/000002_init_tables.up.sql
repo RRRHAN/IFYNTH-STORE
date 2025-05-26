@@ -68,7 +68,7 @@ CREATE TABLE message (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
       FOREIGN KEY(product_id) 
       REFERENCES cus_product(id)
-      ON DELETE CASCADE,
+      ON DELETE CASCADE
 );
 
 CREATE TABLE transactions (
@@ -112,11 +112,11 @@ CREATE TABLE transaction_details (
 CREATE TABLE
   IF NOT EXISTS capital (
     id UUID PRIMARY KEY,
-    product_id VARCHAR(255) NOT NULL,
+    product_id UUID NOT NULL,
     total_stock INT NOT NULL,
     capital_per_item DECIMAL(10, 2) NOT NULL,
     total_capital DECIMAL(10, 2) NOT NULL,
-    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW (),
-    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW (),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     FOREIGN KEY (product_id) REFERENCES product (id)
   );
