@@ -100,3 +100,68 @@ export const dummyTotalTransactionUsers: TotalTransactionUser[] = [
     TotalAmount: 550000,
   },
 ];
+
+// Di file tempat Anda menggunakan ProfitProductChart, misalnya SomeScreen.tsx
+
+export const dummyProfitProducts = [
+  {
+    ProductID: "prod-001", // <--- Tambahkan ini
+    ProductName: "Laptop Gaming A",
+    TotalCapital: 10000000,
+    TotalIncome: 12500000,
+  },
+  {
+    ProductID: "prod-002", // <--- Tambahkan ini
+    ProductName: "Smartphone B",
+    TotalCapital: 5000000,
+    TotalIncome: 6200000,
+  },
+  {
+    ProductID: "prod-003", // <--- Tambahkan ini
+    ProductName: "Headphone C",
+    TotalCapital: 750000,
+    TotalIncome: 900000,
+  },
+  {
+    ProductID: "prod-004", // <--- Tambahkan ini
+    ProductName: "Smartwatch D",
+    TotalCapital: 2000000,
+    TotalIncome: 2800000,
+  },
+  {
+    ProductID: "prod-005", // <--- Tambahkan ini
+    ProductName: "Keyboard E",
+    TotalCapital: 300000,
+    TotalIncome: 450000,
+  },
+  {
+    ProductID: "prod-006", // <--- Tambahkan ini
+    ProductName: "Mouse F",
+    TotalCapital: 150000,
+    TotalIncome: 200000,
+  },
+  {
+    ProductID: "prod-007", // <--- Tambahkan ini
+    ProductName: "Monitor G",
+    TotalCapital: 7000000,
+    TotalIncome: 8500000,
+  },
+  {
+    ProductID: "prod-008", // <--- Tambahkan ini
+    ProductName: "Printer H",
+    TotalCapital: 4000000,
+    TotalIncome: 4900000,
+  },
+  {
+    ProductID: "prod-009", // <--- Tambahkan ini
+    ProductName: "Webcam I",
+    TotalCapital: 250000,
+    TotalIncome: 300000,
+  },
+  {
+    ProductID: "prod-010", // <--- Tambahkan ini
+    ProductName: "SSD J",
+    TotalCapital: 900000,
+    TotalIncome: 1100000,
+  },
+];

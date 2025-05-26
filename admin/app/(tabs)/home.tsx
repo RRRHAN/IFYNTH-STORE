@@ -27,9 +27,12 @@ import TransactionReportTable from "@/components/home/TransactionReportChart";
 import TotalCapitalTable from "@/components/home/TotalCapitalTable";
 import TotalIncomeTable from "@/components/home/TotalIncomeTable";
 import TotalTransactionUserTable from "@/components/home/TotalTransactionUserTable";
+import ProfitProductChart from "@/components/home/ProfitProductChart";
 import { ScrollView } from "react-native";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { Platform } from "react-native";
+
+import { dummyProfitProducts } from "@/components/DataDummy/home";
 
 export default function HomeScreen() {
   const colorScheme = useColorScheme();
@@ -177,7 +180,9 @@ export default function HomeScreen() {
                         flex: 1,
                         paddingTop: width < 1000 ? 40 : 0,
                         top:
-                          Platform.OS === "web" ? 20 : - (contentTotalHeight - 1200),
+                          Platform.OS === "web"
+                            ? 20
+                            : -(contentTotalHeight - 1200),
                       }}
                     >
                       <TransactionReportTable
@@ -191,7 +196,12 @@ export default function HomeScreen() {
                   <View
                     style={[
                       styles.totalTablesContainer,
-                      { top: Platform.OS === "web" ? 0 : - (contentTotalHeight - 1100) },
+                      {
+                        top:
+                          Platform.OS === "web"
+                            ? 0
+                            : -(contentTotalHeight - 1100),
+                      },
                     ]}
                   >
                     <TotalTransactionUserTable
@@ -199,6 +209,36 @@ export default function HomeScreen() {
                     />
                   </View>
                 )}
+                {totalTransactionUser && (
+                  <View
+                    style={[
+                      styles.totalTablesContainer,
+                      {
+                        top:
+                          Platform.OS === "web"
+                            ? 0
+                            : -(contentTotalHeight - 1100),
+                      },
+                    ]}
+                  >
+                    <TotalTransactionUserTable
+                      totalTransactionUser={totalTransactionUser}
+                    />
+                  </View>
+                )}
+                <View
+                  style={{
+                    flex: 1,
+                    paddingTop: width < 1000 ? 40 : 0,
+                    top:
+                      Platform.OS === "web" ? 20 : -(contentTotalHeight - 1200),
+                  }}
+                >
+                  <ProfitProductChart
+                    ProfitProduct={dummyProfitProducts}
+                    height={500}
+                  />
+                </View>
                 {(!productCount ||
                   !transactionCount ||
                   !totalCapital ||

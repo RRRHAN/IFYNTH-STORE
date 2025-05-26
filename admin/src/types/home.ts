@@ -22,3 +22,10 @@ export type TotalTransactionUser = {
   TotalAmount: Float32Array;
   TotalTransaction: Int32Array;
 };
+
+export type ProfitProduct = {
+  ProductID: string;
+  ProductName: string;
+  TotalCapital: number;
+  TotalIncome: number;
+};
