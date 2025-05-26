@@ -33,6 +33,7 @@ migrate-down:
 ### Sync Dependencies ###
 #########################
 
-sync-dependencies:
-	cd .. && ./sync-dependencies.sh back-end
+sync-model:
+	cp ../image-classifier/dist/predict predict
+	cp ../image-classifier/classes.json classes.json
 	

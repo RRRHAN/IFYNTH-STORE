@@ -4,3 +4,4 @@ classes.json
 predict.spec
 build/
 dist/
+test/

@@ -19,7 +19,7 @@ type CustomerProduct struct {
 }
 
 func (CustomerProduct) TableName() string {
-	return "cusproduct"
+	return "cus_product"
 }
 
 type CustomerProductFile struct {
