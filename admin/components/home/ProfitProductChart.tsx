@@ -42,13 +42,13 @@ const ProfitProductChart: React.FC<ProfitChartProps> = ({
   }));
 
   const chartColors = {
-    capital: "#8a4fff",
-    income: "#22c55e",
+    capital: "#8a4fff", // Ungu
+    income: "#22c55e",  // Hijau
     text: colorScheme === "dark" ? "#fff" : "#000",
   };
 
   return (
-    <ThemedView style={{ padding: 10, borderRadius: 20 }}>
+    <ThemedView style={{ padding: 10, borderRadius: 20, backgroundColor: colorScheme === 'dark' ? '#1c1c1c' : '#f0f0f0' }}> {/* Tambahkan background */}
       <ThemedText
         style={{
           fontSize: 22,
@@ -62,23 +62,24 @@ const ProfitProductChart: React.FC<ProfitChartProps> = ({
       </ThemedText>
       <ScrollView horizontal>
         <VictoryChart
-          width={Math.max(screenWidth, productNames.length * 80)}
+          width={Math.max(screenWidth, productNames.length * 80)} // Pastikan lebar cukup
           height={height}
-          domainPadding={{ x: 50 }}
+          domainPadding={{ x: 50 }} // Padding di sekitar bar
           theme={VictoryTheme.material}
+          padding={{ top: 50, bottom: 80, left: 60, right: 20 }} // Sesuaikan padding chart keseluruhan
         >
           {/* Legend */}
           <VictoryLegend
-            x={125}
-            y={1}
+            x={screenWidth / 4} // Posisikan legend di tengah atas
+            y={1} // Posisikan legend di bagian atas chart
             orientation="horizontal"
             gutter={20}
             style={{
               labels: { fill: chartColors.text, fontSize: 12 },
             }}
             data={[
-              { name: "Profit", symbol: { fill: chartColors.income } },
-              { name: "Cost", symbol: { fill: chartColors.capital } },
+              { name: "Modal", symbol: { fill: chartColors.capital } }, // Modal = Ungu
+              { name: "Income", symbol: { fill: chartColors.income } }, // Income = Hijau
             ]}
           />
 
@@ -100,21 +101,22 @@ const ProfitProductChart: React.FC<ProfitChartProps> = ({
           {/* Y-axis */}
           <VictoryAxis
             dependentAxis
-            label="Keuntungan"
+            label="Jumlah (Rp)" // Label Y-axis yang lebih umum
+            tickFormat={(y) => `${(y / 1000).toFixed(0)}k`} // Format label Y-axis (misal: 100000 jadi 100k)
             style={{
-              axisLabel: { padding: 40, angle: -90, fill: chartColors.text },
+              axisLabel: { padding: 40, fill: chartColors.text }, // Hapus angle -90, VictoryAxis biasanya memposisikan label secara otomatis
               tickLabels: { fontSize: 10, padding: 5, fill: chartColors.text },
             }}
           />
 
           {/* Bar chart */}
           <VictoryGroup
-            offset={20}
-            colorScale={[chartColors.capital, chartColors.income]}
-            {...({} as any)}
+            offset={20} // Jarak antar bar dalam satu grup
+            colorScale={[chartColors.capital, chartColors.income]}{...({} as any)}
           >
-            <VictoryBar data={incomeData} />
+            {/* Urutan penting: Capital dulu, lalu Income untuk mencocokkan colorScale */}
             <VictoryBar data={capitalData} />
+            <VictoryBar data={incomeData} />
           </VictoryGroup>
         </VictoryChart>
       </ScrollView>
