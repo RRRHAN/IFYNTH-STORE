@@ -7,12 +7,13 @@ import {
   ScrollView,
   View,
   Modal,
+  Platform,
 } from "react-native";
 import { IconButton } from "react-native-paper";
 import { useRouter } from "expo-router";
 import styles from "../styles/cusProductStyles";
-import { cusProduct } from "../types/product";
-import { fetchOffers, handleStatusChange, Status } from "@/app/api/cusoffers";
+import { cusProduct } from "@/src/types/product";
+import { fetchOffers, handleStatusChange, Status } from "@/src/api/cusoffers";
 import { ThemedView } from "@/components/ThemedView";
 import { ThemedText } from "@/components/ThemedText";
 import {
@@ -24,22 +25,24 @@ import {
 import OfferDetailModal from "../detail_offer";
 import { Picker } from "@react-native-picker/picker";
 import Video from "react-native-video";
+import { BASE_URL } from "@/src/api/constants";
+import { generateVideoThumbnailJS } from "@/hooks/helpers/ThumbnailProcessor";
+import * as VideoThumbnails from "expo-video-thumbnails";
 
-const userOffers = () => {
+const UserAdvertisementScreen = () => {
   const screenWidth = Dimensions.get("window").width;
   const [isMobile, setIsMobile] = useState(screenWidth < 768);
   const columnWidths = isMobile
     ? {
-        name: screenWidth * 0.15,
-        price: screenWidth * 0.15,
-        status: screenWidth * 0.15,
+        name: screenWidth * 0.22,
+        status: screenWidth * 0.4,
         action: screenWidth * 0.12,
       }
     : {
         image: screenWidth * 0.15,
         name: screenWidth * 0.2,
         price: screenWidth * 0.15,
-        status: screenWidth * 0.12,
+        status: screenWidth * 0.18,
         action: screenWidth * 0.1,
       };
 
@@ -63,7 +66,7 @@ const userOffers = () => {
 
   const [thumbnailUrls, setThumbnailUrls] = useState<{ [key: string]: string }>(
     {}
-  ); // State for storing thumbnail URLs
+  );
 
   const getData = async () => {
     try {
@@ -81,19 +84,6 @@ const userOffers = () => {
     }
   };
 
-  const getVideoThumbnail = async (videoUrl: string) => {
-    try {
-      const response = await fetch(
-        `http://localhost:7777/get-video-thumbnail?videoUrl=${videoUrl}`
-      );
-      const data = await response.json();
-      return data.thumbnailUrl; // Menyediakan URL thumbnail video
-    } catch (error) {
-      console.error("Error fetching video thumbnail:", error);
-      return "https://via.placeholder.com/80"; // Kembalikan placeholder jika gagal
-    }
-  };
-
   useEffect(() => {
     getData();
     const subscription = Dimensions.addEventListener("change", ({ window }) => {
@@ -104,24 +94,49 @@ const userOffers = () => {
     return () => subscription?.remove();
   }, []);
 
-  // Update thumbnailUrls after offers are fetched
   useEffect(() => {
-    offers.forEach((item) => {
-      if (item.Files && item.Files.length > 0) {
-        const fileUrl = item.Files[0].URL;
-        if (/\.(mp4|webm|ogg)$/i.test(fileUrl)) {
-          getVideoThumbnail(`http://localhost:7777${fileUrl}`).then((url) =>
-            setThumbnailUrls((prev) => ({ ...prev, [item.ID]: url }))
-          );
-        } else {
-          setThumbnailUrls((prev) => ({
-            ...prev,
-            [item.ID]: `http://localhost:7777${fileUrl}`,
-          }));
+    async function generateThumbnails() {
+      for (const item of offers) {
+        if (item.Files && item.Files.length > 0) {
+          const fileUrl = item.Files[0].URL;
+          if (/\.(mp4|webm|ogg)$/i.test(fileUrl)) {
+            try {
+              const mediaUrl = `${BASE_URL}${fileUrl}`;
+              if (Platform.OS === "web") {
+                const url = await generateVideoThumbnailJS(mediaUrl);
+                setThumbnailUrls((prev) => ({ ...prev, [item.ID]: url }));
+              } else {
+                const { uri } = await VideoThumbnails.getThumbnailAsync(
+                  mediaUrl,
+                  { time: 1000 }
+                );
+                setThumbnailUrls((prev) => ({
+                  ...prev,
+                  [item.ID]: uri,
+                }));
+              }
+            } catch (error) {
+              console.warn("Failed to generate thumbnail for video", error);
+              // fallback ke fileUrl as image
+              setThumbnailUrls((prev) => ({
+                ...prev,
+                [item.ID]: `${BASE_URL}${fileUrl}`,
+              }));
+            }
+          } else {
+            setThumbnailUrls((prev) => ({
+              ...prev,
+              [item.ID]: `${BASE_URL}${fileUrl}`,
+            }));
+          }
         }
       }
-    });
-  }, [offers]); // This will trigger when the offers data is loaded
+    }
+
+    if (offers.length > 0) {
+      generateThumbnails();
+    }
+  }, [offers]);
 
   if (loading) {
     return (
@@ -133,27 +148,23 @@ const userOffers = () => {
 
   const renderItem = ({ item }: { item: cusProduct }) => {
     const thumbnailUrl =
-      thumbnailUrls[item.ID] || "https://via.placeholder.com/80";
+      thumbnailUrls[item.ID] ||
+      "https://img.lovepik.com/free-png/20210919/lovepik-question-element-png-image_401016497_wh1200.png";
 
     return (
       <ThemedRow>
         {!isMobile && (
           <ThemedCell style={[{ width: columnWidths.image }]}>
-            {/\.(mp4|webm|ogg)$/i.test(thumbnailUrl) ? (
-              <Video
-                source={{ uri: thumbnailUrl }}
-                style={styles.image}
-                resizeMode="cover"
-                paused
-              />
-            ) : (
+            {
               <Image
                 style={styles.image}
                 source={{
-                  uri: thumbnailUrl || "https://via.placeholder.com/80",
+                  uri:
+                    thumbnailUrl ||
+                    "https://img.lovepik.com/free-png/20210919/lovepik-question-element-png-image_401016497_wh1200.png",
                 }}
               />
-            )}
+            }
           </ThemedCell>
         )}
         <ThemedCell style={[{ width: columnWidths.name }]}>
@@ -162,9 +173,11 @@ const userOffers = () => {
         <ThemedCell style={[{ width: columnWidths.name }]}>
           {item.Name}
         </ThemedCell>
-        <ThemedCell style={[{ width: columnWidths.price }]}>
-          Rp {item.Price.toLocaleString()}
-        </ThemedCell>
+        {!isMobile && (
+          <ThemedCell style={[{ width: columnWidths.price }]}>
+            Rp {item.Price.toLocaleString()}
+          </ThemedCell>
+        )}
         <ThemedCell style={[{ width: columnWidths.status }]}>
           <Picker
             selectedValue={selectedStatus[item.ID] || item.Status}
@@ -175,7 +188,7 @@ const userOffers = () => {
                 [item.ID]: newStatus,
               }));
             }}
-            style={{ height: 50, width: "100%" }}
+            style={{ height: 50, width: "100%", backgroundColor: "#fff" }}
           >
             <Picker.Item label="Pending" value="pending" />
             <Picker.Item label="Approved" value="approved" />
@@ -211,7 +224,9 @@ const userOffers = () => {
   };
 
   return (
-    <ThemedView style={[styles.center]}>
+    <ThemedView
+      style={[styles.center, { marginTop: Platform.OS === "web" ? 20 : 50 }]}
+    >
       <Modal
         animationType="slide"
         transparent={true}
@@ -274,14 +289,16 @@ const userOffers = () => {
                 Product Name
               </ThemedText>
             </ThemedHeader>
-            <ThemedHeader style={[{ width: columnWidths.price }]}>
-              <ThemedText
-                type="subtitle"
-                style={[styles.header, { fontSize: fontSizeHeader }]}
-              >
-                Price
-              </ThemedText>
-            </ThemedHeader>
+            {!isMobile && (
+              <ThemedHeader style={[{ width: columnWidths.price }]}>
+                <ThemedText
+                  type="subtitle"
+                  style={[styles.header, { fontSize: fontSizeHeader }]}
+                >
+                  Price
+                </ThemedText>
+              </ThemedHeader>
+            )}
             <ThemedHeader style={[{ width: columnWidths.status }]}>
               <ThemedText
                 type="subtitle"
@@ -310,4 +327,4 @@ const userOffers = () => {
   );
 };
 
-export default userOffers;
+export default UserAdvertisementScreen;

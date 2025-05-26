@@ -22,6 +22,10 @@ type Service interface {
 	GetTransactionsByUserID(ctx context.Context) ([]Transaction, error)
 	GetAllTransaction(ctx context.Context) ([]Transaction, error)
 	UpdateStatus(ctx context.Context, req UpdateStatusRequest) error
+	GetTransactionCountByStatus(ctx context.Context) ([]StatusCount, error)
+	GetTotalAmountByDate(ctx context.Context) ([]Result, error)
+	GetTotalIncome(ctx context.Context) (float64, error)
+	GetTotalTransactionByCustomer(ctx context.Context) ([]ResultByCustomer, error)
 }
 
 type service struct {
@@ -215,4 +219,68 @@ func (s *service) UpdateStatus(ctx context.Context, req UpdateStatusRequest) err
 	}
 
 	return nil
+}
+
+func (s *service) GetTransactionCountByStatus(ctx context.Context) ([]StatusCount, error) {
+	var results []StatusCount
+
+	if err := s.db.WithContext(ctx).
+		Model(&Transaction{}).
+		Select("status, COUNT(*) as count").
+		Group("status").
+		Scan(&results).Error; err != nil {
+		return nil, err
+	}
+
+	return results, nil
+}
+
+func (s *service) GetTotalAmountByDate(ctx context.Context) ([]Result, error) {
+	var results []Result
+
+	err := s.db.WithContext(ctx).
+		Model(&Transaction{}).
+		Select("DATE(created_at) as date, SUM(total_amount) as total_amount").
+		Where("status NOT IN ?", []string{"pending", "cancelled"}).
+		Group("DATE(created_at)").
+		Order("DATE(created_at)").
+		Scan(&results).Error
+
+	if err != nil {
+		return nil, err
+	}
+
+	return results, nil
+}
+
+func (s *service) GetTotalIncome(ctx context.Context) (float64, error) {
+	var totalIncome float64
+
+	if err := s.db.WithContext(ctx).
+		Model(&Transaction{}).
+		Select("COALESCE(SUM(total_amount), 0)").
+		Scan(&totalIncome).Error; err != nil {
+		return 0, err
+	}
+
+	return totalIncome, nil
+}
+
+func (s *service) GetTotalTransactionByCustomer(ctx context.Context) ([]ResultByCustomer, error) {
+	var results []ResultByCustomer
+
+	err := s.db.WithContext(ctx).
+		Model(&Transaction{}).
+		Joins("JOIN customer ON transactions.user_id = customer.id").
+		Select("transactions.user_id, customer.name as customer_name, customer.phone_number as phone_number, SUM(transactions.total_amount) as total_amount, COUNT(transactions.id) as transaction_count").
+		Where("transactions.status NOT IN (?)", []string{"pending", "cancelled"}).
+		Group("transactions.user_id, customer.name, customer.phone_number").
+		Order("total_amount DESC").
+		Scan(&results).Error
+
+	if err != nil {
+		return nil, err
+	}
+
+	return results, nil
 }

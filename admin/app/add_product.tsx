@@ -5,7 +5,7 @@ import { useColorScheme } from "@/hooks/useColorScheme";
 import { pickImage } from "@/hooks/helpers/pickImage";
 import { handleStockChange } from "@/hooks/helpers/handleStockChange";
 import styles from "./styles/addProductStyles";
-import { addProduct } from "./api/products";
+import { addProduct } from "@/src/api/products";
 import { ThemedText } from "@/components/ThemedText";
 import { IconButton } from "react-native-paper";
 import { useRouter } from "expo-router";

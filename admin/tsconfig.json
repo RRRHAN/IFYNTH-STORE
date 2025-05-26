@@ -13,5 +13,5 @@
     "**/*.tsx",
     ".expo/types/**/*.ts",
     "expo-env.d.ts"
-, "app/api/admin.js"  ]
+, "app/api/admin.js", "hooks/helpers/ThumbnailProcessor.js"  ]
 }

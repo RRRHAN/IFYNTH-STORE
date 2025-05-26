@@ -9,6 +9,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\MessageController;
+use App\Http\Controllers\TryonController;
 
 Route::get('/', function () {
     return view('login');
@@ -75,3 +76,9 @@ Route::controller(OngkirController::class)->group(function () {
 Route::controller(TransactionController::class)->group(function () {
     Route::post('/checkout', 'addTransaction');
 });
+
+Route::post('/tryon', [TryonController::class, 'tryon']);
+
+Route::get('/tryon-form', function () {
+    return view('tryon');
+})->name('tryon-form');

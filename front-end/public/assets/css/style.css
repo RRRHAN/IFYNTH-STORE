@@ -5119,3 +5119,34 @@ input {
     background-color: #e9ecef;
     border-radius: 10px;
 }
+
+/* Styling untuk input pencarian */
+.custom-search-input {
+    background-color: #262626 !important; /* Latar belakang gelap */
+    color: #ffffff !important;           /* Warna teks putih */
+    border-color: #3b3b3b !important;    /* Warna border yang serasi */
+}
+
+/* Styling untuk placeholder */
+.custom-search-input::placeholder { /* Untuk browser modern */
+    color: #cccccc !important;
+    opacity: 1; /* Pastikan opacity tidak diatur terlalu rendah oleh browser */
+}
+
+.custom-search-input::-webkit-input-placeholder {
+    color: #cccccc !important;
+}
+
+.custom-search-input:-ms-input-placeholder {
+    color: #cccccc !important;
+}
+
+.custom-search-input::-ms-input-placeholder {
+    color: #cccccc !important;
+}
+
+.custom-search-addon {
+    background-color: #262626 !important;
+    color: #ffffff !important;
+    border-color: #3b3b3b !important;
+}

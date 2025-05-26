@@ -10,6 +10,7 @@ import "react-native-reanimated";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { MyLightTheme, MyDarkTheme } from "@/constants/Theme";
+import { BASE_URL } from "@/src/api/constants";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -21,20 +22,43 @@ export default function RootLayout() {
   });
 
   useEffect(() => {
-    
     const checkLoginStatus = async () => {
       if (loaded) {
         await SplashScreen.hideAsync();
-        const isLoggedIn = await AsyncStorage.getItem("is_logged_in");
-        if (isLoggedIn === 'false' || !isLoggedIn) {
+        const jwtToken = await AsyncStorage.getItem("auth_token");
+
+        const isLoggedInLocally = await AsyncStorage.getItem("is_logged_in");
+        if (isLoggedInLocally === 'false' || !isLoggedInLocally || !jwtToken) {
+          router.replace("/login");
+          return;
+        }
+
+        try {
+          const response = await fetch(`${BASE_URL}/user/check-jwt`, {
+            method: 'GET',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${jwtToken}`,
+            },
+          });
+
+          if (response.ok) {
+            console.log("JWT verified successfully with backend.");
+          } else {
+            await AsyncStorage.setItem("is_logged_in", "false");
+            await AsyncStorage.removeItem("auth_token");
+            router.replace("/login");
+          }
+        } catch (error) {
+          await AsyncStorage.setItem("is_logged_in", "false");
+          await AsyncStorage.removeItem("auth_token");
           router.replace("/login");
         }
       }
-    };    
+    };
 
     checkLoginStatus();
-  }, [loaded]);
-
+  }, [loaded, router]);
   if (!loaded) {
     return null;
   }

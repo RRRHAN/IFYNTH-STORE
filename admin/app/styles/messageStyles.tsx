@@ -93,10 +93,7 @@ const styles = StyleSheet.create({
     zIndex: 10,
     width: 350,
     borderRadius: 10,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 4,
+    boxShadow: "0px 2px 4px rgba(0,0,0,0.2)",
   },
   itemTitle: {
     fontWeight: "bold",
@@ -106,7 +103,7 @@ const styles = StyleSheet.create({
     width: 80,
     height: 80,
     borderRadius: 10,
-    marginTop: 10,   
+    marginTop: 10,
   },
   itemContent: {
     flexDirection: "row",
@@ -116,7 +113,6 @@ const styles = StyleSheet.create({
     marginLeft: 10,
     justifyContent: "center",
   },
-  
 });
 
 export default styles;

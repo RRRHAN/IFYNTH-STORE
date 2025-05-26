@@ -2,7 +2,9 @@ import React from "react";
 import { View, Image, TouchableOpacity } from "react-native";
 import { ThemedText } from "@/components/ThemedText";
 import { IconButton } from "react-native-paper";
-
+import { BASE_URL
+  
+ } from "@/src/api/constants";
 interface ProductImage {
   ProductID: string;
   URL: string;
@@ -28,7 +30,7 @@ export default function CurrentImagesList({
         productImages.map((image, index) => (
           <View key={index} style={styles.imageContainer}>
             <Image
-              source={{ uri: `http://localhost:7777${image.URL}` }}
+              source={{ uri: `${BASE_URL}${image.URL}` }}
               style={styles.image}
             />
             <TouchableOpacity

@@ -1,51 +1,45 @@
 import { StyleSheet, Dimensions } from "react-native";
 
-const { height } = Dimensions.get("window");
+const { width, height } = Dimensions.get("window");
+
 const styles = StyleSheet.create({
+  // === Layout Containers ===
   container: {
     flex: 1,
     position: "relative",
   },
   background: {
+    flex: 1,
     position: "absolute",
-    width: "100%",
+    top: -50,
+    width: width,
     height: height,
-    top: -70,
     zIndex: -1,
   },
-  overlay: {
+  overlayContent: {
     flex: 1,
-    paddingTop: 100,
-    paddingHorizontal: 20,
+    justifyContent: "flex-start",
+    alignItems: "center",
+    paddingTop: 130,
+    backgroundColor: "rgba(255, 255, 255, 0)",
   },
-  title: {
-    fontSize: 24,
-    fontWeight: "bold",
-    color: "#fff",
-    textAlign: "center",
+
+  // === Section Layouts ===
+  sectionRow: {
     marginBottom: 24,
+    backgroundColor: "rgba(255, 255, 255, 0)",
   },
-  row: {
-    flexDirection: "row",
-    backgroundColor: "#ffffffcc",
-    paddingVertical: 12,
-    paddingHorizontal: 8,
-    borderRadius: 6,
-    marginBottom: 8,
+    totalTablesContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    gap: 20,
   },
-  headerRow: {
-    backgroundColor: "#333",
-  },
-  cell: {
+    loaderContainer: {
     flex: 1,
-    fontSize: 16,
-    color: "#000",
-    textAlign: "center",
+    justifyContent: "center",
+    alignItems: "center",
   },
-  headerText: {
-    color: "#fff",
-    fontWeight: "bold",
-  },
+
 });
 
 export default styles;

@@ -108,3 +108,15 @@ CREATE TABLE transaction_details (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (transaction_id) REFERENCES transactions(id)
 );
+
+CREATE TABLE
+  IF NOT EXISTS capital (
+    id UUID PRIMARY KEY,
+    product_id VARCHAR(255) NOT NULL,
+    total_stock INT NOT NULL,
+    capital_per_item DECIMAL(10, 2) NOT NULL,
+    total_capital DECIMAL(10, 2) NOT NULL,
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW (),
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW (),
+    FOREIGN KEY (product_id) REFERENCES product (id)
+  );

@@ -192,7 +192,6 @@ func (s *service) UpdateCartQuantity(ctx context.Context, req UpdateCartQuantity
 		return fmt.Errorf("failed to update cart item: %w", err)
 	}
 
-	// Update the cart's total price and quantity
 	var total float64
 	var total_quantity int
 	var total_weight float64
@@ -231,7 +230,6 @@ func (s *service) DeleteFromCart(ctx context.Context, req DeleteFromCartRequest)
 		return err
 	}
 
-	// Cari cart milik user
 	var cart Cart
 	if err := s.db.WithContext(ctx).
 		Where("user_id = ?", token.Claims.UserID).
@@ -239,14 +237,12 @@ func (s *service) DeleteFromCart(ctx context.Context, req DeleteFromCartRequest)
 		return fmt.Errorf("cart not found: %w", err)
 	}
 
-	// Hapus cart item
 	if err := s.db.WithContext(ctx).
 		Where("cart_id = ? AND id = ?", cart.ID, req.CartItemID).
 		Delete(&CartItem{}).Error; err != nil {
 		return fmt.Errorf("failed to delete item: %w", err)
 	}
 
-	// Hitung ulang total cart setelah item dihapus
 	var total float64
 	var total_quantity int
 	var total_weight float64

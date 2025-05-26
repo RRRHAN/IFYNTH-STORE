@@ -3,7 +3,7 @@ import { useRouter } from "expo-router";
 import { useState, useEffect } from "react";
 import { Checkbox, Provider as PaperProvider } from "react-native-paper";
 import { useColorScheme } from "@/hooks/useColorScheme";
-import { loginAdmin } from "@/app/api/admin";
+import { loginAdmin } from "@/src/api/admin";
 import ModalComponent from "@/components/ModalComponent";
 import styles from "./styles/loginStyles";
 import { ThemedText } from "@/components/ThemedText";
@@ -17,14 +17,13 @@ export default function Login() {
   const [password, setPassword] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const colorScheme = useColorScheme(); // Get the current color scheme
-  const [visible, setVisible] = useState(false); // Untuk kontrol modal visibility
+  const colorScheme = useColorScheme();
+  const [visible, setVisible] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
 
   const handleLogin = async () => {
     const result = await loginAdmin(username, password);
-
 
     if (result.success) {
       setSuccessMessage(result.message);
@@ -50,7 +49,7 @@ export default function Login() {
 
   return (
     <PaperProvider>
-      <ScrollView contentContainerStyle={styles.container}>
+      <View style={[styles.container]}>
         <View style={styles.logoContainer}>
           <Image
             source={require("@/assets/images/logo.png")}
@@ -58,7 +57,17 @@ export default function Login() {
           />
         </View>
 
-        <ThemedView style={[styles.card]}>
+        <ThemedView
+          style={[
+            styles.card,
+            {
+              backgroundColor:
+                colorScheme === "dark"
+                  ? "rgba(85, 85, 85, 0.56)"
+                  : "rgba(187, 187, 187, 0.61)",
+            },
+          ]}
+        >
           <ThemedText style={[styles.heading]}>
             Sign in to your account
           </ThemedText>
@@ -93,8 +102,28 @@ export default function Login() {
             onChangeText={setPassword}
           />
 
-          <ThemedView style={styles.row}>
-            <ThemedView style={styles.checkboxContainer}>
+          <ThemedView
+            style={[
+              styles.row,
+              {
+                backgroundColor:
+                  colorScheme === "dark"
+                    ? "rgba(42, 42, 42, 0)"
+                    : "rgba(207, 207, 207, 0)",
+              },
+            ]}
+          >
+            <ThemedView
+              style={[
+                styles.checkboxContainer,
+                {
+                  backgroundColor:
+                    colorScheme === "dark"
+                      ? "rgba(42, 42, 42, 0)"
+                      : "rgba(207, 207, 207, 0)",
+                },
+              ]}
+            >
               <Checkbox
                 status={rememberMe ? "checked" : "unchecked"}
                 onPress={() => setRememberMe(!rememberMe)}
@@ -109,7 +138,16 @@ export default function Login() {
                 Remember me
               </ThemedText>
             </ThemedView>
-            <TouchableOpacity>
+            <TouchableOpacity
+              style={[
+                {
+                  backgroundColor:
+                    colorScheme === "dark"
+                      ? "rgba(42, 42, 42, 0)"
+                      : "rgba(207, 207, 207, 0)",
+                },
+              ]}
+            >
               <ThemedText
                 style={[
                   styles.link,
@@ -125,13 +163,12 @@ export default function Login() {
             <ThemedText style={styles.buttonText}>Sign in</ThemedText>
           </TouchableOpacity>
         </ThemedView>
-        {/* Menambahkan Modal untuk menampilkan pesan */}
         <ModalComponent
           visible={visible}
           hideModal={() => setVisible(false)}
           message={errorMessage || successMessage}
         />
-      </ScrollView>
+      </View>
     </PaperProvider>
   );
 }

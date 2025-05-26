@@ -15,7 +15,7 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
     width: '100%',
     padding: 16,
-    gap: 12,
+    gap: 1,
   },
   imageSection: {
     flex: 1,

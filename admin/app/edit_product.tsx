@@ -4,7 +4,7 @@ import ModalComponent from "../components/ModalComponent";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { pickImage } from "@/hooks/helpers/pickImage";
 import styles from "./styles/addProductStyles";
-import { updateProduct } from "./api/products";
+import { updateProduct } from "@/src/api/products";
 import { ThemedText } from "@/components/ThemedText";
 import { IconButton } from "react-native-paper";
 import { useRouter, useLocalSearchParams } from "expo-router";

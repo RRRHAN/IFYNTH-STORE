@@ -13,7 +13,7 @@
                         <div class="profile-header position-relative mt-5">
                             <div class="text-center">
                                 <div class="position-relative d-inline-block">
-                                    <img src="https://assets-a1.kompasiana.com/items/album/2021/03/24/blank-profile-picture-973460-1280-605aadc08ede4874e1153a12.png?t=o&v=1200"
+                                    <img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava6-bg.webp"
                                         class="rounded-circle profile-pic" alt="Profile Picture">
                                     <button class="btn btn-primary btn-sm position-absolute bottom-0 end-0 rounded-circle">
                                         <i class="fas fa-camera"></i>

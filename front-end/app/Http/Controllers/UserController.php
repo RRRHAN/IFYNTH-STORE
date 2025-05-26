@@ -44,7 +44,7 @@ class UserController extends Controller
     
             if ($response->successful()) {
                 session()->flash('success', 'User registered successfully!');
-                return redirect()->route('loginForm');
+                return redirect()->route('login');
             } else {
                 $errors = $response->json()['errors'] ?? ['Failed to register'];
                 session()->flash('error', $errors[0]);

@@ -1,10 +1,11 @@
 import React, { useState } from "react";
 import { Modal, View, Button, Image, TouchableOpacity } from "react-native";
-import { Transaction } from "@/app/types/transaction";
+import { Transaction } from "@/src/types/transaction";
 import { ThemedText } from "./ThemedText";
 import ParallaxScrollView from "./ParallaxScrollView";
 import styles from "@/app/styles/transactionDetailStyles";
 import { formatDate } from "@/hooks/helpers/formatDate";
+import { BASE_URL } from "@/src/api/constants";
 
 type Props = {
   transaction: Transaction;
@@ -142,7 +143,7 @@ const TransactionDetailModal: React.FC<Props> = ({
                 <TouchableOpacity onPress={() => setFullImageVisible(true)}>
                   <Image
                     source={{
-                      uri: `http://localhost:7777${transaction.PaymentProof}`,
+                      uri: `${BASE_URL}${transaction.PaymentProof}`,
                     }}
                     style={styles.paymentProofImage}
                   />
@@ -167,7 +168,7 @@ const TransactionDetailModal: React.FC<Props> = ({
       >
         <View style={styles.fullImageOverlay}>
           <Image
-            source={{ uri: `http://localhost:7777${transaction.PaymentProof}` }}
+            source={{ uri: `${BASE_URL}${transaction.PaymentProof}` }}
             style={styles.fullImage}
           />
           <Button title="Close" onPress={() => setFullImageVisible(false)} />

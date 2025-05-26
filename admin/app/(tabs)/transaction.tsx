@@ -4,13 +4,17 @@ import {
   ActivityIndicator,
   Dimensions,
   ScrollView,
-  View,
+  Platform,
 } from "react-native";
 import { IconButton } from "react-native-paper";
 import { useRouter } from "expo-router";
 import styles from "../styles/transactionStyles";
-import { fetchTransactions, handleStatusChange, TransactionStatus } from "../api/transaction";
-import { Transaction } from "../types/transaction";
+import {
+  fetchTransactions,
+  handleStatusChange,
+  TransactionStatus,
+} from "@/src/api/transaction";
+import { Transaction } from "@/src/types/transaction";
 import { ThemedView } from "@/components/ThemedView";
 import { ThemedText } from "@/components/ThemedText";
 import {
@@ -28,28 +32,20 @@ type StatusMap = {
 
 const TransactionsScreen = () => {
   const screenWidth = Dimensions.get("window").width;
-  const [isMobile, setIsMobile] = useState(screenWidth < 768);
+  const [isMobile, setIsMobile] = useState(screenWidth < 700);
   const [isTinyScreen, setIsTinyScreen] = useState(screenWidth < 500);
 
   const columnWidths = isTinyScreen
     ? {
-        id: screenWidth * 0.5,
-        status: screenWidth * 0.2,
+        id: screenWidth * 0.35,
+        status: screenWidth * 0.4,
         action: screenWidth * 0.2,
-      }
-    : isMobile
-    ? {
-        name: screenWidth * 0.3,
-        amount: screenWidth * 0.15,
-        method: screenWidth * 0.1,
-        status: screenWidth * 0.15,
-        action: screenWidth * 0.12,
       }
     : {
         name: screenWidth * 0.2,
         amount: screenWidth * 0.15,
         method: screenWidth * 0.15,
-        status: screenWidth * 0.1,
+        status: screenWidth * 0.18,
         action: screenWidth * 0.1,
       };
 
@@ -94,7 +90,7 @@ const TransactionsScreen = () => {
 
   if (loading) {
     return (
-      <ThemedView style={styles.center}>
+      <ThemedView style={[styles.center]}>
         <ActivityIndicator size="large" />
       </ThemedView>
     );
@@ -115,8 +111,7 @@ const TransactionsScreen = () => {
                   [item.ID]: newStatus,
                 }));
               }}
-              style={{ height: 40 }}
-              mode="dropdown"
+              style={{ height: 50, width: "100%", backgroundColor: "#fff" }}
             >
               {item.Status === "pending" && (
                 <>
@@ -130,7 +125,7 @@ const TransactionsScreen = () => {
               <Picker.Item label="Proccess" value="proccess" />
               <Picker.Item label="Delivered" value="delivered" />
               <Picker.Item label="Cancelled" value="cancelled" />
-            </Picker>{" "}
+            </Picker>
           </ThemedCell>
           <ThemedCell style={{ width: columnWidths.action }}>
             <IconButton
@@ -168,8 +163,7 @@ const TransactionsScreen = () => {
                   [item.ID]: newStatus,
                 }));
               }}
-              style={{ height: 40 }}
-              mode="dropdown"
+              style={{ height: 50, width: "100%", backgroundColor: "#fff" }}
             >
               {item.Status === "pending" && (
                 <>
@@ -183,7 +177,7 @@ const TransactionsScreen = () => {
               <Picker.Item label="Proccess" value="proccess" />
               <Picker.Item label="Delivered" value="delivered" />
               <Picker.Item label="Cancelled" value="cancelled" />
-            </Picker>{" "}
+            </Picker>
           </ThemedCell>
 
           <ThemedCell style={[{ width: columnWidths.action }]}>
@@ -203,7 +197,7 @@ const TransactionsScreen = () => {
   );
 
   return (
-    <ThemedView style={[styles.center]}>
+    <ThemedView style={[styles.center, {marginTop: Platform.OS === "web" ? 20 : 50, }]}>
       {selectedTransaction && (
         <TransactionDetailModal
           transaction={selectedTransaction}
