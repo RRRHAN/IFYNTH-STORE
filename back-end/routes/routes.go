@@ -52,10 +52,11 @@ func NewDependency(
 		router.Use(mw.Recover)
 	}
 
-	router.Static("/uploads", "./uploads")
+	api := router.Group("/api")
+	api.Static("/uploads", "./uploads")
 
 	// domain user
-	user := router.Group("/user")
+	user := api.Group("/user")
 	{
 		user.POST("/login", mw.BasicAuth, userHandler.Login)
 		user.GET("/verify-token", mw.JWT(constants.ADMIN, constants.CUSTOMER), userHandler.VerifyToken)
@@ -68,7 +69,7 @@ func NewDependency(
 		})
 	}
 
-	product := router.Group("/product")
+	product := api.Group("/product")
 	{
 		product.GET("/", mw.JWT(constants.ADMIN, constants.CUSTOMER), productHandler.GetAllProducts)
 		product.GET("/detail/:id", mw.JWT(constants.ADMIN, constants.CUSTOMER), productHandler.GetProductByID)
@@ -79,7 +80,7 @@ func NewDependency(
 		product.GET("/totalCapital", mw.JWT(constants.ADMIN), productHandler.GetTotalCapital)
 	}
 
-	cart := router.Group("/cart")
+	cart := api.Group("/cart")
 	{
 		cart.POST("/", mw.JWT(constants.CUSTOMER), cartHandler.AddToCart)
 		cart.PUT("/", mw.JWT(constants.CUSTOMER), cartHandler.UpdateCartQuantity)
@@ -88,13 +89,13 @@ func NewDependency(
 
 	}
 
-	imageClassifier := router.Group("/image-classifier")
+	imageClassifier := api.Group("/image-classifier")
 	{
 		imageClassifier.POST("/predict", mw.JWT(constants.ADMIN, constants.CUSTOMER), imageClassifierHandler.Predict)
 
 	}
 
-	cusproduct := router.Group("/cusproduct")
+	cusproduct := api.Group("/cusproduct")
 	{
 		cusproduct.POST("/", mw.JWT(constants.CUSTOMER), cusproductHandler.AddProduct)
 		cusproduct.DELETE("/", mw.JWT(constants.CUSTOMER), cusproductHandler.DeleteProduct)
@@ -105,13 +106,13 @@ func NewDependency(
 
 	}
 
-	message := router.Group("/message")
+	message := api.Group("/message")
 	{
 		message.POST("/", mw.JWT(constants.CUSTOMER, constants.ADMIN), messageHandler.AddMessage)
 		message.GET("/:product_id", mw.JWT(constants.CUSTOMER, constants.ADMIN), messageHandler.GetMessageByProductID)
 	}
 
-	transaction := router.Group("/transaction")
+	transaction := api.Group("/transaction")
 	{
 		transaction.POST("/", mw.JWT(constants.CUSTOMER), transactionHandler.AddTransaction)
 		transaction.GET("/", mw.JWT(constants.CUSTOMER), transactionHandler.GetTransactionsByUserID)
