@@ -18,6 +18,9 @@ import { ThemedText } from "@/components/ThemedText";
 import styles from "./styles/messageStyles";
 import { addMessage, fetchMessage } from "@/src/api/message";
 import { Message } from "@/src/types/message";
+import { BASE_URL } from "@/src/api/constants";
+import { generateVideoThumbnailJS } from "@/hooks/helpers/ThumbnailProcessor";
+import * as VideoThumbnails from "expo-video-thumbnails";
 
 export default function ChatScreen() {
   const router = useRouter();
@@ -30,6 +33,9 @@ export default function ChatScreen() {
     hour: "2-digit",
     minute: "2-digit",
   });
+  const [thumbnailUrls, setThumbnailUrls] = useState<{ [key: string]: string }>(
+    {}
+  );
 
   const handleBack = () => {
     router.replace("/user_advertisement");
@@ -57,7 +63,7 @@ export default function ChatScreen() {
   };
 
   useEffect(() => {
-    let interval: NodeJS.Timeout;
+    let interval: ReturnType<typeof setInterval>;
 
     const loadMessages = async () => {
       if (selectedItem && selectedItem.ID) {
@@ -78,6 +84,44 @@ export default function ChatScreen() {
 
     return () => clearInterval(interval);
   }, [selectedItem]);
+
+  useEffect(() => {
+    async function generateThumbnails() {
+      if (item.Files && item.Files.length > 0) {
+        const fileUrl = item.Files[0].URL;
+        if (/\.(mp4|webm|ogg)$/i.test(fileUrl)) {
+          try {
+            const mediaUrl = `${BASE_URL}${fileUrl}`;
+            if (Platform.OS === "web") {
+              const url = await generateVideoThumbnailJS(mediaUrl);
+              setThumbnailUrls((prev) => ({ ...prev, [item.ID]: url }));
+            } else {
+              const { uri } = await VideoThumbnails.getThumbnailAsync(
+                mediaUrl,
+                { time: 1000 }
+              );
+              setThumbnailUrls((prev) => ({
+                ...prev,
+                [item.ID]: uri,
+              }));
+            }
+          } catch (error) {
+            console.warn("Failed to generate thumbnail for video", error);
+            setThumbnailUrls((prev) => ({
+              ...prev,
+              [item.ID]: `${BASE_URL}${fileUrl}`,
+            }));
+          }
+        } else {
+          setThumbnailUrls((prev) => ({
+            ...prev,
+            [item.ID]: `${BASE_URL}${fileUrl}`,
+          }));
+        }
+      }
+    }
+    generateThumbnails();
+  }, []);
 
   const renderItem = ({ item }: { item: Message }) => {
     console.log("Rendered Item:", item);
@@ -119,6 +163,9 @@ export default function ChatScreen() {
     );
   };
 
+  const thumbnailUrl =
+    thumbnailUrls[item.ID] ||
+    "https://img.lovepik.com/free-png/20210919/lovepik-question-element-png-image_401016497_wh1200.png";
   return (
     <SafeAreaView style={styles.container}>
       {/* Header */}
@@ -134,14 +181,12 @@ export default function ChatScreen() {
         {selectedItem && (
           <View style={styles.fixedItemContainer}>
             <View style={styles.itemContent}>
-              {selectedItem.Files && (
-                <Image
-                  source={{
-                    uri: `http://localhost:7777${selectedItem.Files[0].URL}`,
-                  }}
-                  style={styles.image}
-                />
-              )}
+              <Image
+                source={{
+                  uri: thumbnailUrl,
+                }}
+                style={styles.image}
+              />
               <View style={styles.textContainer}>
                 <Text style={styles.itemTitle}>{selectedItem.Name}</Text>
                 <Text>Rp.{selectedItem.Price}</Text>

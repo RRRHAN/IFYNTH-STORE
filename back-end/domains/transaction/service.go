@@ -25,6 +25,7 @@ type Service interface {
 	GetTransactionCountByStatus(ctx context.Context) ([]StatusCount, error)
 	GetTotalAmountByDate(ctx context.Context) ([]Result, error)
 	GetTotalIncome(ctx context.Context) (float64, error)
+	GetTotalTransactionByCustomer(ctx context.Context) ([]ResultByCustomer, error)
 }
 
 type service struct {
@@ -263,4 +264,23 @@ func (s *service) GetTotalIncome(ctx context.Context) (float64, error) {
 	}
 
 	return totalIncome, nil
+}
+
+func (s *service) GetTotalTransactionByCustomer(ctx context.Context) ([]ResultByCustomer, error) {
+	var results []ResultByCustomer
+
+	err := s.db.WithContext(ctx).
+		Model(&Transaction{}).
+		Joins("JOIN customer ON transactions.user_id = customer.id").
+		Select("transactions.user_id, customer.name as customer_name, customer.phone_number as phone_number, SUM(transactions.total_amount) as total_amount, COUNT(transactions.id) as transaction_count").
+		Where("transactions.status NOT IN (?)", []string{"pending", "cancelled"}).
+		Group("transactions.user_id, customer.name, customer.phone_number").
+		Order("total_amount DESC").
+		Scan(&results).Error
+
+	if err != nil {
+		return nil, err
+	}
+
+	return results, nil
 }

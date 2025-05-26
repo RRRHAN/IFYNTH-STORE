@@ -7,6 +7,7 @@ import {
   ScrollView,
   View,
   Modal,
+  Platform
 } from "react-native";
 import { IconButton } from "react-native-paper";
 import { useRouter } from "expo-router";
@@ -24,6 +25,7 @@ import {
 import { deleteProduct } from "@/src/api/products";
 import ModalComponent from "@/components/ModalComponent";
 import ProductDetailModal from "@/app/detail_product";
+import { BASE_URL } from "@/src/api/constants";
 
 const ProductsScreen = () => {
   const screenWidth = Dimensions.get("window").width;
@@ -121,8 +123,8 @@ const ProductsScreen = () => {
             source={{
               uri:
                 item.ProductImages && item.ProductImages.length > 0
-                  ? `http://localhost:7777${item.ProductImages[0].URL}`
-                  : "https://via.placeholder.com/80",
+                  ? `${BASE_URL}${item.ProductImages[0].URL}`
+                  : "https://img.lovepik.com/free-png/20210919/lovepik-question-element-png-image_401016497_wh1200.png",
             }}
           />
         </ThemedCell>
@@ -174,8 +176,7 @@ const ProductsScreen = () => {
   );
 
   return (
-    <ThemedView style={[styles.center]}>
-      {/* Modal untuk menampilkan ProductDetailScreen */}
+    <ThemedView style={[styles.center, {marginTop: Platform.OS === "web" ? 20 : 50, }]}>
       <Modal
         animationType="slide"
         transparent={true}

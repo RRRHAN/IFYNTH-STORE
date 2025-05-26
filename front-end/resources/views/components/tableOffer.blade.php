@@ -41,7 +41,7 @@
                         <td>
                             <div>{{ $product['Name'] ?? '-' }}</div>
                         </td>
-                        <td>{{ number_format($product['Price'] ?? 0) }}</td>
+                        <td>Rp.{{ number_format($product['Price'] ?? 0) }}</td>
                         <td>{{ ucfirst($product['Status'] ?? '-') }}</td>
                         <td>
                             <a href="#" class="btn btn-sm btn-primary view-detail-btn" data-bs-toggle="modal"

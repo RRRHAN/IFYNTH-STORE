@@ -20,6 +20,7 @@ type Handler interface {
 	GetTransactionCountByStatus(ctx *gin.Context)
 	GetTotalAmountByDate(ctx *gin.Context)
 	GetTotalIncome(ctx *gin.Context)
+	GetTotalTransactionByCustomer(ctx *gin.Context)
 }
 
 type handler struct {
@@ -165,4 +166,19 @@ func (h *handler) GetTotalIncome(ctx *gin.Context) {
 	}
 
 	respond.Success(ctx, http.StatusOK, res)
+}
+
+func (h *handler) GetTotalTransactionByCustomer(ctx *gin.Context) {
+	transactions, err := h.service.GetTotalTransactionByCustomer(ctx)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch transactions", "details": err.Error()})
+		return
+	}
+
+	if len(transactions) == 0 {
+		ctx.JSON(http.StatusOK, gin.H{"message": "No transactions found"})
+		return
+	}
+
+	respond.Success(ctx, http.StatusOK, transactions)
 }

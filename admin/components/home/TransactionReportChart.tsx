@@ -1,5 +1,10 @@
-import React, { useRef } from "react";
-import { Dimensions, StyleSheet, ScrollView, View } from "react-native";
+import React, { useRef, useState } from "react";
+import {
+  Dimensions,
+  StyleSheet,
+  ScrollView,
+  TouchableOpacity,
+} from "react-native";
 import { LineChart } from "react-native-chart-kit";
 import { ThemedView } from "@/components/ThemedView";
 import { ThemedText } from "@/components/ThemedText";
@@ -43,6 +48,13 @@ const TransactionReportChart: React.FC<TransactionChartProps> = ({
   const colorScheme = useColorScheme();
   const scrollRef = useRef<ScrollView>(null);
 
+  const [tooltipData, setTooltipData] = useState<{
+    value: number;
+    x: number;
+    y: number;
+    date: string;
+  } | null>(null);
+
   const labels = (transactionReport ?? []).map((r) => {
     const date = new Date(r.Date);
     const day = String(date.getDate()).padStart(2, "0");
@@ -52,25 +64,28 @@ const TransactionReportChart: React.FC<TransactionChartProps> = ({
   });
 
   const data = (transactionReport ?? []).map((r) => r.TotalAmount / 1000);
+  const actualTotalAmounts = (transactionReport ?? []).map(
+    (r) => r.TotalAmount
+  );
 
   const MAX_VISIBLE_DATA = getMaxVisibleData(screenWidth);
   const LABEL_WIDTH = 70;
   const MIN_WIDTH = getMinWidth(screenWidth);
 
   const visibleCount = Math.min(labels.length, MAX_VISIBLE_DATA);
-  const chartWidth = visibleCount * LABEL_WIDTH;
   const scrollContentWidth = Math.max(labels.length * LABEL_WIDTH, MIN_WIDTH);
-  const chartDisplayWidth = Math.max(chartWidth, MIN_WIDTH);
 
   const chartConfig = {
-    backgroundColor: "transparent",
-    backgroundGradientFrom: "transparent",
-    backgroundGradientTo: "transparent",
+    backgroundColor: colorScheme === "dark" ? "#151718" : "#fff",
+    backgroundGradientFrom: colorScheme === "dark" ? "#151718" : "#fff",
+    backgroundGradientTo: colorScheme === "dark" ? "#151718" : "#fff",
     decimalPlaces: 0,
     color: (opacity = 1) => (colorScheme === "dark" ? "#ffffff" : "#111827"),
     labelColor: (opacity = 1) =>
       colorScheme === "dark" ? "#ffffff" : "#111827",
-    style: { borderRadius: 16 },
+    style: {
+      borderRadius: 16,
+    },
     propsForDots: {
       r: "5",
       strokeWidth: "2",
@@ -80,26 +95,36 @@ const TransactionReportChart: React.FC<TransactionChartProps> = ({
 
   const LABEL_COUNT = 5;
   const adjustedChartHeight = screenWidth > 1000 ? height - 25 : 250;
+  const [productTableHeight, setProductTableHeight] = useState(0);
+  const labelVerticalSpacing = productTableHeight / 6.3;
 
   return (
-    <ThemedView style={styles.container}>
+    <ThemedView
+      style={[styles.container]}
+      onLayout={(event) => {
+        setProductTableHeight(event.nativeEvent.layout.height);
+      }}
+    >
       <ThemedText style={styles.title}>Transaction Report</ThemedText>
       <ThemedView style={{ flexDirection: "row" }}>
-        {/* Manual Y-axis */}
         <ThemedView style={[styles.yAxisContainer]}>
           {[...Array(LABEL_COUNT)].map((_, i) => {
             const max = Math.max(...data);
-            const yValue = Math.round(
-              (max / (LABEL_COUNT - 1)) * (LABEL_COUNT - 1 - i)
-            );
+            const yValue =
+              data.length > 0
+                ? Math.round((max / (LABEL_COUNT - 1)) * (LABEL_COUNT - 1 - i))
+                : 0;
+
+            const labelStyle: any = { ...styles.yAxisLabel };
+            if (i === 0) {
+              labelStyle.paddingTop = 4;
+            } else if (i === LABEL_COUNT - 1) {
+              labelStyle.paddingBottom = labelVerticalSpacing;
+            } else {
+            }
+
             return (
-              <ThemedText
-                key={i}
-                style={[
-                  styles.yAxisLabel,
-                  i === LABEL_COUNT - 1 && styles.bottomYAxisLabel,
-                ]}
-              >
+              <ThemedText key={i} style={labelStyle}>
                 {yValue}k
               </ThemedText>
             );
@@ -110,8 +135,9 @@ const TransactionReportChart: React.FC<TransactionChartProps> = ({
         <ScrollView
           horizontal
           showsHorizontalScrollIndicator={true}
-          contentContainerStyle={{ width: scrollContentWidth }}
-          style={{ width: chartDisplayWidth }}
+          contentContainerStyle={{
+            width: scrollContentWidth,
+          }}
           ref={scrollRef}
           onContentSizeChange={() => {
             if (scrollRef.current) {
@@ -133,7 +159,37 @@ const TransactionReportChart: React.FC<TransactionChartProps> = ({
             style={styles.chart}
             fromZero
             withHorizontalLabels={false}
+            onDataPointClick={({ value, index, x, y }) => {
+              setTooltipData({
+                value: actualTotalAmounts[index],
+                x: x,
+                y: y,
+                date: labels[index],
+              });
+            }}
           />
+          {tooltipData && (
+            <ThemedView
+              style={[
+                styles.tooltipContainer,
+                {
+                  left: tooltipData.x,
+                  top: tooltipData.y,
+                },
+              ]}
+            >
+              <ThemedText style={styles.tooltipText}>
+                {tooltipData.date}: Rp{" "}
+                {tooltipData.value.toLocaleString("id-ID")}
+              </ThemedText>
+              <TouchableOpacity
+                onPress={() => setTooltipData(null)}
+                style={styles.closeTooltipButton}
+              >
+                <ThemedText style={styles.closeTooltipText}>X</ThemedText>
+              </TouchableOpacity>
+            </ThemedView>
+          )}
         </ScrollView>
       </ThemedView>
     </ThemedView>
@@ -158,15 +214,39 @@ const styles = StyleSheet.create({
     width: 40,
     justifyContent: "space-between",
     marginRight: 2,
-    paddingTop: 3,
   },
   yAxisLabel: {
     fontSize: 12,
     color: "#6b7280",
     textAlign: "right",
   },
-  bottomYAxisLabel: {
-    paddingBottom: 35,
+  tooltipContainer: {
+    position: "absolute",
+    backgroundColor: "rgba(0,0,0,0.8)",
+    borderRadius: 8,
+    paddingVertical: 6,
+    paddingHorizontal: 10,
+    zIndex: 100,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 5,
+  },
+  tooltipText: {
+    color: "#fff",
+    fontSize: 12,
+    fontWeight: "bold",
+  },
+  closeTooltipButton: {
+    marginLeft: 8,
+    paddingHorizontal: 5,
+    paddingVertical: 2,
+    borderRadius: 10,
+    backgroundColor: "rgba(255,255,255,0.2)",
+  },
+  closeTooltipText: {
+    color: "#fff",
+    fontSize: 10,
+    fontWeight: "bold",
   },
 });
 

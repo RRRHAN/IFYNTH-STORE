@@ -63,6 +63,9 @@ func NewDependency(
 		user.POST("/register", mw.BasicAuth, userHandler.Register)
 		user.PATCH("/password", mw.JWT(constants.ADMIN, constants.CUSTOMER), userHandler.ChangePassword)
 		user.GET("/get-personal", mw.JWT(constants.ADMIN, constants.CUSTOMER), userHandler.GetPersonal)
+		user.GET("/check-jwt", mw.JWT(constants.ADMIN, constants.CUSTOMER), func(ctx *gin.Context) {
+			respond.Success(ctx, http.StatusOK, "JWT is valid")
+		})
 	}
 
 	product := router.Group("/product")
@@ -117,6 +120,7 @@ func NewDependency(
 		transaction.GET("/count", mw.JWT(constants.ADMIN), transactionHandler.GetTransactionCountByStatus)
 		transaction.GET("/report", mw.JWT(constants.ADMIN), transactionHandler.GetTotalAmountByDate)
 		transaction.GET("/totalIncome", mw.JWT(constants.ADMIN), transactionHandler.GetTotalIncome)
+		transaction.GET("/totalTransactionUser", mw.JWT(constants.ADMIN), transactionHandler.GetTotalTransactionByCustomer)
 	}
 
 	router.NoRoute(func(ctx *gin.Context) {

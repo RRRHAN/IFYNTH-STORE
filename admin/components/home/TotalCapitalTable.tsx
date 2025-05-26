@@ -44,7 +44,18 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderRadius: 15,
     overflow: "hidden",
-    width: width < 1000 ? (width < 500 ? "70%" : "80%") : "100%",
+    width:
+          width < 450
+        ? width - 250
+        : width < 500
+        ? width - 300
+        : width < 768
+        ? width - 400
+        : width < 1000
+        ? width - 550
+        : width < 1500
+        ? width - 700
+        : width - 1500,
     marginBottom: 20,
   },
   row: {

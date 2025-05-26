@@ -5,7 +5,6 @@ import {
   useWindowDimensions,
   View,
 } from "react-native";
-import { ThemedView } from "@/components/ThemedView";
 import { ThemedText } from "@/components/ThemedText";
 import {
   fetchProductCount,
@@ -13,6 +12,7 @@ import {
   fetchTransactionReports,
   fetchTotalCapital,
   fetchTotalIncome,
+  fetchTotalTransactionUser,
 } from "@/src/api/home";
 import ProductCountTable from "@/components/home/ProductCountTable";
 import TransactionCountTable from "@/components/home/TransactionCountTable";
@@ -20,24 +20,19 @@ import {
   DepartentCount,
   TransactionCount,
   TransactionReport,
+  TotalTransactionUser,
 } from "@/src/types/home";
 import styles from "../styles/HomeStyles";
 import TransactionReportTable from "@/components/home/TransactionReportChart";
 import TotalCapitalTable from "@/components/home/TotalCapitalTable";
 import TotalIncomeTable from "@/components/home/TotalIncomeTable";
+import TotalTransactionUserTable from "@/components/home/TotalTransactionUserTable";
 import { ScrollView } from "react-native";
+import { useColorScheme } from "@/hooks/useColorScheme";
+import { Platform } from "react-native";
 
 export default function HomeScreen() {
-  const dummyTransactionReport = Array.from({ length: 50 }, (_, i) => {
-    const date = new Date();
-    date.setDate(date.getDate() - (50 - i));
-    return {
-      Date: date.toISOString(),
-      TotalAmount: Math.floor(Math.random() * 1000000),
-    };
-  });
-
-  // state lama tetap
+  const colorScheme = useColorScheme();
   const [productCount, setProductCount] = useState<DepartentCount[] | null>(
     null
   );
@@ -47,56 +42,89 @@ export default function HomeScreen() {
   const [transactionReport, setTransactionReport] = useState<
     TransactionReport[] | null
   >(null);
+  const [totalTransactionUser, setTotalTransactionUser] = useState<
+    TotalTransactionUser[] | null
+  >(null);
   const [totalCapital, setTotalCapital] = useState<number | null>(null);
   const [totalIncome, setTotalIncome] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
   const { width } = useWindowDimensions();
+  const [hasError, setHasError] = useState(false);
 
-  // Tambah state baru untuk tinggi tabel
+  const [contentTotalHeight, setContentTotalHeight] = useState(0);
   const [productTableHeight, setProductTableHeight] = useState(0);
   const [transactionTableHeight, setTransactionTableHeight] = useState(0);
   const [totalTableHeight, setTotalTableHeight] = useState(0);
 
   useEffect(() => {
-    const loadAll = async () => {
+    const loadAllDataSequentially = async () => {
+      setLoading(true);
+      setHasError(false);
       try {
-        const [products, transactions, reports, totalCapital, totalIncome] =
-          await Promise.all([
-            fetchProductCount(),
-            fetchTransactionCount(),
-            fetchTransactionReports(),
-            fetchTotalCapital(),
-            fetchTotalIncome(),
-          ]);
+        const products = await fetchProductCount();
         setProductCount(products);
+        await new Promise((resolve) => setTimeout(resolve, 300));
+
+        const transactions = await fetchTransactionCount();
         setTransactionCount(transactions);
+        await new Promise((resolve) => setTimeout(resolve, 300));
+
+        const reports = await fetchTransactionReports();
         setTransactionReport(reports);
-        setTotalCapital(totalCapital);
-        setTotalIncome(totalIncome);
-      } catch (err) {
-        console.log("Failed to fetch home data", err);
+        await new Promise((resolve) => setTimeout(resolve, 300));
+
+        const capital = await fetchTotalCapital();
+        setTotalCapital(capital);
+        await new Promise((resolve) => setTimeout(resolve, 300));
+
+        const income = await fetchTotalIncome();
+        setTotalIncome(income);
+        await new Promise((resolve) => setTimeout(resolve, 300));
+
+        const usersData = await fetchTotalTransactionUser();
+        setTotalTransactionUser(usersData);
+      } catch (err: any) {
+        console.error("Failed to fetch home data", err);
+        setHasError(true);
       } finally {
         setLoading(false);
       }
     };
-    const total = productTableHeight + transactionTableHeight;
-    setTotalTableHeight(total);
-    loadAll();
+
+    loadAllDataSequentially();
   }, []);
+  useEffect(() => {
+    if (productTableHeight > 0 || transactionTableHeight > 0) {
+      const total = productTableHeight + transactionTableHeight;
+      setTotalTableHeight(total);
+    }
+  }, [productTableHeight, transactionTableHeight]);
 
   return (
     <View style={styles.container}>
-      <ImageBackground
-        source={require("@/assets/images/banner/banner-bg.svg")}
-        resizeMode="cover"
-        style={styles.background}
-      >
-        <ScrollView>
-          <View style={styles.overlayContent}>
-            {loading ? (
-              <ActivityIndicator size="large" color="#000" />
-            ) : (
-              <>
+      {loading ? (
+        <View style={styles.loaderContainer}>
+          <ActivityIndicator
+            size="large"
+            color={colorScheme === "dark" ? "#ffffff" : "#111827"}
+          />
+        </View>
+      ) : (
+        <View style={styles.container}>
+          <ImageBackground
+            source={require("@/assets/images/banner/banner-bg.png")}
+            resizeMode="cover"
+            style={styles.background}
+          >
+            <ScrollView
+              contentContainerStyle={{
+                paddingBottom: Platform.OS === "web" ? 100 : 150,
+              }}
+              onContentSizeChange={(contentWidth, contentHeight) => {
+                setContentTotalHeight(contentHeight);
+              }}
+            >
+              <View style={styles.overlayContent}>
                 {totalCapital && totalIncome && (
                   <View style={styles.totalTablesContainer}>
                     <TotalCapitalTable totalCapital={totalCapital} />
@@ -113,6 +141,7 @@ export default function HomeScreen() {
                         alignItems: width < 1000 ? "center" : "flex-start",
                         justifyContent:
                           width < 1000 ? "center" : "space-between",
+                        gap: width < 1000 ? 20 : 0,
                       },
                     ]}
                   >
@@ -143,11 +172,12 @@ export default function HomeScreen() {
                         />
                       </View>
                     </View>
-
                     <View
                       style={{
                         flex: 1,
-                        marginTop: width < 1000 ? 20 : 0,
+                        paddingTop: width < 1000 ? 40 : 0,
+                        top:
+                          Platform.OS === "web" ? 20 : - (contentTotalHeight - 1200),
                       }}
                     >
                       <TransactionReportTable
@@ -157,14 +187,30 @@ export default function HomeScreen() {
                     </View>
                   </View>
                 )}
-                {(!productCount || !transactionCount || !totalCapital || !totalIncome) && (
+                {totalTransactionUser && (
+                  <View
+                    style={[
+                      styles.totalTablesContainer,
+                      { top: Platform.OS === "web" ? 0 : - (contentTotalHeight - 1100) },
+                    ]}
+                  >
+                    <TotalTransactionUserTable
+                      totalTransactionUser={totalTransactionUser}
+                    />
+                  </View>
+                )}
+                {(!productCount ||
+                  !transactionCount ||
+                  !totalCapital ||
+                  !totalIncome ||
+                  !totalTransactionUser) && (
                   <ThemedText>Failed to load data</ThemedText>
                 )}
-              </>
-            )}
-          </View>
-        </ScrollView>
-      </ImageBackground>
+              </View>
+            </ScrollView>
+          </ImageBackground>
+        </View>
+      )}
     </View>
   );
 }

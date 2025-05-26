@@ -49,7 +49,7 @@ export default function Login() {
 
   return (
     <PaperProvider>
-      <ScrollView contentContainerStyle={styles.container}>
+      <View style={[styles.container]}>
         <View style={styles.logoContainer}>
           <Image
             source={require("@/assets/images/logo.png")}
@@ -63,8 +63,8 @@ export default function Login() {
             {
               backgroundColor:
                 colorScheme === "dark"
-                  ? "rgba(42, 42, 42, 0.56)"
-                  : "rgba(207, 207, 207, 0.61)",
+                  ? "rgba(85, 85, 85, 0.56)"
+                  : "rgba(187, 187, 187, 0.61)",
             },
           ]}
         >
@@ -102,11 +102,17 @@ export default function Login() {
             onChangeText={setPassword}
           />
 
-          <ThemedView style={[styles.row,
-            {
-              backgroundColor: colorScheme === "dark" ? "rgba(42, 42, 42, 0)" : "rgba(207, 207, 207, 0)"
-            }
-          ]}>
+          <ThemedView
+            style={[
+              styles.row,
+              {
+                backgroundColor:
+                  colorScheme === "dark"
+                    ? "rgba(42, 42, 42, 0)"
+                    : "rgba(207, 207, 207, 0)",
+              },
+            ]}
+          >
             <ThemedView
               style={[
                 styles.checkboxContainer,
@@ -162,7 +168,7 @@ export default function Login() {
           hideModal={() => setVisible(false)}
           message={errorMessage || successMessage}
         />
-      </ScrollView>
+      </View>
     </PaperProvider>
   );
 }

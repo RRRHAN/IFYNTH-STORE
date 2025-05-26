@@ -1,5 +1,5 @@
 import { BASE_URL, getAuthToken } from "./constants";
-import { DepartentCount, TransactionCount, TransactionReport } from "../types/home";
+import { DepartentCount, TotalTransactionUser, TransactionCount, TransactionReport } from "../types/home";
 
 export const fetchProductCount = async (): Promise<DepartentCount[]> => {
   const token = await getAuthToken();
@@ -76,6 +76,24 @@ export const fetchTotalCapital = async (): Promise<number> => {
 export const fetchTotalIncome = async (): Promise<number> => {
   const token = await getAuthToken();
   const getAllUrl = `${BASE_URL}/transaction/totalIncome`;
+
+  const response = await fetch(getAllUrl, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  if (!response.ok) {
+    throw new Error(`HTTP error! status: ${response.status}`);
+  }
+
+  const result = await response.json();
+  return result.data;
+};
+
+export const fetchTotalTransactionUser = async (): Promise<TotalTransactionUser[]> => {
+  const token = await getAuthToken();
+  const getAllUrl = `${BASE_URL}/transaction/totalTransactionUser`;
 
   const response = await fetch(getAllUrl, {
     headers: {

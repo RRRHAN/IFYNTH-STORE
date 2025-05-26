@@ -9,6 +9,7 @@ const styles = StyleSheet.create({
     position: "relative",
   },
   background: {
+    flex: 1,
     position: "absolute",
     top: -50,
     width: width,
@@ -33,6 +34,12 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     gap: 20,
   },
+    loaderContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+
 });
 
 export default styles;

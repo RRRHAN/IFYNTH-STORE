@@ -12,27 +12,30 @@ import { useRouter } from "expo-router";
 export default function TabLayout() {
   const colorScheme = useColorScheme();
   const router = useRouter();
-  const { width } = Dimensions.get('window');
+  const { width } = Dimensions.get("window");
 
   const handleLogout = async () => {
     const result = await logoutAdmin();
     if (result.success) {
       console.log(result.message);
-      router.replace('/login');
+      router.replace("/login");
     } else {
       console.error(result.message);
     }
   };
 
-  // Tentukan apakah label tab harus ditampilkan berdasarkan lebar layar
-  // Properti `title` biasanya untuk header, `tabBarLabel` untuk label di bawah ikon.
-  const showTabBarLabel = width >= 1000;
+  const showTabBarLabel = width >= 900;
 
   return (
     <Tabs
       screenOptions={{
         tabBarActiveTintColor: Colors[colorScheme ?? "light"].tint,
-        headerShown: false, // Ini menyembunyikan header layar
+        headerShown: false,
+        headerStyle: {
+          marginTop: 10,
+          paddingHorizontal: 20,
+          backgroundColor: "white",
+        },
         tabBarButton: HapticTab,
         tabBarBackground: TabBarBackground,
         tabBarStyle: Platform.select({
@@ -83,7 +86,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="logout"
         options={{
-          tabBarLabel: showTabBarLabel ? 'Logout' : undefined,
+          tabBarLabel: showTabBarLabel ? "Logout" : undefined,
           tabBarIcon: ({ color }) => (
             <Icon source="exit-to-app" size={28} color={color} />
           ),
