@@ -92,7 +92,7 @@ CREATE TABLE shipping_address (
     zip_code VARCHAR(255) NOT NULL,
     destination_label VARCHAR(255) not null,
     courir VARCHAR(255) not null,
-    shpiing_cost DECIMAL(12,2) NOT NULL,
+    shipping_cost DECIMAL(12,2) NOT NULL,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     FOREIGN KEY (transaction_id) REFERENCES transactions(id)
