@@ -32,7 +32,7 @@ services:
     env_file:
       - .env
     volumes:
-      - ./uploads:/app/uploads
+      - /root/IFYNTH-STORE/back-end/uploads:/app/uploads:/app/uploads
 
   db:
     image: postgres:15
