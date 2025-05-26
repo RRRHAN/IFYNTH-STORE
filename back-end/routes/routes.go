@@ -54,6 +54,7 @@ func NewDependency(
 
 	api := router.Group("/api")
 	api.Static("/uploads", "./uploads")
+	api.GET("/health-check", HealthCheck)
 
 	// domain user
 	user := api.Group("/user")
