@@ -1,12 +1,18 @@
 import React from "react";
-import { ScrollView, Dimensions, View, StyleSheet } from "react-native";
+import {
+  ScrollView,
+  Dimensions,
+  View,
+  StyleSheet,
+  Platform,
+} from "react-native";
 import {
   VictoryBar,
   VictoryChart,
   VictoryTheme,
   VictoryGroup,
   VictoryAxis,
-  VictoryTooltip, // Tetap import jika Anda berencana menggunakannya
+  VictoryTooltip,
 } from "victory-native";
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
@@ -14,6 +20,11 @@ import { useColorScheme } from "@/hooks/useColorScheme";
 import { ProfitProduct } from "@/src/types/home";
 
 const screenWidth = Dimensions.get("window").width;
+
+const maxWidth =
+  Platform.OS === "web"
+    ? { width: screenWidth > 1000 ? 600 : 900 }
+    : { width: 500 };
 
 type ProfitChartProps = {
   ProfitProduct: ProfitProduct[] | null;
@@ -71,9 +82,8 @@ const ProfitProductChart: React.FC<ProfitChartProps> = ({
     <ThemedView
       style={[
         styles.themedViewContainer,
-        { backgroundColor: colorScheme === "dark" ? "#1c1c1c" : "#f0f0f0",
-          width: screenWidth > 1000 ? 650 : 350,
-         },
+        maxWidth,
+        { backgroundColor: colorScheme === "dark" ? "#1c1c1c" : "#f0f0f0" },
       ]}
     >
       <ThemedText
@@ -83,26 +93,36 @@ const ProfitProductChart: React.FC<ProfitChartProps> = ({
       </ThemedText>
 
       {/* Manual Legend */}
-      <View style={styles.legendContainer}> {/* Dipisahkan */}
-        <View style={styles.legendItem}> {/* Dipisahkan */}
+      <View style={styles.legendContainer}>
+        {" "}
+        {/* Dipisahkan */}
+        <View style={styles.legendItem}>
+          {" "}
+          {/* Dipisahkan */}
           <View
             style={[
               styles.legendColorBox, // Dipisahkan
               { backgroundColor: chartColors.capital },
             ]}
           />
-          <ThemedText style={[styles.legendText, { color: chartColors.text }]}> {/* Dipisahkan */}
+          <ThemedText style={[styles.legendText, { color: chartColors.text }]}>
+            {" "}
+            {/* Dipisahkan */}
             Modal
           </ThemedText>
         </View>
-        <View style={styles.legendItem}> {/* Dipisahkan */}
+        <View style={styles.legendItem}>
+          {" "}
+          {/* Dipisahkan */}
           <View
             style={[
               styles.legendColorBox, // Dipisahkan
               { backgroundColor: chartColors.income },
             ]}
           />
-          <ThemedText style={[styles.legendText, { color: chartColors.text }]}> {/* Dipisahkan */}
+          <ThemedText style={[styles.legendText, { color: chartColors.text }]}>
+            {" "}
+            {/* Dipisahkan */}
             Income
           </ThemedText>
         </View>
@@ -189,7 +209,10 @@ const ProfitProductChart: React.FC<ProfitChartProps> = ({
                   fill: chartColors.text,
                   fontSize: 10,
                 },
-                grid: { stroke: colorScheme === "dark" ? "#444" : "#ccc", strokeDasharray: "5, 5" },
+                grid: {
+                  stroke: colorScheme === "dark" ? "#444" : "#ccc",
+                  strokeDasharray: "5, 5",
+                },
               }}
             />
 
@@ -200,7 +223,8 @@ const ProfitProductChart: React.FC<ProfitChartProps> = ({
               {...({} as any)}
             >
               <VictoryBar
-                data={capitalData} // Ini bukan style, ini data
+                data={capitalData}
+                barWidth={20}
                 // Jika menggunakan tooltip, pastikan prop label dan labelComponent ada di sini
                 /*
                 labels={({ datum }) => datum.label}
@@ -230,7 +254,8 @@ const ProfitProductChart: React.FC<ProfitChartProps> = ({
                 */
               />
               <VictoryBar
-                data={incomeData} // Ini bukan style, ini data
+                data={incomeData}
+                barWidth={20}
                 // Jika menggunakan tooltip, pastikan prop label dan labelComponent ada di sini
                 /*
                 labels={({ datum }) => datum.label}
