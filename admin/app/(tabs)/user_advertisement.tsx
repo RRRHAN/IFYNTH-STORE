@@ -101,7 +101,7 @@ const UserAdvertisementScreen = () => {
           const fileUrl = item.Files[0].URL;
           if (/\.(mp4|webm|ogg)$/i.test(fileUrl)) {
             try {
-              const mediaUrl = `${BASE_URL}${fileUrl}`;
+              const mediaUrl = `${BASE_URL}/api${fileUrl}`;
               if (Platform.OS === "web") {
                 const url = await generateVideoThumbnailJS(mediaUrl);
                 setThumbnailUrls((prev) => ({ ...prev, [item.ID]: url }));
@@ -120,13 +120,13 @@ const UserAdvertisementScreen = () => {
               // fallback ke fileUrl as image
               setThumbnailUrls((prev) => ({
                 ...prev,
-                [item.ID]: `${BASE_URL}${fileUrl}`,
+                [item.ID]: `${BASE_URL}/api${fileUrl}`,
               }));
             }
           } else {
             setThumbnailUrls((prev) => ({
               ...prev,
-              [item.ID]: `${BASE_URL}${fileUrl}`,
+              [item.ID]: `${BASE_URL}/api${fileUrl}`,
             }));
           }
         }

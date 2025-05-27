@@ -27,7 +27,7 @@ export default function ProductDetailModal({
 
   useEffect(() => {
     if (product?.ProductImages && product.ProductImages.length > 0) {
-      setSelectedImage(`${BASE_URL}${product.ProductImages[0].URL}`);
+      setSelectedImage(`${BASE_URL}/api${product.ProductImages[0].URL}`);
     } else {
       setSelectedImage("https://img.lovepik.com/free-png/20210919/lovepik-question-element-png-image_401016497_wh1200.png");
     }
@@ -36,7 +36,7 @@ export default function ProductDetailModal({
   if (!product) return null;
 
   const thumbnails =
-    product.ProductImages?.map((img) => `${BASE_URL}${img.URL}`) || [];
+    product.ProductImages?.map((img) => `${BASE_URL}/api${img.URL}`) || [];
 
   return (
     <ScrollView

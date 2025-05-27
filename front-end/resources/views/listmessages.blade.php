@@ -44,13 +44,13 @@
                                                                                     style="border-radius: 50%; object-fit: cover;"
                                                                                     muted preload="metadata">
                                                                                     <source
-                                                                                        src="{{ url(config('app.back_end_base_url').'/api' . $file) }}"
+                                                                                        src="{{ url(config('app.back_end_base_url') . '/api' . $file) }}"
                                                                                         type="video/mp4">
                                                                                     Your browser does not support the video
                                                                                     tag.
                                                                                 </video>
                                                                             @else
-                                                                                <img src="{{ url(config('app.back_end_base_url').'/api' . $file) }}"
+                                                                                <img src="{{ url(config('app.back_end_base_url') . '/api' . $file) }}"
                                                                                     alt="avatar"
                                                                                     class="d-flex align-self-center me-3"
                                                                                     width="70" height="70"
@@ -135,251 +135,346 @@
         </div>
     </section>
     <script>
-        let currentProductId = null;
+        document.addEventListener('DOMContentLoaded', function() {
+            let currentProductId = null;
 
-        function fetchChatMessages(productId) {
-            fetch(`/getProductMessages/${productId}`)
-                .then(response => response.json())
-                .then(data => {
-                    const chatMessagesContainer = document.getElementById('chatMessages');
+            // Pastikan URL base backend tercetak ke JavaScript dari konfigurasi Laravel
+            const BACKEND_BASE_URL = '{{ config('app.back_end_base_url') }}';
+            const CSRF_TOKEN = '{{ csrf_token() }}';
 
-                    const isAtBottom =
-                        chatMessagesContainer.scrollHeight - chatMessagesContainer.scrollTop <=
-                        chatMessagesContainer.clientHeight + 50;
+            /**
+             * Mengambil dan menampilkan pesan chat untuk suatu produk.
+             * @param {string} productId - ID produk.
+             */
+            function fetchChatMessages(productId) {
+                fetch(`/getProductMessages/${productId}`)
+                    .then(response => {
+                        if (!response.ok) {
+                            // Jika respons bukan OK, throw error dengan status
+                            throw new Error(`HTTP error! status: ${response.status}`);
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        const chatMessagesContainer = document.getElementById('chatMessages');
+                        // Pastikan kontainer pesan ditemukan
+                        if (!chatMessagesContainer) {
+                            console.error('Error: Chat messages container (ID: chatMessages) not found!');
+                            return;
+                        }
 
-                    chatMessagesContainer.innerHTML = '';
+                        const isAtBottom = chatMessagesContainer.scrollHeight - chatMessagesContainer
+                            .scrollTop <=
+                            chatMessagesContainer.clientHeight + 50; 
 
-                    if (data.messages && data.messages.length > 0) {
-                        data.messages.sort((a, b) => new Date(a.CreatedAt) - new Date(b.CreatedAt));
+                        chatMessagesContainer.innerHTML = '';
 
-                        data.messages.forEach(message => {
-                            const wrapper = document.createElement('div');
-                            wrapper.classList.add('d-flex', 'flex-row', 'align-items-start',
+                        // Jika ada pesan, tampilkan
+                        if (data.messages && data.messages.length > 0) {
+                            // Urutkan pesan berdasarkan tanggal dibuat
+                            data.messages.sort((a, b) => new Date(a.CreatedAt) - new Date(b.CreatedAt));
+
+                            data.messages.forEach(message => {
+                                const wrapper = document.createElement('div');
+                                wrapper.classList.add('d-flex', 'flex-row', 'align-items-start',
                                 'mb-2');
 
-                            const isCustomer = message.Role === 'CUSTOMER';
-                            wrapper.classList.add(isCustomer ? 'justify-content-end' : 'justify-content-start');
+                                const isCustomer = message.Role === 'CUSTOMER';
+                                // Atur posisi pesan (kanan untuk customer, kiri untuk lainnya)
+                                wrapper.classList.add(isCustomer ? 'justify-content-end' :
+                                    'justify-content-start');
 
-                            // Elemen Avatar
-                            const avatarDiv = document.createElement('div');
-                            avatarDiv.style.width = '40px';
-                            avatarDiv.style.height = '40px';
-                            avatarDiv.style.borderRadius = '50%';
-                            avatarDiv.style.overflow = 'hidden';
-                            avatarDiv.style.flexShrink = '0';
+                                // Elemen Avatar
+                                const avatarDiv = document.createElement('div');
+                                avatarDiv.style.width = '40px';
+                                avatarDiv.style.height = '40px';
+                                avatarDiv.style.borderRadius = '50%';
+                                avatarDiv.style.overflow = 'hidden';
+                                avatarDiv.style.flexShrink = '0'; // Mencegah avatar menyusut
 
-                            let avatarSrc = '';
-                            if (isCustomer) {
-                                avatarSrc =
-                                    'https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava6-bg.webp';
-                            } else {
-                                avatarSrc =
+                                // Tentukan sumber avatar berdasarkan role
+                                let avatarSrc = isCustomer ?
+                                    'https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava6-bg.webp' :
                                     'https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava1-bg.webp';
+
+                                const avatarImg = document.createElement('img');
+                                avatarImg.src = avatarSrc;
+                                avatarImg.alt = 'avatar';
+                                avatarImg.style.cssText =
+                                    'width: 100%; height: 100%; object-fit: cover;'; // Inline style untuk gambar
+                                avatarDiv.appendChild(avatarImg);
+
+                                // Wrapper untuk bubble pesan
+                                const bubbleWrapper = document.createElement('div');
+                                bubbleWrapper.classList.add('p-2', 'mb-1', 'rounded-3');
+                                bubbleWrapper.style.maxWidth = '75%'; // Batasi lebar bubble
+                                bubbleWrapper.style.minWidth = 'fit-content'; // Sesuaikan lebar minimum
+                                // Atur background bubble berdasarkan role
+                                bubbleWrapper.classList.add(isCustomer ? 'bg-light' : 'bg-secondary');
+
+                                // Teks pesan
+                                const messageText = document.createElement('div');
+                                messageText.classList.add('small');
+                                messageText.innerText = message.Message;
+                                // Atur warna teks pesan
+                                messageText.classList.add(isCustomer ? 'text-dark' : 'text-white');
+
+                                // Waktu pesan
+                                const date = new Date(message.CreatedAt);
+                                const timeOnly =
+                                    `${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}`;
+
+                                const timeText = document.createElement('div');
+                                timeText.classList.add('small', 'text-end'); // Rata kanan untuk waktu
+                                timeText.style.fontSize = '0.65rem'; // Ukuran font lebih kecil
+                                timeText.style.opacity = '0.8'; // Sedikit transparan
+                                timeText.innerText = timeOnly;
+                                // Atur warna teks waktu
+                                timeText.classList.add(isCustomer ? 'text-dark' : 'text-light');
+
+                                // Gabungkan teks pesan dan waktu ke dalam bubble
+                                bubbleWrapper.appendChild(messageText);
+                                bubbleWrapper.appendChild(timeText);
+
+                                // Gabungkan avatar dan bubble ke wrapper pesan
+                                wrapper.style.gap = '8px'; // Jarak antara avatar dan bubble
+                                if (isCustomer) {
+                                    wrapper.appendChild(bubbleWrapper);
+                                    wrapper.appendChild(avatarDiv);
+                                } else {
+                                    wrapper.appendChild(avatarDiv);
+                                    wrapper.appendChild(bubbleWrapper);
+                                }
+
+                                chatMessagesContainer.appendChild(wrapper);
+                            });
+
+                            // Scroll ke bawah jika sebelumnya sudah di paling bawah
+                            if (isAtBottom) {
+                                chatMessagesContainer.scrollTop = chatMessagesContainer.scrollHeight;
                             }
-
-                            const avatarImg = document.createElement('img');
-                            avatarImg.src = avatarSrc;
-                            avatarImg.alt = 'avatar';
-                            avatarImg.style.width = '100%';
-                            avatarImg.style.height = '100%';
-                            avatarImg.style.objectFit = 'cover';
-                            avatarDiv.appendChild(avatarImg);
-
-
-                            const bubbleWrapper = document.createElement('div');
-                            if (isCustomer) {
-                                bubbleWrapper.classList.add('p-2', 'mb-1', 'rounded-3', 'text-dark');
-                            } else {
-                                bubbleWrapper.classList.add('p-2', 'mb-1', 'rounded-3', 'text-white');
-                            }
-                            bubbleWrapper.style.maxWidth = '75%';
-                            bubbleWrapper.style.minWidth = 'fit-content';
-
-                            bubbleWrapper.classList.add(isCustomer ? 'bg-light' : 'bg-secondary');
-
-                            const messageText = document.createElement('div');
-                            messageText.classList.add('small');
-                            messageText.innerText = message.Message;
-
-                            const date = new Date(message.CreatedAt);
-                            const timeOnly =
-                                `${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}`;
-
-                            const timeText = document.createElement('div');
-                            if (isCustomer){
-                                timeText.classList.add('small', 'text-dark', 'text-end');
-                            } else {
-                                timeText.classList.add('small', 'text-light', 'text-end');
-                            }
-                            timeText.style.fontSize = '0.65rem';
-                            timeText.style.opacity = '0.8';
-                            timeText.innerText = timeOnly;
-
-                            bubbleWrapper.appendChild(messageText);
-                            bubbleWrapper.appendChild(timeText);
-
-                            if (isCustomer) {
-                                wrapper.style.gap = '8px';
-                                wrapper.appendChild(bubbleWrapper);
-                                wrapper.appendChild(avatarDiv);
-                            } else {
-                                wrapper.style.gap = '8px';
-                                wrapper.appendChild(avatarDiv);
-                                wrapper.appendChild(bubbleWrapper);
-                            }
-
-                            chatMessagesContainer.appendChild(wrapper);
-                        });
-
-                        if (isAtBottom) {
-                            chatMessagesContainer.scrollTop = chatMessagesContainer.scrollHeight;
+                        } else {
+                            // Tampilkan pesan jika tidak ada chat
+                            chatMessagesContainer.innerHTML =
+                                '<p class="text-center text-muted">No messages available</p>';
                         }
-                    } else {
-                        chatMessagesContainer.innerHTML = '<p class="text-center text-muted">No messages available</p>';
-                    }
-                })
-                .catch(error => {
-                    console.error('Error fetching messages:', error);
-                });
-        }
-        document.querySelectorAll('.product-item').forEach(item => {
-            item.addEventListener('click', function() {
-                const productId = this.getAttribute('data-product-id');
-                const productStatus = this.getAttribute('data-product-status');
-                const productName = this.getAttribute('data-product-name');
-                const productPrice = this.getAttribute('data-product-price');
-                const productMedia = this.getAttribute('data-product-image');
-                const productMediaType = this.getAttribute('data-product-media-type');
-
-                currentProductId = productId;
-
-                document.getElementById('product-list-panel').style.display = 'none';
-                document.getElementById('chat-panel').style.display = 'block';
-
-                document.getElementById('chat-product-name').innerText = productName;
-                document.getElementById('productTitle').innerText = productName;
-                document.getElementById('productPrice').innerText = productPrice;
-
-                const mediaContainer = document.getElementById('productMediaContainer');
-                mediaContainer.innerHTML = '';
-
-                if (productMedia) {
-                    const fullUrl = config('app.back_end_base_url').'/api' + productMedia;
-
-                    if (productMediaType === 'video') {
-                        const videoElement = document.createElement('video');
-                        videoElement.src = fullUrl;
-                        videoElement.alt = 'Product Video';
-                        videoElement.autoplay = false;
-                        videoElement.loop = false;
-                        videoElement.muted = true;
-                        videoElement.preload = 'metadata';
-                        videoElement.style.cssText =
-                            'width: 100%; height: 100%; object-fit: cover; border-radius: 10px;';
-                        mediaContainer.appendChild(videoElement);
-                    } else {
-                        const imgElement = document.createElement('img');
-                        imgElement.src = fullUrl;
-                        imgElement.alt = 'Product Image';
-                        imgElement.style.cssText =
-                            'width: 100%; height: 100%; object-fit: cover; border-radius: 10px;';
-                        mediaContainer.appendChild(imgElement);
-                    }
-                } else {
-                    const placeholderElement = document.createElement('img');
-                    placeholderElement.src =
-                        'https://png.pngtree.com/png-vector/20190417/ourmid/pngtree-vector-question-mark-icon-png-image_947159.jpg';
-                    placeholderElement.alt = 'No Media Available';
-                    placeholderElement.style.cssText =
-                        'width: 100%; height: 100%; object-fit: cover; border-radius: 10px;';
-                    mediaContainer.appendChild(placeholderElement);
-                }
-
-                const chatInput = document.getElementById('chatInput');
-                const sendBtn = document.getElementById('sendBtn');
-
-                chatInput.setAttribute('data-product-id', productId);
-
-                if (productStatus === 'rejected') {
-                    chatInput.disabled = true;
-                    sendBtn.classList.add('disabled');
-                    chatInput.placeholder = 'Product rejected, chat disabled.';
-                } else if (productStatus === 'delivered') {
-                    chatInput.disabled = true;
-                    sendBtn.classList.add('disabled');
-                    chatInput.placeholder = 'Product completed, chat disabled.';
-                } else {
-                    chatInput.disabled = false;
-                    sendBtn.classList.remove('disabled');
-                    chatInput.placeholder = 'Type message';
-                }
-
-                fetchChatMessages(productId);
-            });
-        });
-        document.getElementById('back-to-products').addEventListener('click', function() {
-            document.getElementById('product-list-panel').style.display = 'block';
-            document.getElementById('chat-panel').style.display = 'none';
-            currentProductId = null;
-        });
-
-
-        setInterval(() => {
-            if (currentProductId) {
-                fetchChatMessages(currentProductId);
-            }
-        }, 3000);
-    </script>
-    <script>
-        const input = document.getElementById('chatInput');
-        const sendBtn = document.getElementById('sendBtn');
-
-        input.addEventListener('keypress', function(e) {
-            if (e.key === 'Enter' && input.value.trim() !== '') {
-                sendMessage();
-            }
-        });
-
-        sendBtn.addEventListener('click', function() {
-            if (input.value.trim() !== '') {
-                sendMessage();
-            }
-        });
-
-        function sendMessage() {
-            const message = input.value.trim();
-            const productId = input.getAttribute('data-product-id');
-
-            if (!productId) {
-                alert('Pilih produk terlebih dahulu.');
-                return;
-            }
-
-            fetch('/storeMessage', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                    },
-                    body: JSON.stringify({
-                        product_id: productId,
-                        message: message,
-                        role: 'CUSTOMER'
                     })
-                })
-                .then(response => {
-                    if (!response.ok) throw new Error('Gagal mengirim pesan');
-                    return response.json();
-                })
-                .then(data => {
-                    input.value = '';
-                    fetchChatMessages(productId);
-                })
-                .catch(error => {
-                    console.error(error);
-                    alert('Terjadi kesalahan saat mengirim pesan.');
-                });
-        }
-    </script>
+                    .catch(error => {
+                        console.error('Error fetching messages:', error);
+                        // Opsi: Tampilkan pesan error ke pengguna
+                        const chatMessagesContainer = document.getElementById('chatMessages');
+                        if (chatMessagesContainer) {
+                            chatMessagesContainer.innerHTML =
+                                `<p class="text-center text-danger">Failed to load messages: ${error.message}</p>`;
+                        }
+                    });
+            }
 
+            /**
+             * Mengirim pesan chat baru.
+             */
+            function sendMessage() {
+                const chatInput = document.getElementById('chatInput');
+                // Pastikan input chat ditemukan
+                if (!chatInput) {
+                    console.error('Error: Chat input (ID: chatInput) not found!');
+                    return;
+                }
+
+                const message = chatInput.value.trim();
+                const productId = chatInput.getAttribute('data-product-id');
+
+                // Validasi input
+                if (!productId) {
+                    alert('Pilih produk terlebih dahulu.');
+                    return;
+                }
+                if (message === '') {
+                    // Tidak mengirim pesan kosong
+                    return;
+                }
+                if (chatInput.disabled) { // Jangan kirim jika input disabled
+                    console.warn('Chat input is disabled.');
+                    return;
+                }
+
+                fetch('/storeMessage', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': CSRF_TOKEN
+                        },
+                        body: JSON.stringify({
+                            product_id: productId,
+                            message: message,
+                            role: 'CUSTOMER'
+                        })
+                    })
+                    .then(response => {
+                        if (!response.ok) {
+                            // Jika respons bukan OK, coba parse JSON error atau throw error generik
+                            return response.json().then(err => {
+                                throw new Error(err.message ||
+                                    `Failed to send message: ${response.status}`);
+                            });
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        chatInput.value = '';
+                        fetchChatMessages(productId);
+                    })
+                    .catch(error => {
+                        console.error('Error sending message:', error);
+                        alert('Terjadi kesalahan saat mengirim pesan: ' + error.message);
+                    });
+            }
+
+            // --- Event Listeners setelah DOM siap ---
+
+            // 1. Event listener untuk setiap item produk (saat mengklik item produk)
+            document.querySelectorAll('.product-item').forEach(item => {
+                item.addEventListener('click', function(event) {
+                    event
+                .preventDefault();
+
+
+                    // Ambil data dari atribut data-*
+                    const productId = this.getAttribute('data-product-id');
+                    const productStatus = this.getAttribute('data-product-status');
+                    const productName = this.getAttribute('data-product-name');
+                    const productPrice = this.getAttribute('data-product-price');
+                    const productMedia = this.getAttribute('data-product-image');
+                    const productMediaType = this.getAttribute('data-product-media-type');
+
+                    currentProductId = productId;
+
+                    // Dapatkan referensi ke panel-panel
+                    const productListPanel = document.getElementById('product-list-panel');
+                    const chatPanel = document.getElementById('chat-panel');
+
+                    // Sembunyikan daftar produk, tampilkan panel chat
+                    if (productListPanel) productListPanel.style.display = 'none';
+                    if (chatPanel) chatPanel.style.display = 'block';
+
+                    // Update informasi produk di panel chat
+                    const chatProductName = document.getElementById('chat-product-name');
+                    const productTitle = document.getElementById('productTitle');
+                    const productPriceEl = document.getElementById('productPrice');
+
+                    if (chatProductName) chatProductName.innerText = productName;
+                    if (productTitle) productTitle.innerText = productName;
+                    if (productPriceEl) productPriceEl.innerText = productPrice;
+
+                    // Tampilkan media produk (gambar/video)
+                    const mediaContainer = document.getElementById('productMediaContainer');
+                    if (mediaContainer) {
+                        mediaContainer.innerHTML = '';
+
+                        if (productMedia) {
+                            const fullUrl = BACKEND_BASE_URL + '/api' +
+                            productMedia;
+
+                            if (productMediaType === 'video') {
+                                const videoElement = document.createElement('video');
+                                videoElement.src = fullUrl;
+                                videoElement.alt = 'Product Video';
+                                videoElement.autoplay =
+                                false;
+                                videoElement.loop = false;
+                                videoElement.muted = true;
+                                videoElement.preload = 'metadata';
+                                videoElement.style.cssText =
+                                    'width: 100%; height: 100%; object-fit: cover; border-radius: 10px;';
+                                mediaContainer.appendChild(videoElement);
+                            } else {
+                                const imgElement = document.createElement('img');
+                                imgElement.src = fullUrl;
+                                imgElement.alt = 'Product Image';
+                                imgElement.style.cssText =
+                                    'width: 100%; height: 100%; object-fit: cover; border-radius: 10px;';
+                                mediaContainer.appendChild(imgElement);
+                            }
+                        } else {
+                            // Placeholder jika tidak ada media
+                            const placeholderElement = document.createElement('img');
+                            placeholderElement.src =
+                                'https://png.pngtree.com/png-vector/20190417/ourmid/pngtree-vector-question-mark-icon-png-image_947159.jpg';
+                            placeholderElement.alt = 'No Media Available';
+                            placeholderElement.style.cssText =
+                                'width: 100%; height: 100%; object-fit: cover; border-radius: 10px;';
+                            mediaContainer.appendChild(placeholderElement);
+                        }
+                    }
+
+                    // Atur status input chat berdasarkan status produk
+                    const chatInput = document.getElementById('chatInput');
+                    const sendBtn = document.getElementById('sendBtn');
+
+                    if (chatInput) chatInput.setAttribute('data-product-id',
+                    productId);
+
+                    if (productStatus === 'rejected') {
+                        if (chatInput) {
+                            chatInput.disabled = true;
+                            chatInput.placeholder = 'Product rejected, chat disabled.';
+                        }
+                        if (sendBtn) sendBtn.classList.add('disabled');
+                    } else if (productStatus === 'delivered') {
+                        if (chatInput) {
+                            chatInput.disabled = true;
+                            chatInput.placeholder = 'Product completed, chat disabled.';
+                        }
+                        if (sendBtn) sendBtn.classList.add('disabled');
+                    } else {
+                        if (chatInput) {
+                            chatInput.disabled = false;
+                            chatInput.placeholder = 'Type message';
+                        }
+                        if (sendBtn) sendBtn.classList.remove('disabled');
+                    }
+
+                    fetchChatMessages(productId);
+                });
+            });
+
+            // 2. Event listener untuk tombol 'Back to Product List'
+            const backToProductsBtn = document.getElementById('back-to-products');
+            if (backToProductsBtn) {
+                backToProductsBtn.addEventListener('click', function() {
+                    const productListPanel = document.getElementById('product-list-panel');
+                    const chatPanel = document.getElementById('chat-panel');
+                    if (productListPanel) productListPanel.style.display = 'block';
+                    if (chatPanel) chatPanel.style.display = 'none';
+                    currentProductId = null;
+                });
+            }
+
+            // 3. Event listener untuk mengirim pesan via Enter di input chat
+            const chatInput = document.getElementById('chatInput');
+            if (chatInput) {
+                chatInput.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter' && chatInput.value.trim() !== '' && !chatInput.disabled) {
+                        sendMessage();
+                    }
+                });
+            }
+
+            // 4. Event listener untuk mengirim pesan via tombol 'Send'
+            const sendBtn = document.getElementById('sendBtn');
+            if (sendBtn) {
+                sendBtn.addEventListener('click', function() {
+                    if (chatInput && chatInput.value.trim() !== '' && !chatInput.disabled) {
+                        sendMessage();
+                    }
+                });
+            }
+
+            setInterval(() => {
+                if (currentProductId) {
+                    fetchChatMessages(currentProductId);
+                }
+            }, 3000);
+        });
+    </script>
 @stop
