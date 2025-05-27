@@ -1,0 +1,2 @@
+DROP TABLE IF EXISTS capital;
+DROP TABLE IF EXISTS invalid_token;
