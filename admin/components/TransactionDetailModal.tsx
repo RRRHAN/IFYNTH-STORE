@@ -56,7 +56,7 @@ const TransactionDetailModal: React.FC<Props> = ({
                 Customer Name: {transaction.ShippingAddress.Name}
               </ThemedText>
               <ThemedText>
-                Total Amount: Rp{" "}
+                Total Amount: Rp
                 {parseInt(transaction.TotalAmount || "0").toLocaleString()}
               </ThemedText>
               <ThemedText>
@@ -82,14 +82,14 @@ const TransactionDetailModal: React.FC<Props> = ({
                 Zip Code: {transaction.ShippingAddress.ZipCode}
               </ThemedText>
               <ThemedText>
-                Destination Label:{" "}
+                Destination Label:
                 {transaction.ShippingAddress.DestinationLabel}
               </ThemedText>
               <ThemedText>
                 Courier: {transaction.ShippingAddress.Courir}
               </ThemedText>
               <ThemedText>
-                Shipping Cost: Rp{" "}
+                Shipping Cost: Rp
                 {parseInt(
                   transaction.ShippingAddress.ShippingCost || "0"
                 ).toLocaleString()}
@@ -125,7 +125,7 @@ const TransactionDetailModal: React.FC<Props> = ({
                           {detail.Quantity}
                         </ThemedText>
                         <ThemedText style={styles.tableCell}>
-                          Rp {totalPrice.toLocaleString()}{" "}
+                          Rp {totalPrice.toLocaleString()}
                         </ThemedText>
                       </View>
                     );

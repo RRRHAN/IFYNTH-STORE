@@ -94,10 +94,9 @@ const ProfitProductChart: React.FC<ProfitChartProps> = ({
 
       {/* Manual Legend */}
       <View style={styles.legendContainer}>
-        {" "}
         {/* Dipisahkan */}
         <View style={styles.legendItem}>
-          {" "}
+
           {/* Dipisahkan */}
           <View
             style={[
@@ -106,13 +105,13 @@ const ProfitProductChart: React.FC<ProfitChartProps> = ({
             ]}
           />
           <ThemedText style={[styles.legendText, { color: chartColors.text }]}>
-            {" "}
+  
             {/* Dipisahkan */}
             Modal
           </ThemedText>
         </View>
         <View style={styles.legendItem}>
-          {" "}
+
           {/* Dipisahkan */}
           <View
             style={[
@@ -121,7 +120,7 @@ const ProfitProductChart: React.FC<ProfitChartProps> = ({
             ]}
           />
           <ThemedText style={[styles.legendText, { color: chartColors.text }]}>
-            {" "}
+  
             {/* Dipisahkan */}
             Income
           </ThemedText>
