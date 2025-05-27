@@ -32,7 +32,10 @@ import { ScrollView } from "react-native";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { Platform } from "react-native";
 
-import { dummyProfitProducts, dummyTransactionReports } from "@/components/DataDummy/home";
+import {
+  dummyProfitProducts,
+  dummyTransactionReports,
+} from "@/components/DataDummy/home";
 
 export default function HomeScreen() {
   const colorScheme = useColorScheme();
@@ -220,7 +223,7 @@ export default function HomeScreen() {
                       height={380}
                     />
                   </View>
-                                    <View
+                  <View
                     style={{
                       flex: 1,
                       paddingTop: width < 1000 ? 40 : 20,
