@@ -123,7 +123,7 @@ const ProductsScreen = () => {
             source={{
               uri:
                 item.ProductImages && item.ProductImages.length > 0
-                  ? `${BASE_URL}${item.ProductImages[0].URL}`
+                  ? `${BASE_URL}/api${item.ProductImages[0].URL}`
                   : "https://img.lovepik.com/free-png/20210919/lovepik-question-element-png-image_401016497_wh1200.png",
             }}
           />

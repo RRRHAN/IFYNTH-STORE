@@ -49,7 +49,7 @@ export default function OfferDetailModal({ product }: OfferDetailModalProps) {
 
       await Promise.all(
         product.Files.map(async (file) => {
-          const url = `${BASE_URL}${file.URL}`;
+          const url = `${BASE_URL}/api${file.URL}`;
           if (isVideo(url)) {
             try {
               if (Platform.OS === "web") {
@@ -76,7 +76,7 @@ export default function OfferDetailModal({ product }: OfferDetailModalProps) {
     processThumbnails();
 
     if (product?.Files && product.Files.length > 0) {
-      setSelectedMedia(`${BASE_URL}${product.Files[0].URL}`);
+      setSelectedMedia(`${BASE_URL}/api${product.Files[0].URL}`);
     } else {
       setSelectedMedia("https://img.lovepik.com/free-png/20210919/lovepik-question-element-png-image_401016497_wh1200.png");
     }
@@ -114,17 +114,17 @@ export default function OfferDetailModal({ product }: OfferDetailModalProps) {
           >
             {product.Files?.map((file) => {
               const thumbUrl =
-                thumbnailUrls[file.ID] || `${BASE_URL}${file.URL}`;
+                thumbnailUrls[file.ID] || `${BASE_URL}/api${file.URL}`;
               return (
                 <TouchableOpacity
                   key={file.ID}
-                  onPress={() => setSelectedMedia(`${BASE_URL}${file.URL}`)}
+                  onPress={() => setSelectedMedia(`${BASE_URL}/api${file.URL}`)}
                 >
                   <Image
                     source={{ uri: thumbUrl }}
                     style={[
                       styles.thumbnail,
-                      selectedMedia === `${BASE_URL}${file.URL}` &&
+                      selectedMedia === `${BASE_URL}/api${file.URL}` &&
                         styles.activeThumbnail,
                     ]}
                   />
