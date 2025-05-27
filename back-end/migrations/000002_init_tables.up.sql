@@ -77,7 +77,7 @@ CREATE TABLE transactions (
     total_amount DECIMAL(12,2) NOT NULL,
     payment_method VARCHAR(50) NOT NULL DEFAULT 'Bank Transfer',
     payment_proof VARCHAR(255) NOT NULL,
-    status VARCHAR(20) DEFAULT 'pending' CHECK (status IN ('pending', 'proccess', 'canceled', 'success')),
+    status VARCHAR(20) DEFAULT 'pending',
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     FOREIGN KEY (user_id) REFERENCES customer(id)
