@@ -5,6 +5,7 @@ import {
   ScrollView,
   TouchableOpacity,
   View,
+  Platform,
 } from "react-native";
 import {
   VictoryChart,
@@ -19,6 +20,11 @@ import { TransactionReport } from "@/src/types/home";
 import { useColorScheme } from "@/hooks/useColorScheme";
 
 const screenWidth = Dimensions.get("window").width;
+
+const maxWidth =
+  Platform.OS === "web"
+    ? { width: screenWidth > 1000 ? 700 : screenWidth > 1500 ? 820 : 900 }
+    : { width: 500 };
 
 const formatDateTime = (date: Date) => {
   const options: Intl.DateTimeFormatOptions = {
@@ -97,9 +103,9 @@ const TransactionReportChart: React.FC<TransactionChartProps> = ({
     <ThemedView
       style={[
         styles.themedViewContainer,
+        maxWidth,
         {
           backgroundColor: colorScheme === "dark" ? "#1c1c1c" : "#f0f0f0",
-          width: screenWidth > 1000 ? 650 : 350,
         },
       ]}
     >
@@ -251,11 +257,11 @@ const styles = StyleSheet.create({
     width: 100,
     textAlign: "center",
   },
-    dateTimeText: {
+  dateTimeText: {
     fontSize: 16,
-    textAlign: 'center',
+    textAlign: "center",
     marginBottom: 10,
-    fontWeight: '500',
+    fontWeight: "500",
   },
 });
 

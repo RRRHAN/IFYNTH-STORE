@@ -23,7 +23,7 @@ const screenWidth = Dimensions.get("window").width;
 
 const maxWidth =
   Platform.OS === "web"
-    ? { width: screenWidth > 1000 ? 600 : 900 }
+    ? { width: screenWidth > 1000 ? 700 : screenWidth > 1500 ? 820 : 900 }
     : { width: 500 };
 
 type ProfitChartProps = {
