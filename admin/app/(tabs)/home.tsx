@@ -32,7 +32,7 @@ import { ScrollView } from "react-native";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { Platform } from "react-native";
 
-import { dummyProfitProducts } from "@/components/DataDummy/home";
+import { dummyProfitProducts, dummyTransactionReports } from "@/components/DataDummy/home";
 
 export default function HomeScreen() {
   const colorScheme = useColorScheme();
@@ -144,7 +144,7 @@ export default function HomeScreen() {
                         alignItems: width < 1000 ? "center" : "flex-start",
                         justifyContent:
                           width < 1000 ? "center" : "space-between",
-                        gap: width < 1000 ? 20 : 0,
+                        gap: width < 1000 ? 20 : 20,
                       },
                     ]}
                   >
@@ -175,52 +175,66 @@ export default function HomeScreen() {
                         />
                       </View>
                     </View>
-                    <View
-                      style={{
-                        flex: 1,
-                        paddingTop: width < 1000 ? 40 : 0,
-                        top:
-                          Platform.OS === "web"
-                            ? 20
-                            : -(contentTotalHeight - 1200),
-                      }}
-                    >
-                      <TransactionReportTable
-                        transactionReport={transactionReport}
-                        height={totalTableHeight || 277}
-                      />
-                    </View>
-                  </View>
-                )}
-                {totalTransactionUser && (
-                  <View
-                    style={[
-                      styles.totalTablesContainer,
-                      {
-                        top:
-                          Platform.OS === "web"
-                            ? 0
-                            : -(contentTotalHeight - 1100),
-                      },
-                    ]}
-                  >
-                    <TotalTransactionUserTable
-                      totalTransactionUser={totalTransactionUser}
-                    />
+                    {totalTransactionUser && (
+                      <View
+                        style={[
+                          styles.totalTablesContainer,
+                          {
+                            top:
+                              Platform.OS === "web"
+                                ? 0
+                                : -(contentTotalHeight - 1100),
+                          },
+                        ]}
+                      >
+                        <TotalTransactionUserTable
+                          totalTransactionUser={totalTransactionUser}
+                        />
+                      </View>
+                    )}
                   </View>
                 )}
                 <View
-                  style={{
-                    flex: 1,
-                    paddingTop: width < 1000 ? 40 : 0,
-                    top:
-                      Platform.OS === "web" ? 20 : -(contentTotalHeight - 1200),
-                  }}
+                  style={[
+                    styles.sectionRow,
+                    {
+                      flexDirection: width < 1000 ? "column" : "row",
+                      alignItems: width < 1000 ? "center" : "flex-start",
+                      justifyContent: width < 1000 ? "center" : "space-between",
+                      gap: width < 1000 ? 20 : 20,
+                    },
+                  ]}
                 >
-                  <ProfitProductChart
-                    ProfitProduct={dummyProfitProducts}
-                    height={500}
-                  />
+                  <View
+                    style={{
+                      flex: 1,
+                      paddingTop: width < 1000 ? 40 : 20,
+                      top:
+                        Platform.OS === "web"
+                          ? 20
+                          : -(contentTotalHeight - 1200),
+                    }}
+                  >
+                    <TransactionReportTable
+                      transactionReport={dummyTransactionReports}
+                      height={380}
+                    />
+                  </View>
+                                    <View
+                    style={{
+                      flex: 1,
+                      paddingTop: width < 1000 ? 40 : 20,
+                      top:
+                        Platform.OS === "web"
+                          ? 20
+                          : -(contentTotalHeight - 1200),
+                    }}
+                  >
+                    <ProfitProductChart
+                      ProfitProduct={dummyProfitProducts}
+                      height={380}
+                    />
+                  </View>
                 </View>
                 {(!productCount ||
                   !transactionCount ||
