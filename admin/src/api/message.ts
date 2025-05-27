@@ -6,7 +6,7 @@ import { MessageData } from "../request/messageReq";
     const authToken = await getAuthToken();
   
     try {
-      const response = await fetch(`${BASE_URL}/message`, {
+      const response = await fetch(`${BASE_URL}/api/message`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${authToken}`,
@@ -29,7 +29,7 @@ import { MessageData } from "../request/messageReq";
     const authToken = await getAuthToken();
   
     try {
-      const response = await fetch(`${BASE_URL}/message/${productId}`, {
+      const response = await fetch(`${BASE_URL}/api/message/${productId}`, {
         method: "GET",
         headers: {
           Authorization: `Bearer ${authToken}`,

@@ -44,13 +44,13 @@
                                                                                     style="border-radius: 50%; object-fit: cover;"
                                                                                     muted preload="metadata">
                                                                                     <source
-                                                                                        src="{{ url('http://localhost:7777' . $file) }}"
+                                                                                        src="{{ url(config('app.back_end_base_url').'/api' . $file) }}"
                                                                                         type="video/mp4">
                                                                                     Your browser does not support the video
                                                                                     tag.
                                                                                 </video>
                                                                             @else
-                                                                                <img src="{{ url('http://localhost:7777' . $file) }}"
+                                                                                <img src="{{ url(config('app.back_end_base_url').'/api' . $file) }}"
                                                                                     alt="avatar"
                                                                                     class="d-flex align-self-center me-3"
                                                                                     width="70" height="70"
@@ -264,7 +264,7 @@
                 mediaContainer.innerHTML = '';
 
                 if (productMedia) {
-                    const fullUrl = 'http://localhost:7777' + productMedia;
+                    const fullUrl = config('app.back_end_base_url').'/api' + productMedia;
 
                     if (productMediaType === 'video') {
                         const videoElement = document.createElement('video');

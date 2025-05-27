@@ -21,7 +21,7 @@ class CartController extends Controller
         try {
             $response = Http::withHeaders([
                 'Authorization' => 'Bearer ' . $token,
-            ])->asJson()->post('http://localhost:7777/cart', ['product_id' => $product_id, 'size' => $validate['size'], 'quantity' => (int) $validate['quantity']]);
+            ])->asJson()->post(config('app.back_end_base_url').'/api/cart', ['product_id' => $product_id, 'size' => $validate['size'], 'quantity' => (int) $validate['quantity']]);
 
             if ($response->successful()) {
                 $totalCart = session('total_cart', 0);
@@ -50,7 +50,7 @@ class CartController extends Controller
         try {
             $response = Http::withHeaders([
                 'Authorization' => 'Bearer ' . $token
-            ])->get('http://localhost:7777/cart');
+            ])->get(config('app.back_end_base_url').'/api/cart');
 
             if ($response->successful() && $response->json('errors') === null) {
                 $cart = collect($response->json()['data']);
@@ -80,7 +80,7 @@ class CartController extends Controller
         try {
             $response = Http::withHeaders([
                 'Authorization' => 'Bearer ' . $token
-            ])->put('http://localhost:7777/cart', [
+            ])->put(config('app.back_end_base_url').'/api/cart', [
                 'product_id' => $product_id, 
                 'cart_item_id' => $cart_item_id,
                 'size' => $request['size'],
@@ -107,7 +107,7 @@ class CartController extends Controller
         try {
             $response = Http::withHeaders([
                 'Authorization' => 'Bearer ' . $token
-            ])->delete('http://localhost:7777/cart/delete', ['cart_item_id' => $id]);
+            ])->delete(config('app.back_end_base_url').'/api/cart/delete', ['cart_item_id' => $id]);
 
             if ($response->successful() && $response->json('errors') === null) {
 

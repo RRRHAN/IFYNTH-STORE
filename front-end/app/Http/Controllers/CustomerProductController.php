@@ -37,7 +37,7 @@ class CustomerProductController extends Controller
         try {
             $client = new Client();
 
-            $response = $client->post($this->goApiUrl . '/cusproduct', [
+            $response = $client->post(config('app.back_end_base_url').'/api/cusproduct', [
                 'headers' => [
                     'Authorization' => 'Bearer ' . $token,
                 ],
@@ -89,7 +89,7 @@ class CustomerProductController extends Controller
         
             $response = Http::withHeaders([
                 'Authorization' => 'Bearer ' . $token
-            ])->get($this->goApiUrl . '/cusproduct', $queryParams);
+            ])->get(config('app.back_end_base_url').'/api/cusproduct', $queryParams);
         
             if ($response->successful() && $response->json('errors') === null) {
                 $allProducts = collect($response->json('data'));
@@ -117,7 +117,7 @@ class CustomerProductController extends Controller
         try {
             $response = Http::withHeaders([
                 'Authorization' => 'Bearer ' . $token
-            ])->delete($this->goApiUrl . '/cusproduct', ['product_id' => $productId]);
+            ])->delete(config('app.back_end_base_url').'/api/cusproduct', ['product_id' => $productId]);
 
             if ($response->successful() && $response->json('errors') === null) {
 

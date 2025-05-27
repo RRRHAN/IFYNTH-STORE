@@ -4,7 +4,7 @@ import { ProductData, UpdateProductData } from "../request/productReq";
 
 export const fetchProducts = async (): Promise<Product[]> => {
   const token = await getAuthToken();
-  const getAllUrl = `${BASE_URL}/product`;
+  const getAllUrl = `${BASE_URL}/api/product`;
 
   const response = await fetch(getAllUrl, {
     headers: {
@@ -45,7 +45,7 @@ export const addProduct = async (productData: ProductData) => {
   formData.append("stock_details", JSON.stringify(productData.sizes));
 
   try {
-    const PostProduct = `${BASE_URL}/product/addProduct`;
+    const PostProduct = `${BASE_URL}/api/product/addProduct`;
     const response = await fetch(PostProduct, {
       method: "POST",
       headers: { Authorization: `Bearer ${authToken}` },
@@ -61,7 +61,7 @@ export const addProduct = async (productData: ProductData) => {
 
 export const deleteProduct = async (productId: string) => {
   const token = await getAuthToken();
-  const deleteUrl = `${BASE_URL}/product/${productId}`;
+  const deleteUrl = `${BASE_URL}/api/product/${productId}`;
 
   try {
     const response = await fetch(deleteUrl, {
@@ -123,7 +123,7 @@ for (const pair of formData.entries()) {
 
 
   try {
-    const updateUrl = `${BASE_URL}/product/update/${productData.productId}`;
+    const updateUrl = `${BASE_URL}/api/product/update/${productData.productId}`;
     const response = await fetch(updateUrl, {
       method: "PUT",
       headers: {

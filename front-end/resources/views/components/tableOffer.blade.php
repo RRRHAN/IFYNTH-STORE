@@ -27,11 +27,11 @@
                                     <video width="80" height="80"
                                         style="object-fit: cover; border-radius: 8px; pointer-events: none;" muted
                                         preload="metadata">
-                                        <source src="{{ url('http://localhost:7777' . $file) }}" type="video/mp4">
+                                        <source src="{{ url(config('app.back_end_base_url').'/api' . $file) }}" type="video/mp4">
                                         Your browser does not support the video tag.
                                     </video>
                                 @else
-                                    <img src="{{ url('http://localhost:7777' . $file) }}" alt="image" width="80"
+                                    <img src="{{ url(config('app.back_end_base_url').'/api' . $file) }}" alt="image" width="80"
                                         height="80" style="object-fit: cover; border-radius: 8px;">
                                 @endif
                             @else
@@ -50,7 +50,7 @@
                                 data-description="{{ $product['Description'] ?? '-' }}"
                                 data-status="{{ ucfirst($product['Status'] ?? '-') }}"
                                 data-images='@json(collect($product['Files'] ?? [])->map(function ($file) {
-                                        return url('http://localhost:7777' . ($file['URL'] ?? ''));
+                                        return url(config('app.back_end_base_url').'/api' . ($file['URL'] ?? ''));
                                     }))'>
                                 <i class="fas fa-eye"></i>
                             </a>

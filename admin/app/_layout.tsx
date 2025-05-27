@@ -34,7 +34,7 @@ export default function RootLayout() {
         }
 
         try {
-          const response = await fetch(`${BASE_URL}/user/check-jwt`, {
+          const response = await fetch(`${BASE_URL}/api/user/check-jwt`, {
             method: 'GET',
             headers: {
               'Content-Type': 'application/json',
