@@ -1,11 +1,18 @@
-import React, { useRef, useState } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import {
   Dimensions,
   StyleSheet,
   ScrollView,
   TouchableOpacity,
+  View,
 } from "react-native";
-import { LineChart } from "react-native-chart-kit";
+import {
+  VictoryChart,
+  VictoryArea,
+  VictoryAxis,
+  VictoryTooltip,
+  VictoryTheme,
+} from "victory-native";
 import { ThemedView } from "@/components/ThemedView";
 import { ThemedText } from "@/components/ThemedText";
 import { TransactionReport } from "@/src/types/home";
@@ -13,27 +20,18 @@ import { useColorScheme } from "@/hooks/useColorScheme";
 
 const screenWidth = Dimensions.get("window").width;
 
-const getMaxVisibleData = (width: number) => {
-  if (width < 401) return 4;
-  if (width < 500) return 5;
-  if (width < 600) return 6;
-  if (width < 700) return 7;
-  if (width < 800) return 9;
-  if (width < 900) return 10;
-  if (width < 1000) return 12;
-  if (width < 1350) return 8;
-  if (width < 1550) return 10;
-  return 12;
-};
-
-const getMinWidth = (screenWidth: number) => {
-  if (screenWidth > 1500) {
-    return 880;
-  } else if (screenWidth > 768) {
-    return 600;
-  } else {
-    return 350;
-  }
+const formatDateTime = (date: Date) => {
+  const options: Intl.DateTimeFormatOptions = {
+    weekday: "long",
+    day: "2-digit",
+    month: "long",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+    hourCycle: "h23",
+  };
+  return date.toLocaleDateString("id-ID", options);
 };
 
 type TransactionChartProps = {
@@ -43,210 +41,221 @@ type TransactionChartProps = {
 
 const TransactionReportChart: React.FC<TransactionChartProps> = ({
   transactionReport,
-  height = 277,
+  height = 350,
 }) => {
+  const transactions = transactionReport || [];
   const colorScheme = useColorScheme();
-  const scrollRef = useRef<ScrollView>(null);
+  const [currentTime, setCurrentTime] = useState(new Date());
 
-  const [tooltipData, setTooltipData] = useState<{
-    value: number;
-    x: number;
-    y: number;
-    date: string;
-  } | null>(null);
+  useEffect(() => {
+    const timerId = setInterval(() => {
+      setCurrentTime(new Date());
+    }, 1000);
 
-  const labels = (transactionReport ?? []).map((r) => {
-    const date = new Date(r.Date);
+    return () => clearInterval(timerId);
+  }, []);
+
+  const formattedCurrentTime = formatDateTime(currentTime);
+
+  const dateData = transactions.map((t) => {
+    const date = new Date(t.Date);
     const day = String(date.getDate()).padStart(2, "0");
     const month = String(date.getMonth() + 1).padStart(2, "0");
     const year = date.getFullYear();
     return `${day}-${month}-${year}`;
   });
 
-  const data = (transactionReport ?? []).map((r) => r.TotalAmount / 1000);
-  const actualTotalAmounts = (transactionReport ?? []).map(
-    (r) => r.TotalAmount
-  );
+  const transactionData = transactions.map((t) => ({
+    x: t.Date,
+    y: t.TotalAmount,
+    label: `Nomina;: Rp ${t.TotalAmount.toLocaleString("id-ID")}`,
+  }));
 
-  const MAX_VISIBLE_DATA = getMaxVisibleData(screenWidth);
-  const LABEL_WIDTH = 70;
-  const MIN_WIDTH = getMinWidth(screenWidth);
-
-  const visibleCount = Math.min(labels.length, MAX_VISIBLE_DATA);
-  const scrollContentWidth = Math.max(labels.length * LABEL_WIDTH, MIN_WIDTH);
-
-  const chartConfig = {
-    backgroundColor: colorScheme === "dark" ? "#151718" : "#fff",
-    backgroundGradientFrom: colorScheme === "dark" ? "#151718" : "#fff",
-    backgroundGradientTo: colorScheme === "dark" ? "#151718" : "#fff",
-    decimalPlaces: 0,
-    color: (opacity = 1) => (colorScheme === "dark" ? "#ffffff" : "#111827"),
-    labelColor: (opacity = 1) =>
-      colorScheme === "dark" ? "#ffffff" : "#111827",
-    style: {
-      borderRadius: 16,
-    },
-    propsForDots: {
-      r: "5",
-      strokeWidth: "2",
-      stroke: colorScheme === "dark" ? "#ffffff" : "#111827",
-    },
+  const chartColors = {
+    transaction: "#8a4fff",
+    text: colorScheme === "dark" ? "#fff" : "#000",
   };
 
-  const LABEL_COUNT = 5;
-  const adjustedChartHeight = screenWidth > 1000 ? height - 25 : 250;
-  const [productTableHeight, setProductTableHeight] = useState(0);
-  const labelVerticalSpacing = productTableHeight / 6.3;
+  // --- Perhitungan untuk Label Sumbu Y Manual ---
+  const allValues = [...transactionData.map((d) => d.y)];
+  const maxVal = allValues.length > 0 ? Math.max(...allValues) : 0;
+  const domainYMax = maxVal * 1.1;
+  const minVal = 0;
+
+  const numYTicks = 5;
+  const yTickValues = Array.from({ length: numYTicks + 1 }, (_, i) => {
+    return minVal + ((domainYMax - minVal) / numYTicks) * i;
+  });
+
+  const chartPadding = { top: 20, bottom: 50, left: 10, right: 20 };
+  const plotAreaHeight = height - chartPadding.top - chartPadding.bottom;
+
+  const tickLabelFontSize = 10;
+  // --- Akhir Perhitungan untuk Label Sumbu Y Manual ---
 
   return (
     <ThemedView
-      style={[styles.container]}
-      onLayout={(event) => {
-        setProductTableHeight(event.nativeEvent.layout.height);
-      }}
+      style={[
+        styles.themedViewContainer,
+        {
+          backgroundColor: colorScheme === "dark" ? "#1c1c1c" : "#f0f0f0",
+          width: screenWidth > 1000 ? 650 : 350,
+        },
+      ]}
     >
       <ThemedText style={styles.title}>Transaction Report</ThemedText>
-      <ThemedView style={{ flexDirection: "row" }}>
-        <ThemedView style={[styles.yAxisContainer]}>
-          {[...Array(LABEL_COUNT)].map((_, i) => {
-            const max = Math.max(...data);
-            const yValue =
-              data.length > 0
-                ? Math.round((max / (LABEL_COUNT - 1)) * (LABEL_COUNT - 1 - i))
-                : 0;
 
-            const labelStyle: any = { ...styles.yAxisLabel };
-            if (i === 0) {
-              labelStyle.paddingTop = 4;
-            } else if (i === LABEL_COUNT - 1) {
-              labelStyle.paddingBottom = labelVerticalSpacing;
-            } else {
-            }
-
-            return (
-              <ThemedText key={i} style={labelStyle}>
-                {yValue}k
-              </ThemedText>
-            );
-          })}
-        </ThemedView>
-
-        {/* Chart with horizontal scroll */}
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={true}
-          contentContainerStyle={{
-            width: scrollContentWidth,
-          }}
-          ref={scrollRef}
-          onContentSizeChange={() => {
-            if (scrollRef.current) {
-              scrollRef.current.scrollToEnd({ animated: true });
-            }
-          }}
+      <ThemedText style={[styles.dateTimeText, { color: chartColors.text }]}>
+        {formattedCurrentTime}
+      </ThemedText>
+      {/* Kontainer untuk Sumbu Y Manual dan ScrollView (Chart + Sumbu X) */}
+      <View style={styles.chartAndYAxisContainer}>
+        {/* Label Sumbu Y Utama */}
+        <ThemedText
+          style={[
+            styles.yAxisMainLabel,
+            { color: chartColors.text, top: height / 2 - 40, left: -50 },
+          ]}
         >
-          <LineChart
-            data={{
-              labels,
-              datasets: [{ data }],
-            }}
-            width={scrollContentWidth}
-            height={adjustedChartHeight}
-            yAxisSuffix="k"
-            yAxisInterval={1}
-            chartConfig={chartConfig}
-            bezier
-            style={styles.chart}
-            fromZero
-            withHorizontalLabels={false}
-            onDataPointClick={({ value, index, x, y }) => {
-              setTooltipData({
-                value: actualTotalAmounts[index],
-                x: x,
-                y: y,
-                date: labels[index],
-              });
-            }}
-          />
-          {tooltipData && (
-            <ThemedView
-              style={[
-                styles.tooltipContainer,
-                {
-                  left: tooltipData.x,
-                  top: tooltipData.y,
+          Nominal (Rp)
+        </ThemedText>
+
+        {/* Manual Y-Axis Labels */}
+        <View style={[styles.yAxisLabelsContainer, { height: height }]}>
+          {yTickValues
+            .slice()
+            .reverse()
+            .map((value, i) => {
+              const yPixelPosition =
+                domainYMax - minVal === 0
+                  ? chartPadding.top + plotAreaHeight
+                  : chartPadding.top +
+                    (1 - (value - minVal) / (domainYMax - minVal)) *
+                      plotAreaHeight;
+
+              return (
+                <ThemedText
+                  key={i}
+                  style={[
+                    styles.yAxisTickLabel,
+                    {
+                      fontSize: tickLabelFontSize,
+                      color: chartColors.text,
+                      top: yPixelPosition - tickLabelFontSize / 2,
+                      position: "absolute",
+                      marginLeft: 15,
+                    },
+                  ]}
+                >
+                  {(value / 1000).toFixed(0)}k
+                </ThemedText>
+              );
+            })}
+        </View>
+
+        <ScrollView horizontal>
+          <VictoryChart
+            width={Math.max(screenWidth, dateData.length * 150)}
+            height={height}
+            domain={{ y: [minVal, domainYMax] }}
+            theme={VictoryTheme.material}
+            padding={chartPadding}
+          >
+            {/* X-axis */}
+            <VictoryAxis
+              label="Nama Produk"
+              tickValues={dateData}
+              style={{
+                axisLabel: { padding: 40, fill: chartColors.text },
+                tickLabels: {
+                  textAnchor: "middle",
+                  fontSize: 10,
+                  fill: chartColors.text,
                 },
-              ]}
-            >
-              <ThemedText style={styles.tooltipText}>
-                {tooltipData.date}: Rp{" "}
-                {tooltipData.value.toLocaleString("id-ID")}
-              </ThemedText>
-              <TouchableOpacity
-                onPress={() => setTooltipData(null)}
-                style={styles.closeTooltipButton}
-              >
-                <ThemedText style={styles.closeTooltipText}>X</ThemedText>
-              </TouchableOpacity>
-            </ThemedView>
-          )}
+              }}
+            />
+
+            {/* Y-axis */}
+            <VictoryAxis
+              dependentAxis
+              tickValues={yTickValues}
+              tickFormat={(y) => `${(y / 1000).toFixed(0)}k`}
+              style={{
+                tickLabels: { fill: chartColors.text },
+                axisLabel: {
+                  padding: 30,
+                  fill: chartColors.text,
+                  fontSize: 10,
+                },
+                grid: {
+                  stroke: colorScheme === "dark" ? "#444" : "#ccc",
+                  strokeDasharray: "5, 5",
+                },
+              }}
+            />
+            <VictoryArea data={transactionData} />
+          </VictoryChart>
         </ScrollView>
-      </ThemedView>
+      </View>
     </ThemedView>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    borderRadius: 20,
-  },
-  chart: {
+  themedViewContainer: {
+    padding: 10,
     borderRadius: 20,
   },
   title: {
-    fontSize: 24,
+    fontSize: 22,
     fontWeight: "bold",
+    marginBottom: 10,
     textAlign: "center",
+  },
+  legendContainer: {
+    flexDirection: "row",
+    justifyContent: "center",
     marginBottom: 20,
     marginTop: 10,
   },
-  yAxisContainer: {
-    width: 40,
-    justifyContent: "space-between",
-    marginRight: 2,
-  },
-  yAxisLabel: {
-    fontSize: 12,
-    color: "#6b7280",
-    textAlign: "right",
-  },
-  tooltipContainer: {
-    position: "absolute",
-    backgroundColor: "rgba(0,0,0,0.8)",
-    borderRadius: 8,
-    paddingVertical: 6,
-    paddingHorizontal: 10,
-    zIndex: 100,
+  legendItem: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 5,
+    marginRight: 20,
   },
-  tooltipText: {
-    color: "#fff",
+  legendColorBox: {
+    width: 15,
+    height: 15,
+    borderRadius: 7.5,
+    marginRight: 5,
+  },
+  legendText: {
+    fontSize: 12,
+  },
+  chartAndYAxisContainer: {
+    flexDirection: "row",
+  },
+  yAxisLabelsContainer: {
+    width: 60,
+    position: "relative",
+  },
+  yAxisTickLabel: {
+    fontSize: 10,
+    position: "absolute",
+  },
+  yAxisMainLabel: {
+    position: "absolute",
     fontSize: 12,
     fontWeight: "bold",
+    transform: [{ rotate: "-90deg" }],
+    width: 100,
+    textAlign: "center",
   },
-  closeTooltipButton: {
-    marginLeft: 8,
-    paddingHorizontal: 5,
-    paddingVertical: 2,
-    borderRadius: 10,
-    backgroundColor: "rgba(255,255,255,0.2)",
-  },
-  closeTooltipText: {
-    color: "#fff",
-    fontSize: 10,
-    fontWeight: "bold",
+    dateTimeText: {
+    fontSize: 16,
+    textAlign: 'center',
+    marginBottom: 10,
+    fontWeight: '500',
   },
 });
 

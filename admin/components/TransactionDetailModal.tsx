@@ -143,7 +143,7 @@ const TransactionDetailModal: React.FC<Props> = ({
                 <TouchableOpacity onPress={() => setFullImageVisible(true)}>
                   <Image
                     source={{
-                      uri: `${BASE_URL}${transaction.PaymentProof}`,
+                      uri: `${BASE_URL}/api${transaction.PaymentProof}`,
                     }}
                     style={styles.paymentProofImage}
                   />
@@ -168,7 +168,7 @@ const TransactionDetailModal: React.FC<Props> = ({
       >
         <View style={styles.fullImageOverlay}>
           <Image
-            source={{ uri: `${BASE_URL}${transaction.PaymentProof}` }}
+            source={{ uri: `${BASE_URL}/api${transaction.PaymentProof}` }}
             style={styles.fullImage}
           />
           <Button title="Close" onPress={() => setFullImageVisible(false)} />

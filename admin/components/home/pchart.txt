@@ -6,7 +6,6 @@ import {
   VictoryTheme,
   VictoryGroup,
   VictoryAxis,
-  VictoryTooltip, // Tetap import jika Anda berencana menggunakannya
 } from "victory-native";
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
@@ -42,8 +41,8 @@ const ProfitProductChart: React.FC<ProfitChartProps> = ({
   }));
 
   const chartColors = {
-    capital: "#8a4fff",
-    income: "#22c55e",
+    capital: "#8a4fff", // Ungu
+    income: "#22c55e", // Hijau
     text: colorScheme === "dark" ? "#fff" : "#000",
   };
 
@@ -69,40 +68,65 @@ const ProfitProductChart: React.FC<ProfitChartProps> = ({
 
   return (
     <ThemedView
-      style={[
-        styles.themedViewContainer,
-        { backgroundColor: colorScheme === "dark" ? "#1c1c1c" : "#f0f0f0",
-          width: screenWidth > 1000 ? 650 : 350,
-         },
-      ]}
+      style={{
+        padding: 10,
+        borderRadius: 20,
+        backgroundColor: colorScheme === "dark" ? "#1c1c1c" : "#f0f0f0",
+        width: 800,
+      }}
     >
       <ThemedText
-        style={[styles.title]} // Dipisahkan
+        style={{
+          fontSize: 22,
+          fontWeight: "bold",
+          marginBottom: 10,
+          textAlign: "center",
+          color: chartColors.text,
+        }}
       >
         Laporan Keuangan Produk
       </ThemedText>
 
       {/* Manual Legend */}
-      <View style={styles.legendContainer}> {/* Dipisahkan */}
-        <View style={styles.legendItem}> {/* Dipisahkan */}
+      <View
+        style={{
+          flexDirection: "row",
+          justifyContent: "center",
+          marginBottom: 20,
+          marginTop: 10,
+        }}
+      >
+        <View
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+            marginRight: 20,
+          }}
+        >
           <View
-            style={[
-              styles.legendColorBox, // Dipisahkan
-              { backgroundColor: chartColors.capital },
-            ]}
+            style={{
+              width: 15,
+              height: 15,
+              borderRadius: 7.5,
+              backgroundColor: chartColors.capital,
+              marginRight: 5,
+            }}
           />
-          <ThemedText style={[styles.legendText, { color: chartColors.text }]}> {/* Dipisahkan */}
+          <ThemedText style={{ fontSize: 12, color: chartColors.text }}>
             Modal
           </ThemedText>
         </View>
-        <View style={styles.legendItem}> {/* Dipisahkan */}
+        <View style={{ flexDirection: "row", alignItems: "center" }}>
           <View
-            style={[
-              styles.legendColorBox, // Dipisahkan
-              { backgroundColor: chartColors.income },
-            ]}
+            style={{
+              width: 15,
+              height: 15,
+              borderRadius: 7.5,
+              backgroundColor: chartColors.income,
+              marginRight: 5,
+            }}
           />
-          <ThemedText style={[styles.legendText, { color: chartColors.text }]}> {/* Dipisahkan */}
+          <ThemedText style={{ fontSize: 12, color: chartColors.text }}>
             Income
           </ThemedText>
         </View>
@@ -120,7 +144,6 @@ const ProfitProductChart: React.FC<ProfitChartProps> = ({
         >
           Nominal (Rp)
         </ThemedText>
-
         {/* Manual Y-Axis Labels */}
         <View style={[styles.yAxisLabelsContainer, { height: height }]}>
           {yTickValues
@@ -158,10 +181,9 @@ const ProfitProductChart: React.FC<ProfitChartProps> = ({
           <VictoryChart
             width={Math.max(screenWidth, productNames.length * 150)}
             height={height}
-            domain={{ y: [minVal, domainYMax] }} // Ini bukan style, ini domain data
-            domainPadding={{ x: 50 }} // Ini bukan style, ini padding domain
-            theme={VictoryTheme.material} // Ini bukan style, ini tema
-            padding={chartPadding} // Ini bukan style, ini padding chart
+            domainPadding={{ x: 50 }}
+            theme={VictoryTheme.material}
+            padding={chartPadding}
           >
             {/* X-axis */}
             <VictoryAxis
@@ -170,6 +192,7 @@ const ProfitProductChart: React.FC<ProfitChartProps> = ({
               style={{
                 axisLabel: { padding: 40, fill: chartColors.text },
                 tickLabels: {
+                  angle: -40,
                   textAnchor: "middle",
                   fontSize: 10,
                   fill: chartColors.text,
@@ -180,124 +203,28 @@ const ProfitProductChart: React.FC<ProfitChartProps> = ({
             {/* Y-axis */}
             <VictoryAxis
               dependentAxis
-              tickValues={yTickValues} // Ini bukan style, ini tick values
-              tickFormat={(y) => `${(y / 1000).toFixed(0)}k`} // Ini bukan style, ini format tick
-              style={{
-                tickLabels: { fill: chartColors.text },
-                axisLabel: {
-                  padding: 30,
-                  fill: chartColors.text,
-                  fontSize: 10,
-                },
-                grid: { stroke: colorScheme === "dark" ? "#444" : "#ccc", strokeDasharray: "5, 5" },
-              }}
+              label="Jumlah (Rp)"
+              tickFormat={(y) => `${(y / 1000).toFixed(0)}k`}
             />
 
             {/* Bar chart */}
             <VictoryGroup
-              offset={50} // Ini bukan style, ini offset
-              colorScale={[chartColors.capital, chartColors.income]} // Ini bukan style, ini color scale
+              offset={50}
+              colorScale={[chartColors.capital, chartColors.income]}
               {...({} as any)}
             >
-              <VictoryBar
-                data={capitalData} // Ini bukan style, ini data
-                // Jika menggunakan tooltip, pastikan prop label dan labelComponent ada di sini
-                /*
-                labels={({ datum }) => datum.label}
-                labelComponent={
-                  <VictoryTooltip
-                    flyoutStyle={{
-                      fill: colorScheme === "dark" ? "#333" : "white",
-                      stroke: colorScheme === "dark" ? "#666" : "#ccc",
-                    }}
-                    style={{
-                      fontSize: 12,
-                      fill: chartColors.text,
-                    }}
-                    activateData={true}
-                    renderInPortal={true}
-                  />
-                }
-                events={[
-                  {
-                    target: "data",
-                    eventHandlers: {
-                      onPressIn: () => [{ mutation: (props) => ({ active: true }) }],
-                      onPressOut: () => [{ mutation: (props) => ({ active: undefined }) }],
-                    },
-                  },
-                ]}
-                */
-              />
-              <VictoryBar
-                data={incomeData} // Ini bukan style, ini data
-                // Jika menggunakan tooltip, pastikan prop label dan labelComponent ada di sini
-                /*
-                labels={({ datum }) => datum.label}
-                labelComponent={
-                  <VictoryTooltip
-                    flyoutStyle={{
-                      fill: colorScheme === "dark" ? "#333" : "white",
-                      stroke: colorScheme === "dark" ? "#666" : "#ccc",
-                    }}
-                    style={{
-                      fontSize: 12,
-                      fill: chartColors.text,
-                    }}
-                    activateData={true}
-                    renderInPortal={true}
-                  />
-                }
-                events={[
-                  {
-                    target: "data",
-                    eventHandlers: {
-                      onPressIn: () => [{ mutation: (props) => ({ active: true }) }],
-                      onPressOut: () => [{ mutation: (props) => ({ active: undefined }) }],
-                    },
-                  },
-                ]}
-                */
-              />
+              <VictoryBar data={capitalData} />
+              <VictoryBar data={incomeData} />
             </VictoryGroup>
           </VictoryChart>
         </ScrollView>
       </View>
+      {/* End Manual Y-Axis Labels */}
     </ThemedView>
   );
 };
 
 const styles = StyleSheet.create({
-  themedViewContainer: {
-    padding: 10,
-    borderRadius: 20,
-  },
-  title: {
-    fontSize: 22,
-    fontWeight: "bold",
-    marginBottom: 10,
-    textAlign: "center",
-  },
-  legendContainer: {
-    flexDirection: "row",
-    justifyContent: "center",
-    marginBottom: 20,
-    marginTop: 10,
-  },
-  legendItem: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginRight: 20,
-  },
-  legendColorBox: {
-    width: 15,
-    height: 15,
-    borderRadius: 7.5,
-    marginRight: 5,
-  },
-  legendText: {
-    fontSize: 12,
-  },
   chartAndYAxisContainer: {
     flexDirection: "row",
   },
@@ -307,7 +234,6 @@ const styles = StyleSheet.create({
   },
   yAxisTickLabel: {
     fontSize: 10,
-    position: "absolute",
   },
   yAxisMainLabel: {
     position: "absolute",

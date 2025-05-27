@@ -1,3 +1,5 @@
+import { TransactionReport } from "@/src/types/home";
+
 export interface TotalTransactionUser {
   UserID: string;
   CustomerName: string;
@@ -5,6 +7,39 @@ export interface TotalTransactionUser {
   TotalTransaction: number;
   TotalAmount: number;
 }
+
+export const dummyTransactionReports: TransactionReport[] = [
+  { Date: "2025-05-01", TotalAmount: 125000 },
+  { Date: "2025-05-02", TotalAmount: 150000 },
+  { Date: "2025-05-03", TotalAmount: 110000 },
+  { Date: "2025-05-04", TotalAmount: 180000 },
+  { Date: "2025-05-05", TotalAmount: 95000 },
+  { Date: "2025-05-06", TotalAmount: 200000 },
+  { Date: "2025-05-07", TotalAmount: 175000 },
+  { Date: "2025-05-08", TotalAmount: 220000 },
+  { Date: "2025-05-09", TotalAmount: 130000 },
+  { Date: "2025-05-10", TotalAmount: 250000 },
+  { Date: "2025-05-11", TotalAmount: 100000 },
+  { Date: "2025-05-12", TotalAmount: 160000 },
+  { Date: "2025-05-13", TotalAmount: 190000 },
+  { Date: "2025-05-14", TotalAmount: 145000 },
+  { Date: "2025-05-15", TotalAmount: 230000 },
+  { Date: "2025-05-16", TotalAmount: 115000 },
+  { Date: "2025-05-17", TotalAmount: 240000 },
+  { Date: "2025-05-18", TotalAmount: 185000 },
+  { Date: "2025-05-19", TotalAmount: 210000 },
+  { Date: "2025-05-20", TotalAmount: 170000 },
+  { Date: "2025-05-21", TotalAmount: 260000 },
+  { Date: "2025-05-22", TotalAmount: 135000 },
+  { Date: "2025-05-23", TotalAmount: 270000 },
+  { Date: "2025-05-24", TotalAmount: 195000 },
+  { Date: "2025-05-25", TotalAmount: 280000 },
+  { Date: "2025-05-26", TotalAmount: 205000 }, // Tanggal terakhir di screenshot Anda
+  { Date: "2025-05-27", TotalAmount: 300000 }, // Hari ini
+  { Date: "2025-05-28", TotalAmount: 215000 },
+  { Date: "2025-05-29", TotalAmount: 290000 },
+  { Date: "2025-05-30", TotalAmount: 225000 },
+];
 
 // Untuk digunakan di komponen atau di mana pun Anda memanggil data
 export const dummyTotalTransactionUsers: TotalTransactionUser[] = [
