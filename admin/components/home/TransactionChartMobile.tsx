@@ -16,7 +16,16 @@ const screenWidth = Dimensions.get("window").width;
 
 const maxWidth =
   Platform.OS === "web"
-    ? { width: screenWidth > 300 ? 400 : screenWidth > 1000 ? 700 : screenWidth > 1500 ? 820 : 900 }
+    ? {
+        width:
+          screenWidth > 1500
+            ? 750
+            : screenWidth > 1000
+            ? 800
+            : screenWidth > 400
+            ? 700
+            : 900,
+      }
     : { width: 380 };
 
 const getMaxVisibleData = (width: number) => {
@@ -66,7 +75,7 @@ const MTransactionReportChart: React.FC<TransactionChartProps> = ({
     const day = String(date.getDate()).padStart(2, "0");
     const month = String(date.getMonth() + 1).padStart(2, "0");
     const year = date.getFullYear();
-    return `${day}-${month}-${year}`;
+    return maxWidth.width > 400 ? `${day}-${month}-${year}` : `${day}-${month}`;
   });
 
   const data = (transactionReport ?? []).map((r) => r.TotalAmount / 1000);
@@ -171,6 +180,7 @@ const MTransactionReportChart: React.FC<TransactionChartProps> = ({
               });
             }}
           />
+
           {tooltipData && (
             <ThemedView
               style={[

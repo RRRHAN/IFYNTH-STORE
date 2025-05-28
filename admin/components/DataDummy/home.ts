@@ -1,12 +1,4 @@
-import { TransactionReport } from "@/src/types/home";
-
-export interface TotalTransactionUser {
-  UserID: string;
-  CustomerName: string;
-  PhoneNumber: string;
-  TotalTransaction: number;
-  TotalAmount: number;
-}
+import { TransactionReport, TotalTransactionUser } from "@/src/types/home";
 
 export const dummyTransactionReports: TransactionReport[] = [
   { Date: "2025-05-01", TotalAmount: 125000 },

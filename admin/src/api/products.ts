@@ -5,10 +5,6 @@ import { ProductData, UpdateProductData } from "../request/productReq";
 export const fetchProducts = async (): Promise<Product[]> => {
   try {
     const token = await getAuthToken();
-    if (!token) {
-      throw new Error("No auth token found");
-    }
-    
     const getAllUrl = `${BASE_URL}/api/product`;
 
     const response = await fetch(getAllUrl, {

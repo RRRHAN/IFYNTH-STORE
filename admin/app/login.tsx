@@ -1,4 +1,10 @@
-import { TouchableOpacity, Image, ScrollView, View } from "react-native";
+import {
+  TouchableOpacity,
+  Image,
+  ScrollView,
+  View,
+  Platform,
+} from "react-native";
 import { useRouter } from "expo-router";
 import { useState, useEffect } from "react";
 import { Checkbox, Provider as PaperProvider } from "react-native-paper";
@@ -124,11 +130,20 @@ export default function Login() {
                 },
               ]}
             >
-              <Checkbox
-                status={rememberMe ? "checked" : "unchecked"}
-                onPress={() => setRememberMe(!rememberMe)}
-                color="#2563eb"
-              />
+              {Platform.OS === "web" ? (
+                <Checkbox
+                  status={rememberMe ? "checked" : "unchecked"}
+                  onPress={() => setRememberMe(!rememberMe)}
+                  color="#2563eb"
+                />
+              ) : (
+                <Checkbox.Android
+                  status={rememberMe ? "checked" : "unchecked"}
+                  onPress={() => setRememberMe(!rememberMe)}
+                  color="#2563eb"
+                />
+              )}
+
               <ThemedText
                 style={[
                   styles.checkboxLabel,

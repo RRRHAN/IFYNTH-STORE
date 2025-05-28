@@ -86,15 +86,15 @@ export default function OfferDetailModal({ product }: OfferDetailModalProps) {
 
   return (
     <ScrollView
+    pointerEvents="box-none"
       contentContainerStyle={{
         paddingBottom: Platform.OS === "web" ? 100 : 150,
-        width: "100%",
       }}
       onContentSizeChange={(contentWidth, contentHeight) => {
         setContentTotalHeight(contentHeight);
       }}
     >
-      <View style={[styles.imageDetailRow, { marginTop: 20}]}>
+      <View style={[styles.imageDetailRow, { marginTop: Platform.OS === "web" ? 20 : 100}]}>
         <View style={styles.imageSection}>
           {isVideo(selectedMedia!) ? (
             <VideoView
@@ -138,7 +138,7 @@ export default function OfferDetailModal({ product }: OfferDetailModalProps) {
             styles.details,
             {
               position: "relative",
-              top: Platform.OS === "web" ? 0 : contentTotalHeight - 1050,
+              top: Platform.OS === "web" ? 0 : contentTotalHeight - 1100,
             },
           ]}
         >

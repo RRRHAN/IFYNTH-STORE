@@ -1,5 +1,12 @@
 import React, { useState } from "react";
-import { Modal, View, Button, Image, TouchableOpacity } from "react-native";
+import {
+  Modal,
+  View,
+  Button,
+  Image,
+  TouchableOpacity,
+  Text,
+} from "react-native";
 import { Transaction } from "@/src/types/transaction";
 import { ThemedText } from "./ThemedText";
 import ParallaxScrollView from "./ParallaxScrollView";
@@ -154,24 +161,33 @@ const TransactionDetailModal: React.FC<Props> = ({
             )}
 
             <View style={styles.closeButtonContainer}>
-              <Button title="Close" onPress={onClose} />
+              <TouchableOpacity style={styles.closeButton} onPress={onClose}>
+                <Text style={styles.closeButtonText}>Close</Text>
+              </TouchableOpacity>
+
+              <Modal
+                visible={fullImageVisible}
+                transparent={true}
+                animationType="fade"
+                onRequestClose={() => setFullImageVisible(false)}
+              >
+                <View style={styles.fullImageOverlay}>
+                  <Image
+                    source={{
+                      uri: `${BASE_URL}/api${transaction.PaymentProof}`,
+                    }}
+                    style={styles.fullImage}
+                  />
+                  <TouchableOpacity
+                    style={styles.closeButton}
+                    onPress={() => setFullImageVisible(false)}
+                  >
+                    <Text style={styles.closeButtonText}>Close</Text>
+                  </TouchableOpacity>
+                </View>
+              </Modal>
             </View>
           </ParallaxScrollView>
-        </View>
-      </Modal>
-
-      <Modal
-        visible={fullImageVisible}
-        transparent={true}
-        animationType="fade"
-        onRequestClose={() => setFullImageVisible(false)}
-      >
-        <View style={styles.fullImageOverlay}>
-          <Image
-            source={{ uri: `${BASE_URL}/api${transaction.PaymentProof}` }}
-            style={styles.fullImage}
-          />
-          <Button title="Close" onPress={() => setFullImageVisible(false)} />
         </View>
       </Modal>
     </>
