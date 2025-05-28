@@ -12,7 +12,21 @@ use App\Http\Controllers\MessageController;
 use App\Http\Controllers\TryonController;
 
 Route::get('/', function () {
-    return view('login');
+    $token = session('api_token');
+    if($token == null){
+        return view('login');
+    }
+    $response = Http::withHeaders([
+        'Authorization' => 'Bearer ' . $token,
+        'Content-Type' => 'application/json'
+    ])->get(config('app.back_end_base_url') . '/api/user/check-jwt');
+    if ($response->successful()) {
+        return redirect()->route('landing');
+
+    }
+    session()->flush();
+    session()->flash('error', 'Token Expired');
+    return redirect()->route('login');
 })->name('login');
 
 Route::get('/sellproduct', function () {
