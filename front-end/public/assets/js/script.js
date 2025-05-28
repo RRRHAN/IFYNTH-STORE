@@ -74,6 +74,7 @@ CSS TABLE OF CONTENTS
 	Pace.on("done", function () {
 		$("#preloader").addClass("isdone");
 		$(".loading").addClass("isdone");
+		$(".loading").addClass("d-none");
 	});
 	// Preloader area end here ***
 
