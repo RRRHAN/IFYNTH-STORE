@@ -51,71 +51,80 @@ export const pickImage = async (
   setVisible: (visible: boolean) => void
 ) => {
   console.log("📸 Memanggil launchImageLibrary...");
+
   const permissionGranted = await requestAndroidPermissions();
   if (!permissionGranted) {
     console.log("❌ Permission ditolak");
     setErrorMessage("Izin dibutuhkan untuk mengakses galeri.");
     setVisible(true);
     return;
+  } else {
+    console.log("✅ Permission disetujui");
   }
 
-  launchImageLibrary(
-    {
+  try {
+    const result = await launchImageLibrary({
       mediaType: "photo",
-      selectionLimit: 0, // 0 = multiple
-    },
-    (response) => {
-      console.log("✅ Callback launchImageLibrary dipanggil.");
-      console.log("🖼️ Image Picker Response:", response);
+      selectionLimit: 0,
+    });
 
-      if (response.didCancel) {
-        console.log("🚫 User membatalkan image picker.");
-      } else if (response.errorCode) {
-        console.log("❗ ImagePicker Error Code:", response.errorCode);
-        console.log("❗ ImagePicker Error Message:", response.errorMessage);
-        setErrorMessage("Error accessing image library.");
-        setVisible(true);
-      } else if (response.assets) {
-        console.log("📦 Raw assets:", response.assets);
+    console.log("📥 Hasil dari launchImageLibrary:", result);
 
-        const selectedImages = response.assets
-          .filter((asset: any) => {
-            let extension: string | null = null;
-
-            if (asset.uri.startsWith("data:image/")) {
-              extension = getExtensionFromBase64(asset.uri);
-            } else {
-              extension = asset.fileName
-                ? asset.fileName.split(".").pop()?.toLowerCase()
-                : asset.uri.split(".").pop()?.toLowerCase();
-            }
-
-            console.log("🔍 Checking asset:", asset);
-            console.log("📄 Extracted extension:", extension);
-
-            return extension && allowedExtensions.includes(extension);
-          })
-          .map((asset: any) => {
-            const imageObj = {
-              uri: asset.uri,
-              name: asset.fileName,
-              type: asset.type,
-            };
-            console.log("✅ Valid image:", imageObj);
-            return imageObj;
-          });
-
-        console.log("🎯 Filtered selected images:", selectedImages);
-
-        if (selectedImages.length === 0) {
-          console.log("⚠️ No valid images passed the filter.");
-          setErrorMessage("Only JPG, JPEG, and PNG images are allowed.");
-          setVisible(true);
-          return;
-        }
-
-        setImages((prevImages) => [...prevImages, ...selectedImages]);
-      }
+    if (result.didCancel) {
+      console.log("🚫 User membatalkan image picker.");
+      return;
     }
-  );
+
+    if (result.errorCode) {
+      console.log("❗ Error Code:", result.errorCode);
+      console.log("❗ Error Message:", result.errorMessage);
+      setErrorMessage("Gagal mengakses galeri: " + result.errorMessage);
+      setVisible(true);
+      return;
+    }
+
+    if (result.assets) {
+      const selectedImages = result.assets
+        .filter((asset: any) => {
+          let extension: string | null = null;
+          if (asset.uri.startsWith("data:image/")) {
+            extension = getExtensionFromBase64(asset.uri);
+          } else {
+            extension = asset.fileName
+              ? asset.fileName.split(".").pop()?.toLowerCase()
+              : asset.uri.split(".").pop()?.toLowerCase();
+          }
+
+          console.log("🔍 Cek asset:", asset);
+          console.log("📄 Ekstensi:", extension);
+
+          return extension && allowedExtensions.includes(extension);
+        })
+        .map((asset: any) => {
+          const imageObj = {
+            uri: asset.uri,
+            name: asset.fileName,
+            type: asset.type,
+          };
+          console.log("✅ Gambar valid:", imageObj);
+          return imageObj;
+        });
+
+      console.log("🎯 Gambar terpilih:", selectedImages);
+
+      if (selectedImages.length === 0) {
+        console.log("⚠️ Tidak ada gambar yang valid.");
+        setErrorMessage("Hanya gambar JPG, JPEG, atau PNG yang diizinkan.");
+        setVisible(true);
+        return;
+      }
+
+      setImages((prevImages) => [...prevImages, ...selectedImages]);
+    }
+  } catch (err) {
+    console.log("💥 Terjadi error saat memanggil launchImageLibrary:", err);
+    setErrorMessage("Terjadi kesalahan.");
+    setVisible(true);
+  }
 };
+

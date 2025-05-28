@@ -38,9 +38,9 @@ const TransactionsScreen = () => {
 
   const columnWidths = isTinyScreen
     ? {
-        id: screenWidth * 0.35,
+        id: screenWidth * 0.4,
         status: screenWidth * 0.4,
-        action: screenWidth * 0.2,
+        action: screenWidth * 0.15,
       }
     : {
         name: screenWidth * 0.2,
@@ -448,7 +448,7 @@ const TransactionsScreen = () => {
           <ThemedCell style={[{ width: columnWidths.action }]}>
             <IconButton
               icon="eye"
-              size={20}
+              size={25}
               iconColor="#00FFFF"
               onPress={() => {
                 setSelectedTransaction(item);

@@ -1,1 +1,2 @@
 victory-native version 36.6.11
+"react-native-image-picker": "^8.2.0",
