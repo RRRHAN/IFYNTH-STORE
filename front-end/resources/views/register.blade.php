@@ -26,7 +26,7 @@
                                 <h2 class="text-white mb-65">create account</h2>
                                 <div class="form-area login__form">
                                     <!-- Use standard form submission -->
-                                    <form id="" action="{{ route('register.proccess') }}" method="POST">
+                                    <form id="registrationForm">
                                         @csrf <input type="text" id="name" name="name" placeholder="Full Name"
                                             required>
                                         <input class="mt-30" type="text" id="username" name="username"
@@ -44,6 +44,7 @@
                                         <button class="mt-30" type="submit">Create Account</button>
                                     </form>
 
+                                    {{-- Element untuk menampilkan pesan feedback --}}
                                     <div id="feedbackMessage" style="margin-top: 20px; color: green;"></div>
                                     <div id="errorMessage" style="margin-top: 20px; color: red;"></div>
                                 </div>
@@ -57,14 +58,20 @@
         document.addEventListener('DOMContentLoaded', function() {
             const registrationForm = document.getElementById('registrationForm');
             const feedbackMessage = document.getElementById('feedbackMessage');
-            const errorMessage = document.getElementById('errorMessage');
+
+            // Tampilkan pesan yang tersimpan di localStorage
+            const savedFeedback = localStorage.getItem('feedbackMessage');
+            if (savedFeedback) {
+                feedbackMessage.textContent = savedFeedback;
+                localStorage.removeItem('feedbackMessage');
+            }
 
             registrationForm.addEventListener('submit', async function(event) {
-                event.preventDefault(); // Mencegah form melakukan submit default
+                event.preventDefault();
 
                 // Reset pesan sebelumnya
                 feedbackMessage.textContent = '';
-                errorMessage.textContent = '';
+                localStorage.removeItem('feedbackMessage');
 
                 const name = document.getElementById('name').value;
                 const username = document.getElementById('username').value;
@@ -72,12 +79,10 @@
                 const password = document.getElementById('password').value;
                 const password_confirmation = document.getElementById('password_confirmation').value;
 
-                // Ambil CSRF token jika diperlukan (untuk aplikasi Laravel)
-                // Jika Anda menggunakan Laravel Blade, token ini ada di meta tag atau input tersembunyi
-                const csrfToken = document.querySelector('meta[name="csrf-token"]') ?
-                    document.querySelector('meta[name="csrf-token"]').getAttribute('content') :
-                    document.querySelector('input[name="_token"]') ?
-                    document.querySelector('input[name="_token"]').value : '';
+                if (password !== password_confirmation) {
+                    feedbackMessage.textContent = 'Password not match.';
+                    return;
+                }
 
                 try {
                     const response = await axios.post(
@@ -89,42 +94,42 @@
                         }, {
                             headers: {
                                 'Authorization': 'Basic ' + btoa('admin:admin'),
-                                'Content-Type': 'application/json'
-                            }
+                                'Content-Type': 'application/json',
+                            },
                         }
                     );
 
-                    feedbackMessage.textContent = "Register Succesfully!";
+                    // Simpan pesan sukses ke localStorage
+                    localStorage.setItem('feedbackMessage', 'Register Successfully!');
                     registrationForm.reset();
+
+                    // Redirect ke halaman login setelah 2 detik
                     setTimeout(() => {
                         window.location.href = '/loginForm';
                     }, 2000);
-
                 } catch (error) {
+                    let message = '';
                     if (error.response) {
-                        // Server merespons dengan status di luar 2xx
                         const status = error.response.status;
                         const data = error.response.data;
 
                         if (status === 422 && data.errors) {
-                            // Error validasi
-                            errorMessage.textContent = data.errors.join(', ');
+                            message = data.errors.join(', ');
                         } else {
-                            // Error lain dari server
-                            errorMessage.textContent = data.message ||
-                                'Registration failed. Please try again.';
+                            message = data.message || 'Registration failed. Please try again.';
                         }
                     } else if (error.request) {
-                        // Permintaan dibuat tapi tidak ada respons
-                        errorMessage.textContent =
-                            'No response from server. Please check your network connection.';
+                        message = 'No response from server. Please check your network connection.';
                     } else {
-                        // Sesuatu terjadi saat menyiapkan permintaan
-                        errorMessage.textContent = 'Error: ' + error.message;
+                        message = 'Error: ' + error.message;
                     }
+
+                    localStorage.setItem('feedbackMessage', message);
+                    feedbackMessage.textContent = message;
                     console.error('Registration error:', error);
                 }
             });
         });
     </script>
+
 @stop
