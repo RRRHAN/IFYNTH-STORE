@@ -95,12 +95,11 @@
                         }
                     );
 
-                    if (response.status === 201) {
-                        feedbackMessage.textContent = response.data.message;
-                        registrationForm.reset(); // Kosongkan form
-                        // Opsional: Redirect ke halaman login atau dashboard
+                    feedbackMessage.textContent = "Register Succesfully!";
+                    registrationForm.reset();
+                    setTimeout(() => {
                         window.location.href = '/loginForm';
-                    }
+                    }, 2000);
 
                 } catch (error) {
                     if (error.response) {

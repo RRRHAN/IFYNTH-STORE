@@ -13,6 +13,7 @@ import (
 	"github.com/google/uuid"
 
 	apierror "github.com/RRRHAN/IFYNTH-STORE/back-end/utils/api-error"
+	fileutils "github.com/RRRHAN/IFYNTH-STORE/back-end/utils/file"
 	"github.com/RRRHAN/IFYNTH-STORE/back-end/utils/respond"
 )
 
@@ -72,85 +73,30 @@ func (h *handler) GetProductByID(ctx *gin.Context) {
 
 func (h *handler) AddProduct(ctx *gin.Context) {
 
-	form, err := ctx.MultipartForm()
+	var input AddProductRequest
+	err := ctx.ShouldBind(&input)
 	if err != nil {
 		respond.Error(ctx, apierror.FromErr(err))
 		return
 	}
 
-	name := form.Value["name"]
-	description := form.Value["description"]
-	price := form.Value["price"]
-	weight := form.Value["weight"]
-	capital := form.Value["capital"]
-	category := form.Value["category"]
-	department := form.Value["department"]
-	rawStockDetails := form.Value["stock_details"]
-	images := form.File["images"]
-
-	// Check if any required fields are missing
-	if len(name) == 0 || len(description) == 0 || len(price) == 0 || len(category) == 0 || len(department) == 0 || len(rawStockDetails) == 0 || len(images) == 0 || len(weight) == 0 {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": "One or more required fields are missing"})
-		return
-	}
-
 	// Validate image files
-	for _, file := range images {
-		if !isValidImage(file) {
+	for _, file := range input.Images {
+		if !fileutils.IsValidImage(file) {
 			ctx.JSON(http.StatusBadRequest, gin.H{
 				"error": fmt.Sprintf("Invalid image format: %s", file.Filename),
 			})
-			return
 		}
 	}
 
-	// Parse price and capital as float64
-	priceValue, err := strconv.ParseFloat(price[0], 64)
-	if err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid price format"})
-		return
-	}
-
-	capitalValue, err := strconv.ParseFloat(capital[0], 64)
-	if err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid capital format"})
-		return
-	}
-
-	weightValue, err := strconv.ParseFloat(weight[0], 64)
-	if err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid weight format"})
-		return
-	}
-
-	// Parse the stock details from JSON
-	var stockDetails []StockDetailInput
-	if err := json.Unmarshal([]byte(rawStockDetails[0]), &stockDetails); err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid stock_details format"})
-		return
-	}
-
-	// Create the AddProductRequest
-	req := AddProductRequest{
-		Name:         name[0],
-		Description:  description[0],
-		Price:        priceValue,
-		Weight:       weightValue,
-		Capital:      capitalValue,
-		Department:   department[0],
-		Category:     category[0],
-		Images:       images,
-		StockDetails: stockDetails,
-	}
-
 	// Call the service to add the product
-	if err := h.service.AddProduct(ctx.Request.Context(), req, images); err != nil {
+	if err := h.service.AddProduct(ctx.Request.Context(), input); err != nil {
 		respond.Error(ctx, apierror.FromErr(err))
 		return
 	}
 
 	// Return success response
-	respond.Success(ctx, http.StatusCreated, gin.H{"message": "Product and images added successfully"})
+	respond.Success(ctx, http.StatusCreated, "Product and images added successfully")
 }
 
 func (h *handler) DeleteProduct(ctx *gin.Context) {
@@ -160,7 +106,7 @@ func (h *handler) DeleteProduct(ctx *gin.Context) {
 		return
 	}
 
-	respond.Success(ctx, http.StatusOK, gin.H{"message": "Product deleted successfully"})
+	respond.Success(ctx, http.StatusOK, "Product deleted successfully")
 }
 
 func (h *handler) UpdateProduct(ctx *gin.Context) {
@@ -190,37 +136,37 @@ func (h *handler) UpdateProduct(ctx *gin.Context) {
 	newImages := form.File["images"]
 
 	if len(name) == 0 || len(description) == 0 || len(price) == 0 || len(category) == 0 || len(department) == 0 || len(rawStockDetails) == 0 || len(weight) == 0 {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": "One or more required fields are missing"})
+		respond.Error(ctx, apierror.NewWarn(http.StatusBadRequest, "One or more required fields are missing"))
 		return
 	}
 
 	priceValue, err := strconv.ParseFloat(price[0], 64)
 	if err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid price format"})
+		respond.Error(ctx, apierror.NewWarn(http.StatusBadRequest, "Invalid price format"))
 		return
 	}
 
 	weightValue, err := strconv.ParseFloat(weight[0], 64)
 	if err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid weight format"})
+		respond.Error(ctx, apierror.NewWarn(http.StatusBadRequest, "Invalid weight format"))
 		return
 	}
 
 	capitalValue, err := strconv.ParseFloat(capital[0], 64)
 	if err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid price format"})
+		respond.Error(ctx, apierror.NewWarn(http.StatusBadRequest, "Invalid price format"))
 		return
 	}
 
 	var stockDetails []StockDetailInput
 	if err := json.Unmarshal([]byte(rawStockDetails[0]), &stockDetails); err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid stockDetails format"})
+		respond.Error(ctx, apierror.NewWarn(http.StatusBadRequest, "Invalid stockDetails format"))
 		return
 	}
 
 	var removedImagesParsed []RemovedImage
 	if err := json.Unmarshal([]byte(removedImages[0]), &removedImagesParsed); err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid removedImages format"})
+		respond.Error(ctx, apierror.NewWarn(http.StatusBadRequest, "Invalid removedImages format"))
 		return
 	}
 
@@ -247,7 +193,7 @@ func (h *handler) UpdateProduct(ctx *gin.Context) {
 		return
 	}
 
-	respond.Success(ctx, http.StatusOK, gin.H{"message": "Product updated successfully"})
+	respond.Success(ctx, http.StatusOK, "Product updated successfully")
 }
 
 func (h *handler) GetProductCountByDepartment(ctx *gin.Context) {

@@ -6,15 +6,15 @@ import (
 )
 
 type AddTransactionRequest struct {
-	Name             string                `json:"name"`
-	PhoneNumber      string                `json:"phone_number"`
-	PaymentMethod    string                `json:"payment_method"`
-	PaymentProof     *multipart.FileHeader `json:"payment_proof"`
-	Address          string                `json:"address"`
-	ZipCode          string                `json:"zip_code"`
-	DestinationLabel string                `json:"destination_label"`
-	Courir           string                `json:"courir"`
-	ShippingCost     float64               `json:"shipping_cost"`
+	Name             string                `json:"name" form:"name" binding:"required"`
+	PhoneNumber      string                `json:"phone_number" form:"phone_number" binding:"required"`
+	PaymentMethod    string                `json:"payment_method" form:"payment_method" binding:"required"`
+	PaymentProof     *multipart.FileHeader `json:"payment_proof" form:"payment_proof" binding:"required"`
+	Address          string                `json:"address" form:"address" binding:"required"`
+	ZipCode          string                `json:"zip_code" form:"zip_code" binding:"required"`
+	DestinationLabel string                `json:"destination_label" form:"destination_label" binding:"required"`
+	Courir           string                `json:"courir" form:"name" courir:"required"`
+	ShippingCost     float64               `json:"shipping_cost" form:"shipping_cost" binding:"required"`
 }
 
 type UpdateStatusRequest struct {

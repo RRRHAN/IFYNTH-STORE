@@ -3,7 +3,6 @@ package transaction
 import (
 	"context"
 	"fmt"
-	"mime/multipart"
 	"os"
 	"path/filepath"
 	"time"
@@ -15,10 +14,11 @@ import (
 	"github.com/RRRHAN/IFYNTH-STORE/back-end/domains/product"
 	"github.com/RRRHAN/IFYNTH-STORE/back-end/utils/config"
 	contextUtil "github.com/RRRHAN/IFYNTH-STORE/back-end/utils/context"
+	fileutils "github.com/RRRHAN/IFYNTH-STORE/back-end/utils/file"
 )
 
 type Service interface {
-	AddTransaction(ctx context.Context, req AddTransactionRequest, paymentProofFile *multipart.FileHeader) error
+	AddTransaction(ctx context.Context, req AddTransactionRequest) error
 	GetTransactionsByUserID(ctx context.Context) ([]Transaction, error)
 	GetAllTransaction(ctx context.Context) ([]Transaction, error)
 	UpdateStatus(ctx context.Context, req UpdateStatusRequest) error
@@ -78,7 +78,7 @@ func (s *service) GetTransactionsByUserID(ctx context.Context) ([]Transaction, e
 	return transactions, nil
 }
 
-func (s *service) AddTransaction(ctx context.Context, req AddTransactionRequest, paymentProofFile *multipart.FileHeader) error {
+func (s *service) AddTransaction(ctx context.Context, req AddTransactionRequest) error {
 	token, err := contextUtil.GetTokenClaims(ctx)
 	if err != nil {
 		return err
@@ -97,13 +97,13 @@ func (s *service) AddTransaction(ctx context.Context, req AddTransactionRequest,
 	}
 
 	var paymentProofPath string
-	if paymentProofFile != nil {
-		ext := filepath.Ext(paymentProofFile.Filename)
-		if !isValidImageExtension(ext) {
+	if req.PaymentProof != nil {
+		ext := filepath.Ext(req.PaymentProof.Filename)
+		if !fileutils.IsValidImageExtension(ext) {
 			return fmt.Errorf("invalid file type: %v", ext)
 		}
 
-		filename, err := generateMediaName(user_cart.UserID.String())
+		filename, err := fileutils.GenerateMediaName(user_cart.UserID.String())
 		if err != nil {
 			return fmt.Errorf("error generating image name: %v", err)
 		}
@@ -114,7 +114,7 @@ func (s *service) AddTransaction(ctx context.Context, req AddTransactionRequest,
 			return fmt.Errorf("failed to create directory: %w", err)
 		}
 
-		if err := s.saveImage(ctx, paymentProofFile, path); err != nil {
+		if err := fileutils.SaveMedia(ctx, req.PaymentProof, path); err != nil {
 			return err
 		}
 

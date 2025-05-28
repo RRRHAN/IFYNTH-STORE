@@ -13,13 +13,14 @@ import (
 	"gorm.io/gorm"
 
 	"github.com/RRRHAN/IFYNTH-STORE/back-end/utils/config"
+	fileutils "github.com/RRRHAN/IFYNTH-STORE/back-end/utils/file"
 	"github.com/google/uuid"
 )
 
 type Service interface {
 	GetAllProducts(ctx context.Context, keyword string, department string, category string) ([]Product, error)
 	GetProductByID(ctx context.Context, id uuid.UUID) (*Product, error)
-	AddProduct(ctx context.Context, req AddProductRequest, images []*multipart.FileHeader) error
+	AddProduct(ctx context.Context, req AddProductRequest) error
 	UpdateProduct(ctx context.Context, productID string, req UpdateProductRequest, images []*multipart.FileHeader) error
 	DeleteProduct(ctx context.Context, productID string) error
 	GetProductCountByDepartment(ctx context.Context) ([]DepartmentCount, error)
@@ -80,7 +81,7 @@ func (s *service) GetProductByID(ctx context.Context, id uuid.UUID) (*Product, e
 	return &product, nil
 }
 
-func (s *service) AddProduct(ctx context.Context, req AddProductRequest, images []*multipart.FileHeader) error {
+func (s *service) AddProduct(ctx context.Context, req AddProductRequest) error {
 	totalStock := 0
 	for _, detail := range req.StockDetails {
 		totalStock += int(detail.Stock)
@@ -121,10 +122,10 @@ func (s *service) AddProduct(ctx context.Context, req AddProductRequest, images 
 
 	// save img if exist
 	var productImages []ProductImage
-	for _, file := range images {
+	for _, file := range req.Images {
 		ext := filepath.Ext(file.Filename)
 
-		filename, err := generateImageName(product.ID.String())
+		filename, err := fileutils.GenerateMediaName(product.ID.String())
 		if err != nil {
 			return fmt.Errorf("error generating image name: %v", err)
 		}
@@ -136,7 +137,7 @@ func (s *service) AddProduct(ctx context.Context, req AddProductRequest, images 
 			return fmt.Errorf("failed to create directory: %w", err)
 		}
 
-		if err := s.saveImage(ctx, file, path); err != nil {
+		if err := fileutils.SaveMedia(ctx, file, path); err != nil {
 			return err
 		}
 
@@ -288,7 +289,7 @@ func (s *service) UpdateProduct(ctx context.Context, productID string, req Updat
 	for _, file := range images {
 		ext := filepath.Ext(file.Filename)
 
-		filename, err := generateImageName(product.ID.String())
+		filename, err := fileutils.GenerateMediaName(product.ID.String())
 		if err != nil {
 			return fmt.Errorf("error generating image name: %v", err)
 		}
@@ -299,7 +300,7 @@ func (s *service) UpdateProduct(ctx context.Context, productID string, req Updat
 		if err := os.MkdirAll(filepath.Dir(path), os.ModePerm); err != nil {
 			return fmt.Errorf("failed to create directory: %w", err)
 		}
-		if err := s.saveImage(ctx, file, path); err != nil {
+		if err := fileutils.SaveMedia(ctx, file, path); err != nil {
 			return err
 		}
 

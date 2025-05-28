@@ -1,4 +1,4 @@
-package message
+package fileutils
 
 import (
 	"context"
@@ -11,7 +11,7 @@ import (
 	"time"
 )
 
-func isValidImage(file *multipart.FileHeader) bool {
+func IsValidImage(file *multipart.FileHeader) bool {
 	ext := strings.ToLower(filepath.Ext(file.Filename))
 	validImageExtensions := []string{".jpg", ".jpeg", ".png", ".gif", ".bmp"}
 
@@ -23,7 +23,7 @@ func isValidImage(file *multipart.FileHeader) bool {
 	return false
 }
 
-func isValidVideo(file *multipart.FileHeader) bool {
+func IsValidVideo(file *multipart.FileHeader) bool {
 	ext := strings.ToLower(filepath.Ext(file.Filename))
 	validVideoExtensions := []string{".mp4", ".avi", ".mov", ".mkv", ".flv", ".webm"}
 
@@ -35,8 +35,19 @@ func isValidVideo(file *multipart.FileHeader) bool {
 	return false
 }
 
+// Example of image validation function
+func IsValidImageExtension(ext string) bool {
+	validExtensions := []string{".jpg", ".jpeg", ".png", ".gif"}
+	for _, validExt := range validExtensions {
+		if ext == validExt {
+			return true
+		}
+	}
+	return false
+}
+
 // Helper function to check if a file extension is a video
-func isVideo(extension string) bool {
+func IsVideo(extension string) bool {
 	// List of video file extensions
 	videoExtensions := []string{".mp4", ".avi", ".mov", ".mkv", ".flv", ".webm"}
 	for _, ext := range videoExtensions {
@@ -48,12 +59,12 @@ func isVideo(extension string) bool {
 }
 
 // Helper function to generate a name for media files
-func generateMediaName(productID string) (string, error) {
+func GenerateMediaName(productID string) (string, error) {
 	// Generate a unique name for the media file
 	return fmt.Sprintf("%s_%d", productID, time.Now().UnixNano()), nil
 }
 
-func (s *service) saveMedia(ctx context.Context, file *multipart.FileHeader, path string) error {
+func SaveMedia(ctx context.Context, file *multipart.FileHeader, path string) error {
 	src, err := file.Open()
 	if err != nil {
 		return fmt.Errorf("failed to open uploaded file: %w", err)
