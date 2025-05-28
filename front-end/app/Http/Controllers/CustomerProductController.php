@@ -37,7 +37,7 @@ class CustomerProductController extends Controller
         try {
             $client = new Client();
 
-            $response = $client->post(config('app.back_end_base_url').'/api/cusproduct', [
+            $response = $client->post(config('app.back_end_base_url') . '/api/cusproduct', [
                 'headers' => [
                     'Authorization' => 'Bearer ' . $token,
                 ],
@@ -60,6 +60,11 @@ class CustomerProductController extends Controller
             $responseBody = json_decode($response->getBody(), true);
             \Log::info('Respon Data', [$responseBody['errors']]);
 
+            if (in_array('Unauthorized!', $responseBody['errors'] ?? [])) {
+                return redirect()->route('login')->with('error', 'Session expired. Please log in again.');
+            }
+
+
             if ($responseBody['errors'] === null) {
                 session()->flash('success', 'Product added to offer');
                 return redirect()->back();
@@ -80,20 +85,24 @@ class CustomerProductController extends Controller
     {
         $keyword = $request->query('keyword');
         $token = session('api_token');
-        
+
         try {
             // Siapkan query parameters, hanya kirim yang tidak kosong
             $queryParams = array_filter([
                 'keyword' => $keyword,
             ]);
-        
+
             $response = Http::withHeaders([
                 'Authorization' => 'Bearer ' . $token
-            ])->get(config('app.back_end_base_url').'/api/cusproduct', $queryParams);
-        
+            ])->get(config('app.back_end_base_url') . '/api/cusproduct', $queryParams);
+
+            if (in_array('Unauthorized!', $response->json('errors') ?? [])) {
+                return redirect()->route('login')->with('error', 'Session expired. Please log in again.');
+            }
+
             if ($response->successful() && $response->json('errors') === null) {
                 $allProducts = collect($response->json('data'));
-        
+
                 return collect([
                     'products' => $allProducts,
                 ]);
@@ -117,7 +126,11 @@ class CustomerProductController extends Controller
         try {
             $response = Http::withHeaders([
                 'Authorization' => 'Bearer ' . $token
-            ])->delete(config('app.back_end_base_url').'/api/cusproduct', ['product_id' => $productId]);
+            ])->delete(config('app.back_end_base_url') . '/api/cusproduct', ['product_id' => $productId]);
+
+            if (in_array('Unauthorized!', $response->json('errors') ?? [])) {
+                return redirect()->route('login')->with('error', 'Session expired. Please log in again.');
+            }
 
             if ($response->successful() && $response->json('errors') === null) {
 
@@ -132,4 +145,4 @@ class CustomerProductController extends Controller
             return redirect()->back()->with('error', $e->getMessage());
         }
     }
-}    
+}

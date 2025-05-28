@@ -25,7 +25,7 @@ Route::get('/', function () {
 
     }
     session()->flush();
-    session()->flash('error', 'Token Expired');
+    session()->flash('error', 'Session expired. Please log in again.');
     return redirect()->route('login');
 })->name('login');
 

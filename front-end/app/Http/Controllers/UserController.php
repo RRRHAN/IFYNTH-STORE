@@ -157,6 +157,10 @@ class UserController extends Controller
                         'role' => "CUSTOMER",
                     ]);
 
+            if (in_array('Unauthorized!', $response->json('errors') ?? [])) {
+                return redirect()->route('login')->with('error', 'Session expired. Please log in again.');
+            }
+
             if ($response->successful()) {
                 session()->flash('success', 'Changed password successfully!');
                 return redirect()->route('dashboard');
@@ -184,6 +188,10 @@ class UserController extends Controller
             $response = Http::withHeaders([
                 'Authorization' => 'Bearer ' . $token,
             ])->get(config('app.back_end_base_url') . '/api/user/get-personal');
+
+            if (in_array('Unauthorized!', $response->json('errors') ?? [])) {
+                return redirect()->route('login')->with('error', 'Session expired. Please log in again.');
+            }
 
             if ($response->successful()) {
                 $data = collect($response->json());
