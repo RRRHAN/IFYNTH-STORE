@@ -26,7 +26,7 @@
                                 <h2 class="text-white mb-65">create account</h2>
                                 <div class="form-area login__form">
                                     <!-- Use standard form submission -->
-                                    <form id="registrationForm">
+                                    <form id="" action="{{ route('register.proccess') }}" method="POST">
                                         @csrf <input type="text" id="name" name="name" placeholder="Full Name"
                                             required>
                                         <input class="mt-30" type="text" id="username" name="username"
@@ -44,7 +44,6 @@
                                         <button class="mt-30" type="submit">Create Account</button>
                                     </form>
 
-                                    {{-- Element untuk menampilkan pesan feedback --}}
                                     <div id="feedbackMessage" style="margin-top: 20px; color: green;"></div>
                                     <div id="errorMessage" style="margin-top: 20px; color: red;"></div>
                                 </div>
