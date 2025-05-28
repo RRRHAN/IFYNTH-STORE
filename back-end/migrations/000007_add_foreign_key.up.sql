@@ -12,6 +12,7 @@ REFERENCES product(id)
 ON DELETE CASCADE
 ON UPDATE CASCADE;
 
+-- TODO: use different column
 ALTER TABLE message
 ADD CONSTRAINT fk_customer
 FOREIGN KEY (user_id)
