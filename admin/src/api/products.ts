@@ -3,22 +3,32 @@ import { BASE_URL, getAuthToken } from "./constants";
 import { ProductData, UpdateProductData } from "../request/productReq";
 
 export const fetchProducts = async (): Promise<Product[]> => {
-  const token = await getAuthToken();
-  const getAllUrl = `${BASE_URL}/api/product`;
+  try {
+    const token = await getAuthToken();
+    if (!token) {
+      throw new Error("No auth token found");
+    }
+    
+    const getAllUrl = `${BASE_URL}/api/product`;
 
-  const response = await fetch(getAllUrl, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  });
+    const response = await fetch(getAllUrl, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
 
-  if (!response.ok) {
-    throw new Error(`HTTP error! status: ${response.status}`);
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const result = await response.json();
+    console.log("Fetched product data:", result.data);
+    return result.data;
+
+  } catch (error) {
+    console.error("Failed to fetch products:", error);
+    return [];
   }
-
-  const result = await response.json();
-  console.log("Fetched product data:", result.data);
-  return result.data;
 };
 
 export const addProduct = async (productData: ProductData) => {

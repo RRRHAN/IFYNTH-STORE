@@ -186,7 +186,7 @@ export default function HomeScreen() {
                             top:
                               Platform.OS === "web"
                                 ? 0
-                                : -(contentTotalHeight - 1100),
+                                : - 240,
                           },
                         ]}
                       >
@@ -218,10 +218,12 @@ export default function HomeScreen() {
                           : -(contentTotalHeight - 1200),
                     }}
                   >
-                    <TransactionReportTable
-                      transactionReport={dummyTransactionReports}
-                      height={380}
-                    />
+                    {Platform.OS === "web" && (
+                      <TransactionReportTable
+                        transactionReport={dummyTransactionReports}
+                        height={380}
+                      />
+                    )}
                   </View>
                   <View
                     style={{
@@ -233,10 +235,12 @@ export default function HomeScreen() {
                           : -(contentTotalHeight - 1200),
                     }}
                   >
-                    <ProfitProductChart
-                      ProfitProduct={dummyProfitProducts}
-                      height={380}
-                    />
+                    {Platform.OS === "web" && (
+                      <ProfitProductChart
+                        ProfitProduct={dummyProfitProducts}
+                        height={380}
+                      />
+                    )}
                   </View>
                 </View>
                 {(!productCount ||
