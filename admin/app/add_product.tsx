@@ -190,7 +190,9 @@ export default function AddProductScreen() {
       />
 
       <ActionButtons
-        pickImage={() => pickImage(setImages, setErrorMessage, setVisible)}
+        pickImage={() => {
+          console.log("📸 pickImage dipanggil");
+          pickImage(setImages, setErrorMessage, setVisible)}}
         handleAddProduct={handleAddProduct}
         styles={styles}
       />

@@ -36,7 +36,7 @@ export default function ProductPickers({
               onPress={() => setModalDepartVisible(true)}
               style={{
                 height: 50,
-                width: 150,
+                width: 170,
                 justifyContent: "center",
                 backgroundColor: isDark ? "#555555" : "#f9fafb",
                 paddingHorizontal: 10,
@@ -132,7 +132,7 @@ export default function ProductPickers({
               }}
               style={{
                 height: 50,
-                width: 150,
+                width: 170,
                 justifyContent: "center",
                 backgroundColor: isDark ? "#555555" : "#f9fafb",
                 paddingHorizontal: 10,
