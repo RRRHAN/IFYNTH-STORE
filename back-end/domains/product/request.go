@@ -3,20 +3,20 @@ package product
 import "mime/multipart"
 
 type AddProductRequest struct {
-	Name         string
-	Description  string
-	Price        float64
-	Weight       float64
-	Department   string
-	Category     string
-	Images       []*multipart.FileHeader
-	StockDetails []StockDetailInput
-	Capital      float64
+	Name         string                  `form:"name" binding:"required"`
+	Description  string                  `form:"description" binding:"required"`
+	Price        float64                 `form:"price" binding:"required"`
+	Weight       float64                 `form:"weight" binding:"required"`
+	Department   string                  `form:"department" binding:"required"`
+	Category     string                  `form:"category" binding:"required"`
+	Images       []*multipart.FileHeader `form:"images" binding:"required"`
+	StockDetails []StockDetailInput      `form:"stock_details" binding:"required"`
+	Capital      float64                 `form:"capital" binding:"required"`
 }
 
 type StockDetailInput struct {
-	Size  string
-	Stock int
+	Size  string `json:"size"`
+	Stock int    `json:"stock"`
 }
 
 type RemovedImage struct {

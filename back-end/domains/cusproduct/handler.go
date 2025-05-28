@@ -1,9 +1,7 @@
 package cusproduct
 
 import (
-	"fmt"
 	"net/http"
-	"strconv"
 
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
@@ -91,50 +89,14 @@ func (h *handler) GetProductByUserID(ctx *gin.Context) {
 
 func (h *handler) AddProduct(ctx *gin.Context) {
 
-	form, err := ctx.MultipartForm()
+	var input AddProductRequest
+	err := ctx.ShouldBind(&input)
 	if err != nil {
 		respond.Error(ctx, apierror.FromErr(err))
 		return
 	}
 
-	name := form.Value["name"]
-	description := form.Value["description"]
-	price := form.Value["price"]
-	files := form.File["files"]
-
-	fmt.Println("Received name:", name)
-	fmt.Println("Received description:", description)
-	fmt.Println("Received price:", price)
-	fmt.Println("Received files:", files)
-
-	if len(name) == 0 || len(description) == 0 || len(price) == 0 || len(files) == 0 {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": "One or more required fields are missing"})
-		return
-	}
-
-	for _, file := range files {
-		if !isValidImage(file) && !isValidVideo(file) {
-			ctx.JSON(http.StatusBadRequest, gin.H{
-				"error": fmt.Sprintf("Invalid file format: %s", file.Filename),
-			})
-			return
-		}
-	}
-
-	priceValue, err := strconv.ParseFloat(price[0], 64)
-	if err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid price format"})
-		return
-	}
-
-	req := AddProductRequest{
-		Name:        name[0],
-		Description: description[0],
-		Price:       priceValue,
-		Files:       files,
-	}
-
-	if err := h.service.AddProduct(ctx.Request.Context(), req, files); err != nil {
+	if err := h.service.AddProduct(ctx, input); err != nil {
 		respond.Error(ctx, apierror.FromErr(err))
 		return
 	}
@@ -166,7 +128,7 @@ func (h *handler) UpdateProductStatus(ctx *gin.Context) {
 	}
 
 	if req.ProductID == "" || req.NewStatus == "" {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": "One or more required fields are missing"})
+		respond.Error(ctx, apierror.NewWarn(http.StatusBadRequest, "One or more required fields are missing"))
 		return
 	}
 

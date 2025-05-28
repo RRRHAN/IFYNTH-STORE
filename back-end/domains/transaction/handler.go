@@ -1,9 +1,7 @@
 package transaction
 
 import (
-	"errors"
 	"net/http"
-	"strconv"
 
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
@@ -43,7 +41,7 @@ func (h *handler) GetAllTransaction(ctx *gin.Context) {
 	}
 
 	if len(transactions) == 0 {
-		ctx.JSON(http.StatusOK, gin.H{"message": "No transactions found"})
+		respond.Success(ctx, http.StatusOK, "No transactions found")
 		return
 	}
 
@@ -58,7 +56,7 @@ func (h *handler) GetTransactionsByUserID(ctx *gin.Context) {
 	}
 
 	if len(transactions) == 0 {
-		ctx.JSON(http.StatusOK, gin.H{"message": "No transactions found"})
+		respond.Success(ctx, http.StatusOK, "No transactions found")
 		return
 	}
 
@@ -66,44 +64,15 @@ func (h *handler) GetTransactionsByUserID(ctx *gin.Context) {
 }
 
 func (h *handler) AddTransaction(ctx *gin.Context) {
-	form, err := ctx.MultipartForm()
+
+	var input AddTransactionRequest
+	err := ctx.ShouldBind(&input)
 	if err != nil {
-		respond.Error(ctx, errors.New("failed to parse multipart form"))
+		respond.Error(ctx, apierror.FromErr(err))
 		return
 	}
 
-	get := func(key string) string {
-		if val, ok := form.Value[key]; ok && len(val) > 0 {
-			return val[0]
-		}
-		return ""
-	}
-
-	shippingCost, err := strconv.ParseFloat(get("shipping_cost"), 64)
-	if err != nil {
-		respond.Error(ctx, errors.New("invalid shipping_cost"))
-		return
-	}
-
-	paymentProofHeader, err := ctx.FormFile("payment_proof")
-	if err != nil && err.Error() != "http: no such file" {
-		respond.Error(ctx, err)
-		return
-	}
-
-	req := AddTransactionRequest{
-		Name:             get("name"),
-		PhoneNumber:      get("phone_number"),
-		PaymentMethod:    get("payment_method"),
-		PaymentProof:     paymentProofHeader,
-		Address:          get("address"),
-		ZipCode:          get("zip_code"),
-		DestinationLabel: get("destination_label"),
-		Courir:           get("courir"),
-		ShippingCost:     shippingCost,
-	}
-
-	if err := h.service.AddTransaction(ctx, req, paymentProofHeader); err != nil {
+	if err := h.service.AddTransaction(ctx, input); err != nil {
 		respond.Error(ctx, err)
 		return
 	}
@@ -121,7 +90,7 @@ func (h *handler) UpdateTransactionStatus(ctx *gin.Context) {
 	}
 
 	if req.TransactionID == "" || req.NewStatus == "" {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": "One or more required fields are missing"})
+		respond.Error(ctx, apierror.NewWarn(http.StatusBadRequest, "One or more required fields are missing"))
 		return
 	}
 
@@ -130,7 +99,7 @@ func (h *handler) UpdateTransactionStatus(ctx *gin.Context) {
 		return
 	}
 
-	respond.Success(ctx, http.StatusOK, gin.H{"message": "status updated successfully"})
+	respond.Success(ctx, http.StatusOK, "status updated successfully")
 }
 
 func (h *handler) GetTransactionCountByStatus(ctx *gin.Context) {
@@ -151,7 +120,7 @@ func (h *handler) GetTotalAmountByDate(ctx *gin.Context) {
 	}
 
 	if len(transactions) == 0 {
-		ctx.JSON(http.StatusOK, gin.H{"message": "No transactions found"})
+		respond.Success(ctx, http.StatusOK, "No transactions found")
 		return
 	}
 
@@ -176,7 +145,7 @@ func (h *handler) GetTotalTransactionByCustomer(ctx *gin.Context) {
 	}
 
 	if len(transactions) == 0 {
-		ctx.JSON(http.StatusOK, gin.H{"message": "No transactions found"})
+		respond.Success(ctx, http.StatusOK, "No transactions found")
 		return
 	}
 

@@ -3,10 +3,10 @@ package cusproduct
 import "mime/multipart"
 
 type AddProductRequest struct {
-	Name        string
-	Description string
-	Price       float64
-	Files       []*multipart.FileHeader
+	Name        string                  `form:"name" binding:"required"`
+	Description string                  `form:"description" binding:"required"`
+	Price       float64                 `form:"price" binding:"required"`
+	Files       []*multipart.FileHeader `form:"files" binding:"required"`
 }
 
 type StockDetailInput struct {

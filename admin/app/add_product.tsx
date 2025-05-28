@@ -37,7 +37,7 @@ export default function AddProductScreen() {
     setSizes,
     images,
     setImages,
-  } = useProductForm(); 
+  } = useProductForm();
   const theme = useColorScheme();
   const isDark = theme === "dark";
   const [visible, setVisible] = useState(false);
@@ -139,6 +139,9 @@ export default function AddProductScreen() {
         icon="arrow-left"
         size={30}
         onPress={() => router.replace("/products")}
+        style={{
+          top: 20,
+        }}
       />
       <ThemedText style={[styles.title]}>Add Product</ThemedText>
 
@@ -187,7 +190,9 @@ export default function AddProductScreen() {
       />
 
       <ActionButtons
-        pickImage={() => pickImage(setImages, setErrorMessage, setVisible)}
+        pickImage={() => {
+          console.log("📸 pickImage dipanggil");
+          pickImage(setImages, setErrorMessage, setVisible)}}
         handleAddProduct={handleAddProduct}
         styles={styles}
       />

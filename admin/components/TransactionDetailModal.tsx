@@ -1,5 +1,12 @@
 import React, { useState } from "react";
-import { Modal, View, Button, Image, TouchableOpacity } from "react-native";
+import {
+  Modal,
+  View,
+  Button,
+  Image,
+  TouchableOpacity,
+  Text,
+} from "react-native";
 import { Transaction } from "@/src/types/transaction";
 import { ThemedText } from "./ThemedText";
 import ParallaxScrollView from "./ParallaxScrollView";
@@ -56,7 +63,7 @@ const TransactionDetailModal: React.FC<Props> = ({
                 Customer Name: {transaction.ShippingAddress.Name}
               </ThemedText>
               <ThemedText>
-                Total Amount: Rp{" "}
+                Total Amount: Rp
                 {parseInt(transaction.TotalAmount || "0").toLocaleString()}
               </ThemedText>
               <ThemedText>
@@ -82,14 +89,14 @@ const TransactionDetailModal: React.FC<Props> = ({
                 Zip Code: {transaction.ShippingAddress.ZipCode}
               </ThemedText>
               <ThemedText>
-                Destination Label:{" "}
+                Destination Label:
                 {transaction.ShippingAddress.DestinationLabel}
               </ThemedText>
               <ThemedText>
                 Courier: {transaction.ShippingAddress.Courir}
               </ThemedText>
               <ThemedText>
-                Shipping Cost: Rp{" "}
+                Shipping Cost: Rp
                 {parseInt(
                   transaction.ShippingAddress.ShippingCost || "0"
                 ).toLocaleString()}
@@ -125,7 +132,7 @@ const TransactionDetailModal: React.FC<Props> = ({
                           {detail.Quantity}
                         </ThemedText>
                         <ThemedText style={styles.tableCell}>
-                          Rp {totalPrice.toLocaleString()}{" "}
+                          Rp {totalPrice.toLocaleString()}
                         </ThemedText>
                       </View>
                     );
@@ -154,24 +161,33 @@ const TransactionDetailModal: React.FC<Props> = ({
             )}
 
             <View style={styles.closeButtonContainer}>
-              <Button title="Close" onPress={onClose} />
+              <TouchableOpacity style={styles.closeButton} onPress={onClose}>
+                <Text style={styles.closeButtonText}>Close</Text>
+              </TouchableOpacity>
+
+              <Modal
+                visible={fullImageVisible}
+                transparent={true}
+                animationType="fade"
+                onRequestClose={() => setFullImageVisible(false)}
+              >
+                <View style={styles.fullImageOverlay}>
+                  <Image
+                    source={{
+                      uri: `${BASE_URL}/api${transaction.PaymentProof}`,
+                    }}
+                    style={styles.fullImage}
+                  />
+                  <TouchableOpacity
+                    style={styles.closeButton}
+                    onPress={() => setFullImageVisible(false)}
+                  >
+                    <Text style={styles.closeButtonText}>Close</Text>
+                  </TouchableOpacity>
+                </View>
+              </Modal>
             </View>
           </ParallaxScrollView>
-        </View>
-      </Modal>
-
-      <Modal
-        visible={fullImageVisible}
-        transparent={true}
-        animationType="fade"
-        onRequestClose={() => setFullImageVisible(false)}
-      >
-        <View style={styles.fullImageOverlay}>
-          <Image
-            source={{ uri: `${BASE_URL}/api${transaction.PaymentProof}` }}
-            style={styles.fullImage}
-          />
-          <Button title="Close" onPress={() => setFullImageVisible(false)} />
         </View>
       </Modal>
     </>

@@ -4,6 +4,7 @@ import {
   StyleSheet,
   ScrollView,
   TouchableOpacity,
+  Platform,
 } from "react-native";
 import { LineChart } from "react-native-chart-kit";
 import { ThemedView } from "@/components/ThemedView";
@@ -12,6 +13,20 @@ import { TransactionReport } from "@/src/types/home";
 import { useColorScheme } from "@/hooks/useColorScheme";
 
 const screenWidth = Dimensions.get("window").width;
+
+const maxWidth =
+  Platform.OS === "web"
+    ? {
+        width:
+          screenWidth > 1500
+            ? 750
+            : screenWidth > 1000
+            ? 800
+            : screenWidth > 400
+            ? 700
+            : 900,
+      }
+    : { width: 380 };
 
 const getMaxVisibleData = (width: number) => {
   if (width < 401) return 4;
@@ -41,7 +56,7 @@ type TransactionChartProps = {
   height?: number;
 };
 
-const TransactionReportChart: React.FC<TransactionChartProps> = ({
+const MTransactionReportChart: React.FC<TransactionChartProps> = ({
   transactionReport,
   height = 277,
 }) => {
@@ -60,7 +75,7 @@ const TransactionReportChart: React.FC<TransactionChartProps> = ({
     const day = String(date.getDate()).padStart(2, "0");
     const month = String(date.getMonth() + 1).padStart(2, "0");
     const year = date.getFullYear();
-    return `${day}-${month}-${year}`;
+    return maxWidth.width > 400 ? `${day}-${month}-${year}` : `${day}-${month}`;
   });
 
   const data = (transactionReport ?? []).map((r) => r.TotalAmount / 1000);
@@ -76,9 +91,9 @@ const TransactionReportChart: React.FC<TransactionChartProps> = ({
   const scrollContentWidth = Math.max(labels.length * LABEL_WIDTH, MIN_WIDTH);
 
   const chartConfig = {
-    backgroundColor: colorScheme === "dark" ? "#1c1c1c" : "#f0f0f0",
-    backgroundGradientFrom: colorScheme === "dark" ? "#1c1c1c" : "#f0f0f0",
-    backgroundGradientTo: colorScheme === "dark" ? "#1c1c1c" : "#f0f0f0",
+    backgroundColor: colorScheme === "dark" ? "#151718" : "#fff",
+    backgroundGradientFrom: colorScheme === "dark" ? "#151718" : "#fff",
+    backgroundGradientTo: colorScheme === "dark" ? "#151718" : "#fff",
     decimalPlaces: 0,
     color: (opacity = 1) => (colorScheme === "dark" ? "#ffffff" : "#111827"),
     labelColor: (opacity = 1) =>
@@ -96,31 +111,18 @@ const TransactionReportChart: React.FC<TransactionChartProps> = ({
   const LABEL_COUNT = 5;
   const adjustedChartHeight = screenWidth > 1000 ? height - 25 : 250;
   const [productTableHeight, setProductTableHeight] = useState(0);
-  const labelVerticalSpacing = productTableHeight / 6.3;
+  const labelVerticalSpacing = productTableHeight / 8.5;
 
   return (
     <ThemedView
-      style={[
-        styles.container,
-        { backgroundColor: colorScheme === "dark" ? "#1c1c1c" : "#f0f0f0" },
-      ]}
+      style={[styles.container, maxWidth]}
       onLayout={(event) => {
         setProductTableHeight(event.nativeEvent.layout.height);
       }}
     >
       <ThemedText style={styles.title}>Transaction Report</ThemedText>
-      <ThemedView
-        style={{
-          flexDirection: "row",
-          backgroundColor: colorScheme === "dark" ? "#1c1c1c" : "#f0f0f0",
-        }}
-      >
-        <ThemedView
-          style={[
-            styles.yAxisContainer,
-            { backgroundColor: colorScheme === "dark" ? "#1c1c1c" : "#f0f0f0" },
-          ]}
-        >
+      <ThemedView style={{ flexDirection: "row" }}>
+        <ThemedView style={[styles.yAxisContainer]}>
           {[...Array(LABEL_COUNT)].map((_, i) => {
             const max = Math.max(...data);
             const yValue =
@@ -148,9 +150,6 @@ const TransactionReportChart: React.FC<TransactionChartProps> = ({
         <ScrollView
           horizontal
           showsHorizontalScrollIndicator={true}
-          contentContainerStyle={{
-            width: scrollContentWidth,
-          }}
           ref={scrollRef}
           onContentSizeChange={() => {
             if (scrollRef.current) {
@@ -181,6 +180,7 @@ const TransactionReportChart: React.FC<TransactionChartProps> = ({
               });
             }}
           />
+
           {tooltipData && (
             <ThemedView
               style={[
@@ -192,7 +192,7 @@ const TransactionReportChart: React.FC<TransactionChartProps> = ({
               ]}
             >
               <ThemedText style={styles.tooltipText}>
-                {tooltipData.date}: Rp
+                {tooltipData.date}: Rp{" "}
                 {tooltipData.value.toLocaleString("id-ID")}
               </ThemedText>
               <TouchableOpacity
@@ -263,4 +263,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default TransactionReportChart;
+export default MTransactionReportChart;

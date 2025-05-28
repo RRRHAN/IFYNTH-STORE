@@ -3,7 +3,6 @@ package cusproduct
 import (
 	"context"
 	"fmt"
-	"mime/multipart"
 	"os"
 	"path/filepath"
 	"strings"
@@ -14,13 +13,14 @@ import (
 	"github.com/RRRHAN/IFYNTH-STORE/back-end/domains/message"
 	"github.com/RRRHAN/IFYNTH-STORE/back-end/utils/config"
 	contextUtil "github.com/RRRHAN/IFYNTH-STORE/back-end/utils/context"
+	fileutils "github.com/RRRHAN/IFYNTH-STORE/back-end/utils/file"
 	"github.com/google/uuid"
 )
 
 type Service interface {
 	GetAllProducts(ctx context.Context, keyword string) ([]ProductWithCustomer, error)
 	GetProductByID(ctx context.Context, id uuid.UUID) (*CustomerProduct, error)
-	AddProduct(ctx context.Context, req AddProductRequest, images []*multipart.FileHeader) error
+	AddProduct(ctx context.Context, req AddProductRequest) error
 	DeleteProduct(ctx context.Context, req DeleteProductRequest) error
 	GetProductByUserID(ctx context.Context, keyword string) ([]CustomerProduct, error)
 	UpdateStatus(ctx context.Context, req UpdateStatusRequest) error
@@ -163,7 +163,7 @@ func (s *service) GetProductByID(ctx context.Context, id uuid.UUID) (*CustomerPr
 	return &product, nil
 }
 
-func (s *service) AddProduct(ctx context.Context, req AddProductRequest, files []*multipart.FileHeader) error {
+func (s *service) AddProduct(ctx context.Context, req AddProductRequest) error {
 
 	token, err := contextUtil.GetTokenClaims(ctx)
 	if err != nil {
@@ -187,9 +187,9 @@ func (s *service) AddProduct(ctx context.Context, req AddProductRequest, files [
 	}
 
 	var productMedia []CustomerProductFile
-	for _, file := range files {
+	for _, file := range req.Files {
 		ext := filepath.Ext(file.Filename)
-		filename, err := generateMediaName(product.ID.String())
+		filename, err := fileutils.GenerateMediaName(product.ID.String())
 		if err != nil {
 			return fmt.Errorf("error generating media name: %v", err)
 		}
@@ -198,7 +198,7 @@ func (s *service) AddProduct(ctx context.Context, req AddProductRequest, files [
 		var path string
 
 		// Check if it's an image or video based on file extension
-		if isVideo(ext) {
+		if fileutils.IsVideo(ext) {
 			path = filepath.Join("uploads", "cus_products", "videos", filename)
 		} else {
 			path = filepath.Join("uploads", "cus_products", "images", filename)
@@ -210,7 +210,7 @@ func (s *service) AddProduct(ctx context.Context, req AddProductRequest, files [
 		}
 
 		// Save the file to disk
-		if err := s.saveMedia(ctx, file, path); err != nil {
+		if err := fileutils.SaveMedia(ctx, file, path); err != nil {
 			return err
 		}
 

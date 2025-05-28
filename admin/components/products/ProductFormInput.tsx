@@ -1,5 +1,5 @@
 import React from "react";
-import { View } from "react-native";
+import { View, Platform } from "react-native";
 import { ThemedTextInput } from "@/components/ThemedTextInput";
 import { ThemedText } from "../ThemedText";
 
@@ -41,7 +41,7 @@ export default function ProductFormInputs({
           gap: 12,
         }}
       >
-        <View style={{ flex: 3 }}>
+        <View style={{ flex: 2 }}>
           <ThemedText>Product Name</ThemedText>
           <ThemedTextInput
             style={[styles.input, { borderColor: isDark ? "#666" : "#ccc" }]}

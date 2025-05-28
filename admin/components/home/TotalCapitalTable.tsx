@@ -54,7 +54,7 @@ const styles = StyleSheet.create({
         : width < 1000
         ? width - 550
         : width < 1500
-        ? width - 700
+        ? width - 900
         : width - 1500,
     marginBottom: 20,
   },

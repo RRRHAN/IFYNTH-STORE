@@ -8,6 +8,7 @@ import {
   View,
   Modal,
   Platform,
+  TouchableOpacity,
 } from "react-native";
 import { IconButton } from "react-native-paper";
 import { useRouter } from "expo-router";
@@ -24,12 +25,13 @@ import {
 } from "@/components/ThemedTable";
 import OfferDetailModal from "../detail_offer";
 import { Picker } from "@react-native-picker/picker";
-import Video from "react-native-video";
 import { BASE_URL } from "@/src/api/constants";
 import { generateVideoThumbnailJS } from "@/hooks/helpers/ThumbnailProcessor";
+import { useColorScheme } from "@/hooks/useColorScheme";
 import * as VideoThumbnails from "expo-video-thumbnails";
 
 const UserAdvertisementScreen = () => {
+  const colorScheme = useColorScheme();
   const screenWidth = Dimensions.get("window").width;
   const [isMobile, setIsMobile] = useState(screenWidth < 768);
   const columnWidths = isMobile
@@ -45,10 +47,6 @@ const UserAdvertisementScreen = () => {
         status: screenWidth * 0.18,
         action: screenWidth * 0.1,
       };
-
-  const [fontSizeTitle, setFontSizeTitle] = useState(
-    screenWidth < 768 ? 20 : 28
-  );
   const [fontSizeHeader, setFontSizeHeader] = useState(
     screenWidth < 768 ? 14 : 18
   );
@@ -60,6 +58,7 @@ const UserAdvertisementScreen = () => {
     null
   );
   const [isProductModalVisible, setIsProductModalVisible] = useState(false);
+  const [modalStatusVisible, setModalStatusVisible] = useState(false);
   const [selectedStatus, setSelectedStatus] = useState<{
     [key: string]: Status;
   }>({});
@@ -88,7 +87,6 @@ const UserAdvertisementScreen = () => {
     getData();
     const subscription = Dimensions.addEventListener("change", ({ window }) => {
       setIsMobile(window.width < 768);
-      setFontSizeTitle(window.width < 768 ? 20 : 28);
       setFontSizeHeader(window.width < 768 ? 14 : 18);
     });
     return () => subscription?.remove();
@@ -178,23 +176,154 @@ const UserAdvertisementScreen = () => {
             Rp {item.Price.toLocaleString()}
           </ThemedCell>
         )}
-        <ThemedCell style={[{ width: columnWidths.status }]}>
-          <Picker
-            selectedValue={selectedStatus[item.ID] || item.Status}
-            onValueChange={(newStatus: Status) => {
-              handleStatusChange(newStatus, item.ID);
-              setSelectedStatus((prev) => ({
-                ...prev,
-                [item.ID]: newStatus,
-              }));
-            }}
-            style={{ height: 50, width: "100%", backgroundColor: "#fff" }}
+        {Platform.OS === "ios" ? (
+          <>
+            <ThemedCell
+              style={[
+                {
+                  width: columnWidths.status,
+                  minHeight: 60,
+                  overflow: "visible",
+                },
+              ]}
+            >
+              <TouchableOpacity
+                onPress={() => setModalStatusVisible(true)}
+                style={{
+                  height: 50,
+                  width: 150,
+                  justifyContent: "center",
+                  backgroundColor:
+                    colorScheme === "dark" ? "#555555" : "#f9fafb",
+                  paddingHorizontal: 10,
+                  borderWidth: 1,
+                  borderColor: "#ccc",
+                  borderRadius: 10,
+                }}
+              >
+                <ThemedText style={{ textAlign: "center" }}>
+                  {(selectedStatus[item.ID] || item.Status)
+                    .charAt(0)
+                    .toUpperCase() +
+                    (selectedStatus[item.ID] || item.Status).slice(1)}
+                </ThemedText>
+              </TouchableOpacity>
+            </ThemedCell>
+            <Modal
+              visible={modalStatusVisible}
+              transparent
+              animationType="slide"
+            >
+              <View
+                style={{
+                  flex: 1,
+                  justifyContent: "center",
+                  alignItems: "center",
+                  backgroundColor: "rgba(0,0,0,0.5)",
+                }}
+              >
+                <ThemedView
+                  style={{
+                    paddingBottom: 20,
+                    width: 300,
+                    borderRadius: 20,
+                  }}
+                >
+                  <View
+                    style={{
+                      flexDirection: "row",
+                      justifyContent: "center",
+                      padding: 10,
+                    }}
+                  >
+                    <TouchableOpacity
+                      onPress={() => setModalStatusVisible(false)}
+                      style={{
+                        paddingVertical: 10,
+                        paddingHorizontal: 20,
+                        borderRadius: 20,
+                        alignItems: "center",
+                        right: 95,
+                        bottom: 15,
+                      }}
+                    >
+                      <ThemedText
+                        style={{
+                          color: "#000",
+                          fontSize: 10,
+                          fontWeight: "bold",
+                        }}
+                      >
+                        ❌
+                      </ThemedText>
+                    </TouchableOpacity>
+                    <ThemedText
+                      style={{
+                        paddingVertical: 10,
+                        alignItems: "center",
+                        fontSize: 20,
+                        fontWeight: "bold",
+                        right: 30,
+                      }}
+                    >
+                      Status
+                    </ThemedText>
+                  </View>
+
+                  <Picker
+                    selectedValue={selectedStatus[item.ID] || item.Status}
+                    onValueChange={(newStatus: Status) => {
+                      handleStatusChange(newStatus, item.ID);
+                      setSelectedStatus((prev) => ({
+                        ...prev,
+                        [item.ID]: newStatus,
+                      }));
+                    }}
+                    itemStyle={{ height: 120 }}
+                  >
+                    <Picker.Item label="Pending" value="pending" />
+                    <Picker.Item label="Process" value="process" />
+                    <Picker.Item label="Approved" value="approved" />
+                    <Picker.Item label="Rejected" value="rejected" />
+                  </Picker>
+                </ThemedView>
+              </View>
+            </Modal>
+          </>
+        ) : (
+          <ThemedCell
+            style={[
+              {
+                width: columnWidths.status,
+                minHeight: 60,
+                overflow: "visible",
+              },
+            ]}
           >
-            <Picker.Item label="Pending" value="pending" />
-            <Picker.Item label="Approved" value="approved" />
-            <Picker.Item label="Rejected" value="rejected" />
-          </Picker>
-        </ThemedCell>
+            <Picker
+              selectedValue={selectedStatus[item.ID] || item.Status}
+              onValueChange={(newStatus: Status) => {
+                handleStatusChange(newStatus, item.ID);
+                setSelectedStatus((prev) => ({
+                  ...prev,
+                  [item.ID]: newStatus,
+                }));
+              }}
+              style={{
+                height: 50,
+                width: "100%",
+                backgroundColor: colorScheme === "dark" ? "#555555" : "#f9fafb",
+                color: colorScheme === "dark" ? "#f9fafb" : "#555555",
+                borderRadius: 10,
+              }}
+            >
+              <Picker.Item label="Pending" value="pending" />
+              <Picker.Item label="Process" value="process" />
+              <Picker.Item label="Approved" value="approved" />
+              <Picker.Item label="Rejected" value="rejected" />
+            </Picker>
+          </ThemedCell>
+        )}
 
         <ThemedCell style={[{ width: columnWidths.action }]}>
           <IconButton
@@ -241,19 +370,28 @@ const UserAdvertisementScreen = () => {
             backgroundColor: "rgba(0, 0, 0, 0.7)",
           }}
         >
-          <IconButton
-            icon="close"
-            size={24}
-            onPress={() => setIsProductModalVisible(false)}
+          <TouchableOpacity
+            onPress={() => {
+              console.log("Tombol close diklik");
+              setIsProductModalVisible(false);
+            }}
             style={{
               position: "absolute",
-              top: 40,
+              top: Platform.OS === "web" ? 50 : 80,
               left: 20,
               backgroundColor: "white",
-              zIndex: 1,
+              width: 40,
+              height: 40,
+              borderRadius: 20,
+              alignItems: "center",
+              justifyContent: "center",
+              zIndex: 10,
+              elevation: 10,
             }}
-            iconColor="black"
-          />
+          >
+            <ThemedText style={{ fontSize: 20, color: "black" }}>✕</ThemedText>
+          </TouchableOpacity>
+
           <OfferDetailModal product={selectedProduct} />
         </View>
       </Modal>

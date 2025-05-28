@@ -7,7 +7,8 @@ import {
   ScrollView,
   View,
   Modal,
-  Platform
+  Platform,
+  TouchableOpacity
 } from "react-native";
 import { IconButton } from "react-native-paper";
 import { useRouter } from "expo-router";
@@ -192,19 +193,27 @@ const ProductsScreen = () => {
           }}
         >
           {/* Tombol silang dengan React Native Paper */}
-          <IconButton
-            icon="close"
-            size={24}
-            onPress={() => setIsProductModalVisible(false)}
+          <TouchableOpacity
+            onPress={() => {
+              console.log("Tombol close diklik");
+              setIsProductModalVisible(false);
+            }}
             style={{
               position: "absolute",
-              top: 40,
+              top: Platform.OS === "web" ? 50 : 80,
               left: 20,
               backgroundColor: "white",
-              zIndex: 1,
+              width: 40,
+              height: 40,
+              borderRadius: 20,
+              alignItems: "center",
+              justifyContent: "center",
+              zIndex: 10,
+              elevation: 10,
             }}
-            iconColor="black"
-          />
+          >
+            <ThemedText style={{ fontSize: 20, color: "black" }}>✕</ThemedText>
+          </TouchableOpacity>
 
           {/* Konten modal */}
           <ProductDetailModal product={selectedProduct} />
