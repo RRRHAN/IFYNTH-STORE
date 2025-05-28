@@ -170,7 +170,8 @@
             transaction.ShippingAddress.ShippingCost.toLocaleString() : '0';
 
         // Populate the payment proof image
-        let paymentProofImage = transaction.PaymentProof ? `http://localhost:7777${transaction.PaymentProof}` : '';
+        let baseUrl = "{{ url(config('app.back_end_base_url')) }}"
+        let paymentProofImage = transaction.PaymentProof ? baseUrl + `/api${transaction.PaymentProof}` : '';
         document.getElementById('paymentProofImage' + iteration).src = paymentProofImage;
     }
 
