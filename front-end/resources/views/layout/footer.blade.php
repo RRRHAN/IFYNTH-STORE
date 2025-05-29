@@ -9,9 +9,9 @@
                             <ul>
                                 <li><a href="contact.html"><span></span>Help Portal</a></li>
                                 <li><a href="contact.html"><span></span>Contact Us</a></li>
-                                <li><a href="error.html"><span></span>Delivery Information</a></li>
-                                <li><a href="error.html"><span></span>Click and Collect</a></li>
-                                <li><a href="error.html"><span></span>Refunds and Returns</a></li>
+                                <li><a href=""><span></span>Delivery Information</a></li>
+                                <li><a href=""><span></span>Click and Collect</a></li>
+                                <li><a href=""><span></span>Refunds and Returns</a></li>
                             </ul>
                         </div>
                     </div>
@@ -19,23 +19,22 @@
                         <div class="footer__item">
                             <h4 class="footer-title">Get to Know Us</h4>
                             <ul>
-                                <li><a href="about.html"><span></span>About Us</a></li>
-                                <li><a href="blog-grid.html"><span></span>News & Blog</a></li>
-                                <li><a href="error.html"><span></span>Careers</a></li>
-                                <li><a href="error.html"><span></span>Investors</a></li>
-                                <li><a href="contact.html"><span></span>Contact Us</a></li>
+                                <li><a href="{{route('products.getAll', ['department' => 'IFY'])}}"><span></span>I Found You</a></li>
+                                <li><a href="{{route('products.getAll', ['department' => 'NTH'])}}"><span></span>No Time To Hell</a></li>
+                                <li><a href="/sellproduct"><span></span>Sell Your Clothes</a></li>
+                                <li><a href=""><span></span>Contact Us</a></li>
                             </ul>
                         </div>
                     </div>
                     <div class="col-xl-3 col-lg-6 col-md-6 wow fadeInUp" data-wow-duration="1.3s" data-wow-delay=".3s">
                         <div class="footer__item">
-                            <h4 class="footer-title">vapes new collections</h4>
+                            <h4 class="footer-title">IFYNTH new collections</h4>
                             <ul>
-                                <li><a href="shop.html"><span></span>E-Cigarettes</a></li>
-                                <li><a href="shop.html"><span></span>Vape Pens</a></li>
-                                <li><a href="shop.html"><span></span>Pod Systems</a></li>
-                                <li><a href="shop.html"><span></span>Disposable Vapes</a></li>
-                                <li><a href="shop.html"><span></span>Nicotine Salt Devices</a></li>
+                                <li><a href="{{route('products.getAll', ['category' => 'Shirt'])}}"><span></span>Shirt</a></li>
+                                <li><a href="{{route('products.getAll', ['category' => 'T-Shirt'])}}"><span></span>T-Shirt</a></li>
+                                <li><a href="{{route('products.getAll', ['category' => 'Long Shirt'])}}"><span></span>Long Shirt</a></li>
+                                <li><a href="{{route('products.getAll', ['category' => 'Outerwear'])}}"><span></span>Outerwear</a></li>
+                                <li><a href="{{route('products.getAll', ['category' => 'Pants'])}}"><span></span>Pants</a></li>
                             </ul>
                         </div>
                     </div>
@@ -47,10 +46,10 @@
                                 <button><i class="fa-solid fa-paper-plane"></i></button>
                             </div>
                             <div class="social-icon mt-40">
-                                <a href="login.html#0"><i class="fa-brands fa-facebook-f"></i></a>
-                                <a href="login.html#0"><i class="fa-brands fa-twitter"></i></a>
-                                <a href="login.html#0"><i class="fa-brands fa-linkedin-in"></i></a>
-                                <a href="login.html#0"><i class="fa-brands fa-youtube"></i></a>
+                                <a href=""><i class="fa-brands fa-facebook-f"></i></a>
+                                <a href=""><i class="fa-brands fa-twitter"></i></a>
+                                <a href=""><i class="fa-brands fa-linkedin-in"></i></a>
+                                <a href=""><i class="fa-brands fa-youtube"></i></a>
                             </div>
                         </div>
                     </div>

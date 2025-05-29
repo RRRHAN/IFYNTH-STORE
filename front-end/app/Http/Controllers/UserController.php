@@ -36,10 +36,10 @@ class UserController extends Controller
                 'Authorization' => 'Basic ' . base64_encode('admin:admin'),
                 'Content-Type' => 'application/json'
             ])->post(config('app.back_end_base_url') . '/api/user/register', [
-                        'name' => $request['name'],
-                        'username' => $request['username'],
-                        'phoneNumber' => $request['phoneNumber'],
-                        'password' => $request['password'],
+                        'name' => $validated['name'],
+                        'username' => $validated['username'],
+                        'phoneNumber' => $validated['phoneNumber'],
+                        'password' => $validated['password'],
                     ]);
 
             if ($response->successful()) {
