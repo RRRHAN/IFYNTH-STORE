@@ -29,6 +29,7 @@ import { BASE_URL } from "@/src/api/constants";
 import { generateVideoThumbnailJS } from "@/hooks/helpers/ThumbnailProcessor";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import * as VideoThumbnails from "expo-video-thumbnails";
+import StatusOfferIOS from "@/components/StatusOfferIOS";
 
 const UserAdvertisementScreen = () => {
   const colorScheme = useColorScheme();
@@ -66,6 +67,7 @@ const UserAdvertisementScreen = () => {
   const [thumbnailUrls, setThumbnailUrls] = useState<{ [key: string]: string }>(
     {}
   );
+  const [currentItemId, setCurrentItemId] = useState<string | null>(null);
 
   const getData = async () => {
     try {
@@ -177,119 +179,18 @@ const UserAdvertisementScreen = () => {
           </ThemedCell>
         )}
         {Platform.OS === "ios" ? (
-          <>
-            <ThemedCell
-              style={[
-                {
-                  width: columnWidths.status,
-                  minHeight: 60,
-                  overflow: "visible",
-                },
-              ]}
-            >
-              <TouchableOpacity
-                onPress={() => setModalStatusVisible(true)}
-                style={{
-                  height: 50,
-                  width: 150,
-                  justifyContent: "center",
-                  backgroundColor:
-                    colorScheme === "dark" ? "#555555" : "#f9fafb",
-                  paddingHorizontal: 10,
-                  borderWidth: 1,
-                  borderColor: "#ccc",
-                  borderRadius: 10,
-                }}
-              >
-                <ThemedText style={{ textAlign: "center" }}>
-                  {(selectedStatus[item.ID] || item.Status)
-                    .charAt(0)
-                    .toUpperCase() +
-                    (selectedStatus[item.ID] || item.Status).slice(1)}
-                </ThemedText>
-              </TouchableOpacity>
-            </ThemedCell>
-            <Modal
-              visible={modalStatusVisible}
-              transparent
-              animationType="slide"
-            >
-              <View
-                style={{
-                  flex: 1,
-                  justifyContent: "center",
-                  alignItems: "center",
-                  backgroundColor: "rgba(0,0,0,0.5)",
-                }}
-              >
-                <ThemedView
-                  style={{
-                    paddingBottom: 20,
-                    width: 300,
-                    borderRadius: 20,
-                  }}
-                >
-                  <View
-                    style={{
-                      flexDirection: "row",
-                      justifyContent: "center",
-                      padding: 10,
-                    }}
-                  >
-                    <TouchableOpacity
-                      onPress={() => setModalStatusVisible(false)}
-                      style={{
-                        paddingVertical: 10,
-                        paddingHorizontal: 20,
-                        borderRadius: 20,
-                        alignItems: "center",
-                        right: 95,
-                        bottom: 15,
-                      }}
-                    >
-                      <ThemedText
-                        style={{
-                          color: "#000",
-                          fontSize: 10,
-                          fontWeight: "bold",
-                        }}
-                      >
-                        ❌
-                      </ThemedText>
-                    </TouchableOpacity>
-                    <ThemedText
-                      style={{
-                        paddingVertical: 10,
-                        alignItems: "center",
-                        fontSize: 20,
-                        fontWeight: "bold",
-                        right: 30,
-                      }}
-                    >
-                      Status
-                    </ThemedText>
-                  </View>
-
-                  <Picker
-                    selectedValue={selectedStatus[item.ID] || item.Status}
-                    onValueChange={(newStatus: Status) => {
-                      handleStatusChange(newStatus, item.ID);
-                      setSelectedStatus((prev) => ({
-                        ...prev,
-                        [item.ID]: newStatus,
-                      }));
-                    }}
-                    itemStyle={{ height: 120 }}
-                  >
-                    <Picker.Item label="Pending" value="pending" />
-                    <Picker.Item label="Process" value="process" />
-                    <Picker.Item label="Approved" value="approved" />
-                    <Picker.Item label="Rejected" value="rejected" />
-                  </Picker>
-                </ThemedView>
-              </View>
-            </Modal>
-          </>
+          <StatusOfferIOS
+            item={item}
+            columnWidths={columnWidths}
+            selectedStatus={selectedStatus}
+            setSelectedStatus={setSelectedStatus}
+            currentItemId={currentItemId}
+            setCurrentItemId={setCurrentItemId}
+            modalStatusVisible={modalStatusVisible}
+            setModalStatusVisible={setModalStatusVisible}
+            handleStatusChange={handleStatusChange}
+            offers={offers}
+          />
         ) : (
           <ThemedCell
             style={[
@@ -309,16 +210,39 @@ const UserAdvertisementScreen = () => {
                   [item.ID]: newStatus,
                 }));
               }}
+              enabled={
+                (selectedStatus[item.ID] || item.Status) !== "approved" &&
+                (selectedStatus[item.ID] || item.Status) !== "rejected"
+              }
               style={{
                 height: 50,
                 width: "100%",
-                backgroundColor: colorScheme === "dark" ? "#555555" : "#f9fafb",
-                color: colorScheme === "dark" ? "#f9fafb" : "#555555",
+                backgroundColor:
+                  (selectedStatus[item.ID] || item.Status) === "approved" ||
+                  (selectedStatus[item.ID] || item.Status) === "rejected"
+                    ? "#ddd"
+                    : colorScheme === "dark"
+                    ? "#555555"
+                    : "#f9fafb",
+                color:
+                  (selectedStatus[item.ID] || item.Status) === "approved" ||
+                  (selectedStatus[item.ID] || item.Status) === "rejected"
+                    ? "#888"
+                    : colorScheme === "dark"
+                    ? "#f9fafb"
+                    : "#555555",
                 borderRadius: 10,
               }}
             >
-              <Picker.Item label="Pending" value="pending" />
-              <Picker.Item label="Process" value="process" />
+              {item.Status === "pending" && (
+                <>
+                  <Picker.Item label="Pending" value="pending" />
+                  <Picker.Item label="Process" value="process" />
+                </>
+              )}
+              {item.Status === "process" && (
+                <Picker.Item label="Process" value="process" />
+              )}
               <Picker.Item label="Approved" value="approved" />
               <Picker.Item label="Rejected" value="rejected" />
             </Picker>

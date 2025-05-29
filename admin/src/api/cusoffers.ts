@@ -19,7 +19,7 @@ export const fetchOffers = async (): Promise<cusProduct[]> => {
   return result.data;
 };
 
-export type Status = "pending" | "approved" | "rejected";
+export type Status = "pending" | "approved" | "rejected" | "process";
 
 export const handleStatusChange = async (
   newStatus: Status,
