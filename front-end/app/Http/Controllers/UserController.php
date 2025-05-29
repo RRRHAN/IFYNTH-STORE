@@ -188,7 +188,7 @@ class UserController extends Controller
         try {
             $response = Http::withHeaders([
                 'Authorization' => 'Bearer ' . $token,
-            ])->get('localhost:7777/api/user/get-personal');
+            ])->get(config('app.back_end_base_url') . '/api/user/get-personal');
 
             if (in_array('Unauthorized!', $response->json('errors') ?? [])) {
                 return redirect()->route('login')->with('error', 'Session expired. Please log in again.');
@@ -219,7 +219,7 @@ class UserController extends Controller
 
         $response = Http::withHeaders([
             'Authorization' => 'Bearer ' . $token,
-        ])->patch('localhost:7777/api/user/updateCustomer', [
+        ])->patch(config('app.back_end_base_url') . '/api/user/updateCustomer', [
                     'username' => $request->username,
                     'email' => $request->email,
                     'name' => $request->name,
