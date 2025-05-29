@@ -5,8 +5,6 @@ services:
     build: ./front-end
     container_name: laravel_app
     working_dir: /var/www
-    volumes:
-      - ./front-end:/var/www
     env_file:
       - .env
     ports:
