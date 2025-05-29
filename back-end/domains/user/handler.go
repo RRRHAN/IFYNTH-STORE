@@ -16,6 +16,7 @@ type Handler interface {
 	VerifyToken(ctx *gin.Context)
 	Logout(ctx *gin.Context)
 	Register(ctx *gin.Context)
+	RegisterAdmin(ctx *gin.Context)
 	ChangePassword(ctx *gin.Context)
 	GetPersonal(ctx *gin.Context)
 }
@@ -104,6 +105,29 @@ func (h *handler) Register(ctx *gin.Context) {
 	}
 
 	res, err := h.service.Register(ctx, input)
+	if err != nil {
+		respond.Error(ctx, apierror.FromErr(err))
+		return
+	}
+
+	respond.Success(ctx, http.StatusCreated, res)
+}
+
+func (h *handler) RegisterAdmin(ctx *gin.Context) {
+
+	var input RegisterReq
+	if err := ctx.ShouldBindJSON(&input); err != nil {
+		respond.Error(ctx, apierror.Warn(http.StatusBadRequest, err))
+		return
+	}
+
+	err := h.validate.Struct(input)
+	if err != nil {
+		respond.Error(ctx, apierror.FromErr(err))
+		return
+	}
+
+	res, err := h.service.RegisterAdmin(ctx, input)
 	if err != nil {
 		respond.Error(ctx, apierror.FromErr(err))
 		return

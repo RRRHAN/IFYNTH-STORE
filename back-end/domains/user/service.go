@@ -21,6 +21,7 @@ type Service interface {
 	Logout(ctx context.Context, input LogoutReq) (res *LogoutRes, err error)
 	ValidateToken(ctx context.Context, token string) (err error)
 	Register(ctx context.Context, input RegisterReq) (res *Customer, err error)
+	RegisterAdmin(ctx context.Context, input RegisterReq) (res *Admin, err error)
 	ChangePassword(ctx context.Context, input ChangePasswordReq) error
 	GetPersonal(ctx context.Context) (interface{}, error)
 }
@@ -181,6 +182,40 @@ func (s *service) Register(ctx context.Context, input RegisterReq) (res *Custome
 	}
 
 	return &customer, nil
+}
+
+func (s *service) RegisterAdmin(ctx context.Context, input RegisterReq) (res *Admin, err error) {
+	token, err := contextUtil.GetTokenClaims(ctx)
+	if err != nil {
+		return nil, err
+	}
+	loggedInUsername := token.Claims.Username
+	if loggedInUsername != "owner" {
+		return nil, errors.New("unauthorized: only owners can register admins")
+	}
+
+	// Hash password
+	hashedPassword, err := hashPassword(input.Password)
+	if err != nil {
+		return nil, apierror.FromErr(err)
+	}
+
+	// Build admin object
+	admin := Admin{
+		Name:        input.Name,
+		PhoneNumber: input.PhoneNumber,
+		Username:    input.Username,
+		Password:    hashedPassword,
+		CreatedAt:   time.Now(),
+		UpdatedAt:   time.Now(),
+	}
+
+	// Insert into DB
+	if err := s.db.WithContext(ctx).Create(&admin).Error; err != nil {
+		return nil, apierror.FromErr(err)
+	}
+
+	return &admin, nil
 }
 
 func (s *service) ChangePassword(ctx context.Context, input ChangePasswordReq) error {

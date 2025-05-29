@@ -27,6 +27,7 @@ export const loginAdmin = async (username: string, password: string) => {
 
       await AsyncStorage.setItem("auth_token", token);
       await AsyncStorage.setItem("expires_at", expires);
+      await AsyncStorage.setItem("username", username);
 
       return { success: true, message: "Login Successfully!" };
     }
@@ -54,8 +55,7 @@ export const logoutAdmin = async () => {
     const data = await response.json();
 
     if (response.ok || data.success) {
-      await AsyncStorage.removeItem("auth_token");
-      await AsyncStorage.removeItem("expires_at");
+      await AsyncStorage.clear();
 
       return { success: true, message: "Logout Successfully!" };
     } else {
