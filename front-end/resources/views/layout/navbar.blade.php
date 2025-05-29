@@ -2,7 +2,7 @@
 <div class="top__header top-header-one pt-30 pb-30">
     <div class="container">
         <div class="top__wrapper d-flex justify-content-between align-items-center">
-            <a href="index.html" class="main__logo">
+            <a href="/landing" class="main__logo">
                 <img src="/assets/images/logo/logo.png" alt="logo__image" style="width: 220px">
             </a>
             <div class="search__wrp">

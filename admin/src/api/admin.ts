@@ -1,5 +1,6 @@
 import { BASE_URL } from "./constants";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useRouter } from "expo-router";
 
 export const loginAdmin = async (username: string, password: string) => {
   try {
@@ -37,15 +38,15 @@ export const loginAdmin = async (username: string, password: string) => {
 
 export const logoutAdmin = async () => {
   try {
-    const token = await AsyncStorage.getItem('auth_token');
+    const token = await AsyncStorage.getItem("auth_token");
     if (!token) {
-      return { success: false, message: 'No token found, already logged out.' };
+      return { success: false, message: "No token found, already logged out." };
     }
 
     const response = await fetch(`${BASE_URL}/api/user/logout`, {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
       },
     });
@@ -53,15 +54,59 @@ export const logoutAdmin = async () => {
     const data = await response.json();
 
     if (response.ok || data.success) {
-      await AsyncStorage.removeItem('auth_token');
-      await AsyncStorage.removeItem('expires_at');
+      await AsyncStorage.removeItem("auth_token");
+      await AsyncStorage.removeItem("expires_at");
 
-      return { success: true, message: 'Logout Successfully!' };
+      return { success: true, message: "Logout Successfully!" };
     } else {
-      return { success: false, message: data.message || 'An error occurred during logout. Please try again.' };
+      return {
+        success: false,
+        message:
+          data.message || "An error occurred during logout. Please try again.",
+      };
     }
   } catch (error) {
     console.error(error);
-    return { success: false, message: 'An error occurred during logout. Please try again.' };
+    return {
+      success: false,
+      message: "An error occurred during logout. Please try again.",
+    };
+  }
+};
+
+export const checkLoginStatus = async (
+  router: ReturnType<typeof useRouter>
+): Promise<boolean> => {
+  const jwtToken = await AsyncStorage.getItem("auth_token");
+  const isLoggedInLocally = await AsyncStorage.getItem("is_logged_in");
+
+  if (isLoggedInLocally === "false" || !isLoggedInLocally || !jwtToken) {
+    router.replace("/login");
+    return false;
+  }
+
+  try {
+    const response = await fetch(`${BASE_URL}/api/user/check-jwt`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${jwtToken}`,
+      },
+    });
+
+    if (response.ok) {
+      console.log("JWT verified successfully with backend.");
+      return true;
+    } else {
+      await AsyncStorage.setItem("is_logged_in", "false");
+      await AsyncStorage.removeItem("auth_token");
+      router.replace("/login");
+      return false;
+    }
+  } catch (error) {
+    await AsyncStorage.setItem("is_logged_in", "false");
+    await AsyncStorage.removeItem("auth_token");
+    router.replace("/login");
+    return false;
   }
 };

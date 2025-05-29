@@ -23,3 +23,9 @@ export interface UpdateProductData {
   images: any[];
   removedImages: { productID: string; url: string }[];
 }
+
+export interface ImageAsset {
+  uri: string;
+  fileName?: string;
+  mimeType?: string;
+}

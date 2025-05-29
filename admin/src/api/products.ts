@@ -1,6 +1,7 @@
 import { Product } from "../types/product";
 import { BASE_URL, getAuthToken } from "./constants";
 import { ProductData, UpdateProductData } from "../request/productReq";
+import { Platform } from "react-native";
 
 export const fetchProducts = async (): Promise<Product[]> => {
   try {
@@ -39,11 +40,34 @@ export const addProduct = async (productData: ProductData) => {
   formData.append("category", productData.category);
 
   if (productData.images.length > 0) {
-    for (const [index, img] of productData.images.entries()) {
-      const imageUri = img.uri;
-      const response = await fetch(imageUri);
-      const blob = await response.blob();
-      formData.append("images", blob, img.name || `image${index}.jpg`);
+    if (Platform.OS === "web") {
+      console.log("Mengunggah gambar dari PLATFORM WEB...");
+      for (const [index, img] of productData.images.entries()) {
+        const imageUri = img.uri;
+        const response = await fetch(imageUri);
+        const blob = await response.blob();
+        formData.append("images", blob, img.fileName || `image${index}.jpg`);
+        console.log(
+          `✅ Gambar web '${
+            img.fileName || `image${index}.jpg`
+          }' ditambahkan ke FormData.`
+        );
+      }
+    } else {
+      // Platform adalah 'ios' atau 'android' (mobile)
+      console.log("Mengunggah gambar dari PLATFORM MOBILE...");
+      for (const [index, img] of productData.images.entries()) {
+        const imageUri = img.uri;
+        const fileName = img.fileName || `image_${Date.now()}_${index}.jpg`;
+        const fileType = img.type || "image/jpeg";
+
+        formData.append("images", {
+          uri: imageUri,
+          name: fileName,
+          type: fileType,
+        } as any);
+        console.log(`✅ Gambar mobile '${fileName}' ditambahkan ke FormData.`);
+      }
     }
   }
 
@@ -59,7 +83,34 @@ export const addProduct = async (productData: ProductData) => {
       body: formData,
     });
 
-    const result = await response.json();
+    // --- TAMBAHKAN LOG INI ---
+    console.log("HTTP Status Code:", response.status);
+    const responseText = await response.text();
+    console.log("Raw Server Response:", responseText);
+
+    let result;
+    try {
+      result = JSON.parse(responseText);
+      console.log("Parsed JSON Response:", result);
+    } catch (parseError) {
+      console.error("Failed to parse JSON response:", parseError);
+      throw new Error(
+        `Server returned non-JSON response or parse error: ${responseText}`
+      );
+    }
+    // --- AKHIR LOG TAMBAHAN ---
+
+    if (!response.ok) {
+      console.error(
+        "Server returned an error status:",
+        response.status,
+        result
+      );
+      throw new Error(
+        result.message || "Failed to add product on server (Non-OK status)."
+      );
+    }
+
     return result;
   } catch (error) {
     throw new Error("Something went wrong while adding the product.");

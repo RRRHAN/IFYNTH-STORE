@@ -134,7 +134,7 @@ export default function ChatScreen() {
         {isMe && (
           <Image
             source={{
-              uri: "https://png.pngtree.com/png-vector/20240601/ourmid/pngtree-casual-man-flat-design-avatar-profile-picture-vector-png-image_12593008.png",
+              uri: "https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava1-bg.webp",
             }}
             style={styles.avatarLeft}
           />
@@ -155,7 +155,7 @@ export default function ChatScreen() {
         </ThemedView>
         {!isMe && (
           <Image
-            source={{ uri: "/w3images/bandmember.jpg" }}
+            source={{ uri: "https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava6-bg.webp" }}
             style={styles.avatarRight}
           />
         )}
