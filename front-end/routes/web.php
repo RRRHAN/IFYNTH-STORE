@@ -10,6 +10,7 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\MessageController;
 use App\Http\Controllers\TryonController;
+use Illuminate\Support\Facades\Http;
 
 Route::get('/', function () {
     $token = session('api_token');
