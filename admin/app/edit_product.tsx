@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { View, Alert, ScrollView } from "react-native";
 import ModalComponent from "../components/ModalComponent";
 import { useColorScheme } from "@/hooks/useColorScheme";
-import { pickImage } from "@/hooks/helpers/pickImage";
+import { pickImage } from "@/hooks/helpers/pickImage2";
 import styles from "./styles/addProductStyles";
 import { updateProduct } from "@/src/api/products";
 import { ThemedText } from "@/components/ThemedText";

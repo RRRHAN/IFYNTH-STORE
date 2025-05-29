@@ -159,11 +159,34 @@ export const updateProduct = async (productData: UpdateProductData) => {
   formData.append("category", productData.category);
 
   if (productData.images.length > 0) {
-    for (const [index, img] of productData.images.entries()) {
-      const imageUri = img.uri;
-      const response = await fetch(imageUri);
-      const blob = await response.blob();
-      formData.append("images", blob, img.name || `image${index}.jpg`);
+    if (Platform.OS === "web") {
+      console.log("Mengunggah gambar dari PLATFORM WEB...");
+      for (const [index, img] of productData.images.entries()) {
+        const imageUri = img.uri;
+        const response = await fetch(imageUri);
+        const blob = await response.blob();
+        formData.append("images", blob, img.fileName || `image${index}.jpg`);
+        console.log(
+          `✅ Gambar web '${
+            img.fileName || `image${index}.jpg`
+          }' ditambahkan ke FormData.`
+        );
+      }
+    } else {
+      // Platform adalah 'ios' atau 'android' (mobile)
+      console.log("Mengunggah gambar dari PLATFORM MOBILE...");
+      for (const [index, img] of productData.images.entries()) {
+        const imageUri = img.uri;
+        const fileName = img.fileName || `image_${Date.now()}_${index}.jpg`;
+        const fileType = img.type || "image/jpeg";
+
+        formData.append("images", {
+          uri: imageUri,
+          name: fileName,
+          type: fileType,
+        } as any);
+        console.log(`✅ Gambar mobile '${fileName}' ditambahkan ke FormData.`);
+      }
     }
   }
 
