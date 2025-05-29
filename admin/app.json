@@ -15,7 +15,8 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.devanadindra.admin"
     },
     "web": {
       "bundler": "metro",
@@ -43,6 +44,12 @@
     ],
     "experiments": {
       "typedRoutes": true
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "75d851ad-6ea7-4c80-a5fb-63f468da01f8"
+      }
     }
   }
 }

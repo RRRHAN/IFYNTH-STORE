@@ -197,7 +197,7 @@ export default function HomeScreen() {
                         ]}
                       >
                         <TotalTransactionUserTable
-                          totalTransactionUser={dummyTotalTransactionUsers}
+                          totalTransactionUser={totalTransactionUser}
                         />
                       </View>
                     )}
