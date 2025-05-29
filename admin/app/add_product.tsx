@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { View, Alert, ScrollView, Image } from "react-native";
 import ModalComponent from "../components/ModalComponent";
 import { useColorScheme } from "@/hooks/useColorScheme";
-import { pickImage } from "@/hooks/helpers/pickImage";
+import { pickImage } from "@/hooks/helpers/pickImage2";
 import { handleStockChange } from "@/hooks/helpers/handleStockChange";
 import styles from "./styles/addProductStyles";
 import { addProduct } from "@/src/api/products";
@@ -191,7 +191,6 @@ export default function AddProductScreen() {
 
       <ActionButtons
         pickImage={() => {
-          console.log("📸 pickImage dipanggil");
           pickImage(setImages, setErrorMessage, setVisible)}}
         handleAddProduct={handleAddProduct}
         styles={styles}

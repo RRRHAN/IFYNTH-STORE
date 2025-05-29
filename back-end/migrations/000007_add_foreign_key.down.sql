@@ -1,0 +1,11 @@
+ALTER TABLE carts
+DROP CONSTRAINT fk_user;
+
+ALTER TABLE cart_items
+DROP CONSTRAINT fk_product;
+
+ALTER TABLE message
+DROP CONSTRAINT fk_customer;
+
+ALTER TABLE message
+DROP CONSTRAINT fk_admin;

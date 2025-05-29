@@ -180,6 +180,10 @@ func (s *service) DeleteProduct(ctx context.Context, productID string) error {
 		return fmt.Errorf("product not found: %v", err)
 	}
 
+	if err := s.db.WithContext(ctx).Where("product_id = ?", productID).Delete(&ProductCapital{}).Error; err != nil {
+		return fmt.Errorf("error deleting product capital details: %v", err)
+	}
+
 	if err := s.db.WithContext(ctx).Where("product_id = ?", productID).Delete(&ProductStockDetail{}).Error; err != nil {
 		return fmt.Errorf("error deleting product stock details: %v", err)
 	}

@@ -67,16 +67,20 @@ class TransactionController extends Controller
                 ],
             ];
 
-
-
             $client = new \GuzzleHttp\Client();
 
-            $response = $client->request('POST', config('app.back_end_base_url').'/api/transaction', [
+            $response = $client->request('POST', config('app.back_end_base_url') . '/api/transaction', [
                 'headers' => [
                     'Authorization' => 'Bearer ' . $token,
                 ],
                 'multipart' => $multipartData,
             ]);
+
+            $responseBody = json_decode($response->getBody(), true);
+
+            if (in_array('Unauthorized!', $responseBody['errors'] ?? [])) {
+                return redirect()->route('login')->with('error', 'Session expired. Please log in again.');
+            }
 
             if ($response->getStatusCode() === 201) {
                 Session::forget('total_cart');
@@ -93,19 +97,23 @@ class TransactionController extends Controller
     {
 
         $token = Session::get('api_token');
-    
+
         try {
             $response = Http::withHeaders([
                 'Authorization' => 'Bearer ' . $token,
-            ])->get(config('app.back_end_base_url').'/api/transaction');
-    
+            ])->get(config('app.back_end_base_url') . '/api/transaction');
+
+            if (in_array('Unauthorized!', $response->json('errors') ?? [])) {
+                return redirect()->route('login')->with('error', 'Session expired. Please log in again.');
+            }
+
             if ($response->successful()) {
                 $transactions = collect($response->json('data'));
-    
+
                 if ($transactions->isEmpty()) {
                     return response()->json(['message' => 'No transactions found'], 404);
                 }
-    
+
                 return response()->json(['transactions' => $transactions], 200);
             } else {
                 return response()->json(['error' => 'Failed to fetch transactions', 'details' => $response->body()], $response->status());

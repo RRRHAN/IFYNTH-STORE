@@ -31,17 +31,17 @@ class UserController extends Controller
                 'password' => 'required|string',
                 'password_confirmation' => 'required|string|same:password',
             ]);
-    
+
             $response = Http::withHeaders([
                 'Authorization' => 'Basic ' . base64_encode('admin:admin'),
                 'Content-Type' => 'application/json'
-            ])->post(config('app.back_end_base_url').'/api/user/register', [
-                'name' => $validated['name'],
-                'username' => $validated['username'],
-                'phoneNumber' => $validated['phoneNumber'],
-                'password' => $validated['password'],
-            ]);
-    
+            ])->post(config('app.back_end_base_url') . '/api/user/register', [
+                        'name' => $request['name'],
+                        'username' => $request['username'],
+                        'phoneNumber' => $request['phoneNumber'],
+                        'password' => $request['password'],
+                    ]);
+
             if ($response->successful()) {
                 session()->flash('success', 'User registered successfully!');
                 return redirect()->route('login');
@@ -50,7 +50,7 @@ class UserController extends Controller
                 session()->flash('error', $errors[0]);
                 return redirect()->back()->withInput();
             }
-    
+
         } catch (ValidationException $e) {
             session()->flash('error', $e->validator->errors()->first());
             return redirect()->back()->withInput();
@@ -60,7 +60,7 @@ class UserController extends Controller
             return redirect()->back()->withInput();
         }
     }
-    
+
     public function login(Request $request)
     {
         // Validasi input
@@ -68,21 +68,21 @@ class UserController extends Controller
             'username' => 'required|string',
             'password' => 'required|string',
         ]);
-    
+
         try {
             $response = Http::withHeaders([
                 'Authorization' => 'Basic ' . base64_encode('admin:admin'),
                 'Content-Type' => 'application/json'
-            ])->post(config('app.back_end_base_url').'/api/user/login', [
-                'username' => $validated['username'],
-                'password' => $validated['password'],
-                'role' => 'CUSTOMER',
-            ]);
-    
+            ])->post(config('app.back_end_base_url') . '/api/user/login', [
+                        'username' => $validated['username'],
+                        'password' => $validated['password'],
+                        'role' => 'CUSTOMER',
+                    ]);
+
             // Jika respons berhasil
             if ($response->successful()) {
                 $data = $response->json();
-    
+
                 if (isset($data['data']['token'])) {
                     // Simpan data token ke sesi
                     session([
@@ -92,42 +92,36 @@ class UserController extends Controller
                         'username' => $validated['username'],
                         'total_cart' => $data['data']['total_cart'],
                     ]);
-    
+
                     return redirect()->route('landing');
                 }
-    
+
                 session()->flash('error', 'Token not received, login failed');
                 return redirect()->back();
             }
-    
+
             $error = $response->json()['errors'][0] ?? 'Login failed.';
             session()->flash('error', $error);
             return redirect()->back();
-    
+
         } catch (\Exception $e) {
             Log::error('Login failed: ' . $e->getMessage());
             session()->flash('error', 'An error occurred during login');
             return redirect()->back();
         }
-    }    
+    }
 
     public function logout(Request $request)
     {
         $token = session('api_token');
-    
-        // Hapus data sesi
-        Session::forget('api_token');
-        Session::forget('token_expiry');
-        Session::forget('username');
-        Session::forget('user_logged_in');
-        Session::forget('total_cart');
-    
+        session()->flush();
+
         try {
             // Kirim request logout ke API eksternal
             $response = Http::withHeaders([
                 'Authorization' => 'Bearer ' . $token,
-            ])->post(config('app.back_end_base_url').'/api/user/logout');
-    
+            ])->post(config('app.back_end_base_url') . '/api/user/logout');
+
             if ($response->successful()) {
                 // Flash pesan sukses dan redirect
                 session()->flash('success', 'Logout successful!');
@@ -146,7 +140,7 @@ class UserController extends Controller
     public function changePassword(Request $request)
     {
         $token = session('api_token');
-    
+
         try {
             // Validate the incoming request
             $validated = $request->validate([
@@ -154,15 +148,19 @@ class UserController extends Controller
                 'new_password' => 'required|string',
                 'password_confirmation' => 'required|string|same:new_password',
             ]);
-    
+
             $response = Http::withHeaders([
                 'Authorization' => 'Bearer ' . $token,
-            ])->patch(config('app.back_end_base_url').'/api/user/password', [
-                'current_password' => $validated['current_password'],
-                'new_password' => $validated['new_password'],
-                'role' => "CUSTOMER",
-            ]);
-    
+            ])->patch(config('app.back_end_base_url') . '/api/user/password', [
+                        'current_password' => $validated['current_password'],
+                        'new_password' => $validated['new_password'],
+                        'role' => "CUSTOMER",
+                    ]);
+
+            if (in_array('Unauthorized!', $response->json('errors') ?? [])) {
+                return redirect()->route('login')->with('error', 'Session expired. Please log in again.');
+            }
+
             if ($response->successful()) {
                 session()->flash('success', 'Changed password successfully!');
                 return redirect()->route('dashboard');
@@ -171,7 +169,7 @@ class UserController extends Controller
                 session()->flash('error', $errors[0]);
                 return redirect()->back();
             }
-    
+
         } catch (ValidationException $e) {
             session()->flash('error', $e->validator->errors()->first());
             return redirect()->back()->withInput();
@@ -181,18 +179,23 @@ class UserController extends Controller
             return redirect()->back();
         }
     }
-    
-    public function getPersonal() {
+
+    public function getPersonal()
+    {
         $token = session('api_token');
-    
+
         try {
             $response = Http::withHeaders([
                 'Authorization' => 'Bearer ' . $token,
-            ])->get(config('app.back_end_base_url').'/api/user/get-personal');
-    
+            ])->get(config('app.back_end_base_url') . '/api/user/get-personal');
+
+            if (in_array('Unauthorized!', $response->json('errors') ?? [])) {
+                return redirect()->route('login')->with('error', 'Session expired. Please log in again.');
+            }
+
             if ($response->successful()) {
-                $data = collect($response->json()); 
-    
+                $data = collect($response->json());
+
                 if ($data->has('data')) {
                     $user = $data->get('data');
                     session(['user' => $user]);
@@ -207,6 +210,6 @@ class UserController extends Controller
             // Jika ada exception
             return collect(['error' => 'Error occurred: ' . $e->getMessage()]);
         }
-    }    
-    
+    }
+
 }

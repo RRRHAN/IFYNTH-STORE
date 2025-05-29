@@ -31,6 +31,23 @@
 </head>
 
 <body>
+    <div class="modal fade" id="localMessageModal" tabindex="-1" aria-labelledby="localMessageModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="localMessageModalLabel">Pesan</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
+                </div>
+                <div class="modal-body">
+                    <span id="localMessageContent"></span>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+                </div>
+            </div>
+        </div>
+    </div>
     <div class="modal fade" id="notificationModal" tabindex="-1" aria-labelledby="notificationModalLabel"
         aria-hidden="true">
         <div class="modal-dialog">
@@ -53,7 +70,7 @@
         </div>
     </div>
     <!-- Preloader area start -->
-    <div class="loading">
+    <div class="loading" id="preloaderContainer">
         <span class="text-capitalize">L</span>
         <span>o</span>
         <span>a</span>
@@ -63,7 +80,7 @@
         <span>g</span>
     </div>
 
-    <div id="preloader">
+    <div id="preloader" id="preloaderContainer">
     </div>
     <!-- Preloader area end -->
 
@@ -73,7 +90,7 @@
     <!-- Mouse cursor area end here -->
 
     @if (session('api_token'))
-    @include('layout.navbar')
+        @include('layout.navbar')
     @endif
     @yield('container')
     @include('layout.footer')
@@ -105,6 +122,22 @@
             var myModal = new bootstrap.Modal(document.getElementById('notificationModal'));
             myModal.show();
         @endif
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const localMessage = localStorage.getItem('feedbackMessage');
+
+            if (localMessage) {
+                const content = document.getElementById('localMessageContent');
+                if (content) {
+                    content.textContent = localMessage;
+                }
+                const modal = new bootstrap.Modal(document.getElementById('localMessageModal'));
+                modal.show();
+
+                localStorage.removeItem('feedbackMessage');
+            }
+        });
     </script>
 </body>
 

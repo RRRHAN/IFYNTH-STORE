@@ -21,9 +21,13 @@ class ProductController extends Controller
             // Ambil data produk dari API
             $response = Http::withHeaders([
                 'Authorization' => 'Bearer ' . $token
-            ])->get(config('app.back_end_base_url').'/api/product', [
+            ])->get(config('app.back_end_base_url') . '/api/product', [
                         'department' => $department
                     ]);
+
+            if (in_array('Unauthorized!', $response->json('errors') ?? [])) {
+                return redirect()->route('login')->with('error', 'Session expired. Please log in again.');
+            }
 
             if ($response->successful() && $response->json('errors') === null) {
                 $allProducts = collect($response->json('data')); // Koleksi produk dari response
@@ -53,51 +57,55 @@ class ProductController extends Controller
     }
 
     public function fetchAll(Request $request)
-{
-    $keyword = $request->query('keyword');
-    $department = $request->query('department');
-    $category = $request->query('category');
-    $page = $request->query('page', 1);
-    $perPage = 12;
-    $token = session('api_token');
+    {
+        $keyword = $request->query('keyword');
+        $department = $request->query('department');
+        $category = $request->query('category');
+        $page = $request->query('page', 1);
+        $perPage = 12;
+        $token = session('api_token');
 
-    try {
-        // Siapkan query parameters, hanya kirim yang tidak kosong
-        $queryParams = array_filter([
-            'keyword' => $keyword,
-            'department' => $department,
-            'category' => $category,
-        ]);
-
-        $response = Http::withHeaders([
-            'Authorization' => 'Bearer ' . $token
-        ])->get(config('app.back_end_base_url').'/api/product', $queryParams);
-
-        if ($response->successful() && $response->json('errors') === null) {
-            $allProducts = collect($response->json('data'));
-
-            $total = $allProducts->count();
-            $products = $allProducts->slice(($page - 1) * $perPage, $perPage)->values();
-            $totalPages = ceil($total / $perPage);
-
-            $pagination = [
-                'total_pages' => $totalPages,
-                'current_page' => $page,
-                'perPage' => $perPage,
-                'total' => $total,
-            ];
-
-            return view('catalog', [
-                'products' => $products,
-                'pagination' => $pagination,
+        try {
+            // Siapkan query parameters, hanya kirim yang tidak kosong
+            $queryParams = array_filter([
+                'keyword' => $keyword,
+                'department' => $department,
+                'category' => $category,
             ]);
-        } else {
-            return redirect()->back()->with('error', 'Failed to fetch products.');
+
+            $response = Http::withHeaders([
+                'Authorization' => 'Bearer ' . $token
+            ])->get(config('app.back_end_base_url') . '/api/product', $queryParams);
+
+            if (in_array('Unauthorized!', $response->json('errors') ?? [])) {
+                return redirect()->route('login')->with('error', 'Session expired. Please log in again.');
+            }
+
+            if ($response->successful() && $response->json('errors') === null) {
+                $allProducts = collect($response->json('data'));
+
+                $total = $allProducts->count();
+                $products = $allProducts->slice(($page - 1) * $perPage, $perPage)->values();
+                $totalPages = ceil($total / $perPage);
+
+                $pagination = [
+                    'total_pages' => $totalPages,
+                    'current_page' => $page,
+                    'perPage' => $perPage,
+                    'total' => $total,
+                ];
+
+                return view('catalog', [
+                    'products' => $products,
+                    'pagination' => $pagination,
+                ]);
+            } else {
+                return redirect()->back()->with('error', 'Failed to fetch products.');
+            }
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'An error occurred while fetching products.');
         }
-    } catch (\Exception $e) {
-        return redirect()->back()->with('error', 'An error occurred while fetching products.');
     }
-}
 
     public function detailProduct($id)
     {
@@ -105,11 +113,15 @@ class ProductController extends Controller
         $token = session('api_token');
 
         try {
-            $url = config('app.back_end_base_url').'/api/product/detail/' . $id;
+            $url = config('app.back_end_base_url') . '/api/product/detail/' . $id;
             Log::info('Memanggil URL:', ['url' => $url]);
             $response = Http::withHeaders([
                 'Authorization' => 'Bearer ' . $token
-            ])->get(config('app.back_end_base_url').'/api/product/detail/' . $id);
+            ])->get(config('app.back_end_base_url') . '/api/product/detail/' . $id);
+
+            if (in_array('Unauthorized!', $response->json('errors') ?? [])) {
+                return redirect()->route('login')->with('error', 'Session expired. Please log in again.');
+            }
 
             // Cek apakah HTTP status 200
             if ($response->successful() && $response->json('errors') === null) {
