@@ -13,7 +13,7 @@ type AddTransactionRequest struct {
 	Address          string                `json:"address" form:"address" binding:"required"`
 	ZipCode          string                `json:"zip_code" form:"zip_code" binding:"required"`
 	DestinationLabel string                `json:"destination_label" form:"destination_label" binding:"required"`
-	Courir           string                `json:"courir" form:"name" courir:"required"`
+	Courir           string                `json:"courir" form:"courir" courir:"required"`
 	ShippingCost     float64               `json:"shipping_cost" form:"shipping_cost" binding:"required"`
 }
 

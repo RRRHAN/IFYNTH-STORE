@@ -12,6 +12,8 @@ class TransactionController extends Controller
     {
         $token = session("api_token");
 
+        \Log::info('Incoming transaction request:', $request->all());
+
         $validatedData = $request->validate([
             'name' => 'required',
             'phone_number' => 'required',
@@ -69,7 +71,7 @@ class TransactionController extends Controller
 
             $client = new \GuzzleHttp\Client();
 
-            $response = $client->request('POST', config('app.back_end_base_url') . '/api/transaction', [
+            $response = $client->request('POST',  'localhost:7777/api/transaction', [
                 'headers' => [
                     'Authorization' => 'Bearer ' . $token,
                 ],

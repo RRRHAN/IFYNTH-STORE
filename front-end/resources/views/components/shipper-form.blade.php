@@ -14,29 +14,33 @@
         </div>
         <div class="mb-3">
             <label for="address" class="form-label">Shipping Address</label>
-            <textarea class="form-control" id="address" name="address" rows="3" required></textarea>
+            <textarea class="form-control" id="address" name="address" rows="3" required>{{ session('user')['CustomerDetails']['Address'] ?? '' }}</textarea>
         </div>
         <div class="mb-3 row">
             <div class="col-md-8">
-                <label for="searchDestinaton" class="form-label">Search Destination (Kota, Distrik, Kecamatan / Kode
+                <label for="searchDestination" class="form-label">Search Destination (Kota, Distrik, Kecamatan / Kode
                     Pos)</label>
-                <input type="text" class="form-control" id="searchDestinaton" placeholder="e.g., Surabaya"
-                    autocomplete="off" name="destination_label">
-                <input type="hidden" id="destination_id">
+                <input type="text" class="form-control" id="searchDestination" placeholder="e.g., Surabaya"
+                    autocomplete="off" name="destination_label"
+                    value="{{ session('user')['CustomerDetails']['DestinationLabel'] ?? '' }}">
+                <input type="hidden" id="destination_id"
+                    value="{{ session('user')['CustomerDetails']['DestinationID'] ?? '' }}">
                 <ul id="suggestions" class="list-group position-absolute w-50 mt-1"
                     style="z-index: 1000; max-height: 200px; overflow-y: auto;"></ul>
             </div>
             <div class="col-md-4">
                 <label for="zip_code" class="form-label">Zip Code</label>
                 <input type="text" class="form-control" id="zip_code" name="zip_code" maxlength="5"
-                    inputmode="numeric" pattern="\d{5}" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+                    inputmode="numeric" pattern="\d{5}" oninput="this.value = this.value.replace(/[^0-9]/g, '')"
+                    value="{{ session('user')['CustomerDetails']['ZipCode'] ?? '' }}">
             </div>
         </div>
         <div id="shippingTariff" class="mb-3" style="display: none;">
             <label for="tariff" class="form-label">Courir</label>
-            <select class="form-control" id="tariff" name="courir">
+            <select class="form-control" id="tariff">
                 <option value="">Courir</option>
             </select>
+            <input type="text" id="courierInput" name="courir" hidden>
             <input type="hidden" id="shipping_cost" name="shipping_cost">
             <input type="hidden" id="grandtotal">
         </div>
@@ -60,8 +64,8 @@
     });
 </script>
 <script>
-    // Ambil elemen yang diperlukan
-    const searchInput = document.getElementById('searchDestinaton');
+    // Ambil elemen penting
+    const searchInput = document.getElementById('searchDestination');
     const zipCodeInput = document.getElementById('zip_code');
     const suggestionBox = document.getElementById('suggestions');
     const tariffDropdown = document.getElementById('tariff');
@@ -71,9 +75,51 @@
 
     let debounceTimer;
 
-    // Event listener untuk input pencarian
-    searchInput.addEventListener('input', function() {
-        const query = this.value.trim();
+    // Fungsi render option tarif pengiriman
+    function renderTariffOptions(data) {
+        tariffDropdown.innerHTML = '<option value="">Select a Courier</option>';
+        const tarifList = [];
+
+        if (data.data) {
+            const {
+                calculate_reguler = [], calculate_cargo = []
+            } = data.data;
+
+            calculate_reguler.forEach((item, index) => {
+                tarifList.push({
+                    ...item,
+                    type: 'Reguler',
+                    index
+                });
+            });
+
+            calculate_cargo.forEach((item, index) => {
+                tarifList.push({
+                    ...item,
+                    type: 'Cargo',
+                    index
+                });
+            });
+        }
+
+        if (tarifList.length > 0) {
+            shippingTariffDiv.style.display = 'block';
+            tarifList.forEach(item => {
+                const option = document.createElement('option');
+                option.value = `${item.shipping_name}-${item.service_name}-${item.type}-${item.index}`;
+                option.textContent =
+                    `${item.shipping_name} ${item.service_name} (${item.type}) - Rp${item.shipping_cost.toLocaleString()} - ETA: ${item.etd}`;
+                option.dataset.shipping = JSON.stringify(item);
+                tariffDropdown.appendChild(option);
+            });
+        } else {
+            shippingTariffDiv.style.display = 'none';
+        }
+    }
+
+    // Event input pencarian lokasi
+    searchInput.addEventListener('input', () => {
+        const query = searchInput.value.trim();
         clearTimeout(debounceTimer);
 
         if (query.length < 3) {
@@ -85,7 +131,6 @@
             fetch(`/search-destination?q=${encodeURIComponent(query)}&limit=5&offset=0`)
                 .then(res => res.json())
                 .then(data => {
-                    console.log('API Response:', data);
                     suggestionBox.innerHTML = '';
 
                     if (data.data && data.data.length > 0) {
@@ -96,6 +141,54 @@
                                 `${item.subdistrict_name}, ${item.district_name}, ${item.city_name}, ${item.province_name}`;
                             li.dataset.zip = item.zip_code || '';
                             li.dataset.id = item.id;
+
+                            li.addEventListener('click', e => {
+                                e.stopPropagation();
+                                searchInput.value = li.textContent;
+                                zipCodeInput.value = li.dataset.zip;
+                                document.getElementById('destination_id').value = li
+                                    .dataset.id;
+                                suggestionBox.innerHTML = '';
+
+                                // Ambil data berat dan nilai item dari server-side blade (atau data JS lain)
+                                const weight = parseFloat(
+                                    "{{ isset($cartItems['TotalWeight']) ? number_format($cartItems['TotalWeight'] / 1000, 2, '.', '') : 0 }}"
+                                );
+                                const itemValue =
+                                    {{ isset($cartItems['TotalPrice']) ? $cartItems['TotalPrice'] : 0 }};
+
+                                if (!weight || !itemValue) {
+                                    console.error("Missing weight or item value!");
+                                    return;
+                                }
+
+                                fetch('/check-tariff', {
+                                        method: 'POST',
+                                        headers: {
+                                            'Content-Type': 'application/json',
+                                            'X-CSRF-TOKEN': document
+                                                .querySelector(
+                                                    'meta[name="csrf-token"]')
+                                                .getAttribute('content')
+                                        },
+                                        body: JSON.stringify({
+                                            receiver_destination_id: li
+                                                .dataset.id,
+                                            weight: weight,
+                                            item_value: itemValue
+                                        })
+                                    })
+                                    .then(response => response.json())
+                                    .then(data => {
+                                        renderTariffOptions(data);
+                                    })
+                                    .catch(error => {
+                                        console.error(
+                                            'Error fetching shipping cost:',
+                                            error);
+                                    });
+                            });
+
                             suggestionBox.appendChild(li);
                         });
                     } else {
@@ -110,26 +203,21 @@
                     suggestionBox.innerHTML =
                         '<li class="list-group-item disabled">Error loading</li>';
                 });
-        }, 300);
+        }, 200);
     });
 
-    // Event listener untuk memilih suggestion dari daftar
-    suggestionBox.addEventListener('click', function(e) {
-        if (e.target && e.target.matches('li.list-group-item-action')) {
-            searchInput.value = e.target.textContent;
-            zipCodeInput.value = e.target.dataset.zip;
-            document.getElementById('destination_id').value = e.target.dataset.id;
+    // Auto-fetch tarif jika destination_id sudah ada saat halaman load
+    document.addEventListener('DOMContentLoaded', () => {
+        const destinationId = document.getElementById('destination_id').value.trim();
 
-            console.log('Selected Destination ID:', e.target.dataset.id);
-
-            const receiverDestinationId = document.getElementById('destination_id').value;
+        if (destinationId) {
             const weight = parseFloat(
                 "{{ isset($cartItems['TotalWeight']) ? number_format($cartItems['TotalWeight'] / 1000, 2, '.', '') : 0 }}"
-                );
+            );
             const itemValue = {{ isset($cartItems['TotalPrice']) ? $cartItems['TotalPrice'] : 0 }};
 
-            if (!receiverDestinationId || !weight || !itemValue) {
-                console.error("Missing required fields!");
+            if (!weight || !itemValue) {
+                console.error("Missing weight or item value!");
                 return;
             }
 
@@ -141,91 +229,42 @@
                             'content')
                     },
                     body: JSON.stringify({
-                        receiver_destination_id: receiverDestinationId,
+                        receiver_destination_id: destinationId,
                         weight: weight,
                         item_value: itemValue
                     })
                 })
                 .then(response => response.json())
                 .then(data => {
-                    console.log('Shipping Cost Response:', data);
-
-                    // Kosongkan isi dropdown tarif
-                    tariffDropdown.innerHTML = '<option value="">Select a Courir</option>';
-
-                    const tarifList = [];
-
-                    if (data.data) {
-                        const {
-                            calculate_reguler = [], calculate_cargo = []
-                        } = data.data;
-
-                        // Menambahkan tarif reguler
-                        calculate_reguler.forEach((item, index) => {
-                            tarifList.push({
-                                ...item,
-                                type: 'Reguler',
-                                index
-                            });
-                        });
-
-                        // Menambahkan tarif cargo
-                        calculate_cargo.forEach((item, index) => {
-                            tarifList.push({
-                                ...item,
-                                type: 'Cargo',
-                                index
-                            });
-                        });
-                    }
-
-                    if (tarifList.length > 0) {
-                        shippingTariffDiv.style.display = 'block';
-
-                        tarifList.forEach(item => {
-                            const option = document.createElement('option');
-                            option.value =
-                                `${item.shipping_name}-${item.service_name}-${item.type}-${item.index}`;
-                            option.textContent =
-                                `${item.shipping_name} ${item.service_name} (${item.type}) - Rp${item.shipping_cost.toLocaleString()} - ETA: ${item.etd}`;
-                            option.dataset.shipping = JSON.stringify(item);
-                            tariffDropdown.appendChild(option);
-                        });
-                    } else {
-                        shippingTariffDiv.style.display = 'none';
-                    }
+                    renderTariffOptions(data);
                 })
                 .catch(error => {
-                    console.error('Error fetching shipping cost:', error);
+                    console.error('Error auto-fetching shipping cost:', error);
                 });
-
-            suggestionBox.innerHTML = '';
         }
     });
 
-    // Event listener untuk perubahan pilihan tarif
-    tariffDropdown.addEventListener('change', function() {
+    // Event pilihan tarif pengiriman berubah
+    tariffDropdown.addEventListener('change', () => {
         const selectedOption = tariffDropdown.options[tariffDropdown.selectedIndex];
-        if (selectedOption) {
-            const shippingCost = JSON.parse(selectedOption.dataset.shipping).shipping_cost;
-            const grandTotal = JSON.parse(selectedOption.dataset.shipping).grandtotal;
-            // Menyimpan biaya pengiriman di input tersembunyi
+        if (selectedOption && selectedOption.dataset.shipping) {
+            const shippingData = JSON.parse(selectedOption.dataset.shipping);
+            const shippingCost = shippingData.shipping_cost || 0;
+            const grandTotal = shippingData.grandtotal || 0;
+            const courier = (shippingData.shipping_name + '-' + shippingData.service_name + '-(' + shippingData.type + ')') || '';
+            console.log(shippingData);
+
+
             shippingCostInput.value = shippingCost;
             grandTotalInput.value = grandTotal;
 
-            // Menampilkan biaya pengiriman di frontend
-            const shippingCostDisplay = document.getElementById('shippingCostDisplay');
-            const shippingCostAmount = document.getElementById('shippingCostAmount');
-            shippingCostAmount.textContent =
-                `Rp.${shippingCost.toLocaleString()}`;
-            shippingCostDisplay.style.display = 'block';
+            // Tampilkan biaya pengiriman dan grand total
+            document.getElementById('courierInput').value = courier;
+            document.getElementById('shippingCostAmount').textContent = `Rp.${shippingCost.toLocaleString()}`;
+            document.getElementById('shippingCostDisplay').style.display = 'block';
 
-            // Menampilkan biaya pengiriman di frontend
-            const grandTotalDisplay = document.getElementById('grandTotalDisplay');
-            const grandTotalAmount = document.getElementById('grandTotalAmount');
-            grandTotalAmount.textContent =
-                `Rp.${grandTotal.toLocaleString()}`;
-            grandTotalDisplay.style.display = 'block';
+            document.getElementById('grandTotalAmount').textContent = `Rp.${grandTotal.toLocaleString()}`;
+            document.getElementById('grandTotalDisplay').style.display = 'block';
 
             document.getElementById('uploadProofContainer').style.display = 'block';
 
@@ -233,8 +272,8 @@
         }
     });
 
-    // Menutup suggestion box jika klik di luar elemen pencarian
-    document.addEventListener('click', function(e) {
+    // Tutup suggestion box jika klik di luar area pencarian
+    document.addEventListener('click', e => {
         if (!searchInput.contains(e.target) && !suggestionBox.contains(e.target)) {
             suggestionBox.innerHTML = '';
         }
