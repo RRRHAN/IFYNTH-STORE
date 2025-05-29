@@ -32,3 +32,4 @@ jobs:
               docker-compose build
             fi
             docker-compose up -d
+            docker image prune -f
