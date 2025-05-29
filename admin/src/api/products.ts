@@ -1,4 +1,4 @@
-import {  Product } from "../types/product";
+import { Product } from "../types/product";
 import { BASE_URL, getAuthToken } from "./constants";
 import { ProductData, UpdateProductData } from "../request/productReq";
 
@@ -20,7 +20,6 @@ export const fetchProducts = async (): Promise<Product[]> => {
     const result = await response.json();
     console.log("Fetched product data:", result.data);
     return result.data;
-
   } catch (error) {
     console.error("Failed to fetch products:", error);
     return [];
@@ -48,7 +47,9 @@ export const addProduct = async (productData: ProductData) => {
     }
   }
 
-  formData.append("stock_details", JSON.stringify(productData.sizes));
+  productData.sizes.forEach((size) => {
+    formData.append("stock_details", JSON.stringify(size));
+  });
 
   try {
     const PostProduct = `${BASE_URL}/api/product/addProduct`;
@@ -118,15 +119,14 @@ export const updateProduct = async (productData: UpdateProductData) => {
   if (productData.removedImages) {
     formData.append("removedImages", JSON.stringify(productData.removedImages));
   }
-  
+
   console.log(productData);
   formData.append("stockDetails", JSON.stringify(productData.sizes));
 
   console.log("FormData contents:");
-for (const pair of formData.entries()) {
-  console.log(`${pair[0]}:`, pair[1]);
-}
-
+  for (const pair of formData.entries()) {
+    console.log(`${pair[0]}:`, pair[1]);
+  }
 
   try {
     const updateUrl = `${BASE_URL}/api/product/update/${productData.productId}`;
