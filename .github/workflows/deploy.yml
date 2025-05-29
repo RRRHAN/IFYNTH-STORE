@@ -27,9 +27,9 @@ jobs:
             cd IFYNTH-STORE
             git pull
             if [ "${{ github.event.inputs.no_cache }}" = "true" ]; then
-              docker-compose build --no-cache
+              docker-compose build --no-cache || exit 1
             else
-              docker-compose build
+              docker-compose build || exit 1
             fi
-            docker-compose up -d
-            docker image prune -f
+            docker-compose up -d || exit 1
+            docker image prune -f || exit 1
