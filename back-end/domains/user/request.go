@@ -29,3 +29,14 @@ type ChangePasswordReq struct {
 	NewPassword     string         `json:"new_password" validate:"required"`
 	Role            constants.ROLE `json:"role" validate:"required,oneof=ADMIN CUSTOMER"`
 }
+
+type UpdateProfileReq struct {
+	Name             string `json:"name" validate:"required"`
+	Username         string `json:"username" validate:"required"`
+	PhoneNumber      string `json:"phoneNumber" validate:"required"`
+	Email            string
+	DestinationID    string
+	Address          string
+	ZipCode          string
+	DestinationLabel string
+}

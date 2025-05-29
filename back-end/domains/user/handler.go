@@ -19,6 +19,7 @@ type Handler interface {
 	RegisterAdmin(ctx *gin.Context)
 	ChangePassword(ctx *gin.Context)
 	GetPersonal(ctx *gin.Context)
+	UpdateProfile(ctx *gin.Context)
 }
 
 type handler struct {
@@ -154,4 +155,30 @@ func (h *handler) ChangePassword(ctx *gin.Context) {
 	}
 
 	respond.Success(ctx, http.StatusOK, gin.H{"message": "Password changed successfully"})
+}
+
+func (h *handler) UpdateProfile(ctx *gin.Context) {
+	var input UpdateProfileReq
+
+	// Bind JSON ke struct input
+	if err := ctx.ShouldBindJSON(&input); err != nil {
+		respond.Error(ctx, apierror.Warn(http.StatusBadRequest, err))
+		return
+	}
+
+	// Validasi input menggunakan validator
+	if err := h.validate.Struct(input); err != nil {
+		respond.Error(ctx, apierror.FromErr(err))
+		return
+	}
+
+	// Panggil service untuk update profile
+	res, err := h.service.UpdateProfile(ctx, input)
+	if err != nil {
+		respond.Error(ctx, apierror.FromErr(err))
+		return
+	}
+
+	// Respon sukses
+	respond.Success(ctx, http.StatusOK, res)
 }

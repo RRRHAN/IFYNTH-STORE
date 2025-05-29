@@ -51,6 +51,7 @@ Route::controller(UserController::class)->group(function () {
     Route::post('/changePassword', 'changePassword')->name('change.password');
     Route::get('/loginForm', 'showLoginForm')->name('login');
     Route::post('/login', 'login')->name('login.proccess');
+    Route::post('/update-profile', 'updateProfile')->name('update.profile');
     Route::post('/logout', 'logout')->name('logout');
 });
 

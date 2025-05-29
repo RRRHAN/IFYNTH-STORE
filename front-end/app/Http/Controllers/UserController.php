@@ -93,7 +93,7 @@ class UserController extends Controller
                         'total_cart' => $data['data']['total_cart'],
                     ]);
 
-                     $this->getPersonal();
+                    $this->getPersonal();
                     return redirect()->route('landing');
                 }
 
@@ -188,7 +188,7 @@ class UserController extends Controller
         try {
             $response = Http::withHeaders([
                 'Authorization' => 'Bearer ' . $token,
-            ])->get(config('app.back_end_base_url') . '/api/user/get-personal');
+            ])->get('localhost:7777/api/user/get-personal');
 
             if (in_array('Unauthorized!', $response->json('errors') ?? [])) {
                 return redirect()->route('login')->with('error', 'Session expired. Please log in again.');
@@ -211,6 +211,30 @@ class UserController extends Controller
             // Jika ada exception
             return collect(['error' => 'Error occurred: ' . $e->getMessage()]);
         }
+    }
+
+    public function updateProfile(Request $request)
+    {
+        $token = session('api_token');
+
+        $response = Http::withHeaders([
+            'Authorization' => 'Bearer ' . $token,
+        ])->patch('localhost:7777/api/user/updateCustomer', [
+                    'username' => $request->username,
+                    'email' => $request->email,
+                    'name' => $request->name,
+                    'phoneNumber' => $request->phone_number,
+                    'destinationId' => $request->destination_id,
+                    'address' => $request->address,
+                    'zipCode' => $request->zip_code,
+                    'destinationLabel' => $request->destination_label,
+                ]);
+
+        if ($response->successful()) {
+            return redirect()->back()->with('success', 'Profile updated successfully.');
+        }
+
+        return redirect()->back()->with('error', 'Failed to update profile.');
     }
 
 }

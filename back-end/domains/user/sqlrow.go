@@ -30,15 +30,32 @@ func (Admin) TableName() string {
 }
 
 type Customer struct {
-	ID          uuid.UUID `gorm:"type:uuid;default:gen_random_uuid();primaryKey"`
-	Name        string
-	PhoneNumber string
-	Username    string `gorm:"unique"`
-	Password    string
-	CreatedAt   time.Time
-	UpdatedAt   time.Time
+	ID              uuid.UUID `gorm:"type:uuid;default:gen_random_uuid();primaryKey"`
+	Name            string
+	PhoneNumber     string
+	Username        string `gorm:"unique"`
+	Password        string
+	CreatedAt       time.Time
+	UpdatedAt       time.Time
+	CustomerDetails *CustomerDetails `gorm:"foreignKey:UserID;references:ID"`
 }
 
 func (Customer) TableName() string {
 	return "customer"
+}
+
+type CustomerDetails struct {
+	ID               uuid.UUID `gorm:"type:uuid;default:gen_random_uuid();primaryKey"`
+	UserID           uuid.UUID
+	Email            *string `gorm:"default:null"`
+	DestinationID    *string `gorm:"default:null"`
+	Address          *string `gorm:"default:null"`
+	ZipCode          *string `gorm:"default:null"`
+	DestinationLabel *string `gorm:"default:null"`
+	CreatedAt        time.Time
+	UpdatedAt        time.Time
+}
+
+func (CustomerDetails) TableName() string {
+	return "customer_details"
 }

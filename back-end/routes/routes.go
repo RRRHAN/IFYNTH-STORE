@@ -64,6 +64,7 @@ func NewDependency(
 		user.POST("/logout", mw.JWT(constants.ADMIN, constants.CUSTOMER), userHandler.Logout)
 		user.POST("/register", mw.BasicAuth, userHandler.Register)
 		user.POST("/registerAdmin", mw.JWT(constants.ADMIN), userHandler.RegisterAdmin)
+		user.PATCH("/updateCustomer", mw.JWT(constants.CUSTOMER), userHandler.UpdateProfile)
 		user.PATCH("/password", mw.JWT(constants.ADMIN, constants.CUSTOMER), userHandler.ChangePassword)
 		user.GET("/get-personal", mw.JWT(constants.ADMIN, constants.CUSTOMER), userHandler.GetPersonal)
 		user.GET("/check-jwt", mw.JWT(constants.ADMIN, constants.CUSTOMER), func(ctx *gin.Context) {
