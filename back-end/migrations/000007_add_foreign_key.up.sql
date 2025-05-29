@@ -12,17 +12,31 @@ REFERENCES product(id)
 ON DELETE CASCADE
 ON UPDATE CASCADE;
 
--- TODO: use different column
+ALTER TABLE message
+ADD COLUMN admin_id UUID,
+ADD COLUMN customer_id UUID;
+
+UPDATE message
+SET customer_id = user_id
+WHERE role = 'CUSTOMER';
+
+UPDATE message
+SET admin_id = user_id
+WHERE role = 'ADMIN';
+
+ALTER TABLE message
+DROP COLUMN user_id;
+
 ALTER TABLE message
 ADD CONSTRAINT fk_customer
-FOREIGN KEY (user_id)
+FOREIGN KEY (customer_id)
 REFERENCES customer(id)
 ON DELETE CASCADE
 ON UPDATE CASCADE;
 
 ALTER TABLE message
 ADD CONSTRAINT fk_admin
-FOREIGN KEY (user_id)
+FOREIGN KEY (admin_id)
 REFERENCES admin(id)
 ON DELETE CASCADE
 ON UPDATE CASCADE;
