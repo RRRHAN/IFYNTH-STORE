@@ -93,6 +93,7 @@ class UserController extends Controller
                         'total_cart' => $data['data']['total_cart'],
                     ]);
 
+                     $this->getPersonal();
                     return redirect()->route('landing');
                 }
 
