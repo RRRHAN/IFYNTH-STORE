@@ -85,17 +85,15 @@ export const addProduct = async (productData: ProductData) => {
 
     // --- TAMBAHKAN LOG INI ---
     console.log("HTTP Status Code:", response.status);
-    const responseText = await response.text(); // Ambil respons sebagai teks mentah dulu
+    const responseText = await response.text();
     console.log("Raw Server Response:", responseText);
 
     let result;
     try {
-      result = JSON.parse(responseText); // Coba parse sebagai JSON
+      result = JSON.parse(responseText);
       console.log("Parsed JSON Response:", result);
     } catch (parseError) {
       console.error("Failed to parse JSON response:", parseError);
-      // Jika respons bukan JSON, mungkin itu adalah error HTTP standar
-      // atau error dari server sebelum respons JSON terbentuk
       throw new Error(
         `Server returned non-JSON response or parse error: ${responseText}`
       );
