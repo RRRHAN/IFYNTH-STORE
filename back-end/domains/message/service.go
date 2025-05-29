@@ -7,6 +7,7 @@ import (
 	"gorm.io/gorm"
 
 	"github.com/RRRHAN/IFYNTH-STORE/back-end/utils/config"
+	"github.com/RRRHAN/IFYNTH-STORE/back-end/utils/constants"
 	contextUtil "github.com/RRRHAN/IFYNTH-STORE/back-end/utils/context"
 	"github.com/google/uuid"
 )
@@ -47,14 +48,28 @@ func (s *service) AddMessage(ctx context.Context, req AddMessageRequest) error {
 	if err != nil {
 		return err
 	}
+
+	var (
+		adminID    *uuid.UUID
+		customerID *uuid.UUID
+	)
+
+	switch token.Claims.Role {
+	case constants.ADMIN:
+		adminID = &token.Claims.UserID
+	case constants.CUSTOMER:
+		customerID = &token.Claims.UserID
+	}
+
 	// Product entry
 	message := Message{
-		ID:        uuid.New(),
-		ProductID: req.ProductID,
-		UserID:    token.Claims.UserID,
-		Message:   req.Message,
-		Role:      req.Role,
-		CreatedAt: time.Now(),
+		ID:         uuid.New(),
+		ProductID:  req.ProductID,
+		CustomerID: customerID,
+		AdminID:    adminID,
+		Message:    req.Message,
+		Role:       token.Claims.Role,
+		CreatedAt:  time.Now(),
 	}
 
 	// save to db

@@ -67,7 +67,7 @@ func (h *handler) AddMessage(ctx *gin.Context) {
 	}
 
 	// Panggil service untuk menyimpan pesan
-	if err := h.service.AddMessage(ctx.Request.Context(), req); err != nil {
+	if err := h.service.AddMessage(ctx, req); err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{
 			"error": "Failed to add message",
 		})

@@ -3,6 +3,7 @@ package message
 import (
 	"time"
 
+	"github.com/RRRHAN/IFYNTH-STORE/back-end/utils/constants"
 	"github.com/google/uuid"
 )
 
@@ -39,12 +40,13 @@ type ProductWithCustomer struct {
 }
 
 type Message struct {
-	ID        uuid.UUID `gorm:"type:uuid;default:gen_random_uuid();primaryKey"`
-	ProductID uuid.UUID `gorm:"type:uuid;not null"`
-	UserID    uuid.UUID `gorm:"type:uuid;not null"`
-	Message   string
-	Role      string
-	CreatedAt time.Time
+	ID         uuid.UUID  `gorm:"type:uuid;default:gen_random_uuid();primaryKey"`
+	ProductID  uuid.UUID  `gorm:"type:uuid;not null"`
+	CustomerID *uuid.UUID `gorm:"type:uuid"`
+	AdminID    *uuid.UUID `gorm:"type:uuid"`
+	Message    string
+	Role       constants.ROLE
+	CreatedAt  time.Time
 }
 
 func (Message) TableName() string {

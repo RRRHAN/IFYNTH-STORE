@@ -90,7 +90,6 @@ class MessageController extends Controller
             ])->post(config('app.back_end_base_url').'/api/message/', [
                 'product_id' => $validated['product_id'],
                 'message' => $validated['message'],
-                'role' => "CUSTOMER",
             ]);
     
             $result = $response->json(); // Ambil response dalam bentuk array

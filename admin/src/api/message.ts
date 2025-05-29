@@ -14,7 +14,6 @@ import { MessageData } from "../request/messageReq";
         body: JSON.stringify({
           product_id: MessageData.ProductID,
           message: MessageData.Message,
-          role: "ADMIN",
         }),
       });
   

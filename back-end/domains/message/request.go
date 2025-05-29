@@ -5,7 +5,6 @@ import "github.com/google/uuid"
 type AddMessageRequest struct {
 	ProductID uuid.UUID `json:"product_id"`
 	Message   string    `json:"message"`
-	Role      string    `json:"role"`
 }
 
 type StockDetailInput struct {
