@@ -69,7 +69,9 @@ const TransactionsScreen = () => {
     } catch (err) {
       console.error("Failed to fetch transactions:", err);
     } finally {
-      setLoading(false);
+      setTimeout(() => {
+        setLoading(false);
+      }, 1000);
     }
   };
 
@@ -84,8 +86,11 @@ const TransactionsScreen = () => {
 
   if (loading) {
     return (
-      <ThemedView style={[styles.center]}>
-        <ActivityIndicator size="large" />
+      <ThemedView style={styles.loaderContainer}>
+        <ActivityIndicator
+          size="large"
+          color={colorScheme === "dark" ? "#ffffff" : "#111827"}
+        />
       </ThemedView>
     );
   }
@@ -119,12 +124,27 @@ const TransactionsScreen = () => {
                     [item.ID]: newStatus,
                   }));
                 }}
+                enabled={
+                  (selectedStatus[item.ID] || item.Status) !== "delivered" &&
+                  (selectedStatus[item.ID] || item.Status) !== "cancelled"
+                }
                 style={{
                   height: 50,
                   width: "100%",
                   backgroundColor:
-                    colorScheme === "dark" ? "#555555" : "#f9fafb",
-                  color: colorScheme === "dark" ? "#f9fafb" : "#555555",
+                    (selectedStatus[item.ID] || item.Status) === "delivered" ||
+                    (selectedStatus[item.ID] || item.Status) === "cancelled"
+                      ? "#ddd"
+                      : colorScheme === "dark"
+                      ? "#555555"
+                      : "#f9fafb",
+                  color:
+                    (selectedStatus[item.ID] || item.Status) === "delivered" ||
+                    (selectedStatus[item.ID] || item.Status) === "cancelled"
+                      ? "#888"
+                      : colorScheme === "dark"
+                      ? "#f9fafb"
+                      : "#555555",
                   borderRadius: 10,
                 }}
               >
@@ -193,12 +213,27 @@ const TransactionsScreen = () => {
                     [item.ID]: newStatus,
                   }));
                 }}
+                enabled={
+                  (selectedStatus[item.ID] || item.Status) !== "delivered" &&
+                  (selectedStatus[item.ID] || item.Status) !== "cancelled"
+                }
                 style={{
                   height: 50,
                   width: "100%",
                   backgroundColor:
-                    colorScheme === "dark" ? "#555555" : "#f9fafb",
-                  color: colorScheme === "dark" ? "#f9fafb" : "#555555",
+                    (selectedStatus[item.ID] || item.Status) === "delivered" ||
+                    (selectedStatus[item.ID] || item.Status) === "cancelled"
+                      ? "#ddd"
+                      : colorScheme === "dark"
+                      ? "#555555"
+                      : "#f9fafb",
+                  color:
+                    (selectedStatus[item.ID] || item.Status) === "delivered" ||
+                    (selectedStatus[item.ID] || item.Status) === "cancelled"
+                      ? "#888"
+                      : colorScheme === "dark"
+                      ? "#f9fafb"
+                      : "#555555",
                   borderRadius: 10,
                 }}
               >

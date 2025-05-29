@@ -27,8 +27,10 @@ import { deleteProduct } from "@/src/api/products";
 import ModalComponent from "@/components/ModalComponent";
 import ProductDetailModal from "@/app/detail_product";
 import { BASE_URL } from "@/src/api/constants";
+import { useColorScheme } from "@/hooks/useColorScheme";
 
 const ProductsScreen = () => {
+    const colorScheme = useColorScheme();
   const screenWidth = Dimensions.get("window").width;
   const [isMobile, setIsMobile] = useState(screenWidth < 768);
   const columnWidths = isMobile
@@ -73,7 +75,9 @@ const ProductsScreen = () => {
     } catch (err) {
       console.error("Failed to fetch products:", err);
     } finally {
-      setLoading(false);
+      setTimeout(() => {
+        setLoading(false);
+      }, 1000);
     }
   };
 
@@ -103,8 +107,11 @@ const ProductsScreen = () => {
 
   if (loading) {
     return (
-      <ThemedView style={styles.center}>
-        <ActivityIndicator size="large" />
+      <ThemedView style={styles.loaderContainer}>
+        <ActivityIndicator
+          size="large"
+          color={colorScheme === "dark" ? "#ffffff" : "#111827"}
+        />
       </ThemedView>
     );
   }

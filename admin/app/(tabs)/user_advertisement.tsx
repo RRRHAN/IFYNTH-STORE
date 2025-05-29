@@ -81,7 +81,9 @@ const UserAdvertisementScreen = () => {
     } catch (err) {
       console.error("Failed to fetch products:", err);
     } finally {
-      setLoading(false);
+      setTimeout(() => {
+        setLoading(false);
+      }, 1000);
     }
   };
 
@@ -140,8 +142,11 @@ const UserAdvertisementScreen = () => {
 
   if (loading) {
     return (
-      <ThemedView style={styles.center}>
-        <ActivityIndicator size="large" />
+      <ThemedView style={styles.loaderContainer}>
+        <ActivityIndicator
+          size="large"
+          color={colorScheme === "dark" ? "#ffffff" : "#111827"}
+        />
       </ThemedView>
     );
   }
