@@ -1,6 +1,5 @@
 // src/helpers/pickImage.ts
 import * as ImagePicker from "expo-image-picker";
-import { Platform } from "react-native";
 
 const allowedExtensions = ["jpg", "jpeg", "png"];
 

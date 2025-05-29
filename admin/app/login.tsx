@@ -4,6 +4,7 @@ import {
   ScrollView,
   View,
   Platform,
+  KeyboardAvoidingView,
 } from "react-native";
 import { useRouter } from "expo-router";
 import { useState, useEffect } from "react";
@@ -55,135 +56,145 @@ export default function Login() {
 
   return (
     <PaperProvider>
-      <View style={[styles.container]}>
-        <View style={styles.logoContainer}>
-          <Image
-            source={require("@/assets/images/logo.png")}
-            style={styles.logo}
-          />
-        </View>
+      <KeyboardAvoidingView
+        style={{ flex: 1 }}
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 0} 
+      >
+        <ScrollView contentContainerStyle={{ flexGrow: 1, justifyContent: 'center' }}>
+          <View style={[styles.container]}>
+            <View style={styles.logoContainer}>
+              <Image
+                source={require("@/assets/images/logo.png")}
+                style={styles.logo}
+              />
+            </View>
 
-        <ThemedView
-          style={[
-            styles.card,
-            {
-              backgroundColor:
-                colorScheme === "dark"
-                  ? "rgba(85, 85, 85, 0.56)"
-                  : "rgba(187, 187, 187, 0.61)",
-            },
-          ]}
-        >
-          <ThemedText style={[styles.heading]}>
-            Sign in to your account
-          </ThemedText>
-
-          <ThemedText style={[styles.label]}>Your username</ThemedText>
-          <ThemedTextInput
-            style={[
-              styles.input,
-              {
-                backgroundColor: colorScheme === "dark" ? "#555555" : "#f9fafb",
-                color: colorScheme === "dark" ? "#ffffff" : "#111827",
-              },
-            ]}
-            placeholder="Enter your username"
-            value={username}
-            onChangeText={setUsername}
-            autoCapitalize="none"
-          />
-
-          <ThemedText style={[styles.label]}>Password</ThemedText>
-          <ThemedTextInput
-            style={[
-              styles.input,
-              {
-                backgroundColor: colorScheme === "dark" ? "#555555" : "#f9fafb",
-                color: colorScheme === "dark" ? "#ffffff" : "#111827",
-              },
-            ]}
-            placeholder="Enter your password"
-            secureTextEntry
-            value={password}
-            onChangeText={setPassword}
-          />
-
-          <ThemedView
-            style={[
-              styles.row,
-              {
-                backgroundColor:
-                  colorScheme === "dark"
-                    ? "rgba(42, 42, 42, 0)"
-                    : "rgba(207, 207, 207, 0)",
-              },
-            ]}
-          >
             <ThemedView
               style={[
-                styles.checkboxContainer,
+                styles.card,
                 {
                   backgroundColor:
                     colorScheme === "dark"
-                      ? "rgba(42, 42, 42, 0)"
-                      : "rgba(207, 207, 207, 0)",
+                      ? "rgba(85, 85, 85, 0.56)"
+                      : "rgba(187, 187, 187, 0.61)",
                 },
               ]}
             >
-              {Platform.OS === "web" ? (
-                <Checkbox
-                  status={rememberMe ? "checked" : "unchecked"}
-                  onPress={() => setRememberMe(!rememberMe)}
-                  color="#2563eb"
-                />
-              ) : (
-                <Checkbox.Android
-                  status={rememberMe ? "checked" : "unchecked"}
-                  onPress={() => setRememberMe(!rememberMe)}
-                  color="#2563eb"
-                />
-              )}
+              <ThemedText style={[styles.heading]}>
+                Sign in to your account
+              </ThemedText>
 
-              <ThemedText
+              <ThemedText style={[styles.label]}>Your username</ThemedText>
+              <ThemedTextInput
                 style={[
-                  styles.checkboxLabel,
-                  { color: colorScheme === "dark" ? "#ffffff" : "#374151" },
+                  styles.input,
+                  {
+                    backgroundColor:
+                      colorScheme === "dark" ? "#555555" : "#f9fafb",
+                    color: colorScheme === "dark" ? "#ffffff" : "#111827",
+                  },
+                ]}
+                placeholder="Enter your username"
+                value={username}
+                onChangeText={setUsername}
+                autoCapitalize="none"
+              />
+
+              <ThemedText style={[styles.label]}>Password</ThemedText>
+              <ThemedTextInput
+                style={[
+                  styles.input,
+                  {
+                    backgroundColor:
+                      colorScheme === "dark" ? "#555555" : "#f9fafb",
+                    color: colorScheme === "dark" ? "#ffffff" : "#111827",
+                  },
+                ]}
+                placeholder="Enter your password"
+                secureTextEntry
+                value={password}
+                onChangeText={setPassword}
+              />
+
+              <ThemedView
+                style={[
+                  styles.row,
+                  {
+                    backgroundColor:
+                      colorScheme === "dark"
+                        ? "rgba(42, 42, 42, 0)"
+                        : "rgba(207, 207, 207, 0)",
+                  },
                 ]}
               >
-                Remember me
-              </ThemedText>
+                <ThemedView
+                  style={[
+                    styles.checkboxContainer,
+                    {
+                      backgroundColor:
+                        colorScheme === "dark"
+                          ? "rgba(42, 42, 42, 0)"
+                          : "rgba(207, 207, 207, 0)",
+                    },
+                  ]}
+                >
+                  {Platform.OS === "web" ? (
+                    <Checkbox
+                      status={rememberMe ? "checked" : "unchecked"}
+                      onPress={() => setRememberMe(!rememberMe)}
+                      color="#2563eb"
+                    />
+                  ) : (
+                    <Checkbox.Android
+                      status={rememberMe ? "checked" : "unchecked"}
+                      onPress={() => setRememberMe(!rememberMe)}
+                      color="#2563eb"
+                    />
+                  )}
+
+                  <ThemedText
+                    style={[
+                      styles.checkboxLabel,
+                      { color: colorScheme === "dark" ? "#ffffff" : "#374151" },
+                    ]}
+                  >
+                    Remember me
+                  </ThemedText>
+                </ThemedView>
+                <TouchableOpacity
+                  style={[
+                    {
+                      backgroundColor:
+                        colorScheme === "dark"
+                          ? "rgba(42, 42, 42, 0)"
+                          : "rgba(207, 207, 207, 0)",
+                    },
+                  ]}
+                >
+                  <ThemedText
+                    style={[
+                      styles.link,
+                      { color: colorScheme === "dark" ? "#3b82f6" : "#3b82f6" },
+                    ]}
+                  >
+                    Forgot password?
+                  </ThemedText>
+                </TouchableOpacity>
+              </ThemedView>
+
+              <TouchableOpacity style={styles.button} onPress={handleLogin}>
+                <ThemedText style={styles.buttonText}>Sign in</ThemedText>
+              </TouchableOpacity>
             </ThemedView>
-            <TouchableOpacity
-              style={[
-                {
-                  backgroundColor:
-                    colorScheme === "dark"
-                      ? "rgba(42, 42, 42, 0)"
-                      : "rgba(207, 207, 207, 0)",
-                },
-              ]}
-            >
-              <ThemedText
-                style={[
-                  styles.link,
-                  { color: colorScheme === "dark" ? "#3b82f6" : "#3b82f6" },
-                ]}
-              >
-                Forgot password?
-              </ThemedText>
-            </TouchableOpacity>
-          </ThemedView>
-
-          <TouchableOpacity style={styles.button} onPress={handleLogin}>
-            <ThemedText style={styles.buttonText}>Sign in</ThemedText>
-          </TouchableOpacity>
-        </ThemedView>
-        <ModalComponent
-          visible={visible}
-          hideModal={() => setVisible(false)}
-          message={errorMessage || successMessage}
-        />
-      </View>
+            <ModalComponent
+              visible={visible}
+              hideModal={() => setVisible(false)}
+              message={errorMessage || successMessage}
+            />
+          </View>
+        </ScrollView>
+      </KeyboardAvoidingView>
     </PaperProvider>
   );
 }

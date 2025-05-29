@@ -37,8 +37,11 @@ import {
   dummyTransactionReports,
   dummyTotalTransactionUsers,
 } from "@/components/DataDummy/home";
+import { checkLoginStatus } from "@/src/api/admin";
+import { useRouter } from "expo-router";
 
 export default function HomeScreen() {
+  const router = useRouter();
   const colorScheme = useColorScheme();
   const [productCount, setProductCount] = useState<DepartentCount[] | null>(
     null
@@ -67,6 +70,10 @@ export default function HomeScreen() {
     const loadAllDataSequentially = async () => {
       setLoading(true);
       setHasError(false);
+
+      const isLoggedIn = await checkLoginStatus(router);
+      if (!isLoggedIn) return;
+
       try {
         const products = await fetchProductCount();
         setProductCount(products);
@@ -100,6 +107,7 @@ export default function HomeScreen() {
 
     loadAllDataSequentially();
   }, []);
+
   useEffect(() => {
     if (productTableHeight > 0 || transactionTableHeight > 0) {
       const total = productTableHeight + transactionTableHeight;
@@ -219,17 +227,17 @@ export default function HomeScreen() {
                     />
                   </View>
                   {Platform.OS === "web" && (
-                      <View
-                        style={{
-                          flex: 1,
-                          paddingTop: width < 1000 ? 40 : 20,
-                        }}
-                      >
-                        <ProfitProductChart
-                          ProfitProduct={dummyProfitProducts}
-                          height={380}
-                        />
-                      </View>
+                    <View
+                      style={{
+                        flex: 1,
+                        paddingTop: width < 1000 ? 40 : 20,
+                      }}
+                    >
+                      <ProfitProductChart
+                        ProfitProduct={dummyProfitProducts}
+                        height={380}
+                      />
+                    </View>
                   )}
                 </View>
                 {(!productCount ||

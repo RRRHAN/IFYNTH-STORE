@@ -1,6 +1,4 @@
-import {
-  ThemeProvider,
-} from "@react-navigation/native";
+import { ThemeProvider } from "@react-navigation/native";
 import { useFonts } from "expo-font";
 import { Stack, useRouter } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
@@ -11,6 +9,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { MyLightTheme, MyDarkTheme } from "@/constants/Theme";
 import { BASE_URL } from "@/src/api/constants";
+import { checkLoginStatus } from "@/src/api/admin";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -22,43 +21,18 @@ export default function RootLayout() {
   });
 
   useEffect(() => {
-    const checkLoginStatus = async () => {
+    const initApp = async () => {
       if (loaded) {
         await SplashScreen.hideAsync();
-        const jwtToken = await AsyncStorage.getItem("auth_token");
 
-        const isLoggedInLocally = await AsyncStorage.getItem("is_logged_in");
-        if (isLoggedInLocally === 'false' || !isLoggedInLocally || !jwtToken) {
-          router.replace("/login");
-          return;
-        }
-
-        try {
-          const response = await fetch(`${BASE_URL}/api/user/check-jwt`, {
-            method: 'GET',
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': `Bearer ${jwtToken}`,
-            },
-          });
-
-          if (response.ok) {
-            console.log("JWT verified successfully with backend.");
-          } else {
-            await AsyncStorage.setItem("is_logged_in", "false");
-            await AsyncStorage.removeItem("auth_token");
-            router.replace("/login");
-          }
-        } catch (error) {
-          await AsyncStorage.setItem("is_logged_in", "false");
-          await AsyncStorage.removeItem("auth_token");
-          router.replace("/login");
-        }
+        const isLoggedIn = await checkLoginStatus(router);
+        if (!isLoggedIn) return;
       }
     };
 
-    checkLoginStatus();
+    initApp();
   }, [loaded, router]);
+
   if (!loaded) {
     return null;
   }
