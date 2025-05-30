@@ -81,7 +81,7 @@
                                                     @endforeach
                                                 @else
                                                     <li class="p-2">
-                                                        <p class="text-center text-capitalize mb-0">No products available
+                                                        <p class="text-center text-capitalize mb-0 text-white">No messages available
                                                         </p>
                                                     </li>
                                                 @endif
