@@ -91,7 +91,7 @@ class HomeController extends Controller
 
             $response = Http::withHeaders([
                 'Authorization' => 'Bearer ' . $token
-            ])->get('localhost:7777/api/message/countUnread');
+            ])->get(config('app.back_end_base_url') . '/api/message/countUnread');
 
             if ($response->successful() && $response->json('errors') === null) {
                 $unread = $response->json('data');

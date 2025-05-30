@@ -29,7 +29,7 @@
 
                 <div class="message-icon-wrapper" onclick="window.location.href='{{ route('fetchList') }}'">
                         <i class="fa-solid fa-message"></i>
-                        <span class="message-badge" id="unreadCount">{{ Session::get('unread', 0)}}</span>
+                        <span class="message-badge" id="unreadCount"></span>
                     </a>
                 </div>
             </div>
@@ -170,13 +170,19 @@ function fetchUnreadCount() {
     })
     .then(data => {
       console.log('Unread count:', data);
+      const unreadElem = document.getElementById('unreadCount');
+      if (unreadElem) {
+        unreadElem.textContent = data.data ?? 0;
+      }
     })
     .catch(error => {
       console.error('Fetch error:', error);
     });
 }
 
+// Panggil pertama kali saat halaman load
 fetchUnreadCount();
 
+// Set interval tiap 2 detik (2000 ms)
 setInterval(fetchUnreadCount, 2000);
 </script>
