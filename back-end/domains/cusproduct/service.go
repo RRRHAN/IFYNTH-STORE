@@ -12,6 +12,7 @@ import (
 
 	"github.com/RRRHAN/IFYNTH-STORE/back-end/domains/message"
 	"github.com/RRRHAN/IFYNTH-STORE/back-end/utils/config"
+	"github.com/RRRHAN/IFYNTH-STORE/back-end/utils/constants"
 	contextUtil "github.com/RRRHAN/IFYNTH-STORE/back-end/utils/context"
 	fileutils "github.com/RRRHAN/IFYNTH-STORE/back-end/utils/file"
 	"github.com/google/uuid"
@@ -24,7 +25,7 @@ type Service interface {
 	DeleteProduct(ctx context.Context, req DeleteProductRequest) error
 	GetProductByUserID(ctx context.Context, keyword string) ([]CustomerProduct, error)
 	UpdateStatus(ctx context.Context, req UpdateStatusRequest) error
-	GetProductByMessage(ctx context.Context, keyword string) ([]CustomerProduct, error)
+	GetProductByMessage(ctx context.Context, keyword string) ([]CustomerProductMessage, error)
 }
 
 type service struct {
@@ -122,7 +123,7 @@ func (s *service) GetProductByUserID(ctx context.Context, keyword string) ([]Cus
 	return products, nil
 }
 
-func (s *service) GetProductByMessage(ctx context.Context, keyword string) ([]CustomerProduct, error) {
+func (s *service) GetProductByMessage(ctx context.Context, keyword string) ([]CustomerProductMessage, error) {
 	var products []CustomerProduct
 
 	token, _ := contextUtil.GetTokenClaims(ctx)
@@ -147,7 +148,39 @@ func (s *service) GetProductByMessage(ctx context.Context, keyword string) ([]Cu
 		return nil, err
 	}
 
-	return products, nil
+	var results []Result
+	err := s.db.Model(&message.Message{}).
+		Select("product_id, COUNT(*) as total").
+		Where("is_read = ? ", false).
+		Where("role = ? ", constants.ADMIN).
+		Group("product_id").
+		Scan(&results).Error
+	if err != nil {
+		return nil, err
+	}
+
+	mapUnreadCount := make(map[uuid.UUID]int, 0)
+	for _, result := range results {
+		mapUnreadCount[result.ProductID] = result.Total
+	}
+
+	var productMessages []CustomerProductMessage
+	for _, product := range products {
+		url := ""
+		if len(product.Files) != 0 {
+			url = product.Files[0].URL
+		}
+		productMessages = append(productMessages, CustomerProductMessage{
+			ProductID:   product.ID,
+			Name:        product.Name,
+			Price:       product.Price,
+			Status:      product.Status,
+			URL:         url,
+			UnreadCount: mapUnreadCount[product.ID],
+		})
+	}
+
+	return productMessages, nil
 }
 
 func (s *service) GetProductByID(ctx context.Context, id uuid.UUID) (*CustomerProduct, error) {

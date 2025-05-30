@@ -37,3 +37,8 @@ type ProductWithCustomer struct {
 	CustomerProduct
 	CustomerName string `json:"customer_name"`
 }
+
+type Result struct {
+	ProductID uuid.UUID
+	Total     int
+}

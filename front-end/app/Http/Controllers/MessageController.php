@@ -22,7 +22,7 @@ class MessageController extends Controller
 
             $response = Http::withHeaders([
                 'Authorization' => 'Bearer ' . $token
-            ])->get(config('app.back_end_base_url') . '/api/cusproduct/list', $queryParams);
+            ])->get( config('app.back_end_base_url') . '/api/cusproduct/list', $queryParams);
 
             if (in_array('Unauthorized!', $response->json('errors') ?? [])) {
                 return redirect()->route('login')->with('error', 'Session expired. Please log in again.');
@@ -114,5 +114,35 @@ class MessageController extends Controller
             ], 500);
         }
     }
+public function fetchListJson(Request $request)
+{
+    $token = session('api_token');
+    if (!$token) {
+        return response()->json(['error' => 'Session token missing.'], 401);
+    }
+
+    try {
+        $response = Http::withHeaders([
+            'Authorization' => 'Bearer ' . $token
+        ])->get(config('app.back_end_base_url') . '/api/cusproduct/list');
+
+        if ($response->successful() && $response->json('errors') === null) {
+            $list = collect($response->json('data'));
+
+            $unreadCounts = $list->mapWithKeys(function ($product) {
+                return [
+                    $product['ProductID'] => $product['UnreadCount'] ?? 0
+                ];
+            });
+
+            return response()->json($unreadCounts);
+        } else {
+            return response()->json(['error' => 'Failed to fetch list.'], 500);
+        }
+    } catch (\Exception $e) {
+        \Log::error('Fetch unread counts error: ' . $e->getMessage());
+        return response()->json(['error' => 'An error occurred.'], 500);
+    }
+}
 
 }
