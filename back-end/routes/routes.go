@@ -138,7 +138,7 @@ func NewDependency(
 		address.POST("/", mw.JWT(constants.CUSTOMER), addressHandler.InsertAddress)
 		address.GET("/", mw.JWT(constants.CUSTOMER), addressHandler.GetAdderess)
 		address.PUT("/:id", mw.JWT(constants.CUSTOMER), addressHandler.UpdateAddress)
-		address.PUT("/:id", mw.JWT(constants.CUSTOMER), addressHandler.DeleteAddress)
+		address.DELETE("/:id", mw.JWT(constants.CUSTOMER), addressHandler.DeleteAddress)
 	}
 
 	ongkir := api.Group("/ongkir")
