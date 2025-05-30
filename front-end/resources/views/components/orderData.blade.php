@@ -14,36 +14,33 @@
                 </tr>
             </thead>
             <tbody>
-                @if (!empty($transactions) && count($transactions) > 0)
-                    @foreach ($transactions as $transaction)
-                        <tr class="text-center align-middle">
-                            <th scope="row">{{ $loop->iteration }}</th>
-                            <td>{{ $transaction['ID'] }}</td>
-                            <td>{{ $transaction['PaymentMethod'] ?? '-' }}</td>
-                            <td>Rp.{{ number_format($transaction['TotalAmount'] ?? 0) }}</td>
-                            <td>{{ ucfirst($transaction['Status'] ?? '-') }}</td>
-                            <td>
-                                <!-- Button trigger modal -->
-                                <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal"
-                                    data-bs-target="#detailModal{{ $loop->iteration }}"
-                                    data-transaction="{{ json_encode($transaction) }}"
-                                    onclick="loadTransactionData(this)">
-                                    Detail
-                                </button>
-                            </td>
-                        </tr>
-                    @endforeach
-                @else
+                @forelse ($transactions ?? [] as $transaction)
+                    <tr class="text-center align-middle">
+                        <th scope="row">{{ $loop->iteration }}</th>
+                        <td>{{ $transaction['ID'] ?? null }}</td>
+                        <td>{{ $transaction['PaymentMethod'] ?? '-' }}</td>
+                        <td>Rp.{{ number_format($transaction['TotalAmount'] ?? 0) }}</td>
+                        <td>{{ ucfirst($transaction['Status'] ?? '-') }}</td>
+                        <td>
+                            <!-- Button trigger modal -->
+                            <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal"
+                                data-bs-target="#detailModal{{ $loop->iteration }}"
+                                data-transaction="{{ json_encode($transaction) }}" onclick="loadTransactionData(this)">
+                                Detail
+                            </button>
+                        </td>
+                    </tr>
+                @empty
                     <tr>
                         <td colspan="6" class="text-center">No orders available.</td>
                     </tr>
-                @endif
+                @endforelse
             </tbody>
         </table>
     </div>
 </div>
 
-@foreach ($transactions as $transaction)
+@forelse ($transactions ?? [] as $transaction)
     <div class="modal fade" id="detailModal{{ $loop->iteration }}" tabindex="-1" aria-labelledby="detailModalLabel"
         aria-hidden="true">
         <div class="modal-dialog modal-lg modal-dialog-centered">
@@ -104,7 +101,8 @@
             </div>
         </div>
     </div>
-@endforeach
+@empty
+@endforelse
 
 <!-- Modal for Viewing Large Image -->
 <div class="modal fade" id="imageModal" tabindex="-1" aria-labelledby="imageModalLabel" aria-hidden="true">

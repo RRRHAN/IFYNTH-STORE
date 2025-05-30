@@ -66,16 +66,15 @@ class HomeController extends Controller
         $token = session('api_token');
 
         $cusproductController = new CustomerProductController();
-        $result = $cusproductController->fetchOffers($request);
-        $products = $result->get('products');
+        $resultProducts = $cusproductController->fetchOffers($request);
+        $products = $resultProducts->get('products');
 
         $userController = new UserController();
         $user = $userController->getPersonal();
 
         $transactionController = new TransactionController();
-        $transactionsResponse = $transactionController->getTransaction();
-
-        $transactions = $transactionsResponse->getData(true)['transactions'] ?? [];
+        $resultTransactions = $transactionController->getTransaction();
+        $transactions = $resultTransactions->get('transactions');
 
         return view('dashboard', [
             'products' => $products,

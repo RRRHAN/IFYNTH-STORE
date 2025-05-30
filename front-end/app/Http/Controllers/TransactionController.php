@@ -69,7 +69,7 @@ class TransactionController extends Controller
 
             $client = new \GuzzleHttp\Client();
 
-            $response = $client->request('POST',  config('app.back_end_base_url') . '/api/transaction', [
+            $response = $client->request('POST', config('app.back_end_base_url') . '/api/transaction', [
                 'headers' => [
                     'Authorization' => 'Bearer ' . $token,
                 ],
@@ -101,22 +101,21 @@ class TransactionController extends Controller
         try {
             $response = Http::withHeaders([
                 'Authorization' => 'Bearer ' . $token,
-            ])->get(config('app.back_end_base_url') . '/api/transaction');
+            ])->get('localhost:7777/api/transaction');
 
             if (in_array('Unauthorized!', $response->json('errors') ?? [])) {
                 return redirect()->route('login')->with('error', 'Session expired. Please log in again.');
             }
 
-            if ($response->successful()) {
+            if ($response->successful() && $response->json('errors') === null) {
                 $transactions = collect($response->json('data'));
 
-                if ($transactions->isEmpty()) {
-                    return response()->json(['message' => 'No transactions found'], 404);
-                }
+                return collect([
+                    'transactions' => $transactions,
+                ]);
 
-                return response()->json(['transactions' => $transactions], 200);
             } else {
-                return response()->json(['error' => 'Failed to fetch transactions', 'details' => $response->body()], $response->status());
+                return collect(['error' => 'Failed to fetch transactions.']);
             }
         } catch (\Exception $e) {
             return response()->json(['error' => 'Error while fetching transactions', 'details' => $e->getMessage()], 500);

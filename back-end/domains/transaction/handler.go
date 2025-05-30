@@ -37,12 +37,7 @@ func NewHandler(service Service, validate *validator.Validate) Handler {
 func (h *handler) GetAllTransaction(ctx *gin.Context) {
 	transactions, err := h.service.GetAllTransaction(ctx)
 	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch transactions", "details": err.Error()})
-		return
-	}
-
-	if len(transactions) == 0 {
-		respond.Success(ctx, http.StatusOK, "No transactions found")
+		respond.Error(ctx, apierror.FromErr(err))
 		return
 	}
 
@@ -52,12 +47,7 @@ func (h *handler) GetAllTransaction(ctx *gin.Context) {
 func (h *handler) GetTransactionsByUserID(ctx *gin.Context) {
 	transactions, err := h.service.GetTransactionsByUserID(ctx)
 	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch transactions", "details": err.Error()})
-		return
-	}
-
-	if len(transactions) == 0 {
-		respond.Success(ctx, http.StatusOK, "No transactions found")
+		respond.Error(ctx, apierror.FromErr(err))
 		return
 	}
 

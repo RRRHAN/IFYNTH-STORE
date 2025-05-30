@@ -86,4 +86,14 @@
             </div>
         </div>
     </main>
+    <script>
+    const products = @json($products);
+    const user = @json($user);
+    const transactions = @json($transactions);
+
+    console.log("Products:", products);
+    console.log("User:", user);
+    console.log("Transactions:", transactions);
+</script>
+
 @stop
