@@ -37,7 +37,7 @@ type Customer struct {
 	Username    string `gorm:"unique"`
 	Password    string
 	Email       string
-	Address     []address.CustomerAddress
+	Address     []address.CustomerAddress `gorm:"foreignKey:UserID"`
 	CreatedAt   time.Time
 	UpdatedAt   time.Time
 }
