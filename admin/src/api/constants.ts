@@ -3,7 +3,7 @@ import { Platform } from 'react-native';
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export const BASE_URL = (() => {
-  return 'http://ifynth.raihan-firm.com';
+  return 'http://185.201.8.140';
 })();
 
 export const getAuthToken = async (): Promise<string | null> => {
