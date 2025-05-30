@@ -29,7 +29,7 @@
 
                 <div class="message-icon-wrapper" onclick="window.location.href='{{ route('fetchList') }}'">
                         <i class="fa-solid fa-message"></i>
-                        <span class="message-badge" id="unreadCount"></span>
+                        <span class="message-badge" id="unreadCount">0</span>
                     </a>
                 </div>
             </div>
