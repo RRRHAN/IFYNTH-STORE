@@ -3,34 +3,36 @@ package rajaongkir
 import (
 	"errors"
 
+	"github.com/RRRHAN/IFYNTH-STORE/back-end/utils/config"
 	"github.com/go-resty/resty/v2"
 )
 
-type OngkirClient interface {
-	SearchDestination(keyword string) (*DefaultResponse[Destination], error)
-	GetShippingCost(input GetShippingCostReq) (*DefaultResponse[ShippingOption], error)
+type Client interface {
+	SearchDestination(keyword string) (*DefaultResponse[[]Destination], error)
+	GetShippingCost(input GetShippingCostReq) (*DefaultResponse[[]ShippingCost], error)
 }
 
-type ongkirClient struct {
+type client struct {
 	resty *resty.Client
 }
 
-func NewOngkirClient(apiKey string, baseURL string) OngkirClient {
-	client := resty.New().
-		SetBaseURL(baseURL).
-		SetHeader("x-api-key", apiKey)
+func NewRajaOngkirClient(conf *config.Config) Client {
+	rajaOngkirConf := conf.RajaOngkir
+	c := resty.New().
+		SetBaseURL(rajaOngkirConf.BaseUrl).
+		SetHeader("x-api-key", rajaOngkirConf.ApiKey)
 
-	return &ongkirClient{
-		resty: client,
+	return &client{
+		resty: c,
 	}
 }
 
-func (c *ongkirClient) SearchDestination(keyword string) (*DefaultResponse[Destination], error) {
+func (c *client) SearchDestination(keyword string) (*DefaultResponse[[]Destination], error) {
 	if len(keyword) < 3 {
 		return nil, errors.New("keyword must be at least 3 characters")
 	}
 
-	var res DefaultResponse[Destination]
+	var res DefaultResponse[[]Destination]
 	_, err := c.resty.R().
 		SetQueryParam("keyword", keyword).
 		SetResult(&res).
@@ -43,8 +45,8 @@ func (c *ongkirClient) SearchDestination(keyword string) (*DefaultResponse[Desti
 	return &res, nil
 }
 
-func (c *ongkirClient) GetShippingCost(input GetShippingCostReq) (*DefaultResponse[ShippingOption], error) {
-	var res DefaultResponse[ShippingOption]
+func (c *client) GetShippingCost(input GetShippingCostReq) (*DefaultResponse[[]ShippingCost], error) {
+	var res DefaultResponse[[]ShippingCost]
 	_, err := c.resty.R().
 		SetQueryParams(map[string]string{
 			"shipper_destination_id":  "30711",

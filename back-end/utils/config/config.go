@@ -19,6 +19,7 @@ type Config struct {
 	Auth        Auth        `envconfig:"auth"`
 	RateLimiter RateLimiter `envconfig:"rate_limiter"`
 	FeatureFlag FeatureFlag `envconfig:"feature_flag"`
+	RajaOngkir  RajaOngkir  `envconfig:"raja_ongkir"`
 }
 
 type Database struct {
@@ -57,6 +58,11 @@ type RateLimiter struct {
 
 type FeatureFlag struct {
 	ImageClassifier bool `envconfig:"image_classifier" default:"false"`
+}
+
+type RajaOngkir struct {
+	BaseUrl string `envconfig:"base_url"`
+	ApiKey  string `envconfig:"api_key"`
 }
 
 var config *Config

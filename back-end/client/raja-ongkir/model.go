@@ -21,7 +21,7 @@ type Destination struct {
 	ZipCode     string `json:"zip_code"`
 }
 
-type ShippingOption struct {
+type ShippingCost struct {
 	ShippingName     string `json:"shipping_name"`
 	ServiceName      string `json:"service_name"`
 	Weight           int    `json:"weight"`
@@ -36,9 +36,9 @@ type ShippingOption struct {
 }
 
 type ShippingCostResponse struct {
-	CalculateReguler []ShippingOption `json:"calculate_reguler"`
-	CalculateCargo   []ShippingOption `json:"calculate_cargo"`
-	CalculateInstant []ShippingOption `json:"calculate_instant"`
+	CalculateReguler []ShippingCost `json:"calculate_reguler"`
+	CalculateCargo   []ShippingCost `json:"calculate_cargo"`
+	CalculateInstant []ShippingCost `json:"calculate_instant"`
 }
 
 type GetShippingCostReq struct {

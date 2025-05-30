@@ -19,6 +19,7 @@ type Handler interface {
 	GetTotalAmountByDate(ctx *gin.Context)
 	GetTotalIncome(ctx *gin.Context)
 	GetTotalTransactionByCustomer(ctx *gin.Context)
+	PayTransaction(ctx *gin.Context)
 }
 
 type handler struct {
@@ -150,4 +151,20 @@ func (h *handler) GetTotalTransactionByCustomer(ctx *gin.Context) {
 	}
 
 	respond.Success(ctx, http.StatusOK, transactions)
+}
+
+func (h *handler) PayTransaction(ctx *gin.Context) {
+	var input PayTransactionReq
+	err := ctx.ShouldBind(&input)
+	if err != nil {
+		respond.Error(ctx, apierror.FromErr(err))
+		return
+	}
+
+	if err := h.service.PayTransaction(ctx, input); err != nil {
+		respond.Error(ctx, err)
+		return
+	}
+
+	respond.Success(ctx, http.StatusOK, nil)
 }

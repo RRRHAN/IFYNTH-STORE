@@ -8,11 +8,14 @@ import (
 	_ "github.com/google/subcommands"
 	"github.com/google/wire"
 
+	rajaongkir "github.com/RRRHAN/IFYNTH-STORE/back-end/client/raja-ongkir"
 	"github.com/RRRHAN/IFYNTH-STORE/back-end/database"
+	"github.com/RRRHAN/IFYNTH-STORE/back-end/domains/address"
 	"github.com/RRRHAN/IFYNTH-STORE/back-end/domains/cart"
 	"github.com/RRRHAN/IFYNTH-STORE/back-end/domains/cusproduct"
 	imageclassifier "github.com/RRRHAN/IFYNTH-STORE/back-end/domains/image-classifier"
 	"github.com/RRRHAN/IFYNTH-STORE/back-end/domains/message"
+	"github.com/RRRHAN/IFYNTH-STORE/back-end/domains/ongkir"
 	"github.com/RRRHAN/IFYNTH-STORE/back-end/domains/product"
 	"github.com/RRRHAN/IFYNTH-STORE/back-end/domains/transaction"
 	"github.com/RRRHAN/IFYNTH-STORE/back-end/domains/user"
@@ -57,6 +60,16 @@ var transactionSet = wire.NewSet(
 	transaction.NewHandler,
 )
 
+var ongkirSet = wire.NewSet(
+	ongkir.NewService,
+	ongkir.NewHandler,
+)
+
+var addressSet = wire.NewSet(
+	address.NewService,
+	address.NewHandler,
+)
+
 func initializeDependency(config *config.Config) (*routes.Dependency, error) {
 
 	wire.Build(
@@ -71,6 +84,9 @@ func initializeDependency(config *config.Config) (*routes.Dependency, error) {
 		cusproductSet,
 		messageSet,
 		transactionSet,
+		rajaongkir.NewRajaOngkirClient,
+		ongkirSet,
+		addressSet,
 	)
 
 	return nil, nil

@@ -46,7 +46,7 @@ func (s *service) GetPersonal(ctx context.Context) (interface{}, error) {
 	}
 
 	switch token.Claims.Role {
-	case "ADMIN":
+	case constants.ADMIN:
 		var admin Admin
 		err = s.db.WithContext(ctx).Where("id = ?", token.Claims.UserID).First(&admin).Error
 		if err != nil {
@@ -54,9 +54,9 @@ func (s *service) GetPersonal(ctx context.Context) (interface{}, error) {
 		}
 		return &admin, nil
 
-	case "CUSTOMER":
+	case constants.CUSTOMER:
 		var customer Customer
-		err = s.db.WithContext(ctx).Preload("CustomerDetails").Where("id = ?", token.Claims.UserID).First(&customer).Error
+		err = s.db.WithContext(ctx).Preload("Address").Where("id = ?", token.Claims.UserID).First(&customer).Error
 		if err != nil {
 			return nil, err
 		}
@@ -283,7 +283,6 @@ func (s *service) UpdateProfile(ctx context.Context, input UpdateProfileReq) (re
 	// Ambil data customer dengan preload ke CustomerDetails
 	var customer Customer
 	err = s.db.WithContext(ctx).
-		Preload("CustomerDetails").
 		Where("id = ?", userID).
 		First(&customer).Error
 	if err != nil {
@@ -294,38 +293,8 @@ func (s *service) UpdateProfile(ctx context.Context, input UpdateProfileReq) (re
 	customer.Name = input.Name
 	customer.Username = input.Username
 	customer.PhoneNumber = input.PhoneNumber
+	customer.Email = input.Email
 	customer.UpdatedAt = time.Now()
-
-	// Update atau buat CustomerDetails (jika belum ada)
-	if customer.CustomerDetails != nil {
-		customer.CustomerDetails.Email = optionalString(input.Email)
-		customer.CustomerDetails.DestinationID = optionalString(input.DestinationID)
-		customer.CustomerDetails.Address = optionalString(input.Address)
-		customer.CustomerDetails.ZipCode = optionalString(input.ZipCode)
-		customer.CustomerDetails.DestinationLabel = optionalString(input.DestinationLabel)
-		customer.CustomerDetails.UpdatedAt = time.Now()
-
-		if err := s.db.WithContext(ctx).Save(customer.CustomerDetails).Error; err != nil {
-			return nil, apierror.FromErr(err)
-		}
-	} else {
-		customerDetails := CustomerDetails{
-			UserID:           customer.ID,
-			Email:            optionalString(input.Email),
-			DestinationID:    optionalString(input.DestinationID),
-			Address:          optionalString(input.Address),
-			ZipCode:          optionalString(input.ZipCode),
-			DestinationLabel: optionalString(input.DestinationLabel),
-			CreatedAt:        time.Now(),
-			UpdatedAt:        time.Now(),
-		}
-
-		if err := s.db.WithContext(ctx).Create(&customerDetails).Error; err != nil {
-			return nil, apierror.FromErr(err)
-		}
-
-		customer.CustomerDetails = &customerDetails
-	}
 
 	// Simpan perubahan di tabel customer
 	if err := s.db.WithContext(ctx).Save(&customer).Error; err != nil {
