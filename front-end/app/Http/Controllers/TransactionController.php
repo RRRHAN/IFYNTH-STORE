@@ -101,7 +101,7 @@ class TransactionController extends Controller
         try {
             $response = Http::withHeaders([
                 'Authorization' => 'Bearer ' . $token,
-            ])->get('localhost:7777/api/transaction');
+            ])->get(config('app.back_end_base_url') . '/api/transaction');
 
             if (in_array('Unauthorized!', $response->json('errors') ?? [])) {
                 return redirect()->route('login')->with('error', 'Session expired. Please log in again.');
