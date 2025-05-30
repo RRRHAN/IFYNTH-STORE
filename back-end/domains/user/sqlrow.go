@@ -32,6 +32,7 @@ func (Admin) TableName() string {
 type Customer struct {
 	ID              uuid.UUID `gorm:"type:uuid;default:gen_random_uuid();primaryKey"`
 	Name            string
+	Email           *string `gorm:"default:null"`
 	PhoneNumber     string
 	Username        string `gorm:"unique"`
 	Password        string
@@ -47,7 +48,6 @@ func (Customer) TableName() string {
 type CustomerDetails struct {
 	ID               uuid.UUID `gorm:"type:uuid;default:gen_random_uuid();primaryKey"`
 	UserID           uuid.UUID
-	Email            *string `gorm:"default:null"`
 	DestinationID    *string `gorm:"default:null"`
 	Address          *string `gorm:"default:null"`
 	ZipCode          *string `gorm:"default:null"`

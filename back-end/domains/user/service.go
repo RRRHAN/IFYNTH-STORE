@@ -294,11 +294,11 @@ func (s *service) UpdateProfile(ctx context.Context, input UpdateProfileReq) (re
 	customer.Name = input.Name
 	customer.Username = input.Username
 	customer.PhoneNumber = input.PhoneNumber
+	customer.Email = optionalString(input.Email)
 	customer.UpdatedAt = time.Now()
 
 	// Update atau buat CustomerDetails (jika belum ada)
 	if customer.CustomerDetails != nil {
-		customer.CustomerDetails.Email = optionalString(input.Email)
 		customer.CustomerDetails.DestinationID = optionalString(input.DestinationID)
 		customer.CustomerDetails.Address = optionalString(input.Address)
 		customer.CustomerDetails.ZipCode = optionalString(input.ZipCode)
@@ -311,7 +311,6 @@ func (s *service) UpdateProfile(ctx context.Context, input UpdateProfileReq) (re
 	} else {
 		customerDetails := CustomerDetails{
 			UserID:           customer.ID,
-			Email:            optionalString(input.Email),
 			DestinationID:    optionalString(input.DestinationID),
 			Address:          optionalString(input.Address),
 			ZipCode:          optionalString(input.ZipCode),
