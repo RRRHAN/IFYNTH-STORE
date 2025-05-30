@@ -140,6 +140,7 @@ class UserController extends Controller
 
     public function changePassword(Request $request)
     {
+        session()->flash('preloader', false);
         $token = session('api_token');
 
         try {
@@ -215,6 +216,7 @@ class UserController extends Controller
 
     public function updateProfile(Request $request)
     {
+        session()->flash('preloader', false);
         $token = session('api_token');
 
         $response = Http::withHeaders([

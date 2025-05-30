@@ -11,6 +11,7 @@ class CartController extends Controller
 {
     public function AddtoCart(Request $request, $product_id)
     {
+        session()->flash('preloader', false);
         $token = session('api_token');
 
         $validate = $request->validate([
@@ -76,6 +77,7 @@ class CartController extends Controller
 
     public function updateCart(Request $request, $product_id, $cart_item_id)
     {
+        session()->flash('preloader', false);
         $token = session('api_token');
 
         $request->validate(
@@ -114,6 +116,7 @@ class CartController extends Controller
 
     public function deleteItem($id)
     {
+        session()->flash('preloader', false);
         $token = session('api_token');
 
         try {

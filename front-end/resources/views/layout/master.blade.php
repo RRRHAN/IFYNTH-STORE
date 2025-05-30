@@ -21,6 +21,7 @@
     <link rel="stylesheet" href="/assets/css/nice-select.css">
     <!-- Style css -->
     <link rel="stylesheet" href="/assets/css/style.css">
+    <link rel="stylesheet" href="/assets/css/preloader.css" id="preloader-css">
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <!-- Skrip umum lainnya -->
     <!-- Skrip umum lainnya -->
@@ -69,20 +70,22 @@
             </div>
         </div>
     </div>
-    <!-- Preloader area start -->
-    <div class="loading" id="preloaderContainer">
-        <span class="text-capitalize">L</span>
-        <span>o</span>
-        <span>a</span>
-        <span>d</span>
-        <span>i</span>
-        <span>n</span>
-        <span>g</span>
-    </div>
+    @if (session('preloader', true))
+        <!-- Preloader area start -->
+        <div class="loading" id="preloaderContainer">
+            <span class="text-capitalize">L</span>
+            <span>o</span>
+            <span>a</span>
+            <span>d</span>
+            <span>i</span>
+            <span>n</span>
+            <span>g</span>
+        </div>
 
-    <div id="preloader" id="preloaderContainer">
-    </div>
-    <!-- Preloader area end -->
+        <div id="preloader" id="preloaderContainer">
+        </div>
+        <!-- Preloader area end -->
+    @endif
 
     <!-- Mouse cursor area start here -->
     <div class="mouse-cursor cursor-outer"></div>
@@ -139,19 +142,14 @@
             }
         });
     </script>
-    <script>
-        paceOptions = {
-            ajax: true,
-            document: true,
-            eventLag: false,
-        };
-
-        Pace.on("done", function() {
-            $("#preloader").addClass("isdone");
-            $(".loading").addClass("isdone");
-            $(".loading").addClass("d-none");
-        });
-    </script>
+    @if (session('preloader') === false)
+        <script>
+            document.addEventListener("DOMContentLoaded", function() {
+                const link = document.getElementById('preloader-css');
+                if (link) link.remove();
+            });
+        </script>
+    @endif
 </body>
 
 </html>

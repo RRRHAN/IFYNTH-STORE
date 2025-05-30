@@ -22,17 +22,11 @@
                         </span>
                     </a>
                 </div>
-                <div class="cart d-flex align-items-center">
-                    <span class="cart__icon" onclick="window.location.href='{{ route('get.Cart') }}'">
-                        <i class="fa-regular fa-cart-shopping"></i>
-                    </span>
-                    <a href="{{ route('get.Cart') }}" class="c__one">
-                        <span class="text-white">Cart</span>
-                    </a>
-                    <span class="one">
-                        {{ Session::get('total_cart', 0) }}
-                    </span>
+                <div class="cart-icon-wrapper" onclick="window.location.href='{{ route('get.Cart') }}'">
+                    <i class="fa-solid fa-cart-shopping"></i>
+                    <span class="cart-badge">{{ Session::get('total_cart', 0) }}</span>
                 </div>
+
                 <div class="">
                     <a href="{{ route('fetchList') }}" class="message btn p-0">
                         <i class="fa-solid fa-message text-white"></i>
@@ -143,7 +137,7 @@
 
         document.body.addEventListener("click", function(event) {
             var target = event.target.closest(".account a") || event.target.closest(
-            ".cart a");
+                ".cart a");
 
             if (target && !userLoggedIn) {
                 event.preventDefault();
