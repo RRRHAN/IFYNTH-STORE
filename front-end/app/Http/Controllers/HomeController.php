@@ -84,4 +84,24 @@ class HomeController extends Controller
         ]);
     }
 
+    public function countUnread(Request $request)
+    {
+        try {
+            $token = session('api_token');
+
+            $response = Http::withHeaders([
+                'Authorization' => 'Bearer ' . $token
+            ])->get('localhost:7777/api/message/countUnread');
+
+            if ($response->successful() && $response->json('errors') === null) {
+                $unread = $response->json('data');
+                return response()->json(['data' => $unread, 'errors' => null]);
+            }
+
+            return response()->json(['data' => 0, 'errors' => ['Failed to fetch unread count']], 500);
+        } catch (\Exception $e) {
+            return response()->json(['data' => 0, 'errors' => [$e->getMessage()]], 500);
+        }
+    }
+
 }

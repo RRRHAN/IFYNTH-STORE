@@ -42,6 +42,7 @@ Route::get('/listmessages', function () {
 Route::controller(HomeController::class)->group(function () {
     Route::get('/landing', 'landing')->name('landing');
     Route::get('/dashboard', 'dashboard')->name('dashboard');
+    Route::get('/countUnread', 'countUnread')->name('countUnread');
 });
 
 // Route user

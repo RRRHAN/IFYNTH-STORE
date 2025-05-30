@@ -19,7 +19,7 @@
             <div class="col-md-6">
                 <label class="form-label">Email</label>
                 <input type="email" class="form-control" name="email"
-                    value="{{ session('user')['CustomerDetails']['Email'] ?? '' }}">
+                    value="{{ session('user')['Email'] ?? '' }}">
             </div>
             <div class="mb-3">
                 <label for="address" class="form-label"> Address</label>

@@ -27,9 +27,9 @@
                     <span class="cart-badge">{{ Session::get('total_cart', 0) }}</span>
                 </div>
 
-                <div class="">
-                    <a href="{{ route('fetchList') }}" class="message btn p-0">
-                        <i class="fa-solid fa-message text-white"></i>
+                <div class="message-icon-wrapper" onclick="window.location.href='{{ route('fetchList') }}'">
+                        <i class="fa-solid fa-message"></i>
+                        <span class="message-badge" id="unreadCount">{{ Session::get('unread', 0)}}</span>
                     </a>
                 </div>
             </div>
@@ -160,4 +160,23 @@
             }
         });
     });
+</script>
+<script>
+function fetchUnreadCount() {
+  fetch('/countUnread')
+    .then(response => {
+      if (!response.ok) throw new Error('Network response was not ok');
+      return response.json();
+    })
+    .then(data => {
+      console.log('Unread count:', data);
+    })
+    .catch(error => {
+      console.error('Fetch error:', error);
+    });
+}
+
+fetchUnreadCount();
+
+setInterval(fetchUnreadCount, 2000);
 </script>
