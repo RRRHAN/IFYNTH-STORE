@@ -11,11 +11,5 @@ class Controller extends BaseController
 {
     use AuthorizesRequests, DispatchesJobs, ValidatesRequests;
 
-    protected $goApiUrl;
-
-    public function __construct()
-    {
-        $this->goApiUrl = env('GO_API_URL', 'http://localhost:7777');
-    }
 }
 

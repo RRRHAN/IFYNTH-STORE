@@ -117,6 +117,7 @@ func NewDependency(
 	{
 		message.POST("/", mw.JWT(constants.CUSTOMER, constants.ADMIN), messageHandler.AddMessage)
 		message.GET("/:product_id", mw.JWT(constants.CUSTOMER, constants.ADMIN), messageHandler.GetMessageByProductID)
+		message.GET("/countUnread", mw.JWT(constants.CUSTOMER, constants.ADMIN), messageHandler.CountUnread)
 	}
 
 	transaction := api.Group("/transaction")

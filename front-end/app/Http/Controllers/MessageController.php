@@ -54,7 +54,7 @@ class MessageController extends Controller
             // Ambil pesan untuk produk dari API atau database
             $response = Http::withHeaders([
                 'Authorization' => 'Bearer ' . $token
-            ])->get(config('app.back_end_base_url') . '/api/message/' . $productId);
+            ])->get( config('app.back_end_base_url') . '/api/message/' . $productId);
 
             if (in_array('Unauthorized!', $response->json('errors') ?? [])) {
                 return redirect()->route('login')->with('error', 'Session expired. Please log in again.');

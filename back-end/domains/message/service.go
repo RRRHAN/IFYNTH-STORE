@@ -6,6 +6,7 @@ import (
 
 	"gorm.io/gorm"
 
+	apierror "github.com/RRRHAN/IFYNTH-STORE/back-end/utils/api-error"
 	"github.com/RRRHAN/IFYNTH-STORE/back-end/utils/config"
 	"github.com/RRRHAN/IFYNTH-STORE/back-end/utils/constants"
 	contextUtil "github.com/RRRHAN/IFYNTH-STORE/back-end/utils/context"
@@ -15,6 +16,7 @@ import (
 type Service interface {
 	GetMessageByProductID(ctx context.Context, productID uuid.UUID) ([]Message, error)
 	AddMessage(ctx context.Context, req AddMessageRequest) error
+	CountUnread(ctx context.Context) (int, error)
 }
 
 type service struct {
@@ -30,8 +32,12 @@ func NewService(config *config.Config, db *gorm.DB) Service {
 }
 
 func (s *service) GetMessageByProductID(ctx context.Context, productID uuid.UUID) ([]Message, error) {
-	var messages []Message
+	token, err := contextUtil.GetTokenClaims(ctx)
+	if err != nil {
+		return nil, err
+	}
 
+	var messages []Message
 	if err := s.db.WithContext(ctx).
 		Where("product_id = ?", productID).
 		Order("created_at DESC").
@@ -39,9 +45,69 @@ func (s *service) GetMessageByProductID(ctx context.Context, productID uuid.UUID
 		return nil, err
 	}
 
+	var role = token.Claims.Role
+
+	switch role {
+	case "ADMIN":
+		if err := s.db.WithContext(ctx).
+			Model(&Message{}).
+			Where("product_id = ?", productID).
+			Where("role = ?", "CUSTOMER").
+			Update("is_read", true).Error; err != nil {
+			return nil, err
+		}
+	case "CUSTOMER":
+		if err := s.db.WithContext(ctx).
+			Model(&Message{}).
+			Where("product_id = ?", productID).
+			Where("role = ?", "ADMIN").
+			Update("is_read", true).Error; err != nil {
+			return nil, err
+		}
+	}
+
 	return messages, nil
 }
 
+func (s *service) CountUnread(ctx context.Context) (int, error) {
+	token, err := contextUtil.GetTokenClaims(ctx)
+	if err != nil {
+		return 0, apierror.FromErr(err)
+	}
+
+	var userID = token.Claims.UserID
+	var products []CustomerProduct
+	if err := s.db.WithContext(ctx).
+		Where("user_id", userID).
+		Find(&products).Error; err != nil {
+		return 0, apierror.FromErr(err)
+	}
+
+	var productID []uuid.UUID
+
+	for _, product := range products {
+		productID = append(productID, product.ID)
+	}
+
+	var messages []Message
+	if err := s.db.WithContext(ctx).
+		Where("product_id IN ?", productID).
+		Where("role = ?", "ADMIN").
+		Order("created_at DESC").
+		Find(&messages).Error; err != nil {
+		return 0, apierror.FromErr(err)
+	}
+
+	unreadCount := 0
+	for _, msg := range messages {
+		if !msg.IsRead {
+			unreadCount++
+		}
+
+	}
+
+	return unreadCount, nil
+}
 func (s *service) AddMessage(ctx context.Context, req AddMessageRequest) error {
 
 	token, err := contextUtil.GetTokenClaims(ctx)

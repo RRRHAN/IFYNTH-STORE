@@ -4,6 +4,8 @@ import (
 	"errors"
 	"net/http"
 
+	apierror "github.com/RRRHAN/IFYNTH-STORE/back-end/utils/api-error"
+	"github.com/RRRHAN/IFYNTH-STORE/back-end/utils/respond"
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
 	"github.com/google/uuid"
@@ -13,6 +15,7 @@ import (
 type Handler interface {
 	AddMessage(ctx *gin.Context)
 	GetMessageByProductID(ctx *gin.Context)
+	CountUnread(ctx *gin.Context)
 }
 
 type handler struct {
@@ -77,4 +80,15 @@ func (h *handler) AddMessage(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, gin.H{
 		"message": "Message added successfully",
 	})
+}
+
+func (h *handler) CountUnread(ctx *gin.Context) {
+
+	unreadCount, err := h.service.CountUnread(ctx)
+	if err != nil {
+		respond.Error(ctx, apierror.FromErr(err))
+		return
+	}
+
+	respond.Success(ctx, http.StatusOK, unreadCount)
 }

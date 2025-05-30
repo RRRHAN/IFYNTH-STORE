@@ -20,7 +20,7 @@ type CustomerProduct struct {
 }
 
 func (CustomerProduct) TableName() string {
-	return "cusproduct"
+	return "cus_product"
 }
 
 type CustomerProductFile struct {
@@ -46,6 +46,7 @@ type Message struct {
 	AdminID    *uuid.UUID `gorm:"type:uuid"`
 	Message    string
 	Role       constants.ROLE
+	IsRead     bool `gorm:"column:is_read"`
 	CreatedAt  time.Time
 }
 
