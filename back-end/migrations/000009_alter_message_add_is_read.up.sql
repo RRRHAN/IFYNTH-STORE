@@ -1,0 +1,1 @@
+ALTER TABLE message ADD is_read BOOLEAN NOT NULL DEFAULT false;

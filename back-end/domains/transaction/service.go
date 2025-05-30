@@ -3,6 +3,7 @@ package transaction
 import (
 	"context"
 	"fmt"
+	"net/http"
 	"os"
 	"path/filepath"
 	"time"
@@ -12,6 +13,7 @@ import (
 
 	"github.com/RRRHAN/IFYNTH-STORE/back-end/domains/cart"
 	"github.com/RRRHAN/IFYNTH-STORE/back-end/domains/product"
+	apierror "github.com/RRRHAN/IFYNTH-STORE/back-end/utils/api-error"
 	"github.com/RRRHAN/IFYNTH-STORE/back-end/utils/config"
 	contextUtil "github.com/RRRHAN/IFYNTH-STORE/back-end/utils/context"
 	fileutils "github.com/RRRHAN/IFYNTH-STORE/back-end/utils/file"
@@ -26,6 +28,7 @@ type Service interface {
 	GetTotalAmountByDate(ctx context.Context) ([]Result, error)
 	GetTotalIncome(ctx context.Context) (float64, error)
 	GetTotalTransactionByCustomer(ctx context.Context) ([]ResultByCustomer, error)
+	PayTransaction(ctx context.Context, input PayTransactionReq) error
 }
 
 type service struct {
@@ -96,31 +99,6 @@ func (s *service) AddTransaction(ctx context.Context, req AddTransactionRequest)
 		return fmt.Errorf("no items in cart: %w", err)
 	}
 
-	var paymentProofPath string
-	if req.PaymentProof != nil {
-		ext := filepath.Ext(req.PaymentProof.Filename)
-		if !fileutils.IsValidImageExtension(ext) {
-			return fmt.Errorf("invalid file type: %v", ext)
-		}
-
-		filename, err := fileutils.GenerateMediaName(user_cart.UserID.String())
-		if err != nil {
-			return fmt.Errorf("error generating image name: %v", err)
-		}
-		filename = fmt.Sprintf("%s%s", filename, ext)
-		path := filepath.Join("uploads", "payment", filename)
-
-		if err := os.MkdirAll(filepath.Dir(path), os.ModePerm); err != nil {
-			return fmt.Errorf("failed to create directory: %w", err)
-		}
-
-		if err := fileutils.SaveMedia(ctx, req.PaymentProof, path); err != nil {
-			return err
-		}
-
-		paymentProofPath = "/uploads/payment/" + filename
-	}
-
 	tx := s.db.WithContext(ctx).Begin()
 
 	transaction := Transaction{
@@ -128,8 +106,8 @@ func (s *service) AddTransaction(ctx context.Context, req AddTransactionRequest)
 		UserID:        user_cart.UserID,
 		TotalAmount:   user_cart.TotalPrice + req.ShippingCost,
 		PaymentMethod: req.PaymentMethod,
-		PaymentProof:  paymentProofPath,
-		Status:        "pending",
+		PaymentProof:  "",
+		Status:        "draft",
 		CreatedAt:     time.Now(),
 		UpdatedAt:     time.Now(),
 	}
@@ -283,4 +261,53 @@ func (s *service) GetTotalTransactionByCustomer(ctx context.Context) ([]ResultBy
 	}
 
 	return results, nil
+}
+
+func (s *service) PayTransaction(ctx context.Context, input PayTransactionReq) error {
+
+	token, err := contextUtil.GetTokenClaims(ctx)
+	if err != nil {
+		return err
+	}
+
+	if input.PaymentProof == nil {
+		return apierror.NewWarn(http.StatusBadRequest, "file tidak bolah kosong")
+	}
+
+	ext := filepath.Ext(input.PaymentProof.Filename)
+	if !fileutils.IsValidImageExtension(ext) {
+		return fmt.Errorf("invalid file type: %v", ext)
+	}
+
+	filename, err := fileutils.GenerateMediaName(token.Claims.UserID.String())
+	if err != nil {
+		return fmt.Errorf("error generating image name: %v", err)
+	}
+	filename = fmt.Sprintf("%s%s", filename, ext)
+	path := filepath.Join("uploads", "payment", filename)
+
+	if err := os.MkdirAll(filepath.Dir(path), os.ModePerm); err != nil {
+		return fmt.Errorf("failed to create directory: %w", err)
+	}
+
+	if err := fileutils.SaveMedia(ctx, input.PaymentProof, path); err != nil {
+		return err
+	}
+
+	var transaction *Transaction
+	err = s.db.First(transaction, input.TransactionId).Error
+	if err != nil {
+		return err
+	}
+
+	paymentProofPath := "/uploads/payment/" + filename
+	transaction.PaymentProof = paymentProofPath
+	transaction.Status = "pending"
+
+	err = s.db.Save(transaction).Error
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

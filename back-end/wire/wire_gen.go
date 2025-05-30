@@ -7,11 +7,14 @@
 package wireinject
 
 import (
+	"github.com/RRRHAN/IFYNTH-STORE/back-end/client/raja-ongkir"
 	"github.com/RRRHAN/IFYNTH-STORE/back-end/database"
+	"github.com/RRRHAN/IFYNTH-STORE/back-end/domains/address"
 	"github.com/RRRHAN/IFYNTH-STORE/back-end/domains/cart"
 	"github.com/RRRHAN/IFYNTH-STORE/back-end/domains/cusproduct"
 	"github.com/RRRHAN/IFYNTH-STORE/back-end/domains/image-classifier"
 	"github.com/RRRHAN/IFYNTH-STORE/back-end/domains/message"
+	"github.com/RRRHAN/IFYNTH-STORE/back-end/domains/ongkir"
 	"github.com/RRRHAN/IFYNTH-STORE/back-end/domains/product"
 	"github.com/RRRHAN/IFYNTH-STORE/back-end/domains/transaction"
 	"github.com/RRRHAN/IFYNTH-STORE/back-end/domains/user"
@@ -53,7 +56,12 @@ func initializeDependency(config2 *config.Config) (*routes.Dependency, error) {
 	messageHandler := message.NewHandler(messageService, validate)
 	transactionService := transaction.NewService(config2, db)
 	transactionHandler := transaction.NewHandler(transactionService, validate)
-	dependency := routes.NewDependency(config2, middlewaresMiddlewares, db, predictor, handler, productHandler, cartHandler, imageclassifierHandler, cusproductHandler, messageHandler, transactionHandler)
+	addressService := address.NewService(db)
+	addressHandler := address.NewHandler(addressService, validate)
+	client := rajaongkir.NewRajaOngkirClient(config2)
+	ongkirService := ongkir.NewService(client, db)
+	ongkirHandler := ongkir.NewHandler(ongkirService, validate)
+	dependency := routes.NewDependency(config2, middlewaresMiddlewares, db, predictor, handler, productHandler, cartHandler, imageclassifierHandler, cusproductHandler, messageHandler, transactionHandler, addressHandler, ongkirHandler)
 	return dependency, nil
 }
 
@@ -72,3 +80,7 @@ var cusproductSet = wire.NewSet(cusproduct.NewService, cusproduct.NewHandler)
 var messageSet = wire.NewSet(message.NewService, message.NewHandler)
 
 var transactionSet = wire.NewSet(transaction.NewService, transaction.NewHandler)
+
+var ongkirSet = wire.NewSet(ongkir.NewService, ongkir.NewHandler)
+
+var addressSet = wire.NewSet(address.NewService, address.NewHandler)

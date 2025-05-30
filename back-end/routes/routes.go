@@ -7,10 +7,12 @@ import (
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 
+	"github.com/RRRHAN/IFYNTH-STORE/back-end/domains/address"
 	"github.com/RRRHAN/IFYNTH-STORE/back-end/domains/cart"
 	"github.com/RRRHAN/IFYNTH-STORE/back-end/domains/cusproduct"
 	imageclassifier "github.com/RRRHAN/IFYNTH-STORE/back-end/domains/image-classifier"
 	"github.com/RRRHAN/IFYNTH-STORE/back-end/domains/message"
+	"github.com/RRRHAN/IFYNTH-STORE/back-end/domains/ongkir"
 	"github.com/RRRHAN/IFYNTH-STORE/back-end/domains/product"
 	"github.com/RRRHAN/IFYNTH-STORE/back-end/domains/transaction"
 	"github.com/RRRHAN/IFYNTH-STORE/back-end/domains/user"
@@ -33,6 +35,8 @@ func NewDependency(
 	cusproductHandler cusproduct.Handler,
 	messageHandler message.Handler,
 	transactionHandler transaction.Handler,
+	addressHandler address.Handler,
+	ongkirHandler ongkir.Handler,
 ) *Dependency {
 
 	if conf.Environment != config.DEVELOPMENT_ENVIRONMENT {
@@ -126,6 +130,21 @@ func NewDependency(
 		transaction.GET("/report", mw.JWT(constants.ADMIN), transactionHandler.GetTotalAmountByDate)
 		transaction.GET("/totalIncome", mw.JWT(constants.ADMIN), transactionHandler.GetTotalIncome)
 		transaction.GET("/totalTransactionUser", mw.JWT(constants.ADMIN), transactionHandler.GetTotalTransactionByCustomer)
+		transaction.POST("/pay", mw.JWT(constants.ADMIN), transactionHandler.PayTransaction)
+	}
+
+	address := api.Group("/address")
+	{
+		address.POST("/", mw.JWT(constants.CUSTOMER), addressHandler.InsertAddress)
+		address.GET("/", mw.JWT(constants.CUSTOMER), addressHandler.GetAdderess)
+		address.PUT("/:id", mw.JWT(constants.CUSTOMER), addressHandler.UpdateAddress)
+		address.DELETE("/:id", mw.JWT(constants.CUSTOMER), addressHandler.DeleteAddress)
+	}
+
+	ongkir := api.Group("/ongkir")
+	{
+		ongkir.GET("/destination/:keyword", mw.JWT(constants.CUSTOMER), ongkirHandler.GetDestination)
+		ongkir.GET("/cost", mw.JWT(constants.CUSTOMER), ongkirHandler.GetShippingCost)
 	}
 
 	router.NoRoute(func(ctx *gin.Context) {
