@@ -7,9 +7,6 @@
     "icon": "./assets/images/icon-store.png",
     "scheme": "myapp",
     "userInterfaceStyle": "automatic",
-    "assetBundlePatterns": [
-      "**/*"
-    ],
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true
@@ -22,8 +19,8 @@
       "package": "com.devanadindra.admin"
     },
     "web": {
-      "bundler": "webpack",
-      "output": "static",
+      "bundler": "metro",
+      "output": "static", 
       "favicon": "./assets/images/icon-store.png"
     },
     "plugins": [
@@ -54,6 +51,6 @@
         "projectId": "75d851ad-6ea7-4c80-a5fb-63f468da01f8"
       }
     },
-    "output": "export" 
+    "output": "export"
   }
 }
