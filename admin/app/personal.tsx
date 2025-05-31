@@ -1,35 +1,45 @@
 import React, { useState } from "react";
-import { View, Text, TextInput, Button, Alert, StyleSheet, TouchableOpacity } from "react-native";
+import { View, Text, Alert, StyleSheet, TouchableOpacity } from "react-native";
 import { ThemedView } from "@/components/ThemedView";
 import { ThemedText } from "@/components/ThemedText";
+import { ThemedTextInput } from "@/components/ThemedTextInput";
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 export default function PersonalScreen() {
+  const [username, setUsername] = useState("");
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
 
   const handleSave = () => {
-    if (!fullName || !email || !phoneNumber) {
-      Alert.alert("Error", "Please fill all fields");
+    if (!username || !fullName || !email || !phoneNumber) {
+      Alert.alert("Error", "Mohon isi semua kolom.");
       return;
     }
-    // Simpan data ke backend atau AsyncStorage sesuai kebutuhan
-    Alert.alert("Success", "Personal data saved");
+    Alert.alert("Berhasil", "Data personal berhasil disimpan.");
   };
 
   return (
     <ThemedView style={styles.container}>
-      <ThemedText style={styles.title}>Personal Information</ThemedText>
+      <ThemedText style={styles.title}>Informasi Personal</ThemedText>
 
-      <ThemedText style={styles.label}>Username</ThemedText>
-      <TextInput
+      <ThemedText style={styles.label}>Nama Pengguna</ThemedText>
+      <ThemedTextInput
+        style={styles.input}
+        value={username}
+        onChangeText={setUsername}
+        autoCapitalize="none" // Username biasanya tidak kapital
+      />
+
+      <ThemedText style={styles.label}>Nama Lengkap</ThemedText>
+      <ThemedTextInput
         style={styles.input}
         value={fullName}
         onChangeText={setFullName}
       />
 
-      <ThemedText style={styles.label}>Full Name</ThemedText>
-      <TextInput
+      <ThemedText style={styles.label}>Email</ThemedText>
+      <ThemedTextInput
         style={styles.input}
         value={email}
         onChangeText={setEmail}
@@ -37,15 +47,22 @@ export default function PersonalScreen() {
         autoCapitalize="none"
       />
 
-      <ThemedText style={styles.label}>Phone Number</ThemedText>
-      <TextInput
+      <ThemedText style={styles.label}>Nomor Telepon</ThemedText>
+      <ThemedTextInput
         style={styles.input}
         value={phoneNumber}
         onChangeText={setPhoneNumber}
         keyboardType="phone-pad"
       />
 
-      <TouchableOpacity style={styles.btn}>
+      <TouchableOpacity
+        style={[
+          styles.btn,
+          { flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }
+        ]}
+        onPress={handleSave}
+      >
+        <MaterialCommunityIcons name="content-save" size={20} color="white" style={{ marginRight: 8 }} />
         <Text style={styles.btnText}>Save</Text>
       </TouchableOpacity>
     </ThemedView>
@@ -80,7 +97,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#005BBB',
     paddingVertical: 12,
     borderRadius: 8,
-    alignItems: 'center',
   },
   btnText: {
     color: 'white',

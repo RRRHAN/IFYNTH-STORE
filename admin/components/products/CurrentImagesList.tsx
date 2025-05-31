@@ -3,6 +3,10 @@ import { View, Image, TouchableOpacity } from "react-native";
 import { ThemedText } from "@/components/ThemedText";
 import { IconButton } from "react-native-paper";
 import { BASE_URL } from "@/src/api/constants";
+
+// Impor MaterialCommunityIcons
+import { MaterialCommunityIcons } from '@expo/vector-icons';
+
 interface ProductImage {
   ProductID: string;
   URL: string;
@@ -36,7 +40,13 @@ export default function CurrentImagesList({
               onPress={() => handleToggleImage(index)}
             >
               <IconButton
-                icon={checkedImages[index] ? "check-circle" : "trash-can"}
+                icon={({ color, size }) => (
+                  <MaterialCommunityIcons
+                    name={checkedImages[index] ? "check-circle" : "trash-can"}
+                    size={size}
+                    color={checkedImages[index] ? "green" : "red"}
+                  />
+                )}
                 size={24}
               />
             </TouchableOpacity>

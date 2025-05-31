@@ -1,16 +1,18 @@
 import React, { useState } from "react";
 import {
-  TextInput,
   Alert,
   StyleSheet,
   TouchableOpacity,
   Text,
-} from "react-native";
+} from "react-native"; // Hapus TextInput yang tidak digunakan
 import { ThemedView } from "@/components/ThemedView";
 import { ThemedText } from "@/components/ThemedText";
 import { changePassword } from "@/src/api/admin";
 import { ThemedTextInput } from "@/components/ThemedTextInput";
 import ModalComponent from "@/components/ModalComponent";
+
+// Impor MaterialCommunityIcons
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 export default function SecurityScreen() {
   const [currentPassword, setCurrentPassword] = useState("");
@@ -23,6 +25,12 @@ export default function SecurityScreen() {
   const handleChangePassword = async () => {
     if (!currentPassword || !newPassword || !confirmPassword) {
       Alert.alert("Error", "Please fill all password fields");
+      return;
+    }
+
+    // Tambahkan validasi sederhana untuk password baru
+    if (newPassword !== confirmPassword) {
+      Alert.alert("Error", "New password and confirm password do not match.");
       return;
     }
 
@@ -77,7 +85,14 @@ export default function SecurityScreen() {
         secureTextEntry
       />
 
-      <TouchableOpacity style={styles.btn} onPress={handleChangePassword}>
+      <TouchableOpacity
+        style={[
+          styles.btn,
+          { flexDirection: 'row', alignItems: 'center', justifyContent: 'center' } // Tambahkan gaya untuk ikon
+        ]}
+        onPress={handleChangePassword}
+      >
+        <MaterialCommunityIcons name="lock-reset" size={20} color="white" style={{ marginRight: 8 }} /> {/* Ikon */}
         <Text style={styles.btnText}>Change Password</Text>
       </TouchableOpacity>
       <ModalComponent
@@ -117,11 +132,11 @@ const styles = StyleSheet.create({
     backgroundColor: "#005BBB",
     paddingVertical: 12,
     borderRadius: 8,
-    alignItems: "center",
   },
   btnText: {
     color: "white",
-    fontWeight: "600",
+    textAlign: "center",
     fontSize: 16,
+    fontWeight: "600",
   },
 });

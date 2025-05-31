@@ -29,6 +29,7 @@ import { generateVideoThumbnailJS } from "@/hooks/helpers/ThumbnailProcessor";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import * as VideoThumbnails from "expo-video-thumbnails";
 import StatusOfferIOS from "@/components/StatusOfferIOS";
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 const UserAdvertisementScreen = () => {
   const colorScheme = useColorScheme();
@@ -70,7 +71,7 @@ const UserAdvertisementScreen = () => {
 
   // Pagination states
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 10; // Maximum 10 data per slide
+  const itemsPerPage = 10;
   const totalPages = Math.ceil(offers.length / itemsPerPage);
 
   const getData = async () => {
@@ -123,7 +124,6 @@ const UserAdvertisementScreen = () => {
               }
             } catch (error) {
               console.warn("Failed to generate thumbnail for video", error);
-              // fallback ke fileUrl as image
               setThumbnailUrls((prev) => ({
                 ...prev,
                 [item.ID]: `${BASE_URL}/api${fileUrl}`,
@@ -267,7 +267,9 @@ const UserAdvertisementScreen = () => {
 
         <ThemedCell style={[{ width: columnWidths.action }]}>
           <IconButton
-            icon="eye"
+            icon={({ color, size }) => (
+              <MaterialCommunityIcons name="eye" size={size} color={color} />
+            )}
             size={20}
             iconColor="#00FFFF"
             onPress={() => {
@@ -276,7 +278,9 @@ const UserAdvertisementScreen = () => {
             }}
           />
           <IconButton
-            icon="message"
+            icon={({ color, size }) => (
+              <MaterialCommunityIcons name="message" size={size} color={color} />
+            )}
             size={20}
             iconColor="#4169E1"
             onPress={() => {
@@ -329,7 +333,8 @@ const UserAdvertisementScreen = () => {
               elevation: 10,
             }}
           >
-            <ThemedText style={{ fontSize: 20, color: "black" }}>✕</ThemedText>
+            {/* Gunakan ikon MaterialCommunityIcons untuk tombol close modal */}
+            <MaterialCommunityIcons name="close" size={24} color="black" />
           </TouchableOpacity>
 
           <OfferDetailModal product={selectedProduct} />
@@ -394,7 +399,7 @@ const UserAdvertisementScreen = () => {
           </ThemedHeader>
         </ThemedHeader>
         <FlatList
-          data={currentOffers} // Use paginated data
+          data={currentOffers}
           renderItem={renderItem}
           keyExtractor={(item) => item.ID}
           ListEmptyComponent={
@@ -408,7 +413,9 @@ const UserAdvertisementScreen = () => {
       {/* Pagination Controls */}
       <View style={styles.paginationContainer}>
         <IconButton
-          icon="chevron-left"
+          icon={({ color, size }) => (
+            <MaterialCommunityIcons name="chevron-left" size={size} color={color} />
+          )}
           size={30}
           onPress={() => paginate(currentPage - 1)}
           disabled={currentPage === 1}
@@ -418,7 +425,9 @@ const UserAdvertisementScreen = () => {
           Page {currentPage} of {totalPages}
         </ThemedText>
         <IconButton
-          icon="chevron-right"
+          icon={({ color, size }) => (
+            <MaterialCommunityIcons name="chevron-right" size={size} color={color} />
+          )}
           size={30}
           onPress={() => paginate(currentPage + 1)}
           disabled={currentPage === totalPages}

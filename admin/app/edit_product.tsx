@@ -18,6 +18,7 @@ import ActionButtons from "@/components/products/ActionButtons";
 import SelectedImagesList from "@/components/products/SelectedImagesList";
 import useProductForm from "@/hooks/helpers/useEditProductForm";
 import useImages from "@/hooks/helpers/useImages";
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 export default function EditProductScreen() {
   const [isEditing, setIsEditing] = useState(true);
@@ -142,7 +143,9 @@ export default function EditProductScreen() {
         message={errorMessage || successMessage}
       />
       <IconButton
-        icon="arrow-left"
+        icon={({ color, size }) => (
+          <MaterialCommunityIcons name="arrow-left" size={size} color={color} />
+        )}
         size={30}
         onPress={() => router.replace("/products")}
       />
@@ -174,7 +177,8 @@ export default function EditProductScreen() {
       />
 
       <View style={styles.sizeContainer}>
-        {sizes.map((size, index) => (
+        {/* Pastikan `sizes` adalah array sebelum memetakan */}
+        {Array.isArray(sizes) && sizes.map((size, index) => (
           <SizeInputItem
             key={index}
             size={size.size}

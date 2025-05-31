@@ -16,6 +16,9 @@ import ActionButtons from "@/components/products/ActionButtons";
 import SelectedImagesList from "@/components/products/SelectedImagesList";
 import { useProductForm } from "@/hooks/helpers/useAddProductForm";
 
+// Impor MaterialCommunityIcons
+import { MaterialCommunityIcons } from '@expo/vector-icons';
+
 export default function AddProductScreen() {
   const router = useRouter();
   const {
@@ -136,12 +139,16 @@ export default function AddProductScreen() {
         message={errorMessage || successMessage}
       />
       <IconButton
-        icon="arrow-left"
+        // Gunakan ikon MaterialCommunityIcons sebagai children
+        icon={({ color, size }) => (
+          <MaterialCommunityIcons name="arrow-left" size={size} color={color} />
+        )}
         size={30}
         onPress={() => router.replace("/products")}
         style={{
           top: 20,
         }}
+        // iconColor default mengikuti tema React Native Paper, jadi tidak perlu diatur eksplisit
       />
       <ThemedText style={[styles.title]}>Add Product</ThemedText>
 

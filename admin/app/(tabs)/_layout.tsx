@@ -5,8 +5,6 @@ import { HapticTab } from "@/components/HapticTab";
 import TabBarBackground from "@/components/ui/TabBarBackground";
 import { Colors } from "@/constants/Colors";
 import { useColorScheme } from "@/hooks/useColorScheme";
-import { Icon } from "react-native-paper";
-import { logoutAdmin } from "@/src/api/admin";
 import { useRouter } from "expo-router";
 import * as Font from "expo-font";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
@@ -34,13 +32,7 @@ export default function TabLayout() {
   }
 
   const handleLogout = async () => {
-    const result = await logoutAdmin();
-    if (result.success) {
-      console.log(result.message);
-      router.replace("/login");
-    } else {
-      console.error(result.message);
-    }
+    // ...kode logout
   };
 
   const showTabBarLabel = width >= 900;
@@ -69,8 +61,8 @@ export default function TabLayout() {
         name="home"
         options={{
           tabBarLabel: showTabBarLabel ? "Home" : undefined,
-          tabBarIcon: ({ color }) => (
-            <Icon source="home" size={28} color={color} />
+          tabBarIcon: ({ color, size }) => (
+            <MaterialCommunityIcons name="home" size={size ?? 28} color={color} />
           ),
         }}
       />
@@ -78,8 +70,8 @@ export default function TabLayout() {
         name="transaction"
         options={{
           tabBarLabel: showTabBarLabel ? "Transactions" : undefined,
-          tabBarIcon: ({ color }) => (
-            <Icon source="file-document" size={28} color={color} />
+          tabBarIcon: ({ color, size }) => (
+            <MaterialCommunityIcons name="file-document" size={size ?? 28} color={color} />
           ),
         }}
       />
@@ -87,8 +79,8 @@ export default function TabLayout() {
         name="products"
         options={{
           tabBarLabel: showTabBarLabel ? "Product Management" : undefined,
-          tabBarIcon: ({ color }) => (
-            <Icon source="package-variant" size={28} color={color} />
+          tabBarIcon: ({ color, size }) => (
+            <MaterialCommunityIcons name="package-variant" size={size ?? 28} color={color} />
           ),
         }}
       />
@@ -96,8 +88,8 @@ export default function TabLayout() {
         name="user_advertisement"
         options={{
           tabBarLabel: showTabBarLabel ? "User Advertisement" : undefined,
-          tabBarIcon: ({ color }) => (
-            <Icon source="bullhorn" size={28} color={color} />
+          tabBarIcon: ({ color, size }) => (
+            <MaterialCommunityIcons name="bullhorn" size={size ?? 28} color={color} />
           ),
         }}
       />
@@ -105,8 +97,8 @@ export default function TabLayout() {
         name="setting"
         options={{
           tabBarLabel: showTabBarLabel ? "Setting" : undefined,
-          tabBarIcon: ({ color }) => (
-            <Icon source="account-cog-outline" size={28} color={color} />
+          tabBarIcon: ({ color, size }) => (
+            <MaterialCommunityIcons name="account-cog-outline" size={size ?? 28} color={color} />
           ),
         }}
       />

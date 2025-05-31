@@ -27,6 +27,7 @@ import ModalComponent from "@/components/ModalComponent";
 import ProductDetailModal from "@/app/detail_product";
 import { BASE_URL } from "@/src/api/constants";
 import { useColorScheme } from "@/hooks/useColorScheme";
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 const ProductsScreen = () => {
   const colorScheme = useColorScheme();
@@ -168,18 +169,24 @@ const ProductsScreen = () => {
       </ThemedCell>
       <ThemedCell style={[{ width: columnWidths.action }]}>
         <IconButton
-          icon="eye"
+          // Gunakan ikon MaterialCommunityIcons sebagai children
+          icon={({ color, size }) => (
+            <MaterialCommunityIcons name="eye" size={size} color={color} />
+          )}
           size={20}
-          iconColor="#00FFFF"
+          iconColor="#00FFFF" // Warna untuk ikon itu sendiri
           onPress={() => {
             setSelectedProduct(item);
             setIsProductModalVisible(true);
           }}
         />
         <IconButton
-          icon="pencil"
+          // Gunakan ikon MaterialCommunityIcons sebagai children
+          icon={({ color, size }) => (
+            <MaterialCommunityIcons name="pencil" size={size} color={color} />
+          )}
           size={20}
-          iconColor="#4169E1"
+          iconColor="#4169E1" // Warna untuk ikon itu sendiri
           onPress={() => {
             setSelectedProduct(item);
             router.push({
@@ -189,9 +196,12 @@ const ProductsScreen = () => {
           }}
         />
         <IconButton
-          icon="delete"
+          // Gunakan ikon MaterialCommunityIcons sebagai children
+          icon={({ color, size }) => (
+            <MaterialCommunityIcons name="delete" size={size} color={color} />
+          )}
           size={20}
-          iconColor="#FF0000"
+          iconColor="#FF0000" // Warna untuk ikon itu sendiri
           onPress={() => handleDelete(item.ID)}
         />
       </ThemedCell>
@@ -216,7 +226,7 @@ const ProductsScreen = () => {
             backgroundColor: "rgba(0, 0, 0, 0.7)",
           }}
         >
-          {/* Tombol silang dengan React Native Paper */}
+          {/* Tombol silang dengan MaterialCommunityIcons */}
           <TouchableOpacity
             onPress={() => {
               console.log("Tombol close diklik");
@@ -236,7 +246,7 @@ const ProductsScreen = () => {
               elevation: 10,
             }}
           >
-            <ThemedText style={{ fontSize: 20, color: "black" }}>✕</ThemedText>
+            <MaterialCommunityIcons name="close" size={24} color="black" />
           </TouchableOpacity>
 
           {/* Konten modal */}
@@ -251,8 +261,13 @@ const ProductsScreen = () => {
       <ThemedView style={styles.headerContainer}>
         <ThemedText style={[styles.title]}>LIST PRODUCTS</ThemedText>
         <IconButton
-          icon="plus"
+          // Gunakan ikon MaterialCommunityIcons untuk "plus"
+          icon={({ color, size }) => (
+            <MaterialCommunityIcons name="plus" size={size} color={color} />
+          )}
           size={24}
+          // Default iconColor untuk IconButton paper adalah tema, jadi bisa diabaikan
+          // iconColor={colorScheme === "dark" ? "#ffffff" : "#111827"} // Sesuaikan jika perlu
           onPress={() => router.replace("/add_product")}
         />
       </ThemedView>
@@ -328,10 +343,11 @@ const ProductsScreen = () => {
           }
         />
       </ThemedTable>
-      {/* Pagination Controls */}
       <View style={styles.paginationContainer}>
         <IconButton
-          icon="chevron-left"
+          icon={({ color, size }) => (
+            <MaterialCommunityIcons name="chevron-left" size={size} color={color} />
+          )}
           size={30}
           onPress={() => paginate(currentPage - 1)}
           disabled={currentPage === 1}
@@ -341,7 +357,9 @@ const ProductsScreen = () => {
           Page {currentPage} of {totalPages}
         </ThemedText>
         <IconButton
-          icon="chevron-right"
+          icon={({ color, size }) => (
+            <MaterialCommunityIcons name="chevron-right" size={size} color={color} />
+          )}
           size={30}
           onPress={() => paginate(currentPage + 1)}
           disabled={currentPage === totalPages}

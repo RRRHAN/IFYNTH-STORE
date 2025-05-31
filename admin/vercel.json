@@ -1,10 +1,6 @@
 {
   "rewrites": [
     {
-      "source": "/assets/node_modules/@expo/vector-icons/build/vendor/react-native-vector-icons/Fonts/MaterialCommunityIcons.b62641afc9ab487008e996a5c5865e56.ttf",
-      "destination": "/assets/node_modules/@expo/vector-icons/build/vendor/react-native-vector-icons/Fonts/MaterialCommunityIcons.b62641afc9ab487008e996a5c5865e56.ttf"
-    },
-    {
       "source": "/(.*)",
       "destination": "/index.html"
     }

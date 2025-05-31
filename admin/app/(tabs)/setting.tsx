@@ -12,15 +12,17 @@ import { ThemedText } from "@/components/ThemedText";
 import { logoutAdmin } from "@/src/api/admin";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useEffect, useState } from "react";
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 function NavButton({
   title,
   onPress,
+  icon,
   color = "rgba(85, 85, 85, 0.56)",
 }: {
   title: string;
   onPress: (event: GestureResponderEvent) => void;
-  icon?: any;
+  icon?: keyof typeof MaterialCommunityIcons.glyphMap;
   color?: string;
 }) {
   const [pressed, setPressed] = useState(false);
@@ -56,6 +58,15 @@ function NavButton({
         { backgroundColor: pressed ? darkenColor(color) : color },
       ]}
     >
+      {/* Render ikon jika prop icon diberikan */}
+      {icon && (
+        <MaterialCommunityIcons
+          name={icon}
+          size={20}
+          color="white"
+          style={styles.btnIcon} 
+        />
+      )}
       <Text style={styles.btnText}>{title}</Text>
     </TouchableOpacity>
   );
@@ -104,14 +115,24 @@ export default function SettingScreen() {
         <NavButton
           title="Create Account Admin"
           onPress={() => router.push("/register")}
+          icon="account-plus"
         />
       )}
 
-      <NavButton title="Personal" onPress={() => router.push("/personal")} />
-      <NavButton title="Security" onPress={() => router.push("/security")} />
+      <NavButton
+        title="Personal"
+        onPress={() => router.push("/personal")}
+        icon="account"
+      />
+      <NavButton
+        title="Security"
+        onPress={() => router.push("/security")}
+        icon="shield-lock"
+      />
       <NavButton
         title="Logout"
         onPress={handleLogout}
+        icon="logout"
         color="#e53935"
       />
     </ThemedView>
@@ -139,6 +160,12 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     borderRadius: 8,
     marginVertical: 8,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  btnIcon: {
+    marginRight: 10,
   },
   btnText: {
     color: "white",

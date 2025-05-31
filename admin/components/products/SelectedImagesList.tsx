@@ -3,6 +3,9 @@ import { View, Image, TouchableOpacity } from "react-native";
 import { ThemedText } from "@/components/ThemedText";
 import { IconButton } from "react-native-paper";
 
+// Impor MaterialCommunityIcons
+import { MaterialCommunityIcons } from '@expo/vector-icons';
+
 interface SelectedImagesListProps {
   images: { uri: string }[];
   handleRemoveImage: (index: number) => void;
@@ -26,7 +29,12 @@ export default function SelectedImagesList({
             style={styles.removeButton}
             onPress={() => handleRemoveImage(index)}
           >
-            <IconButton icon="trash-can" size={24} />
+            <IconButton
+              icon={({ color, size }) => (
+                <MaterialCommunityIcons name="trash-can" size={size} color={color} />
+              )}
+              size={24}
+            />
           </TouchableOpacity>
         </View>
       ))}

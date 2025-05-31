@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from "react";
 import {
-  FlatList,
   ActivityIndicator,
   Dimensions,
   Platform,
-  View, // Import View
+  View,
+  FlatList,
 } from "react-native";
 import { IconButton } from "react-native-paper";
 import styles from "../styles/transactionStyles";
@@ -26,6 +26,8 @@ import TransactionDetailModal from "@/components/TransactionDetailModal";
 import { Picker } from "@react-native-picker/picker";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import StatusTransactionIOS from "@/components/StatusTransactionIOS";
+import { MaterialCommunityIcons } from '@expo/vector-icons';
+
 
 const TransactionsScreen = () => {
   const colorScheme = useColorScheme();
@@ -178,7 +180,10 @@ const TransactionsScreen = () => {
           )}
           <ThemedCell style={{ width: columnWidths.action }}>
             <IconButton
-              icon="eye"
+              // Gunakan ikon MaterialCommunityIcons sebagai children
+              icon={({ color, size }) => (
+                <MaterialCommunityIcons name="eye" size={size} color={color} />
+              )}
               size={20}
               iconColor="#00FFFF"
               onPress={() => {
@@ -268,7 +273,10 @@ const TransactionsScreen = () => {
 
           <ThemedCell style={[{ width: columnWidths.action }]}>
             <IconButton
-              icon="eye"
+              // Gunakan ikon MaterialCommunityIcons sebagai children
+              icon={({ color, size }) => (
+                <MaterialCommunityIcons name="eye" size={size} color={color} />
+              )}
               size={25}
               iconColor="#00FFFF"
               onPress={() => {
@@ -398,7 +406,10 @@ const TransactionsScreen = () => {
       {/* Pagination controls */}
       <View style={styles.paginationContainer}>
         <IconButton
-          icon="chevron-left"
+          // Gunakan ikon MaterialCommunityIcons untuk chevron-left
+          icon={({ color, size }) => (
+            <MaterialCommunityIcons name="chevron-left" size={size} color={color} />
+          )}
           size={30}
           onPress={() => paginate(currentPage - 1)}
           disabled={currentPage === 1}
@@ -408,7 +419,10 @@ const TransactionsScreen = () => {
           Page {currentPage} of {totalPages}
         </ThemedText>
         <IconButton
-          icon="chevron-right"
+          // Gunakan ikon MaterialCommunityIcons untuk chevron-right
+          icon={({ color, size }) => (
+            <MaterialCommunityIcons name="chevron-right" size={size} color={color} />
+          )}
           size={30}
           onPress={() => paginate(currentPage + 1)}
           disabled={currentPage === totalPages}
