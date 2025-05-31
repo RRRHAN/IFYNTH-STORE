@@ -37,7 +37,7 @@
                                             placeholder="Enter Password" required>
                                         <input class="mt-30" type="password" id="password_confirmation"
                                             name="password_confirmation" placeholder="Enter Confirm Password" required>
-                                        <div class="radio-btn mt-30">
+                                        <div class="radio-btn mt-30" id="termsCheckbox">
                                             <span></span>
                                             <p>I accept your terms & conditions</p>
                                         </div>
@@ -58,20 +58,34 @@
         document.addEventListener('DOMContentLoaded', function() {
             const registrationForm = document.getElementById('registrationForm');
             const feedbackMessage = document.getElementById('feedbackMessage');
+            const errorMessage = document.getElementById('errorMessage');
+            const termsCheckbox = document.getElementById('termsCheckbox');
+            let accepted = false;
 
-            // Tampilkan pesan yang tersimpan di localStorage
+            // Tampilkan pesan dari localStorage
             const savedFeedback = localStorage.getItem('feedbackMessage');
             if (savedFeedback) {
                 feedbackMessage.textContent = savedFeedback;
                 localStorage.removeItem('feedbackMessage');
             }
 
+            // Toggle checkbox
+            termsCheckbox.addEventListener('click', function() {
+                accepted = !accepted;
+            });
+
             registrationForm.addEventListener('submit', async function(event) {
                 event.preventDefault();
 
-                // Reset pesan sebelumnya
+                // Reset pesan
                 feedbackMessage.textContent = '';
-                localStorage.removeItem('feedbackMessage');
+                errorMessage.textContent = '';
+
+                if (!accepted) {
+                    errorMessage.textContent =
+                    'Please accept the terms & conditions before signing in.';
+                    return;
+                }
 
                 const name = document.getElementById('name').value;
                 const username = document.getElementById('username').value;
@@ -80,7 +94,7 @@
                 const password_confirmation = document.getElementById('password_confirmation').value;
 
                 if (password !== password_confirmation) {
-                    feedbackMessage.textContent = 'Password not match.';
+                    errorMessage.textContent = 'Password not match.';
                     return;
                 }
 
@@ -99,14 +113,12 @@
                         }
                     );
 
-                    // Simpan pesan sukses ke localStorage
                     localStorage.setItem('feedbackMessage', 'Register Successfully!');
                     registrationForm.reset();
 
-                    // Redirect ke halaman login setelah 2 detik
                     setTimeout(() => {
                         window.location.href = '/loginForm';
-                    }, 2000);
+                    }, 500);
                 } catch (error) {
                     let message = '';
                     if (error.response) {
@@ -114,7 +126,7 @@
                         const data = error.response.data;
 
                         if (status === 422 && data.errors) {
-                            message = data.errors.join(', ');
+                            message = Object.values(data.errors).flat().join(', ');
                         } else {
                             message = data.message || 'Registration failed. Please try again.';
                         }
@@ -124,12 +136,12 @@
                         message = 'Error: ' + error.message;
                     }
 
-                    localStorage.setItem('feedbackMessage', message);
-                    feedbackMessage.textContent = message;
+                    errorMessage.textContent = message;
                     console.error('Registration error:', error);
                 }
             });
         });
     </script>
+
 
 @stop

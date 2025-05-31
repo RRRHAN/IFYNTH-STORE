@@ -81,6 +81,8 @@ Route::controller(MessageController::class)->group(function () {
     Route::get('/messages/list', 'fetchList')->name('fetchList');
     Route::post('/storeMessage', 'storeMessage')->name('store.message');
     Route::get('/getProductMessages/{productId}', 'getProductMessages');
+    Route::get('/message/list/json',  'fetchListJson')->name('fetchListJson');
+
 });
 
 // Route ongkir

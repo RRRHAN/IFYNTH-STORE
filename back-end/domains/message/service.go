@@ -108,6 +108,7 @@ func (s *service) CountUnread(ctx context.Context) (int, error) {
 
 	return unreadCount, nil
 }
+
 func (s *service) AddMessage(ctx context.Context, req AddMessageRequest) error {
 
 	token, err := contextUtil.GetTokenClaims(ctx)

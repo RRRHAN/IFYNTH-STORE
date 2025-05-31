@@ -84,19 +84,11 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="logout"
+        name="setting"
         options={{
-          tabBarLabel: showTabBarLabel ? "Logout" : undefined,
+          tabBarLabel: showTabBarLabel ? "Setting" : undefined,
           tabBarIcon: ({ color }) => (
-            <Icon source="exit-to-app" size={28} color={color} />
-          ),
-          tabBarButton: (props) => (
-            <HapticTab
-              {...props}
-              onPress={() => {
-                handleLogout();
-              }}
-            />
+            <Icon source="account-cog-outline" size={28} color={color} />
           ),
         }}
       />

@@ -46,7 +46,7 @@ export default function ProductPickers({
               }}
             >
               <ThemedText style={{ textAlign: "center" }}>
-                {department}
+                {department === "IFY" ? "I Found You" : "No Time to Hell"}
               </ThemedText>
             </TouchableOpacity>
             <Modal

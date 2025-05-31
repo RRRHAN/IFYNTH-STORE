@@ -4,7 +4,7 @@
     "slug": "admin",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/logo.png",
+    "icon": "./assets/images/icon-store.png",
     "scheme": "myapp",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
@@ -14,14 +14,14 @@
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/logo.png",
-        "backgroundColor": "#ffffff"
+        "backgroundColor": "#151718"
       },
       "package": "com.devanadindra.admin"
     },
     "web": {
       "bundler": "metro",
-      "output": "static",
-      "favicon": "./assets/images/logo.png"
+      "output": "static", 
+      "favicon": "./assets/images/icon-store.png"
     },
     "plugins": [
       "expo-router",
@@ -31,7 +31,7 @@
           "image": "./assets/images/logo.png",
           "imageWidth": 200,
           "resizeMode": "contain",
-          "backgroundColor": "#ffffff"
+          "backgroundColor": "#151718"
         }
       ],
       [
@@ -50,6 +50,7 @@
       "eas": {
         "projectId": "75d851ad-6ea7-4c80-a5fb-63f468da01f8"
       }
-    }
+    },
+    "output": "export"
   }
 }

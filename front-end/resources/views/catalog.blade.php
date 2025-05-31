@@ -2,7 +2,7 @@
 @section('container')
     <main>
         <!-- Page banner area start here -->
-        <section class="page-banner bg-image pt-30" data-background="assets/images/banner/inner-banner.jpg">
+        <section class="page-banner bg-image pt-30">
             <div class="container">
                 <h2 class="wow fadeInUp mb-15" data-wow-duration="1.1s" data-wow-delay=".1s">
                     @if (request('department') == 'IFY')

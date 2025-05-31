@@ -17,11 +17,13 @@ class UserController extends Controller
     }
     public function showRegisterForm()
     {
+        session()->flash('preloader', false);
         return view('register');
     }
 
     public function register(Request $request)
     {
+        session()->flash('preloader', false);
         try {
             // Validate the incoming request
             $validated = $request->validate([
@@ -96,12 +98,13 @@ class UserController extends Controller
                     $this->getPersonal();
                     return redirect()->route('landing');
                 }
-
+                session()->flash('preloader', false);
                 session()->flash('error', 'Token not received, login failed');
                 return redirect()->back();
             }
 
             $error = $response->json()['errors'][0] ?? 'Login failed.';
+            session()->flash('preloader', false);
             session()->flash('error', $error);
             return redirect()->back();
 

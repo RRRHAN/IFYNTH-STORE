@@ -22,16 +22,16 @@
                                                 @if (isset($list) && $list->isNotEmpty())
                                                     @foreach ($list as $product)
                                                         @php
-                                                            $file = $product['Files'][0]['URL'] ?? null;
+                                                            $file = $product['URL'] ?? null;
                                                             $isVideo =
                                                                 $file && preg_match('/\.(mp4|webm|ogg)$/i', $file);
                                                         @endphp
                                                         <li class="p-2 product-item border mb-2 rounded"
-                                                            data-product-id="{{ $product['ID'] }}"
+                                                            data-product-id="{{ $product['ProductID'] }}"
                                                             data-product-status="{{ $product['Status'] }}"
                                                             data-product-name="{{ $product['Name'] }}"
                                                             data-product-price="Rp. {{ number_format($product['Price'] ?? 0, 0, ',', '.') }}"
-                                                            data-product-image={{ $product['Files'][0]['URL'] }}
+                                                            data-product-image={{ $product['URL'] }}
                                                             data-product-media-type="{{ $isVideo ? 'video' : 'image' }}">
                                                             <a href="#!" class="d-flex justify-content-between">
                                                                 <div class="d-flex flex-row">
@@ -72,13 +72,16 @@
                                                                 <div class="pt-1">
                                                                     <p class="small mb-1">
                                                                         {{ $product['Status'] }}</p>
+                                                                    <span class="unread-badge"
+                                                                        id="unreadCount-{{ $product['ProductID'] }}"
+                                                                        data-product-id="{{ $product['ProductID'] }}"></span>
                                                                 </div>
                                                             </a>
                                                         </li>
                                                     @endforeach
                                                 @else
                                                     <li class="p-2">
-                                                        <p class="text-center text-capitalize mb-0">No products available
+                                                        <p class="text-center text-capitalize mb-0 text-white">No messages available
                                                         </p>
                                                     </li>
                                                 @endif
@@ -135,6 +138,39 @@
         </div>
     </section>
     <script>
+        function fetchUnreadCounts() {
+            fetch('/message/list/json')
+                .then(response => response.json())
+                .then(data => {
+                    // Cek kalau ada error
+                    if (data.error) {
+                        console.error(data.error);
+                        return;
+                    }
+
+                    // Loop melalui unread badge di halaman
+                    document.querySelectorAll('.unread-badge').forEach(span => {
+                        const productId = span.getAttribute('data-product-id');
+                        if (data[productId] !== undefined) {
+                            span.textContent = data[productId];
+                            // Opsional: sembunyikan jika nol
+                            if (data[productId] == 0) {
+                                span.style.display = 'none';
+                            } else {
+                                span.style.display = 'inline-block';
+                            }
+                        }
+                    });
+                })
+                .catch(error => console.error('Fetch error:', error));
+        }
+
+        fetchUnreadCounts()
+        // Jalankan setiap 2 detik
+        setInterval(fetchUnreadCounts, 2000);
+    </script>
+
+    <script>
         document.addEventListener('DOMContentLoaded', function() {
             let currentProductId = null;
 
@@ -165,7 +201,7 @@
 
                         const isAtBottom = chatMessagesContainer.scrollHeight - chatMessagesContainer
                             .scrollTop <=
-                            chatMessagesContainer.clientHeight + 50; 
+                            chatMessagesContainer.clientHeight + 50;
 
                         chatMessagesContainer.innerHTML = '';
 
@@ -177,7 +213,7 @@
                             data.messages.forEach(message => {
                                 const wrapper = document.createElement('div');
                                 wrapper.classList.add('d-flex', 'flex-row', 'align-items-start',
-                                'mb-2');
+                                    'mb-2');
 
                                 const isCustomer = message.Role === 'CUSTOMER';
                                 // Atur posisi pesan (kanan untuk customer, kiri untuk lainnya)
@@ -336,7 +372,7 @@
             document.querySelectorAll('.product-item').forEach(item => {
                 item.addEventListener('click', function(event) {
                     event
-                .preventDefault();
+                        .preventDefault();
 
 
                     // Ambil data dari atribut data-*
@@ -373,14 +409,14 @@
 
                         if (productMedia) {
                             const fullUrl = BACKEND_BASE_URL + '/api' +
-                            productMedia;
+                                productMedia;
 
                             if (productMediaType === 'video') {
                                 const videoElement = document.createElement('video');
                                 videoElement.src = fullUrl;
                                 videoElement.alt = 'Product Video';
                                 videoElement.autoplay =
-                                false;
+                                    false;
                                 videoElement.loop = false;
                                 videoElement.muted = true;
                                 videoElement.preload = 'metadata';
@@ -412,7 +448,7 @@
                     const sendBtn = document.getElementById('sendBtn');
 
                     if (chatInput) chatInput.setAttribute('data-product-id',
-                    productId);
+                        productId);
 
                     if (productStatus === 'rejected') {
                         if (chatInput) {

@@ -179,6 +179,7 @@
             const form = document.getElementById("formShip");
             checkoutBtn.addEventListener("click", function(e) {
                 e.preventDefault();
+                sessionStorage.setItem('preloader', false);
 
                 if (shipperForm.style.display === "block") {
                     form.submit();

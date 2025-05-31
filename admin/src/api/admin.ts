@@ -1,6 +1,7 @@
 import { BASE_URL } from "./constants";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useRouter } from "expo-router";
+import { Register } from "../types/setting";
 
 export const loginAdmin = async (username: string, password: string) => {
   try {
@@ -108,5 +109,90 @@ export const checkLoginStatus = async (
     await AsyncStorage.removeItem("auth_token");
     router.replace("/login");
     return false;
+  }
+};
+
+export const changePassword = async (
+  current_password: string,
+  new_password: string,
+  confirmed_password: string
+) => {
+  const token = await AsyncStorage.getItem("auth_token");
+
+  if (new_password !== confirmed_password) {
+    return { success: false, message: "Passwords do not match." };
+  }
+
+  try {
+    const response = await fetch(`${BASE_URL}/api/user/password`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        current_password,
+        new_password,
+        role: "ADMIN",
+      }),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      return {
+        success: false,
+        message: data?.errors?.[0] || "Failed to change password.",
+      };
+    }
+
+    return { success: true, message: "Change Password Successfully!" };
+  } catch (error) {
+    console.error(error);
+    return {
+      success: false,
+      message: "An error occurred while updating password. Please try again.",
+    };
+  }
+};
+
+export const register = async (
+  userData: Register
+): Promise<{ success: boolean; message: string }> => {
+  const token = await AsyncStorage.getItem("auth_token");
+  if (userData.Password !== userData.ConfirmedPassword) {
+    return { success: false, message: "Passwords do not match." };
+  }
+  try {
+    const response = await fetch(`${BASE_URL}/api/user/registerAdmin`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        name: userData.Name,
+        username: userData.Username,
+        password: userData.Password,
+        phoneNumber: userData.PhoneNumber,
+      }),
+    });
+
+    const data = await response.json();
+
+    if (response.ok) {
+      return {
+        success: true,
+        message: data.message || "Create Account successful",
+      };
+    } else {
+      return {
+        success: false,
+        message: data.message || data.errors?.[0] || "Registration failed",
+      };
+    }
+  } catch (error) {
+    console.error(error);
+    return { success: false, message: "Network error. Please try again." };
   }
 };

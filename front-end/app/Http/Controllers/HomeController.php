@@ -65,23 +65,31 @@ class HomeController extends Controller
         $keyword = $request->query('keyword');
         $token = session('api_token');
 
+        $response = Http::withHeaders([
+            'Authorization' => 'Bearer ' . $token
+        ])->get(config('app.back_end_base_url') . '/api/user/check-jwt');
+
+        if ($response->successful()){
+
         $cusproductController = new CustomerProductController();
-        $result = $cusproductController->fetchOffers($request);
-        $products = $result->get('products');
+        $resultProducts = $cusproductController->fetchOffers($request);
+        $products = $resultProducts->get('products');
 
         $userController = new UserController();
         $user = $userController->getPersonal();
 
         $transactionController = new TransactionController();
-        $transactionsResponse = $transactionController->getTransaction();
-
-        $transactions = $transactionsResponse->getData(true)['transactions'] ?? [];
+        $resultTransactions = $transactionController->getTransaction();
+        $transactions = $resultTransactions->get('transactions');
 
         return view('dashboard', [
             'products' => $products,
             'user' => $user,
             'transactions' => $transactions,
         ]);
+        } else {
+            return redirect()->route('login')->with('error', 'Session expired. Please log in again.');
+        }
     }
 
     public function countUnread(Request $request)
@@ -91,7 +99,7 @@ class HomeController extends Controller
 
             $response = Http::withHeaders([
                 'Authorization' => 'Bearer ' . $token
-            ])->get(config('app.back_end_base_url') .'/api/message/countUnread');
+            ])->get(config('app.back_end_base_url') . '/api/message/countUnread');
 
             if ($response->successful() && $response->json('errors') === null) {
                 $unread = $response->json('data');

@@ -42,10 +42,6 @@
                                                     href="#security" role="tab">
                                                     <i class="fas fa-lock me-2"></i> Security
                                                 </a>
-                                                <a class="dash-link" id="notifications-tab" data-bs-toggle="pill"
-                                                    href="#notifications" role="tab">
-                                                    <i class="fas fa-bell me-2"></i> Notifications
-                                                </a>
                                                 <a class="dash-link" id="my-order-tab" data-bs-toggle="pill"
                                                     href="#my-order" role="tab">
                                                     <i class="fas fa-box me-2"></i> my order
@@ -86,4 +82,14 @@
             </div>
         </div>
     </main>
+    <script>
+    const products = @json($products);
+    const user = @json($user);
+    const transactions = @json($transactions);
+
+    console.log("Products:", products);
+    console.log("User:", user);
+    console.log("Transactions:", transactions);
+</script>
+
 @stop

@@ -21,6 +21,7 @@
     <link rel="stylesheet" href="/assets/css/nice-select.css">
     <!-- Style css -->
     <link rel="stylesheet" href="/assets/css/style.css">
+    <link rel="stylesheet" href="/assets/css/responsive.css">
     <link rel="stylesheet" href="/assets/css/preloader.css" id="preloader-css">
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <!-- Skrip umum lainnya -->
@@ -96,7 +97,9 @@
         @include('layout.navbar')
     @endif
     @yield('container')
-    @include('layout.footer')
+    @if (session('api_token'))
+        @include('layout.footer')
+    @endif
 
     <!-- Jquery 3. 7. 1 Min Js -->
     <script src="/assets/js/jquery-3.7.1.min.js"></script>

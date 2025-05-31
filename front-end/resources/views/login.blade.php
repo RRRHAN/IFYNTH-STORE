@@ -27,12 +27,15 @@
                                         @csrf
                                         <input for="" type="text" name="username" placeholder="Username">
                                         <input class="mt-30" type="password" name="password" placeholder="Enter Password">
-                                        <div class="radio-btn mt-30">
+                                        <div class="radio-btn mt-30" id="termsCheckbox">
                                             <span></span>
                                             <p>I accept your terms & conditions</p>
                                         </div>
                                         <button class="mt-30">Sign In</button>
                                     </form>
+                                    {{-- Element untuk menampilkan pesan feedback --}}
+                                    <div id="feedbackMessage" style="margin-top: 20px; color: green;"></div>
+                                    <div id="errorMessage" style="margin-top: 20px; color: red;"></div>
                                 </div>
                             </div>
                         </div>
@@ -41,4 +44,28 @@
             </div>
         </section>
     </main>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const termsCheckbox = document.getElementById('termsCheckbox');
+            const form = document.querySelector('.login__form form');
+            const feedbackMessage = document.getElementById('feedbackMessage');
+            const errorMessage = document.getElementById('errorMessage');
+            let accepted = false;
+
+            // Toggle visual dan status
+            termsCheckbox.addEventListener('click', function() {
+                accepted = !accepted;
+            });
+
+            // Validasi sebelum submit
+            form.addEventListener('submit', function(e) {
+                if (!accepted) {
+                    e.preventDefault();
+                    errorMessage.textContent = (
+                        'Please accept the terms & conditions before signing in.');
+                }
+            });
+        });
+    </script>
+
 @stop
