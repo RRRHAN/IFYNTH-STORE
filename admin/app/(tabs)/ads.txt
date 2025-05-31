@@ -4,6 +4,7 @@ import {
   Image,
   ActivityIndicator,
   Dimensions,
+  ScrollView,
   View,
   Modal,
   Platform,
@@ -67,11 +68,6 @@ const UserAdvertisementScreen = () => {
     {}
   );
   const [currentItemId, setCurrentItemId] = useState<string | null>(null);
-
-  // Pagination states
-  const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 10; // Maximum 10 data per slide
-  const totalPages = Math.ceil(offers.length / itemsPerPage);
 
   const getData = async () => {
     try {
@@ -154,13 +150,6 @@ const UserAdvertisementScreen = () => {
       </ThemedView>
     );
   }
-
-  // Calculate items for the current page
-  const indexOfLastItem = currentPage * itemsPerPage;
-  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentOffers = offers.slice(indexOfFirstItem, indexOfLastItem);
-
-  const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
 
   const renderItem = ({ item }: { item: cusProduct }) => {
     const thumbnailUrl =
@@ -294,7 +283,7 @@ const UserAdvertisementScreen = () => {
 
   return (
     <ThemedView
-      style={[styles.center, { marginTop: Platform.OS === "web" ? 20 : 80 }]}
+      style={[styles.center, { marginTop: Platform.OS === "web" ? 20 : 50 }]}
     >
       <Modal
         animationType="slide"
@@ -338,93 +327,69 @@ const UserAdvertisementScreen = () => {
       <ThemedView style={styles.headerContainer}>
         <ThemedText style={[styles.title]}>LIST USER ADVERTISEMENT</ThemedText>
       </ThemedView>
-      <ThemedTable>
-        <ThemedHeader style={[styles.row]}>
-          {!isMobile && (
-            <ThemedHeader style={[{ width: columnWidths.image }]}>
+      <ScrollView horizontal>
+        <ThemedTable>
+          <ThemedHeader style={[styles.row]}>
+            {!isMobile && (
+              <ThemedHeader style={[{ width: columnWidths.image }]}>
+                <ThemedText
+                  type="subtitle"
+                  style={[styles.header, { fontSize: fontSizeHeader }]}
+                >
+                  Product Images
+                </ThemedText>
+              </ThemedHeader>
+            )}
+            <ThemedHeader style={[{ width: columnWidths.name }]}>
               <ThemedText
                 type="subtitle"
                 style={[styles.header, { fontSize: fontSizeHeader }]}
               >
-                Product Images
+                Customer Name
               </ThemedText>
             </ThemedHeader>
-          )}
-          <ThemedHeader style={[{ width: columnWidths.name }]}>
-            <ThemedText
-              type="subtitle"
-              style={[styles.header, { fontSize: fontSizeHeader }]}
-            >
-              Customer Name
-            </ThemedText>
-          </ThemedHeader>
-          <ThemedHeader style={[{ width: columnWidths.name }]}>
-            <ThemedText
-              type="subtitle"
-              style={[styles.header, { fontSize: fontSizeHeader }]}
-            >
-              Product Name
-            </ThemedText>
-          </ThemedHeader>
-          {!isMobile && (
-            <ThemedHeader style={[{ width: columnWidths.price }]}>
+            <ThemedHeader style={[{ width: columnWidths.name }]}>
               <ThemedText
                 type="subtitle"
                 style={[styles.header, { fontSize: fontSizeHeader }]}
               >
-                Price
+                Product Name
               </ThemedText>
             </ThemedHeader>
-          )}
-          <ThemedHeader style={[{ width: columnWidths.status }]}>
-            <ThemedText
-              type="subtitle"
-              style={[styles.header, { fontSize: fontSizeHeader }]}
-            >
-              Status
-            </ThemedText>
+            {!isMobile && (
+              <ThemedHeader style={[{ width: columnWidths.price }]}>
+                <ThemedText
+                  type="subtitle"
+                  style={[styles.header, { fontSize: fontSizeHeader }]}
+                >
+                  Price
+                </ThemedText>
+              </ThemedHeader>
+            )}
+            <ThemedHeader style={[{ width: columnWidths.status }]}>
+              <ThemedText
+                type="subtitle"
+                style={[styles.header, { fontSize: fontSizeHeader }]}
+              >
+                Status
+              </ThemedText>
+            </ThemedHeader>
+            <ThemedHeader style={[{ width: columnWidths.action }]}>
+              <ThemedText
+                type="subtitle"
+                style={[styles.header, { fontSize: fontSizeHeader }]}
+              >
+                Action
+              </ThemedText>
+            </ThemedHeader>
           </ThemedHeader>
-          <ThemedHeader style={[{ width: columnWidths.action }]}>
-            <ThemedText
-              type="subtitle"
-              style={[styles.header, { fontSize: fontSizeHeader }]}
-            >
-              Action
-            </ThemedText>
-          </ThemedHeader>
-        </ThemedHeader>
-        <FlatList
-          data={currentOffers} // Use paginated data
-          renderItem={renderItem}
-          keyExtractor={(item) => item.ID}
-          ListEmptyComponent={
-            <ThemedText style={{ textAlign: "center", padding: 20 }}>
-              No advertisements found.
-            </ThemedText>
-          }
-        />
-      </ThemedTable>
-
-      {/* Pagination Controls */}
-      <View style={styles.paginationContainer}>
-        <IconButton
-          icon="chevron-left"
-          size={30}
-          onPress={() => paginate(currentPage - 1)}
-          disabled={currentPage === 1}
-          iconColor={colorScheme === "dark" ? "#ffffff" : "#111827"}
-        />
-        <ThemedText style={styles.paginationText}>
-          Page {currentPage} of {totalPages}
-        </ThemedText>
-        <IconButton
-          icon="chevron-right"
-          size={30}
-          onPress={() => paginate(currentPage + 1)}
-          disabled={currentPage === totalPages}
-          iconColor={colorScheme === "dark" ? "#ffffff" : "#111827"}
-        />
-      </View>
+          <FlatList
+            data={offers}
+            renderItem={renderItem}
+            keyExtractor={(item) => item.ID}
+          />
+        </ThemedTable>
+      </ScrollView>
     </ThemedView>
   );
 };

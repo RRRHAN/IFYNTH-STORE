@@ -4,10 +4,11 @@ import {
   Image,
   ActivityIndicator,
   Dimensions,
+  ScrollView,
   View,
   Modal,
   Platform,
-  TouchableOpacity,
+  TouchableOpacity
 } from "react-native";
 import { IconButton } from "react-native-paper";
 import { useRouter } from "expo-router";
@@ -29,7 +30,7 @@ import { BASE_URL } from "@/src/api/constants";
 import { useColorScheme } from "@/hooks/useColorScheme";
 
 const ProductsScreen = () => {
-  const colorScheme = useColorScheme();
+    const colorScheme = useColorScheme();
   const screenWidth = Dimensions.get("window").width;
   const [isMobile, setIsMobile] = useState(screenWidth < 768);
   const columnWidths = isMobile
@@ -51,12 +52,12 @@ const ProductsScreen = () => {
         action: screenWidth * 0.1,
       };
 
-  const [fontSizeTitle, setFontSizeTitle] = useState(
-    screenWidth < 768 ? 20 : 28
-  );
-  const [fontSizeHeader, setFontSizeHeader] = useState(
-    screenWidth < 768 ? 14 : 18
-  );
+      const [fontSizeTitle, setFontSizeTitle] = useState(
+        screenWidth < 768 ? 20 : 28
+      );
+      const [fontSizeHeader, setFontSizeHeader] = useState(
+        screenWidth < 768 ? 14 : 18
+      );
 
   const router = useRouter();
   const [products, setProducts] = useState<Product[]>([]);
@@ -66,11 +67,6 @@ const ProductsScreen = () => {
   const [isProductModalVisible, setIsProductModalVisible] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
-
-  // Pagination states
-  const [currentPage, setCurrentPage] = useState(1);
-  const productsPerPage = 8;
-  const totalPages = Math.ceil(products.length / productsPerPage);
 
   const getData = async () => {
     try {
@@ -108,16 +104,6 @@ const ProductsScreen = () => {
       setVisible(true); // Show error modal
     }
   };
-
-  // Get current products for pagination
-  const indexOfLastProduct = currentPage * productsPerPage;
-  const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
-  const currentProducts = products.slice(
-    indexOfFirstProduct,
-    indexOfLastProduct
-  );
-
-  const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
 
   if (loading) {
     return (
@@ -180,8 +166,7 @@ const ProductsScreen = () => {
           icon="pencil"
           size={20}
           iconColor="#4169E1"
-          onPress={() => {
-            setSelectedProduct(item);
+          onPress={() => {setSelectedProduct(item);
             router.push({
               pathname: "/edit_product",
               params: { item: JSON.stringify(item) },
@@ -199,9 +184,7 @@ const ProductsScreen = () => {
   );
 
   return (
-    <ThemedView
-      style={[styles.center, { marginTop: Platform.OS === "web" ? 20 : 80 }]}
-    >
+    <ThemedView style={[styles.center, {marginTop: Platform.OS === "web" ? 20 : 50, }]}>
       <Modal
         animationType="slide"
         transparent={true}
@@ -256,100 +239,55 @@ const ProductsScreen = () => {
           onPress={() => router.replace("/add_product")}
         />
       </ThemedView>
-      <ThemedTable>
-        <ThemedHeader style={[styles.row]}>
-          {!isMobile && (
-            <ThemedHeader style={[{ width: columnWidths.image }]}>
-              <ThemedText
-                type="subtitle"
-                style={[styles.header, { fontSize: fontSizeHeader }]}
-              >
-                Product Images
+      <ScrollView horizontal>
+        <ThemedTable>
+          <ThemedHeader style={[styles.row]}>
+            {!isMobile && (
+              <ThemedHeader style={[{ width: columnWidths.image }]}>
+                <ThemedText type="subtitle" style={[styles.header, { fontSize: fontSizeHeader }]}>
+                  Product Images
+                </ThemedText>
+              </ThemedHeader>
+            )}
+            <ThemedHeader style={[{ width: columnWidths.name }]}>
+              <ThemedText type="subtitle" style={[styles.header, { fontSize: fontSizeHeader }]}>
+                Product Name
               </ThemedText>
             </ThemedHeader>
-          )}
-          <ThemedHeader style={[{ width: columnWidths.name }]}>
-            <ThemedText
-              type="subtitle"
-              style={[styles.header, { fontSize: fontSizeHeader }]}
-            >
-              Product Name
-            </ThemedText>
+            <ThemedHeader style={[{ width: columnWidths.price }]}>
+              <ThemedText type="subtitle" style={[styles.header, { fontSize: fontSizeHeader }]}>
+                Price
+              </ThemedText>
+            </ThemedHeader>
+            <ThemedHeader style={[{ width: columnWidths.stock }]}>
+              <ThemedText type="subtitle" style={[styles.header, { fontSize: fontSizeHeader }]}>
+                Total Stock
+              </ThemedText>
+            </ThemedHeader>
+            <ThemedHeader style={[{ width: columnWidths.category }]}>
+              <ThemedText type="subtitle" style={[styles.header, { fontSize: fontSizeHeader }]}>
+                Category
+              </ThemedText>
+            </ThemedHeader>
+            <ThemedHeader style={[{ width: columnWidths.department }]}>
+              <ThemedText type="subtitle" style={[styles.header, { fontSize: fontSizeHeader }]}>
+                Department
+              </ThemedText>
+            </ThemedHeader>
+            <ThemedHeader style={[{ width: columnWidths.action }]}>
+              <ThemedText type="subtitle" style={[styles.header, { fontSize: fontSizeHeader }]}>
+                Action
+              </ThemedText>
+            </ThemedHeader>
           </ThemedHeader>
-          <ThemedHeader style={[{ width: columnWidths.price }]}>
-            <ThemedText
-              type="subtitle"
-              style={[styles.header, { fontSize: fontSizeHeader }]}
-            >
-              Price
-            </ThemedText>
-          </ThemedHeader>
-          <ThemedHeader style={[{ width: columnWidths.stock }]}>
-            <ThemedText
-              type="subtitle"
-              style={[styles.header, { fontSize: fontSizeHeader }]}
-            >
-              Total Stock
-            </ThemedText>
-          </ThemedHeader>
-          <ThemedHeader style={[{ width: columnWidths.category }]}>
-            <ThemedText
-              type="subtitle"
-              style={[styles.header, { fontSize: fontSizeHeader }]}
-            >
-              Category
-            </ThemedText>
-          </ThemedHeader>
-          <ThemedHeader style={[{ width: columnWidths.department }]}>
-            <ThemedText
-              type="subtitle"
-              style={[styles.header, { fontSize: fontSizeHeader }]}
-            >
-              Department
-            </ThemedText>
-          </ThemedHeader>
-          <ThemedHeader style={[{ width: columnWidths.action }]}>
-            <ThemedText
-              type="subtitle"
-              style={[styles.header, { fontSize: fontSizeHeader }]}
-            >
-              Action
-            </ThemedText>
-          </ThemedHeader>
-        </ThemedHeader>
-        <FlatList
-          data={currentProducts}
-          renderItem={renderItem}
-          keyExtractor={(item) => item.ID}
-          ListEmptyComponent={
-            <ThemedText style={{ textAlign: "center", paddingVertical: 20 }}>
-              No products found.
-            </ThemedText>
-          }
-        />
-      </ThemedTable>
-      {/* Pagination Controls */}
-      <View style={styles.paginationContainer}>
-        <IconButton
-          icon="chevron-left"
-          size={30}
-          onPress={() => paginate(currentPage - 1)}
-          disabled={currentPage === 1}
-          iconColor={colorScheme === "dark" ? "#ffffff" : "#111827"}
-        />
-        <ThemedText style={styles.paginationText}>
-          Page {currentPage} of {totalPages}
-        </ThemedText>
-        <IconButton
-          icon="chevron-right"
-          size={30}
-          onPress={() => paginate(currentPage + 1)}
-          disabled={currentPage === totalPages}
-          iconColor={colorScheme === "dark" ? "#ffffff" : "#111827"}
-        />
-      </View>
+          <FlatList
+            data={products}
+            renderItem={renderItem}
+            keyExtractor={(item) => item.ID}
+          />
+        </ThemedTable>
+      </ScrollView>
     </ThemedView>
   );
 };
-
 export default ProductsScreen;

@@ -52,6 +52,17 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
+  paginationContainer: {
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    marginTop: 20,
+    paddingBottom: 20,
+  },
+  paginationText: {
+    marginHorizontal: 15,
+    fontSize: 16,
+  },
 });
 
 export default styles;
