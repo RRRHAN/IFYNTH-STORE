@@ -20,7 +20,7 @@
     },
     "web": {
       "bundler": "metro",
-      "output": "static",
+      "output": "static", 
       "favicon": "./assets/images/logo.png"
     },
     "plugins": [
@@ -50,6 +50,7 @@
       "eas": {
         "projectId": "75d851ad-6ea7-4c80-a5fb-63f468da01f8"
       }
-    }
+    },
+    "output": "export"
   }
 }
