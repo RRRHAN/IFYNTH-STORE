@@ -7,13 +7,13 @@
     "icon": "./assets/images/icon-store.png",
     "scheme": "myapp",
     "userInterfaceStyle": "automatic",
-    "newArchEnabled": true,
+    "newArchEnabled": false,
     "ios": {
       "supportsTablet": true
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/images/logo.png",
+        "foregroundImage": "./assets/images/icon-store.png",
         "backgroundColor": "#151718"
       },
       "package": "com.devanadindra.admin"
