@@ -171,7 +171,7 @@ export default function AddProductScreen() {
       />
 
       <View style={styles.sizeContainer}>
-        {sizes.map((size, index) => (
+        {Array.isArray(sizes) && sizes.map((size, index) => (
           <SizeInputItem
             key={index}
             size={size.size}

@@ -23,8 +23,19 @@ const screenWidth = Dimensions.get("window").width;
 
 const maxWidth =
   Platform.OS === "web"
-    ? { width: screenWidth > 1000 ? 700 : screenWidth > 1500 ? 820 : 900 }
-    : { width: 500 };
+    ? {
+        width:
+          screenWidth > 1500
+            ? 820
+            : screenWidth > 1000
+            ? 800
+            : screenWidth > 700
+            ? 500
+            : screenWidth > 400
+            ? 380
+            : 300,
+      }
+    : { width: 380 };
 
 type ProfitChartProps = {
   ProfitProduct: ProfitProduct[] | null;
@@ -38,18 +49,39 @@ const ProfitProductChart: React.FC<ProfitChartProps> = ({
   const colorScheme = useColorScheme();
   const products = ProfitProduct || [];
 
-  const productNames = products.map((p) => p.ProductName);
+  const hasValidData =
+    products.length > 0 &&
+    products.some((p) => p.TotalCapital > 0 || p.TotalIncome > 0);
 
-  const capitalData = products.map((p) => ({
+  const displayProducts = hasValidData
+    ? products
+    : [{ ProductName: "Produk A", TotalCapital: 0, TotalIncome: 0 }];
+
+  const productNames = displayProducts.map((p) => p.ProductName);
+
+  // Fungsi helper untuk memformat angka
+  const formatCurrency = (num: number) => {
+    if (num >= 1000000) {
+      // Lebih dari atau sama dengan 1 Juta
+      return `${(num / 1000000).toFixed(1).replace(/\.0$/, "")}M`; // Contoh: 1.2M, 5M
+    }
+    if (num >= 1000) {
+      // Lebih dari atau sama dengan 1 Ribu
+      return `${(num / 1000).toFixed(1).replace(/\.0$/, "")}k`;
+    }
+    return num.toLocaleString("id-ID");
+  };
+
+  const capitalData = displayProducts.map((p) => ({
     x: p.ProductName,
     y: p.TotalCapital,
-    label: `Modal: Rp ${p.TotalCapital.toLocaleString("id-ID")}`,
+    label: `${formatCurrency(p.TotalCapital)}`,
   }));
 
-  const incomeData = products.map((p) => ({
+  const incomeData = displayProducts.map((p) => ({
     x: p.ProductName,
     y: p.TotalIncome,
-    label: `Income: Rp ${p.TotalIncome.toLocaleString("id-ID")}`,
+    label: `${formatCurrency(p.TotalIncome)}`,
   }));
 
   const chartColors = {
@@ -63,8 +95,8 @@ const ProfitProductChart: React.FC<ProfitChartProps> = ({
     ...capitalData.map((d) => d.y),
     ...incomeData.map((d) => d.y),
   ];
-  const maxVal = allValues.length > 0 ? Math.max(...allValues) : 0;
-  const domainYMax = maxVal * 1.1;
+  const maxVal = allValues.length > 0 ? Math.max(...allValues) : 100;
+  const domainYMax = maxVal === 0 ? 100 : maxVal * 1.1;
   const minVal = 0;
 
   const numYTicks = 5;
@@ -76,8 +108,42 @@ const ProfitProductChart: React.FC<ProfitChartProps> = ({
   const plotAreaHeight = height - chartPadding.top - chartPadding.bottom;
 
   const tickLabelFontSize = 10;
-  // --- Akhir Perhitungan untuk Label Sumbu Y Manual ---
 
+  // Lebar chart yang akan digulir
+  const chartScrollWidth = Math.max(screenWidth, productNames.length * 100);
+
+   const CustomTooltip = (props: any) => {
+    return (
+      <VictoryTooltip
+        {...props}
+        flyoutStyle={{
+          // Gaya untuk kotak latar belakang tooltip
+          fill: colorScheme === "dark" ? "#333" : "white",
+          stroke: colorScheme === "dark" ? "#666" : "#ccc",
+          // Jika ingin rotasi pada kotak flyout, bisa ditambahkan di sini
+          // angle: -45, // Ini akan merotasi seluruh kotak tooltip
+        }}
+        style={{
+          // Gaya untuk teks label di dalam tooltip
+          fontSize: 12,
+          fill: chartColors.text, // Mengatur warna teks label
+          // Rotasi untuk teks label saja (di dalam kotak tooltip)
+          // angle: -45, // Rotasi teks label
+        }}
+        // Untuk rotasi pada teks label saja, VictoryTooltip tidak memiliki prop 'angle'
+        // secara langsung pada style teks. Jika sangat diperlukan, Anda mungkin perlu
+        // membuat komponen label kustom yang lebih kompleks atau menggunakan VictoryLabel
+        // sebagai labelComponent untuk VictoryTooltip.
+        // Namun, rotasi tooltip secara keseluruhan (melalui flyoutStyle) lebih umum.
+
+        // Agar tooltip tampil ketika data dihover/sentuh
+        activateData={true}
+        // Pastikan tooltip muncul di atas elemen lain
+        renderInPortal={true}
+      />
+    );
+  };
+  
   return (
     <ThemedView
       style={[
@@ -86,42 +152,29 @@ const ProfitProductChart: React.FC<ProfitChartProps> = ({
         { backgroundColor: colorScheme === "dark" ? "#1c1c1c" : "#f0f0f0" },
       ]}
     >
-      <ThemedText
-        style={[styles.title]} // Dipisahkan
-      >
-        Laporan Keuangan Produk
-      </ThemedText>
+      <ThemedText style={[styles.title]}>Product Financial Reports</ThemedText>
 
       {/* Manual Legend */}
       <View style={styles.legendContainer}>
-        {/* Dipisahkan */}
         <View style={styles.legendItem}>
-
-          {/* Dipisahkan */}
           <View
             style={[
-              styles.legendColorBox, // Dipisahkan
+              styles.legendColorBox,
               { backgroundColor: chartColors.capital },
             ]}
           />
           <ThemedText style={[styles.legendText, { color: chartColors.text }]}>
-  
-            {/* Dipisahkan */}
             Modal
           </ThemedText>
         </View>
         <View style={styles.legendItem}>
-
-          {/* Dipisahkan */}
           <View
             style={[
-              styles.legendColorBox, // Dipisahkan
+              styles.legendColorBox,
               { backgroundColor: chartColors.income },
             ]}
           />
           <ThemedText style={[styles.legendText, { color: chartColors.text }]}>
-  
-            {/* Dipisahkan */}
             Income
           </ThemedText>
         </View>
@@ -167,124 +220,75 @@ const ProfitProductChart: React.FC<ProfitChartProps> = ({
                     },
                   ]}
                 >
-                  {(value / 1000).toFixed(0)}k
+                  {formatCurrency(value)}
                 </ThemedText>
               );
             })}
         </View>
 
-        <ScrollView horizontal>
-          <VictoryChart
-            width={Math.max(screenWidth, productNames.length * 150)}
-            height={height}
-            domain={{ y: [minVal, domainYMax] }} // Ini bukan style, ini domain data
-            domainPadding={{ x: 50 }} // Ini bukan style, ini padding domain
-            theme={VictoryTheme.material} // Ini bukan style, ini tema
-            padding={chartPadding} // Ini bukan style, ini padding chart
-          >
-            {/* X-axis */}
-            <VictoryAxis
-              label="Nama Produk"
-              tickValues={productNames}
-              style={{
-                axisLabel: { padding: 40, fill: chartColors.text },
-                tickLabels: {
-                  textAnchor: "middle",
-                  fontSize: 10,
-                  fill: chartColors.text,
-                },
-              }}
-            />
-
-            {/* Y-axis */}
-            <VictoryAxis
-              dependentAxis
-              tickValues={yTickValues} // Ini bukan style, ini tick values
-              tickFormat={(y) => `${(y / 1000).toFixed(0)}k`} // Ini bukan style, ini format tick
-              style={{
-                tickLabels: { fill: chartColors.text },
-                axisLabel: {
-                  padding: 30,
-                  fill: chartColors.text,
-                  fontSize: 10,
-                },
-                grid: {
-                  stroke: colorScheme === "dark" ? "#444" : "#ccc",
-                  strokeDasharray: "5, 5",
-                },
-              }}
-            />
-
-            {/* Bar chart */}
-            <VictoryGroup
-              offset={50} // Ini bukan style, ini offset
-              colorScale={[chartColors.capital, chartColors.income]} // Ini bukan style, ini color scale
-              {...({} as any)}
+        <ScrollView
+          horizontal
+          contentContainerStyle={{ flexGrow: 1, justifyContent: "center" }}
+        >
+          {hasValidData ? (
+            <VictoryChart
+              width={chartScrollWidth}
+              height={height}
+              domain={{ y: [minVal, domainYMax] }}
+              domainPadding={{ x: 50 }}
+              theme={VictoryTheme.material}
+              padding={chartPadding}
             >
-              <VictoryBar
-                data={capitalData}
-                barWidth={20}
-                // Jika menggunakan tooltip, pastikan prop label dan labelComponent ada di sini
-                /*
-                labels={({ datum }) => datum.label}
-                labelComponent={
-                  <VictoryTooltip
-                    flyoutStyle={{
-                      fill: colorScheme === "dark" ? "#333" : "white",
-                      stroke: colorScheme === "dark" ? "#666" : "#ccc",
-                    }}
-                    style={{
-                      fontSize: 12,
-                      fill: chartColors.text,
-                    }}
-                    activateData={true}
-                    renderInPortal={true}
-                  />
-                }
-                events={[
-                  {
-                    target: "data",
-                    eventHandlers: {
-                      onPressIn: () => [{ mutation: (props) => ({ active: true }) }],
-                      onPressOut: () => [{ mutation: (props) => ({ active: undefined }) }],
-                    },
+              {/* X-axis */}
+              <VictoryAxis
+                label="Nama Produk"
+                tickValues={productNames}
+                style={{
+                  axisLabel: { padding: 40, fill: chartColors.text },
+                  tickLabels: {
+                    textAnchor: "middle",
+                    fontSize: 10,
+                    fill: chartColors.text,
                   },
-                ]}
-                */
+                }}
               />
-              <VictoryBar
-                data={incomeData}
-                barWidth={20}
-                // Jika menggunakan tooltip, pastikan prop label dan labelComponent ada di sini
-                /*
-                labels={({ datum }) => datum.label}
-                labelComponent={
-                  <VictoryTooltip
-                    flyoutStyle={{
-                      fill: colorScheme === "dark" ? "#333" : "white",
-                      stroke: colorScheme === "dark" ? "#666" : "#ccc",
-                    }}
-                    style={{
-                      fontSize: 12,
-                      fill: chartColors.text,
-                    }}
-                    activateData={true}
-                    renderInPortal={true}
-                  />
-                }
-                events={[
-                  {
-                    target: "data",
-                    eventHandlers: {
-                      onPressIn: () => [{ mutation: (props) => ({ active: true }) }],
-                      onPressOut: () => [{ mutation: (props) => ({ active: undefined }) }],
-                    },
+
+              {/* Y-axis */}
+              <VictoryAxis
+                dependentAxis
+                tickValues={yTickValues}
+                tickFormat={(y) => `${(y / 1000).toFixed(0)}k`}
+                style={{
+                  tickLabels: { fill: chartColors.text },
+                  axisLabel: {
+                    padding: 30,
+                    fill: chartColors.text,
+                    fontSize: 10,
                   },
-                ]}
-                */
+                  grid: {
+                    stroke: colorScheme === "dark" ? "#444" : "#ccc",
+                    strokeDasharray: "5, 5",
+                  },
+                }}
               />
-            </VictoryGroup>
-          </VictoryChart>
+
+              {/* Bar chart */}
+              <VictoryGroup
+                offset={50}
+                colorScale={[chartColors.capital, chartColors.income]}
+                {...({} as any)}
+              >
+                <VictoryBar data={capitalData} barWidth={20} />
+                <VictoryBar data={incomeData} barWidth={20} />
+              </VictoryGroup>
+            </VictoryChart>
+          ) : (
+            <View style={styles.noDataMessageContainer}>
+              <ThemedText style={styles.noDataMessageText}>
+                No product profit data available.
+              </ThemedText>
+            </View>
+          )}
         </ScrollView>
       </View>
     </ThemedView>
@@ -328,6 +332,7 @@ const styles = StyleSheet.create({
   yAxisLabelsContainer: {
     width: 60,
     position: "relative",
+    bottom: 8,
   },
   yAxisTickLabel: {
     fontSize: 10,
@@ -339,6 +344,18 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     transform: [{ rotate: "-90deg" }],
     width: 100,
+    textAlign: "center",
+  },
+  noDataMessageContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    height: 300,
+    width: "100%",
+  },
+  noDataMessageText: {
+    fontSize: 16,
+    color: "#888",
     textAlign: "center",
   },
 });

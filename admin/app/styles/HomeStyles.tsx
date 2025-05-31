@@ -39,7 +39,12 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
-
+  errorMessage: {
+    fontSize: 16,
+    textAlign: 'center',
+    marginTop: 20,
+    fontWeight: 'bold',
+  },
 });
 
 export default styles;

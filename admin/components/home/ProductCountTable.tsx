@@ -9,7 +9,7 @@ import { useColorScheme } from "@/hooks/useColorScheme";
 const { width } = Dimensions.get("window");
 
 type ProductCountTableProps = {
-  productCount: DepartentCount[];
+  productCount: DepartentCount[]; // This prop should now always be an array, even if empty
 };
 
 const ProductCountTable: React.FC<ProductCountTableProps> = ({
@@ -18,6 +18,8 @@ const ProductCountTable: React.FC<ProductCountTableProps> = ({
   const colorScheme = useColorScheme();
   const headerBackgroundColor = colorScheme === "dark" ? "#ffffff" : "#111827";
   const headerTextColor = colorScheme === "dark" ? "#000" : "#fff";
+  const rowBackgroundColor = colorScheme === "dark" ? "#1a1a1a" : "#f9f9f9"; // Add a background for data rows
+
   return (
     <ThemedView
       style={[styles.table, { backgroundColor: headerBackgroundColor }]}
@@ -36,21 +38,27 @@ const ProductCountTable: React.FC<ProductCountTableProps> = ({
         </ThemedText>
       </ThemedView>
 
-      {/* Data Rows */}
-      {productCount.map((item, index) => {
-        const isLast = index === productCount.length - 1;
-        return (
-          <ThemedView
-            key={item.Department}
-            style={[styles.row, isLast && styles.lastRow]}
-          >
-            <ThemedText style={styles.cell}>
-              {item.Department === "NTH" ? "No Time To Hell" : "I Found You"}
-            </ThemedText>
-            <ThemedText style={styles.rowLastCell}>{item.Count}</ThemedText>
-          </ThemedView>
-        );
-      })}
+      {/* Data Rows or No Data Message */}
+      {productCount && productCount.length > 0 ? (
+        productCount.map((item, index) => {
+          const isLast = index === productCount.length - 1;
+          return (
+            <ThemedView
+              key={item.Department}
+              style={[styles.row, isLast && styles.lastRow, { backgroundColor: rowBackgroundColor }]}
+            >
+              <ThemedText style={styles.cell}>
+                {item.Department === "NTH" ? "No Time To Hell" : "I Found You"}
+              </ThemedText>
+              <ThemedText style={styles.rowLastCell}>{item.Count}</ThemedText>
+            </ThemedView>
+          );
+        })
+      ) : (
+        <ThemedView style={[styles.noDataRow, { backgroundColor: rowBackgroundColor }]}>
+          <ThemedText style={styles.noDataText}>No product data available.</ThemedText>
+        </ThemedView>
+      )}
     </ThemedView>
   );
 };
@@ -103,6 +111,18 @@ const styles = StyleSheet.create({
   },
   headerText: {
     fontWeight: "bold",
+  },
+  // New styles for no data message
+  noDataRow: {
+    paddingVertical: 20, // Give it some height
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderBottomLeftRadius: 20,
+    borderBottomRightRadius: 20,
+  },
+  noDataText: {
+    fontSize: 16,
+    color: '#888',
   },
 });
 

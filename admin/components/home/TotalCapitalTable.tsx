@@ -4,10 +4,11 @@ import { StyleSheet, Dimensions } from "react-native";
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "../ThemedView";
 import { useColorScheme } from "@/hooks/useColorScheme";
+
 const { width } = Dimensions.get("window");
 
 type Props = {
-  totalCapital: number;
+  totalCapital: number; // Expects a number, so 0 if no actual data
 };
 
 const TotalCapitalTable: React.FC<Props> = ({ totalCapital }) => {
@@ -15,9 +16,10 @@ const TotalCapitalTable: React.FC<Props> = ({ totalCapital }) => {
 
   const headerBackgroundColor = colorScheme === "dark" ? "#ffffff" : "#111827";
   const headerTextColor = colorScheme === "dark" ? "#000" : "#fff";
+  const rowBackgroundColor = colorScheme === "dark" ? "#1a1a1a" : "#f9f9f9"; // Added for consistency
 
   return (
-    <ThemedView style={styles.table}>
+    <ThemedView style={[styles.table, { backgroundColor: rowBackgroundColor }]}>
       {/* Header */}
       <ThemedView
         style={[styles.row, { backgroundColor: headerBackgroundColor }]}
@@ -29,11 +31,17 @@ const TotalCapitalTable: React.FC<Props> = ({ totalCapital }) => {
         </ThemedText>
       </ThemedView>
 
-      {/* Data Row */}
+      {/* Data Row or No Data Message */}
       <ThemedView style={styles.row}>
-        <ThemedText style={[styles.cell]}>
-          Rp{totalCapital.toLocaleString("id-ID")}
-        </ThemedText>
+        {totalCapital > 0 ? ( // Condition to check if capital is positive
+          <ThemedText style={[styles.cell]}>
+            Rp{totalCapital.toLocaleString("id-ID")}
+          </ThemedText>
+        ) : (
+          <ThemedText style={[styles.cell, styles.noDataText]}>
+            Rp0 (No capital data)
+          </ThemedText>
+        )}
       </ThemedView>
     </ThemedView>
   );
@@ -70,6 +78,11 @@ const styles = StyleSheet.create({
   },
   headerText: {
     fontWeight: "bold",
+  },
+  // New style for no data text
+  noDataText: {
+    color: '#888', // A subtle color for the message
+    fontStyle: 'italic', // Optional: make it italic
   },
 });
 

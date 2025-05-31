@@ -3,6 +3,7 @@ import { StyleSheet, Dimensions } from "react-native";
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "../ThemedView";
 import { useColorScheme } from "@/hooks/useColorScheme";
+
 const { width } = Dimensions.get("window");
 
 type Props = {
@@ -14,10 +15,10 @@ const TotalIncomeTable: React.FC<Props> = ({ totalIncome }) => {
 
   const headerBackgroundColor = colorScheme === "dark" ? "#ffffff" : "#111827";
   const headerTextColor = colorScheme === "dark" ? "#000" : "#fff";
+  const rowBackgroundColor = colorScheme === "dark" ? "#1a1a1a" : "#f9f9f9";
 
   return (
-    <ThemedView style={styles.table}>
-      {/* Header */}
+    <ThemedView style={[styles.table, { backgroundColor: rowBackgroundColor }]}>
       <ThemedView
         style={[styles.row, { backgroundColor: headerBackgroundColor }]}
       >
@@ -27,12 +28,16 @@ const TotalIncomeTable: React.FC<Props> = ({ totalIncome }) => {
           Total Income
         </ThemedText>
       </ThemedView>
-
-      {/* Data Row */}
       <ThemedView style={styles.row}>
-        <ThemedText style={[styles.cell]}>
-          Rp{totalIncome.toLocaleString("id-ID")}
-        </ThemedText>
+        {totalIncome > 0 ? (
+          <ThemedText style={[styles.cell]}>
+            Rp{totalIncome.toLocaleString("id-ID")}
+          </ThemedText>
+        ) : (
+          <ThemedText style={[styles.cell, styles.noDataText]}>
+            Rp0 (No income data)
+          </ThemedText>
+        )}
       </ThemedView>
     </ThemedView>
   );
@@ -69,6 +74,10 @@ const styles = StyleSheet.create({
   },
   headerText: {
     fontWeight: "bold",
+  },
+  noDataText: {
+    color: '#888',
+    fontStyle: 'italic',
   },
 });
 
