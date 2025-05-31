@@ -32,4 +32,4 @@ jobs:
               docker-compose build || exit 1
             fi
             docker-compose up -d || exit 1
-            docker image prune -f || exit 1
+            docker system prune -f || exit 1

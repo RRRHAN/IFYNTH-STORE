@@ -99,8 +99,9 @@
                 }
 
                 try {
+                    let baseUrl = "{{ url(config('app.back_end_base_url')) }}"
                     const response = await axios.post(
-                        'http://ifynth.raihan-firm.com/api/user/register', {
+                        `${baseUrl}/api/user/register`, {
                             name: name,
                             username: username,
                             phoneNumber: phoneNumber,
