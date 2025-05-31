@@ -20,7 +20,7 @@
                                     <span class="primary-color text-sm">product thrifting</span>
                                 </h1>
                                 <a class="btn-one wow fadeInUp mt-20" data-wow-delay=".3s"
-                                    href="{{route('products.getAll', ['department' => 'IFY'])}}"><span>Shop
+                                    href="{{ route('products.getAll', ['department' => 'IFY']) }}"><span>Shop
                                         Now</span></a>
                             </div>
                         </div>
@@ -35,7 +35,7 @@
                                     <span class="primary-color">our products</span>
                                 </h1>
                                 <a class="btn-one wow fadeInUp mt-20" data-wow-delay=".3s"
-                                    href="{{route('products.getAll', ['department' => 'NTH'])}}"><span>Shop
+                                    href="{{ route('products.getAll', ['department' => 'NTH']) }}"><span>Shop
                                         Now</span></a>
                             </div>
                         </div>
@@ -56,62 +56,77 @@
                     <div class="swiper-wrapper">
                         <div class="swiper-slide">
                             <div class="category__item text-center">
-                                <a href="{{route('products.getAll', ['category' => 'Shirt'])}}" class="category__image d-block">
+                                <a href="{{ route('products.getAll', ['category' => 'Shirt']) }}"
+                                    class="category__image d-block">
                                     <div class="category-icon">
                                         <img src="/assets/images/category/shirt.png" alt="icon">
                                     </div>
                                 </a>
-                                <h4 class="mt-30"><a href="{{route('products.getAll', ['category' => 'Shirt'])}}">Shirt</a></h4>
+                                <h4 class="mt-30"><a
+                                        href="{{ route('products.getAll', ['category' => 'Shirt']) }}">Shirt</a></h4>
                             </div>
                         </div>
                         <div class="swiper-slide">
                             <div class="category__item text-center">
-                                <a href="{{route('products.getAll', ['category' => 'T-Shirt'])}}" class="category__image d-block">
+                                <a href="{{ route('products.getAll', ['category' => 'T-Shirt']) }}"
+                                    class="category__image d-block">
                                     <div class="category-icon">
                                         <img src="/assets/images/category/tshirt.png" alt="icon">
                                     </div>
                                 </a>
-                                <h4 class="mt-30"><a href="{{route('products.getAll', ['category' => 'T-Shirt'])}}">T-Shirt</a></h4>
+                                <h4 class="mt-30"><a
+                                        href="{{ route('products.getAll', ['category' => 'T-Shirt']) }}">T-Shirt</a></h4>
                             </div>
                         </div>
                         <div class="swiper-slide">
                             <div class="category__item text-center">
-                                <a href="{{route('products.getAll', ['category' => 'Long Shirt'])}}" class="category__image d-block">
+                                <a href="{{ route('products.getAll', ['category' => 'Long Shirt']) }}"
+                                    class="category__image d-block">
                                     <div class="category-icon">
                                         <img src="/assets/images/category/longshirt.png" alt="icon">
                                     </div>
                                 </a>
-                                <h4 class="mt-30"><a href="{{route('products.getAll', ['category' => 'Long Shirt'])}}">Long Shirt</a></h4>
+                                <h4 class="mt-30"><a
+                                        href="{{ route('products.getAll', ['category' => 'Long Shirt']) }}">Long Shirt</a>
+                                </h4>
                             </div>
                         </div>
                         <div class="swiper-slide">
                             <div class="category__item text-center">
-                                <a href="{{route('products.getAll', ['category' => 'Outetwear'])}}" class="category__image d-block">
+                                <a href="{{ route('products.getAll', ['category' => 'Outetwear']) }}"
+                                    class="category__image d-block">
                                     <div class="category-icon">
                                         <img src="/assets/images/category/outerwear.png" alt="icon">
                                     </div>
                                 </a>
-                                <h4 class="mt-30"><a href="{{route('products.getAll', ['category' => 'Outetwear'])}}">Outerwear</a></h4>
+                                <h4 class="mt-30"><a
+                                        href="{{ route('products.getAll', ['category' => 'Outetwear']) }}">Outerwear</a>
+                                </h4>
                             </div>
                         </div>
                         <div class="swiper-slide">
                             <div class="category__item text-center">
-                                <a href="{{route('products.getAll', ['category' => 'Pants'])}}" class="category__image d-block">
+                                <a href="{{ route('products.getAll', ['category' => 'Pants']) }}"
+                                    class="category__image d-block">
                                     <div class="category-icon">
                                         <img src="/assets/images/category/pants.png" alt="icon">
                                     </div>
                                 </a>
-                                <h4 class="mt-30"><a href="{{route('products.getAll', ['category' => 'Pants'])}}">Pants</a></h4>
+                                <h4 class="mt-30"><a
+                                        href="{{ route('products.getAll', ['category' => 'Pants']) }}">Pants</a></h4>
                             </div>
                         </div>
                         <div class="swiper-slide">
                             <div class="category__item text-center">
-                                <a href="{{route('products.getAll', ['category' => 'Long Pants'])}}" class="category__image d-block">
+                                <a href="{{ route('products.getAll', ['category' => 'Long Pants']) }}"
+                                    class="category__image d-block">
                                     <div class="category-icon">
                                         <img src="/assets/images/category/longpants.png" alt="icon">
                                     </div>
                                 </a>
-                                <h4 class="mt-30"><a href="{{route('products.getAll', ['category' => 'Long Pants'])}}">Long Pants</a></h4>
+                                <h4 class="mt-30"><a
+                                        href="{{ route('products.getAll', ['category' => 'Long Pants']) }}">Long Pants</a>
+                                </h4>
                             </div>
                         </div>
                     </div>
@@ -154,48 +169,59 @@
                         <div class="tab-content">
                             <div id="latest-item" class="tab-pane fade show active">
                                 @if (count($products) > 0)
-                                <div class="row g-4">
-                                    @foreach ($products as $product)
-                                        <div class="col-xl-3 col-lg-3 col-md-6">
-                                            <div class="product__item bor">
-                                                <a href="{{ route('product.detail', ['id' => $product['ID']]) }}" class="product__image pt-20 d-block">
-                                                    @php
-                                                        $images = $product['ProductImages'] ?? [];
-                                                        $frontImage = isset($images[0]['URL'])
-                                                            ? config('app.back_end_base_url').'/api' . $images[0]['URL']
-                                                            : asset('default-image.jpg');
-                                                        $backImage = isset($images[1]['URL'])
-                                                            ? config('app.back_end_base_url').'/api' . $images[1]['URL']
-                                                            : $frontImage;
-                                                    @endphp
-                    
-                                                    <img class="font-image" src="{{ $frontImage }}" alt="{{ $product['Name'] }}">
-                                                    <img class="back-image" src="{{ $backImage }}" alt="{{ $product['Name'] }}">
-                                                </a>
-                    
-                                                <div class="product__content">
-                                                    <h4 class="mb-15">
-                                                        <a class="primary-hover" href="{{ route('product.detail', ['id' => $product['ID']]) }}">
-                                                            {{ Str::limit($product['Name'], 20, '...') }}
-                                                        </a>
-                                                    </h4>
-                                                    <del>Rp {{ number_format($product['Price'] + 20000, 0, ',', '.') }}</del>
-                                                    <span class="primary-color ml-10">Rp {{ number_format($product['Price'], 0, ',', '.') }}</span>
+                                    <div class="row g-4">
+                                        @foreach ($products as $product)
+                                            <div class="col-xl-3 col-lg-3 col-md-6 col-sm-6 col-12">
+                                                <div class="product__item bor">
+                                                    <a href="{{ route('product.detail', ['id' => $product['ID']]) }}"
+                                                        class="product__image pt-20 d-block">
+                                                        @php
+                                                            $images = $product['ProductImages'] ?? [];
+                                                            $frontImage = isset($images[0]['URL'])
+                                                                ? config('app.back_end_base_url') .
+                                                                    '/api' .
+                                                                    $images[0]['URL']
+                                                                : asset('default-image.jpg');
+                                                            $backImage = isset($images[1]['URL'])
+                                                                ? config('app.back_end_base_url') .
+                                                                    '/api' .
+                                                                    $images[1]['URL']
+                                                                : $frontImage;
+                                                        @endphp
+
+                                                        <img class="font-image img-fluid" src="{{ $frontImage }}"
+                                                            alt="{{ $product['Name'] }}">
+                                                        <img class="back-image img-fluid" src="{{ $backImage }}"
+                                                            alt="{{ $product['Name'] }}">
+                                                    </a>
+
+                                                    <div class="product__content">
+                                                        <h4 class="mb-15">
+                                                            <a class="primary-hover"
+                                                                href="{{ route('product.detail', ['id' => $product['ID']]) }}">
+                                                                {{ Str::limit($product['Name'], 20, '...') }}
+                                                            </a>
+                                                        </h4>
+                                                        <del>Rp
+                                                            {{ number_format($product['Price'] + 20000, 0, ',', '.') }}</del>
+                                                        <span class="primary-color ml-10">Rp
+                                                            {{ number_format($product['Price'], 0, ',', '.') }}</span>
+                                                    </div>
+
+                                                    <a class="product__cart d-block bor-top"
+                                                        href="{{ route('product.detail', ['id' => $product['ID']]) }}">
+                                                        <i class="primary-color me-1"></i> <span>Detail Product</span>
+                                                    </a>
                                                 </div>
-                    
-                                                <a class="product__cart d-block bor-top" href="{{ route('product.detail', ['id' => $product['ID']]) }}">
-                                                    <i class="primary-color me-1"></i> <span>Detail Product</span>
-                                                </a>
                                             </div>
-                                        </div>
-                                    @endforeach
-                                </div>
-                            @else
-                            <div class="text-center py-5">
-                                <h3>No Product Found</h3>
-                                <p>Try adjusting your search or filter to find what you're looking for.</p>
-                            </div>
-                        @endif
+                                        @endforeach
+                                    </div>
+                                @else
+                                    <div class="text-center py-5">
+                                        <h3>No Product Found</h3>
+                                        <p>Try adjusting your search or filter to find what you're looking for.</p>
+                                    </div>
+                                @endif
                             </div>
                         </div>
                     </div>
