@@ -110,3 +110,47 @@ export const checkLoginStatus = async (
     return false;
   }
 };
+
+export const changePassword = async (
+  current_password: string,
+  new_password: string,
+  confirmed_password: string
+) => {
+  const token = await AsyncStorage.getItem("auth_token");
+
+  if (new_password !== confirmed_password) {
+    return { success: false, message: "Passwords do not match." };
+  }
+
+  try {
+    const response = await fetch(`${BASE_URL}/api/user/password`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        current_password,
+        new_password,
+        role: "ADMIN",
+      }),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      return {
+        success: false,
+        message: data?.errors?.[0] || "Failed to change password.",
+      };
+    }
+
+    return { success: true, message: "Change Password Successfully!" };
+  } catch (error) {
+    console.error(error);
+    return {
+      success: false,
+      message: "An error occurred while updating password. Please try again.",
+    };
+  }
+};

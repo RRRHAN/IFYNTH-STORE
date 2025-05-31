@@ -226,6 +226,19 @@ export default function HomeScreen() {
                       height={380}
                     />
                   </View>
+                  {Platform.OS === "web" && (
+                    <View
+                      style={{
+                        flex: 1,
+                        paddingTop: width < 1000 ? 40 : 20,
+                      }}
+                    >
+                      <ProfitProductChart
+                        ProfitProduct={dummyProfitProducts}
+                        height={380}
+                      />
+                    </View>
+                  )}
                 </View>
                 {(!productCount ||
                   !transactionCount ||
