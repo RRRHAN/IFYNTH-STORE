@@ -5,11 +5,11 @@ import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
 import { useEffect } from "react";
 import "react-native-reanimated";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { MyLightTheme, MyDarkTheme } from "@/constants/Theme";
-import { BASE_URL } from "@/src/api/constants";
 import { checkLoginStatus } from "@/src/api/admin";
+import * as Font from "expo-font";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -18,10 +18,16 @@ export default function RootLayout() {
   const colorScheme = useColorScheme();
   const [loaded] = useFonts({
     SpaceMono: require("../assets/fonts/SpaceMono-Regular.ttf"),
+    ...MaterialCommunityIcons.font,
   });
 
   useEffect(() => {
     const initApp = async () => {
+      await Font.loadAsync({
+        SpaceMono: require("../assets/fonts/SpaceMono-Regular.ttf"),
+        ...MaterialCommunityIcons.font,
+      });
+
       if (loaded) {
         await SplashScreen.hideAsync();
 
@@ -32,10 +38,6 @@ export default function RootLayout() {
 
     initApp();
   }, [loaded, router]);
-
-  if (!loaded) {
-    return null;
-  }
 
   return (
     <ThemeProvider value={colorScheme === "dark" ? MyDarkTheme : MyLightTheme}>

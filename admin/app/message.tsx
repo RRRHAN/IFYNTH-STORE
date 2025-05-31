@@ -8,7 +8,6 @@ import {
   TouchableOpacity,
   KeyboardAvoidingView,
   Platform,
-  ScrollView,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter, useLocalSearchParams } from "expo-router";

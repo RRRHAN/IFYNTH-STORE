@@ -1,5 +1,5 @@
 import { Tabs } from "expo-router";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Platform, Dimensions } from "react-native";
 import { HapticTab } from "@/components/HapticTab";
 import TabBarBackground from "@/components/ui/TabBarBackground";
@@ -8,11 +8,30 @@ import { useColorScheme } from "@/hooks/useColorScheme";
 import { Icon } from "react-native-paper";
 import { logoutAdmin } from "@/src/api/admin";
 import { useRouter } from "expo-router";
+import * as Font from "expo-font";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
   const router = useRouter();
   const { width } = Dimensions.get("window");
+
+  const [fontsLoaded, setFontsLoaded] = useState(false);
+
+  useEffect(() => {
+    async function loadFonts() {
+      await Font.loadAsync({
+        ...MaterialCommunityIcons.font,
+      });
+      setFontsLoaded(true);
+    }
+
+    loadFonts();
+  }, []);
+
+  if (!fontsLoaded) {
+    return null;
+  }
 
   const handleLogout = async () => {
     const result = await logoutAdmin();
@@ -49,7 +68,6 @@ export default function TabLayout() {
       <Tabs.Screen
         name="home"
         options={{
-          // Menggunakan tabBarLabel untuk label di bawah ikon
           tabBarLabel: showTabBarLabel ? "Home" : undefined,
           tabBarIcon: ({ color }) => (
             <Icon source="home" size={28} color={color} />
