@@ -111,38 +111,6 @@ const ProfitProductChart: React.FC<ProfitChartProps> = ({
 
   // Lebar chart yang akan digulir
   const chartScrollWidth = Math.max(screenWidth, productNames.length * 100);
-
-   const CustomTooltip = (props: any) => {
-    return (
-      <VictoryTooltip
-        {...props}
-        flyoutStyle={{
-          // Gaya untuk kotak latar belakang tooltip
-          fill: colorScheme === "dark" ? "#333" : "white",
-          stroke: colorScheme === "dark" ? "#666" : "#ccc",
-          // Jika ingin rotasi pada kotak flyout, bisa ditambahkan di sini
-          // angle: -45, // Ini akan merotasi seluruh kotak tooltip
-        }}
-        style={{
-          // Gaya untuk teks label di dalam tooltip
-          fontSize: 12,
-          fill: chartColors.text, // Mengatur warna teks label
-          // Rotasi untuk teks label saja (di dalam kotak tooltip)
-          // angle: -45, // Rotasi teks label
-        }}
-        // Untuk rotasi pada teks label saja, VictoryTooltip tidak memiliki prop 'angle'
-        // secara langsung pada style teks. Jika sangat diperlukan, Anda mungkin perlu
-        // membuat komponen label kustom yang lebih kompleks atau menggunakan VictoryLabel
-        // sebagai labelComponent untuk VictoryTooltip.
-        // Namun, rotasi tooltip secara keseluruhan (melalui flyoutStyle) lebih umum.
-
-        // Agar tooltip tampil ketika data dihover/sentuh
-        activateData={true}
-        // Pastikan tooltip muncul di atas elemen lain
-        renderInPortal={true}
-      />
-    );
-  };
   
   return (
     <ThemedView
