@@ -41,6 +41,9 @@ export default function SecurityScreen() {
     } else {
       setErrorMessage(result.message);
       setSuccessMessage("");
+      setCurrentPassword("");
+      setNewPassword("");
+      setConfirmPassword("");
     }
 
     setVisible(true);
