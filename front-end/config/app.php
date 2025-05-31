@@ -123,5 +123,5 @@ return [
         'store' => env('APP_MAINTENANCE_STORE', 'database'),
     ],
 
-    'back_end_base_url' => env('APP_BACK_END_BASE_URL','http://ifynth.raihan-firm.com'),
+    'back_end_base_url' => env('APP_BACK_END_BASE_URL','https://ifynth.raihan-firm.com'),
 ];
