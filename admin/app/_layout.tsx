@@ -49,6 +49,7 @@ export default function RootLayout() {
         <Stack.Screen name="detail_product" options={{ headerShown: false }} />
         <Stack.Screen name="edit_product" options={{ headerShown: false }} />
         <Stack.Screen name="message" options={{ headerShown: false }} />
+        <Stack.Screen name="index" options={{ headerShown: false }} />
       </Stack>
       <StatusBar style="auto" />
     </ThemeProvider>
