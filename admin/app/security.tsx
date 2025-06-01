@@ -1,20 +1,16 @@
 import React, { useState } from "react";
-import {
-  Alert,
-  StyleSheet,
-  TouchableOpacity,
-  Text,
-} from "react-native";
+import { Alert, StyleSheet, TouchableOpacity, Text } from "react-native";
 import { ThemedView } from "@/components/ThemedView";
 import { ThemedText } from "@/components/ThemedText";
 import { changePassword } from "@/src/api/admin";
 import { ThemedTextInput } from "@/components/ThemedTextInput";
 import ModalComponent from "@/components/ModalComponent";
-
-// Impor FontAwesome
-import { FontAwesome } from '@expo/vector-icons';
+import { IconButton } from "react-native-paper";
+import { useRouter } from "expo-router";
+import { FontAwesome } from "@expo/vector-icons";
 
 export default function SecurityScreen() {
+  const router = useRouter();
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -59,6 +55,16 @@ export default function SecurityScreen() {
 
   return (
     <ThemedView style={styles.container}>
+      <IconButton
+        icon={({ color, size }) => (
+          <FontAwesome name="arrow-left" size={size} color={color} />
+        )}
+        size={30}
+        onPress={() => router.replace("/setting")}
+        style={{
+          top: 20,
+        }}
+      />
       <ThemedText style={styles.title}>Security Settings</ThemedText>
 
       <ThemedText style={styles.label}>Current Password</ThemedText>
@@ -88,12 +94,22 @@ export default function SecurityScreen() {
       <TouchableOpacity
         style={[
           styles.btn,
-          { flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }
+          {
+            flexDirection: "row",
+            alignItems: "center",
+            justifyContent: "center",
+          },
         ]}
         onPress={handleChangePassword}
       >
         {/* Mengubah MaterialCommunityIcons menjadi FontAwesome */}
-        <FontAwesome name="lock" size={20} color="white" style={{ marginRight: 8 }} /> {/* Menggunakan "lock" atau "key" */}
+        <FontAwesome
+          name="lock"
+          size={20}
+          color="white"
+          style={{ marginRight: 8 }}
+        />{" "}
+        {/* Menggunakan "lock" atau "key" */}
         <Text style={styles.btnText}>Change Password</Text>
       </TouchableOpacity>
       <ModalComponent

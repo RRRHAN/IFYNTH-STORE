@@ -9,7 +9,7 @@ import { useColorScheme } from "@/hooks/useColorScheme";
 import { MyLightTheme, MyDarkTheme } from "@/constants/Theme";
 import { checkLoginStatus } from "@/src/api/admin";
 import * as Font from "expo-font";
-import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { FontAwesome } from "@expo/vector-icons";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -18,14 +18,14 @@ export default function RootLayout() {
   const colorScheme = useColorScheme();
   const [loaded] = useFonts({
     SpaceMono: require("../assets/fonts/SpaceMono-Regular.ttf"),
-    ...MaterialCommunityIcons.font,
+    FontAwesome: require("@/assets/fonts/FontAwesome.ttf"),
   });
 
   useEffect(() => {
     const initApp = async () => {
       await Font.loadAsync({
         SpaceMono: require("../assets/fonts/SpaceMono-Regular.ttf"),
-        ...MaterialCommunityIcons.font,
+        FontAwesome: require("@/assets/fonts/FontAwesome.ttf"),
       });
 
       if (loaded) {
@@ -50,6 +50,9 @@ export default function RootLayout() {
         <Stack.Screen name="edit_product" options={{ headerShown: false }} />
         <Stack.Screen name="message" options={{ headerShown: false }} />
         <Stack.Screen name="index" options={{ headerShown: false }} />
+        <Stack.Screen name="personal" options={{ headerShown: false }} />
+        <Stack.Screen name="register" options={{ headerShown: false }} />
+        <Stack.Screen name="security" options={{ headerShown: false }} />
       </Stack>
       <StatusBar style="auto" />
     </ThemeProvider>

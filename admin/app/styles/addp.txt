@@ -1,23 +1,40 @@
 import React, { useState, useEffect } from "react";
-import { View, Alert, ScrollView, Image } from "react-native";
+import {
+  View,
+  Alert,
+  ScrollView,
+  Image,
+  TouchableOpacity,
+  StyleSheet, // Tetap import StyleSheet jika Anda punya gaya kustom di sini
+} from "react-native";
 import ModalComponent from "../components/ModalComponent";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { pickImage } from "@/hooks/helpers/pickImage2";
-import { handleStockChange } from "@/hooks/helpers/handleStockChange";
-import styles from "./styles/addProductStyles";
+// import { handleStockChange } from "@/hooks/helpers/handleStockChange"; // Tidak perlu lagi diimpor di sini
+import styles from "./styles/addProductStyles"; // Pastikan path ini benar
 import { addProduct } from "@/src/api/products";
 import { ThemedText } from "@/components/ThemedText";
 import { IconButton } from "react-native-paper";
 import { useRouter } from "expo-router";
-import SizeInputItem from "@/components/products/SizeInputItem";
+// import SizeInputItem from "@/components/products/SizeInputItem"; // Tidak perlu diimpor langsung
 import ProductFormInputs from "@/components/products/ProductFormInput";
 import ProductPickers from "@/components/products/ProductPickers";
 import ActionButtons from "@/components/products/ActionButtons";
 import SelectedImagesList from "@/components/products/SelectedImagesList";
 import { useProductForm } from "@/hooks/helpers/useAddProductForm";
+// import { ThemedTextInput } from "@/components/ThemedTextInput"; // Tidak perlu diimpor langsung
+// import { Picker } from "@react-native-picker/picker"; // Tidak perlu diimpor langsung
+import { ThemedView } from "@/components/ThemedView";
+
+// Impor komponen baru
+import ProductSizeManagement from "@/components/products/ProductSizeManagement";
+import { handleStockChange } from "@/hooks/helpers/handleStockChange"; // Pastikan ini diimpor untuk diteruskan
 
 // Impor FontAwesome
-import { FontAwesome } from '@expo/vector-icons';
+import { FontAwesome } from "@expo/vector-icons";
+
+// Hapus type SizeOption dari sini karena sudah ada di ProductSizeManagement
+// type SizeOption = "" | "tshirt" | "pants";
 
 export default function AddProductScreen() {
   const router = useRouter();
@@ -47,10 +64,22 @@ export default function AddProductScreen() {
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
 
+  // newSizeName dan selectedSizeOption akan dikelola di ProductSizeManagement
+  // const [newSizeName, setNewSizeName] = useState("");
+  // const [selectedSizeOption, setSelectedSizeOption] = useState<SizeOption>("");
+
   const handleRemoveImage = (index: number) => {
     const updatedImages = images.filter((_, i) => i !== index);
     setImages(updatedImages);
   };
+
+  // Fungsi-fungsi penambahan/penghapusan ukuran akan berada di ProductSizeManagement
+  // const handleAddSize = () => { ... };
+  // const handleRemoveSize = (indexToRemove: number) => { ... };
+
+  // Efek samping untuk mengatur ukuran berdasarkan pilihan dropdown
+  // Ini juga akan dipindahkan ke ProductSizeManagement
+  // useEffect(() => { ... }, [selectedSizeOption]);
 
   const handleAddProduct = async () => {
     if (!name || !price || !description) {
@@ -58,7 +87,7 @@ export default function AddProductScreen() {
       return;
     }
 
-    const stockDetails = sizes;
+    const stockDetails = sizes.filter((size) => size.stock > 0); // Hanya kirim ukuran dengan stok > 0
 
     if (stockDetails.length === 0) {
       Alert.alert(
@@ -76,7 +105,7 @@ export default function AddProductScreen() {
       weight,
       department,
       category,
-      sizes: stockDetails,
+      sizes: stockDetails, // Kirim hanya yang ada stoknya
       images,
     };
 
@@ -85,6 +114,7 @@ export default function AddProductScreen() {
       if (result.errors === null) {
         setSuccessMessage("Product added successfully.");
         setVisible(true);
+        // Reset form setelah sukses
         setName("");
         setDescription("");
         setPrice("");
@@ -92,32 +122,9 @@ export default function AddProductScreen() {
         setWeight("");
         setDepartment("");
         setCategory("");
-        if (
-          category === "T-Shirt" ||
-          category === "Hoodie" ||
-          category === "Jacket"
-        ) {
-          setSizes([
-            { size: "S", stock: 0 },
-            { size: "M", stock: 0 },
-            { size: "L", stock: 0 },
-            { size: "XL", stock: 0 },
-          ]);
-        } else if (category === "Pants") {
-          setSizes([
-            { size: "27", stock: 0 },
-            { size: "28", stock: 0 },
-            { size: "29", stock: 0 },
-            { size: "30", stock: 0 },
-            { size: "31", stock: 0 },
-            { size: "32", stock: 0 },
-            { size: "33", stock: 0 },
-            { size: "34", stock: 0 },
-          ]);
-        } else {
-          setSizes([]);
-        }
+        setSizes([]); // Reset ukuran ke array kosong untuk manual input
         setImages([]);
+        // setSelectedSizeOption(""); // Ini akan ditangani oleh ProductSizeManagement
       } else {
         setErrorMessage(result.errors[0]);
         setVisible(true);
@@ -128,6 +135,7 @@ export default function AddProductScreen() {
       console.error("Error adding product:", error);
     }
   };
+
   return (
     <ScrollView
       style={[styles.container, { backgroundColor: isDark ? "#000" : "#fff" }]}
@@ -175,18 +183,15 @@ export default function AddProductScreen() {
         isEditing={false}
       />
 
-      <View style={styles.sizeContainer}>
-        {Array.isArray(sizes) && sizes.map((size, index) => (
-          <SizeInputItem
-            key={index}
-            size={size.size}
-            stock={size.stock}
-            onStockChange={(value) =>
-              handleStockChange(index, value, sizes, setSizes)
-            }
-          />
-        ))}
-      </View>
+      {/* Menggunakan komponen baru untuk pengelolaan ukuran */}
+      <ProductSizeManagement
+        sizes={sizes}
+        setSizes={setSizes}
+        isDark={isDark}
+        handleStockChange={handleStockChange}
+        inputStyle={styles.input}
+        titleStyle={styles.title}
+      />
 
       <SelectedImagesList
         images={images}
@@ -196,7 +201,8 @@ export default function AddProductScreen() {
 
       <ActionButtons
         pickImage={() => {
-          pickImage(setImages, setErrorMessage, setVisible)}}
+          pickImage(setImages, setErrorMessage, setVisible);
+        }}
         handleAddProduct={handleAddProduct}
         styles={styles}
       />

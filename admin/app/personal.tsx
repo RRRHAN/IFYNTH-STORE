@@ -3,9 +3,12 @@ import { View, Text, Alert, StyleSheet, TouchableOpacity } from "react-native";
 import { ThemedView } from "@/components/ThemedView";
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedTextInput } from "@/components/ThemedTextInput";
-import { FontAwesome } from '@expo/vector-icons';
+import { FontAwesome } from "@expo/vector-icons";
+import { useRouter } from "expo-router";
+import { IconButton } from "react-native-paper";
 
 export default function PersonalScreen() {
+  const router = useRouter();
   const [username, setUsername] = useState("");
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
@@ -21,6 +24,16 @@ export default function PersonalScreen() {
 
   return (
     <ThemedView style={styles.container}>
+      <IconButton
+        icon={({ color, size }) => (
+          <FontAwesome name="arrow-left" size={size} color={color} />
+        )}
+        size={30}
+        onPress={() => router.replace("/setting")}
+        style={{
+          top: 20,
+        }}
+      />
       <ThemedText style={styles.title}>Informasi Personal</ThemedText>
 
       <ThemedText style={styles.label}>Nama Pengguna</ThemedText>
@@ -58,12 +71,21 @@ export default function PersonalScreen() {
       <TouchableOpacity
         style={[
           styles.btn,
-          { flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }
+          {
+            flexDirection: "row",
+            alignItems: "center",
+            justifyContent: "center",
+          },
         ]}
         onPress={handleSave}
       >
         {/* Mengubah MaterialCommunityIcons menjadi FontAwesome */}
-        <FontAwesome name="save" size={20} color="white" style={{ marginRight: 8 }} />
+        <FontAwesome
+          name="save"
+          size={20}
+          color="white"
+          style={{ marginRight: 8 }}
+        />
         <Text style={styles.btnText}>Save</Text>
       </TouchableOpacity>
     </ThemedView>
@@ -95,13 +117,13 @@ const styles = StyleSheet.create({
   },
   btn: {
     marginTop: 20,
-    backgroundColor: '#005BBB',
+    backgroundColor: "#005BBB",
     paddingVertical: 12,
     borderRadius: 8,
   },
   btnText: {
-    color: 'white',
-    fontWeight: '600',
+    color: "white",
+    fontWeight: "600",
     fontSize: 16,
   },
 });

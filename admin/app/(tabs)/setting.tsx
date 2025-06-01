@@ -12,7 +12,7 @@ import { ThemedText } from "@/components/ThemedText";
 import { logoutAdmin } from "@/src/api/admin";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useEffect, useState } from "react";
-import { FontAwesome } from '@expo/vector-icons'; // Mengubah import menjadi FontAwesome
+import { FontAwesome } from '@expo/vector-icons';
 
 function NavButton({
   title,

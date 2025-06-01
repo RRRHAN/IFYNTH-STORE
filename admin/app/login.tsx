@@ -137,7 +137,7 @@ export default function Login() {
                     name={rememberMe ? "check-square" : "square-o"}
                     size={24}
                     color="#2563eb"
-                    style={styles.checkboxIcon} // Tambahkan gaya untuk ikon
+                    style={styles.checkboxIcon}
                   />
                   <ThemedText
                     style={[

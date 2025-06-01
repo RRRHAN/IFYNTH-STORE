@@ -12,13 +12,16 @@ import { ThemedView } from "@/components/ThemedView";
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedTextInput } from "@/components/ThemedTextInput";
 import ModalComponent from "@/components/ModalComponent";
+import { IconButton } from "react-native-paper";
+import { useRouter } from "expo-router";
 import { register } from "@/src/api/admin";
 import { PaperProvider } from "react-native-paper";
 
 // Import FontAwesome
-import { FontAwesome } from '@expo/vector-icons';
+import { FontAwesome } from "@expo/vector-icons";
 
 export default function RegisterScreen() {
+  const router = useRouter();
   const [username, setUsername] = useState("");
   const [fullName, setFullName] = useState("");
   const [password, setPassword] = useState("");
@@ -71,7 +74,9 @@ export default function RegisterScreen() {
       setSuccessMessage(result.message);
       setErrorMessage("");
     } else {
-      setErrorMessage(result.message || "Registration failed due to an unknown error.");
+      setErrorMessage(
+        result.message || "Registration failed due to an unknown error."
+      );
       setSuccessMessage("");
     }
 
@@ -91,8 +96,20 @@ export default function RegisterScreen() {
         keyboardVerticalOffset={Platform.OS === "ios" ? 80 : 0}
       >
         <TouchableWithoutFeedback>
-          <ScrollView contentContainerStyle={{ flexGrow: 1, justifyContent: 'center' }}>
+          <ScrollView
+            contentContainerStyle={{ flexGrow: 1, justifyContent: "center" }}
+          >
             <ThemedView style={styles.container}>
+              <IconButton
+                icon={({ color, size }) => (
+                  <FontAwesome name="arrow-left" size={size} color={color} />
+                )}
+                size={30}
+                onPress={() => router.replace("/setting")}
+                style={{
+                  top: 20,
+                }}
+              />
               <ThemedText style={styles.title}>Create Account</ThemedText>
 
               <ThemedText style={styles.label}>Username</ThemedText>
@@ -136,11 +153,20 @@ export default function RegisterScreen() {
               <TouchableOpacity
                 style={[
                   styles.btn,
-                  { flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }
+                  {
+                    flexDirection: "row",
+                    alignItems: "center",
+                    justifyContent: "center",
+                  },
                 ]}
                 onPress={handleRegister}
               >
-                <FontAwesome name="user-plus" size={20} color="white" style={{ marginRight: 10 }} />
+                <FontAwesome
+                  name="user-plus"
+                  size={20}
+                  color="white"
+                  style={{ marginRight: 10 }}
+                />
                 <Text style={styles.btnText}>Create Account</Text>
               </TouchableOpacity>
               <ModalComponent
