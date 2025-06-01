@@ -14,45 +14,83 @@ class ProductController extends Controller
     {
         $department = $request->query('department');
         $page = $request->query('page', 1);
-        $perPage = 12; // Tentukan jumlah item per halaman
+        $perPage = 8;
+
         $token = session('api_token');
 
+        if (!$token) {
+            return redirect()->route('login')->with('error', 'Authentication required. Please log in.');
+        }
+
         try {
-            // Ambil data produk dari API
+            // Attempt to fetch paginated data directly from the API
             $response = Http::withHeaders([
-                'Authorization' => 'Bearer ' . $token
+                'Authorization' => 'Bearer ' . $token,
             ])->get(config('app.back_end_base_url') . '/api/product', [
-                        'department' => $department
+                        'department' => $department,
+                        'page' => $page,    // Pass current page to the API
+                        'limit' => $perPage, // Pass per page limit to the API
                     ]);
 
-            if (in_array('Unauthorized!', $response->json('errors') ?? [])) {
+            // Handle Unauthorized response
+            if ($response->status() === 401 || in_array('Unauthorized!', $response->json('errors') ?? [])) {
+                session()->forget('api_token'); // Clear expired token
                 return redirect()->route('login')->with('error', 'Session expired. Please log in again.');
             }
 
             if ($response->successful() && $response->json('errors') === null) {
-                $allProducts = collect($response->json('data')); // Koleksi produk dari response
+                $apiData = $response->json();
 
-                // Hitung produk untuk pagination
-                $total = $allProducts->count();
-                $products = $allProducts->slice(($page - 1) * $perPage, $perPage)->values(); // Ambil produk sesuai halaman
+                // Check if API response contains direct pagination data
+                if (
+                    isset($apiData['data']) && is_array($apiData['data']) &&
+                    isset($apiData['total']) && isset($apiData['per_page']) && isset($apiData['current_page'])
+                ) {
 
-                // Hitung total halaman
-                $totalPages = ceil($total / $perPage);
+                    // *** Scenario 1: API handles pagination directly ***
+                    $products = collect($apiData['data']);
+                    $totalProducts = $apiData['total'];
+                    $perPageFromApi = $apiData['per_page'];
+                    $currentPageFromApi = $apiData['current_page'];
+                    $totalPagesFromApi = ceil($totalProducts / $perPageFromApi); // Use API's per_page for total_pages
 
-                // Buat objek pagination
-                $pagination = [
-                    'total_pages' => $totalPages,
-                    'current_page' => $page,
-                    'perPage' => $perPage,
-                    'total' => $total,
-                ];
+                    $pagination = [
+                        'total_pages' => $totalPagesFromApi,
+                        'current_page' => (int) $currentPageFromApi,
+                        'perPage' => (int) $perPageFromApi,
+                        'total' => $totalProducts,
+                    ];
 
-                return view('catalog', ['products' => $products, 'pagination' => $pagination]);
+                } else {
+                    // *** Scenario 2: API returns ALL data for the department, requiring manual pagination ***
+                    // This is the fallback if your API doesn't support pagination parameters
+                    $allProducts = collect($apiData['data'] ?? []); // Ensure it's a collection
+
+                    $totalProducts = $allProducts->count();
+                    // Manually slice the collection based on the page and perPage
+                    $products = $allProducts->slice(($page - 1) * $perPage, $perPage)->values();
+
+                    $totalPages = ceil($totalProducts / $perPage);
+
+                    $pagination = [
+                        'total_pages' => $totalPages,
+                        'current_page' => (int) $page,
+                        'perPage' => $perPage,
+                        'total' => $totalProducts,
+                    ];
+                }
+
+                return view('catalog', compact('products', 'pagination'));
+
             } else {
-                return redirect()->back()->with('error', 'Failed to fetch products.');
+                // Handle API error messages
+                $errorMessage = $response->json('message') ?? $response->json('errors')[0] ?? 'Failed to fetch products from API.';
+                return redirect()->back()->with('error', $errorMessage);
             }
         } catch (\Exception $e) {
-            return redirect()->back()->with('error', 'An error occurred while fetching products.');
+            // Catch network errors or other unexpected exceptions
+            \Log::error('Error fetching products by department: ' . $e->getMessage(), ['exception' => $e]);
+            return redirect()->back()->with('error', 'An unexpected error occurred while fetching products.');
         }
     }
 
@@ -62,7 +100,7 @@ class ProductController extends Controller
         $department = $request->query('department');
         $category = $request->query('category');
         $page = $request->query('page', 1);
-        $perPage = 12;
+        $perPage = 8;
         $token = session('api_token');
 
         try {

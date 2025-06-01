@@ -13,7 +13,7 @@ class HomeController extends Controller
         $department = $request->query('department');
         $category = $request->query('category');
         $page = $request->query('page', 1);
-        $perPage = 12;
+        $perPage = 4;
         $token = session('api_token');
 
         try {

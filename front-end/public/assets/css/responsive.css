@@ -303,6 +303,125 @@
         font-size: 14px;
     }
 }
+/* Styles for smaller screens (<= 1199px) */
+@media (min-width: 501px) and (max-width: 1199px) {
+    .top__header .top__wrapper .search__wrp {
+        /* This container needs to be a flex parent to align button */
+        display: flex;
+        align-items: center;
+        justify-content: flex-end; /* Align button to the right */
+        position: relative; /* Essential for absolute positioning of the input */
+        margin-right: 10px;
+        /* Width should be auto or specific, min-width for button */
+        width: auto;
+        min-width: 40px; /* Ensures button always has space */
+    }
+
+    .top__header .top__wrapper .search__wrp input {
+        display: none;
+        position: absolute;
+        right: 45px;
+        top: 0;
+        height: 100%;
+        transition: opacity 0.3s ease-out, transform 0.3s ease-out;
+        opacity: 0;
+        transform: translateX(
+            10px
+        );
+        box-sizing: border-box;
+        background: var(--primary-color);
+        border: 1px solid var(--primary-color);
+        border-radius: 20px;
+        padding: 8px 15px;
+    }
+    .top__header .top__wrapper .search__wrp input::placeholder {
+        color: #a6a6a6;
+    }
+
+    .top__header .top__wrapper .search__wrp.search-active input {
+        display: block; /* Make it visible */
+        opacity: 1;
+        transform: translateX(0);
+        width: 200px;
+    }
+
+    .top__header .top__wrapper .search__wrp button {
+        position: initial;
+        background: var(--primary-color);
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        z-index: 2;
+    }
+
+    .top__header .top__wrapper .search__wrp button i {
+        color: var(--white);
+        font-size: 14px;
+    }
+}
+@media (max-width: 500px) {
+    .top__header .top__wrapper .search__wrp {
+        /* This container needs to be a flex parent to align button */
+        display: flex;
+        align-items: center;
+        justify-content: flex-end; /* Align button to the right */
+        position: relative; /* Essential for absolute positioning of the input */
+        margin-right: 10px;
+        /* Width should be auto or specific, min-width for button */
+        width: auto;
+        min-width: 40px; /* Ensures button always has space */
+    }
+
+    .top__header .top__wrapper .search__wrp input {
+        display: none;
+        position: absolute;
+        left: 45px;
+        top: 0;
+        height: 100%;
+        transition: opacity 0.3s ease-out, transform 0.3s ease-out;
+        opacity: 0;
+        transform: translateX(
+            10px
+        );
+        box-sizing: border-box;
+        background: var(--primary-color);
+        border: 1px solid var(--primary-color);
+        border-radius: 20px;
+        padding: 8px 15px;
+    }
+    .top__header .top__wrapper .search__wrp input::placeholder {
+        color: #a6a6a6;
+    }
+
+    .top__header .top__wrapper .search__wrp.search-active input {
+        display: block; /* Make it visible */
+        opacity: 1;
+        transform: translateX(0);
+        width: 200px;
+    }
+
+    .top__header .top__wrapper .search__wrp button {
+        position: initial;
+        background: var(--primary-color);
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        z-index: 2;
+    }
+
+    .top__header .top__wrapper .search__wrp button i {
+        color: var(--white);
+        font-size: 14px;
+    }
+}
 @media (max-width: 991px) {
     .top__header .top__wrapper .account__wrap {
         gap: 15px;
@@ -324,7 +443,7 @@
     }
 }
 @media (max-width: 991px) {
-    .top__header .top__wrapper .account__wrap .account .acc__cont span {
+    .top__header .top__wrapper .account__wrap .account .acc__cont {
         display: none;
     }
 }
@@ -385,7 +504,7 @@
 }
 @media (max-width: 1199px) {
     .header-section {
-        top: 0px;
+        top: 100px;
     }
 }
 @media (max-width: 1199px) {
@@ -649,46 +768,6 @@
         display: none;
     }
 }
-@media screen and (max-width: 768px) {
-    .shopping-cart {
-        display: none;
-    }
-    .shopping-cart.mobile-view {
-        display: block;
-    }
-    .shopping-cart.mobile-view .product-details {
-        width: 100%;
-        text-align: center;
-    }
-    .shopping-cart.mobile-view .product-price {
-        width: 100%;
-        text-align: center;
-        padding: 5px 0px;
-    }
-    .shopping-cart.mobile-view .product-quantity {
-        width: 100%;
-        text-align: center;
-        padding: 5px 0px;
-    }
-    .shopping-cart.mobile-view .product-removal {
-        width: 100%;
-        text-align: center;
-        padding: 5px 0px;
-    }
-    .shopping-cart.mobile-view .product-line-price {
-        width: 100%;
-        text-align: center;
-        padding: 5px 0px;
-    }
-}
-@media screen and (min-width: 768px) {
-    .shopping-cart {
-        display: block;
-    }
-    .shopping-cart.mobile-view {
-        display: none;
-    }
-}
 @media screen and (max-width: 575px) {
     .shop-single .cart-wrp .discount {
         margin-top: 10px;
@@ -719,5 +798,22 @@
 @media (max-width: 575px) {
     .banner__content .btn-one {
         top: -15px;
+    }
+}
+
+@media (max-width: 985px) {
+    .cart-icon-wrapper {
+        width: 40px;
+        height: 40px;
+    }
+    .cart-icon-wrapper i {
+        font-size: 15px;
+    }
+    .message-icon-wrapper {
+        width: 40px;
+        height: 40px;
+    }
+    .message-icon-wrapper i {
+        font-size: 15px;
     }
 }
