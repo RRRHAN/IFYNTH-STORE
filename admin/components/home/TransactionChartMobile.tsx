@@ -19,15 +19,9 @@ const maxWidth =
   Platform.OS === "web"
     ? {
         width:
-          screenWidth > 1500
-            ? 820
-            : screenWidth > 1000
-            ? 800
-            : screenWidth > 700
-            ? 900
-            : screenWidth > 400
-            ? 380
-            : 360,
+          screenWidth > 1000
+            ? screenWidth / 2.3
+            : screenWidth / 1.1
       }
     : { width: 380 };
 

@@ -69,13 +69,7 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     overflow: "hidden",
     width:
-      width < 600
-        ? width - 20
-        : width < 1000
-        ? width - 40
-        : width < 1500
-        ? width - 850
-        : width - 1100,
+    width > 1000 ? width / 3 : width / 1.1,
   },
   tableTitle: {
     fontSize: 18,

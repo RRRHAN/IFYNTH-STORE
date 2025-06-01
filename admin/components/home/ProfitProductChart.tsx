@@ -24,15 +24,9 @@ const maxWidth =
   Platform.OS === "web"
     ? {
         width:
-          screenWidth > 1500
-            ? 820
-            : screenWidth > 1000
-            ? 800
-            : screenWidth > 700
-            ? 900
-            : screenWidth > 400
-            ? 380
-            : 360,
+          screenWidth > 1000
+            ? screenWidth / 2.3
+            : screenWidth / 1.1
       }
     : { width: 380 };
 
@@ -114,13 +108,10 @@ const ProfitProductChart: React.FC<ProfitChartProps> = ({
 
   const isCentered = productNames.length <= 5;
 
-  // --- START: Perubahan untuk Auto-Scroll ke Tengah ---
   const scrollViewRef = useRef<ScrollView>(null);
-  const containerWidthRef = useRef(0); // Untuk menyimpan lebar kontainer ScrollView
+  const containerWidthRef = useRef(0);
 
   useEffect(() => {
-    // Jalankan efek ini setiap kali `isCentered` atau `chartWidth` berubah
-    // atau ketika komponen di-mount.
     if (
       isCentered &&
       scrollViewRef.current &&

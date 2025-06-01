@@ -52,18 +52,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderRadius: 15,
     overflow: "hidden",
-    width:
-          width < 450
-        ? width - 250
-        : width < 500
-        ? width - 300
-        : width < 768
-        ? width - 400
-        : width < 1000
-        ? width - 550
-        : width < 1500
-        ? width - 900
-        : width - 1500,
+    width: width > 1000 ? width / 4.5 : width / 2.35,
     marginBottom: 20,
   },
   row: {
@@ -79,10 +68,9 @@ const styles = StyleSheet.create({
   headerText: {
     fontWeight: "bold",
   },
-  // New style for no data text
   noDataText: {
-    color: '#888', // A subtle color for the message
-    fontStyle: 'italic', // Optional: make it italic
+    color: '#888',
+    fontStyle: 'italic',
   },
 });
 
