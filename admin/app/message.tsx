@@ -43,7 +43,7 @@ export default function ChatScreen() {
       await addMessage({
         ProductID: selectedItem?.ID.toString() || "",
         Message: text,
-        Role: "ADMIN", // Pastikan Role ini benar untuk pengirim (ADMIN)
+        Role: "ADMIN",
       });
 
       // Clear input field

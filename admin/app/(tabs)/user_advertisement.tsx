@@ -29,7 +29,7 @@ import { generateVideoThumbnailJS } from "@/hooks/helpers/ThumbnailProcessor";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import * as VideoThumbnails from "expo-video-thumbnails";
 import StatusOfferIOS from "@/components/StatusOfferIOS";
-import { FontAwesome } from "@expo/vector-icons"; // Mengubah import menjadi FontAwesome
+import { FontAwesome } from "@expo/vector-icons";
 
 const UserAdvertisementScreen = () => {
   const colorScheme = useColorScheme();
