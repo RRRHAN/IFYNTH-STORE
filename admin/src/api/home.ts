@@ -111,7 +111,7 @@ export const fetchTotalTransactionUser = async (): Promise<TotalTransactionUser[
 
 export const fetchProductProfit = async (): Promise<ProfitProduct[]> => {
   const token = await getAuthToken();
-  const getAllUrl = `http://localhost:7777/api/product/productProfit`;
+  const getAllUrl = `${BASE_URL}/api/product/productProfit`;
 
   const response = await fetch(getAllUrl, {
     headers: {
