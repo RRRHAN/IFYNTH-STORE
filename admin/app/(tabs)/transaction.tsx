@@ -26,7 +26,7 @@ import TransactionDetailModal from "@/components/TransactionDetailModal";
 import { Picker } from "@react-native-picker/picker";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import StatusTransactionIOS from "@/components/StatusTransactionIOS";
-import { FontAwesome } from '@expo/vector-icons'; // Mengubah import menjadi FontAwesome
+import { FontAwesome } from "@expo/vector-icons"; // Mengubah import menjadi FontAwesome
 
 const TransactionsScreen = () => {
   const colorScheme = useColorScheme();
@@ -140,7 +140,8 @@ const TransactionsScreen = () => {
                 }}
                 enabled={
                   (selectedStatus[item.ID] || item.Status) !== "delivered" &&
-                  (selectedStatus[item.ID] || item.Status) !== "cancelled"
+                  (selectedStatus[item.ID] || item.Status) !== "cancelled" &&
+                  (selectedStatus[item.ID] || item.Status) !== "draft"
                 }
                 style={{
                   height: 50,
@@ -162,6 +163,9 @@ const TransactionsScreen = () => {
                   borderRadius: 10,
                 }}
               >
+                {item.Status === "draft" && (
+                  <Picker.Item label="Draft" value="draft" />
+                )}
                 {item.Status === "pending" && (
                   <>
                     <Picker.Item label="Pending" value="pending" />
@@ -171,9 +175,13 @@ const TransactionsScreen = () => {
                 {item.Status === "paid" && (
                   <Picker.Item label="Paid" value="paid" />
                 )}
-                <Picker.Item label="Proccess" value="proccess" />
-                <Picker.Item label="Delivered" value="delivered" />
-                <Picker.Item label="Cancelled" value="cancelled" />
+                {item.Status !== "draft" && (
+                  <>
+                    <Picker.Item label="Proccess" value="proccess" />
+                    <Picker.Item label="Delivered" value="delivered" />
+                    <Picker.Item label="Cancelled" value="cancelled" />
+                  </>
+                )}
               </Picker>
             </ThemedCell>
           )}

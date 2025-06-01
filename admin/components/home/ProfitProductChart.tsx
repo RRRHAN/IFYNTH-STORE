@@ -32,7 +32,7 @@ const maxWidth =
             ? 900
             : screenWidth > 400
             ? 380
-            : 300,
+            : 360,
       }
     : { width: 380 };
 

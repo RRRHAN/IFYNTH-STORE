@@ -28,7 +28,7 @@ export const fetchTransactions = async (): Promise<Transaction[]> => {
   }
 };
 
-export type TransactionStatus = "pending" | "paid" | "proccess" | "delivered" | "cancelled";
+export type TransactionStatus = "pending" | "paid" | "proccess" | "delivered" | "cancelled" | "draft";
 
 export const handleStatusChange = async (
   newStatus: TransactionStatus,

@@ -118,12 +118,12 @@ export default function SettingScreen() {
           icon="user-plus"
         />
       )}
-
-      <NavButton
+      {/* 
+    <NavButton
         title="Personal"
         onPress={() => router.push("/personal")}
         icon="user"
-      />
+      /> */}
       <NavButton
         title="Security"
         onPress={() => router.push("/security")}

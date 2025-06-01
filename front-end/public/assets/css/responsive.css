@@ -385,7 +385,7 @@
 }
 @media (max-width: 1199px) {
     .header-section {
-        top: 100px;
+        top: 0px;
     }
 }
 @media (max-width: 1199px) {
