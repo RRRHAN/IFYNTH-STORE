@@ -134,10 +134,10 @@ export default function Login() {
                   onPress={() => setRememberMe(!rememberMe)}
                 >
                   <FontAwesome
-                    name={rememberMe ? "check-square" : "minus-square"}
+                    name={rememberMe ? "check-square" : "square-o"}
                     size={24}
                     color="#2563eb"
-                    style={styles.checkboxIcon}
+                    style={styles.checkboxIcon} // Tambahkan gaya untuk ikon
                   />
                   <ThemedText
                     style={[
