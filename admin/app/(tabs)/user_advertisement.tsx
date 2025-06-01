@@ -29,7 +29,7 @@ import { generateVideoThumbnailJS } from "@/hooks/helpers/ThumbnailProcessor";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import * as VideoThumbnails from "expo-video-thumbnails";
 import StatusOfferIOS from "@/components/StatusOfferIOS";
-import { FontAwesome } from '@expo/vector-icons'; // Mengubah import menjadi FontAwesome
+import { FontAwesome } from "@expo/vector-icons"; // Mengubah import menjadi FontAwesome
 
 const UserAdvertisementScreen = () => {
   const colorScheme = useColorScheme();
@@ -268,7 +268,7 @@ const UserAdvertisementScreen = () => {
         <ThemedCell style={[{ width: columnWidths.action }]}>
           <IconButton
             icon={({ color, size }) => (
-              <FontAwesome name="eye" size={size} color={color} /> // Menggunakan FontAwesome
+              <FontAwesome name="eye" size={size} color={color} />
             )}
             size={20}
             iconColor="#00FFFF"
@@ -279,7 +279,7 @@ const UserAdvertisementScreen = () => {
           />
           <IconButton
             icon={({ color, size }) => (
-              <FontAwesome name="comment" size={size} color={color} /> // Menggunakan FontAwesome untuk "comment"
+              <FontAwesome name="comment" size={size} color={color} />
             )}
             size={20}
             iconColor="#4169E1"
@@ -291,6 +291,13 @@ const UserAdvertisementScreen = () => {
               });
             }}
           />
+          {item.UnreadCount > 0 && (
+            <View style={styles.badgeContainer}>
+              <ThemedText style={styles.badgeText}>
+                {item.UnreadCount}
+              </ThemedText>
+            </View>
+          )}
         </ThemedCell>
       </ThemedRow>
     );
@@ -316,7 +323,6 @@ const UserAdvertisementScreen = () => {
         >
           <TouchableOpacity
             onPress={() => {
-              console.log("Tombol close diklik");
               setIsProductModalVisible(false);
             }}
             style={{

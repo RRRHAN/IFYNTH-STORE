@@ -5,13 +5,11 @@ import { HapticTab } from "@/components/HapticTab";
 import TabBarBackground from "@/components/ui/TabBarBackground";
 import { Colors } from "@/constants/Colors";
 import { useColorScheme } from "@/hooks/useColorScheme";
-import { useRouter } from "expo-router";
 import * as Font from "expo-font";
 import { FontAwesome } from "@expo/vector-icons";
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
-  const router = useRouter();
   const { width } = Dimensions.get("window");
 
   const [fontsLoaded, setFontsLoaded] = useState(false);

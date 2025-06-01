@@ -67,12 +67,6 @@ func (s *service) GetAllProducts(ctx context.Context, keyword string) ([]Product
 		userIDs = append(userIDs, p.UserID)
 	}
 
-	// Ambil nama user dari tabel users
-	type userNameMap struct {
-		ID   uuid.UUID
-		Name string
-	}
-
 	var users []userNameMap
 	if err := s.db.WithContext(ctx).
 		Table("customer").
@@ -88,12 +82,29 @@ func (s *service) GetAllProducts(ctx context.Context, keyword string) ([]Product
 		userNameMapData[u.ID] = u.Name
 	}
 
+	var unreads []Unread
+	err := s.db.Model(&message.Message{}).
+		Select("product_id, COUNT(*) as total").
+		Where("is_read = ? ", false).
+		Where("role = ? ", constants.CUSTOMER).
+		Group("product_id").
+		Scan(&unreads).Error
+	if err != nil {
+		return nil, err
+	}
+
+	mapUnreadCount := make(map[uuid.UUID]int, 0)
+	for _, unread := range unreads {
+		mapUnreadCount[unread.ProductID] = unread.Total
+	}
+
 	// Gabungkan hasil
 	var result []ProductWithCustomer
 	for _, p := range products {
 		result = append(result, ProductWithCustomer{
 			CustomerProduct: p,
 			CustomerName:    userNameMapData[p.UserID],
+			UnreadCount:     mapUnreadCount[p.ID],
 		})
 	}
 
@@ -148,7 +159,7 @@ func (s *service) GetProductByMessage(ctx context.Context, keyword string) ([]Cu
 		return nil, err
 	}
 
-	var results []Result
+	var results []Unread
 	err := s.db.Model(&message.Message{}).
 		Select("product_id, COUNT(*) as total").
 		Where("is_read = ? ", false).

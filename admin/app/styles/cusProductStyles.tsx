@@ -65,6 +65,23 @@ const styles = StyleSheet.create({
     marginHorizontal: 15,
     fontSize: 16,
   },
+    badgeContainer: {
+    position: 'absolute',
+    right: 25,
+    top: 60,
+    backgroundColor: 'red',
+    borderRadius: 9,
+    width: 18,
+    height: 18,
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 1,
+  },
+  badgeText: {
+    color: 'white',
+    fontSize: 10,
+    fontWeight: 'bold',
+  },
 });
 
 export default styles;
