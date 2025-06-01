@@ -40,11 +40,11 @@ const ProductsScreen = () => {
         price: screenWidth * 0.15,
         stock: screenWidth * 0.1,
         category: screenWidth * 0.1,
-        department: screenWidth * 0.15,
+        department: screenWidth * 0.18,
         action: screenWidth * 0.12,
       }
     : {
-        image: screenWidth * 0.15,
+        image: screenWidth * 0.25,
         name: screenWidth * 0.15,
         price: screenWidth * 0.15,
         stock: screenWidth * 0.15,

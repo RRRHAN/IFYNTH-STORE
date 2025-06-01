@@ -17,7 +17,7 @@ import SelectedImagesList from "@/components/products/SelectedImagesList";
 import { useProductForm } from "@/hooks/helpers/useAddProductForm";
 
 // Impor FontAwesome
-import { FontAwesome } from '@expo/vector-icons';
+import { FontAwesome } from "@expo/vector-icons";
 
 export default function AddProductScreen() {
   const router = useRouter();
@@ -98,13 +98,14 @@ export default function AddProductScreen() {
           category === "Jacket"
         ) {
           setSizes([
+            { size: "All Size", stock: 0 },
             { size: "S", stock: 0 },
             { size: "M", stock: 0 },
             { size: "L", stock: 0 },
-            { size: "XL", stock: 0 },
           ]);
         } else if (category === "Pants") {
           setSizes([
+            { size: "All Size", stock: 0 },
             { size: "27", stock: 0 },
             { size: "28", stock: 0 },
             { size: "29", stock: 0 },
@@ -115,7 +116,9 @@ export default function AddProductScreen() {
             { size: "34", stock: 0 },
           ]);
         } else {
-          setSizes([]);
+          setSizes([
+            { size: "All Size", stock: 0 },
+          ]);
         }
         setImages([]);
       } else {
@@ -176,16 +179,17 @@ export default function AddProductScreen() {
       />
 
       <View style={styles.sizeContainer}>
-        {Array.isArray(sizes) && sizes.map((size, index) => (
-          <SizeInputItem
-            key={index}
-            size={size.size}
-            stock={size.stock}
-            onStockChange={(value) =>
-              handleStockChange(index, value, sizes, setSizes)
-            }
-          />
-        ))}
+        {Array.isArray(sizes) &&
+          sizes.map((size, index) => (
+            <SizeInputItem
+              key={index}
+              size={size.size}
+              stock={size.stock}
+              onStockChange={(value) =>
+                handleStockChange(index, value, sizes, setSizes)
+              }
+            />
+          ))}
       </View>
 
       <SelectedImagesList
@@ -196,7 +200,8 @@ export default function AddProductScreen() {
 
       <ActionButtons
         pickImage={() => {
-          pickImage(setImages, setErrorMessage, setVisible)}}
+          pickImage(setImages, setErrorMessage, setVisible);
+        }}
         handleAddProduct={handleAddProduct}
         styles={styles}
       />
