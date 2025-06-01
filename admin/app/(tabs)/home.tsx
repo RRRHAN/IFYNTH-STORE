@@ -23,7 +23,6 @@ import {
   TotalTransactionUser,
 } from "@/src/types/home";
 import styles from "../styles/HomeStyles";
-// Removed: TransactionReportTable (using MTransactionReportChart)
 import TotalCapitalTable from "@/components/home/TotalCapitalTable";
 import TotalIncomeTable from "@/components/home/TotalIncomeTable";
 import TotalTransactionUserTable from "@/components/home/TotalTransactionUserTable";
@@ -201,7 +200,7 @@ export default function HomeScreen() {
                     ]}
                   >
                     <TotalTransactionUserTable
-                      totalTransactionUser={dummyTotalTransactionUsers || []}
+                      totalTransactionUser={totalTransactionUser || []}
                     />
                   </View>
                 </View>
@@ -224,7 +223,7 @@ export default function HomeScreen() {
                     }}
                   >
                     <MTransactionReportChart
-                      transactionReport={dummyTransactionReports}
+                      transactionReport={transactionReport || [] }
                       height={380}
                     />
                   </View>
