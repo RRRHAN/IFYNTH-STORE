@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useRef } from "react"; // Import useEffect dan useRef
 import {
   ScrollView,
   Dimensions,
@@ -12,7 +12,6 @@ import {
   VictoryTheme,
   VictoryGroup,
   VictoryAxis,
-  VictoryTooltip,
 } from "victory-native";
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
@@ -51,37 +50,34 @@ const ProfitProductChart: React.FC<ProfitChartProps> = ({
 
   const hasValidData =
     products.length > 0 &&
-    products.some((p) => p.TotalCapital > 0 || p.TotalIncome > 0);
+    products.some((p) => p.TotalCapital > 0 || p.TotalRevenue > 0);
 
   const displayProducts = hasValidData
     ? products
-    : [{ ProductName: "Produk A", TotalCapital: 0, TotalIncome: 0 }];
+    : [{ Name: "Produk A", TotalCapital: 0, TotalRevenue: 0 }];
 
-  const productNames = displayProducts.map((p) => p.ProductName);
+  const productNames = displayProducts.map((p) => p.Name);
 
-  // Fungsi helper untuk memformat angka
   const formatCurrency = (num: number) => {
     if (num >= 1000000) {
-      // Lebih dari atau sama dengan 1 Juta
-      return `${(num / 1000000).toFixed(1).replace(/\.0$/, "")}M`; // Contoh: 1.2M, 5M
+      return `${(num / 1000000).toFixed(1).replace(/\.0$/, "")}M`;
     }
     if (num >= 1000) {
-      // Lebih dari atau sama dengan 1 Ribu
       return `${(num / 1000).toFixed(1).replace(/\.0$/, "")}k`;
     }
     return num.toLocaleString("id-ID");
   };
 
   const capitalData = displayProducts.map((p) => ({
-    x: p.ProductName,
+    x: p.Name,
     y: p.TotalCapital,
     label: `${formatCurrency(p.TotalCapital)}`,
   }));
 
   const incomeData = displayProducts.map((p) => ({
-    x: p.ProductName,
-    y: p.TotalIncome,
-    label: `${formatCurrency(p.TotalIncome)}`,
+    x: p.Name,
+    y: p.TotalRevenue,
+    label: `${formatCurrency(p.TotalRevenue)}`,
   }));
 
   const chartColors = {
@@ -90,7 +86,6 @@ const ProfitProductChart: React.FC<ProfitChartProps> = ({
     text: colorScheme === "dark" ? "#fff" : "#000",
   };
 
-  // --- Perhitungan untuk Label Sumbu Y Manual ---
   const allValues = [
     ...capitalData.map((d) => d.y),
     ...incomeData.map((d) => d.y),
@@ -109,9 +104,46 @@ const ProfitProductChart: React.FC<ProfitChartProps> = ({
 
   const tickLabelFontSize = 10;
 
-  // Lebar chart yang akan digulir
-  const chartScrollWidth = Math.max(screenWidth, productNames.length * 100);
-  
+  const minChartWidthPerProduct = 100;
+  const calculatedChartWidth = productNames.length * minChartWidthPerProduct;
+
+  const chartWidth = Math.max(
+    screenWidth - chartPadding.left - chartPadding.right - 60, // Kurangi juga lebar Y-axis manual
+    calculatedChartWidth
+  );
+
+  const isCentered = productNames.length <= 5;
+
+  // --- START: Perubahan untuk Auto-Scroll ke Tengah ---
+  const scrollViewRef = useRef<ScrollView>(null);
+  const containerWidthRef = useRef(0); // Untuk menyimpan lebar kontainer ScrollView
+
+  useEffect(() => {
+    // Jalankan efek ini setiap kali `isCentered` atau `chartWidth` berubah
+    // atau ketika komponen di-mount.
+    if (isCentered && scrollViewRef.current && containerWidthRef.current > 0 && chartWidth > 0) {
+      // Hitung posisi tengah: (lebar konten - lebar ScrollView) / 2
+      // Atau, jika kita ingin memusatkan konten di dalam ScrollView,
+      // kita perlu tahu lebar yang sebenarnya dari konten VictoryChart dan lebar ScrollView itu sendiri.
+      // Offset yang dibutuhkan adalah (chartWidth - lebar_visual_viewport_ScrollView) / 2
+      // Lebar visual viewport ScrollView bisa kita dapatkan dari Dimensions.get('window').width
+      // dikurangi padding horizontal kontainer luar dan lebar sumbu Y manual.
+
+      const visibleScrollViewWidth = screenWidth - (styles.themedViewContainer.padding * 2 || 0) - styles.yAxisLabelsContainer.width;
+
+      if (chartWidth < visibleScrollViewWidth) { // Pastikan konten tidak lebih lebar dari layar
+        const scrollXOffset = (chartWidth - visibleScrollViewWidth) / 2;
+        // Hanya gulir jika konten lebih kecil dari viewport dan justify-content: center aktif
+        scrollViewRef.current.scrollTo({ x: scrollXOffset, animated: true, y: 0 });
+      } else {
+        // Jika konten lebih lebar dari viewport, kita ingin mulai dari awal
+        scrollViewRef.current.scrollTo({ x: 0, animated: true, y: 0 });
+      }
+    }
+  }, [isCentered, chartWidth, screenWidth]); // Tambahkan screenWidth ke dependency array
+
+  // --- END: Perubahan untuk Auto-Scroll ke Tengah ---
+
   return (
     <ThemedView
       style={[
@@ -122,7 +154,6 @@ const ProfitProductChart: React.FC<ProfitChartProps> = ({
     >
       <ThemedText style={[styles.title]}>Product Financial Reports</ThemedText>
 
-      {/* Manual Legend */}
       <View style={styles.legendContainer}>
         <View style={styles.legendItem}>
           <View
@@ -147,11 +178,8 @@ const ProfitProductChart: React.FC<ProfitChartProps> = ({
           </ThemedText>
         </View>
       </View>
-      {/* End Manual Legend */}
 
-      {/* Kontainer untuk Sumbu Y Manual dan ScrollView (Chart + Sumbu X) */}
       <View style={styles.chartAndYAxisContainer}>
-        {/* Label Sumbu Y Utama */}
         <ThemedText
           style={[
             styles.yAxisMainLabel,
@@ -161,7 +189,6 @@ const ProfitProductChart: React.FC<ProfitChartProps> = ({
           Nominal (Rp)
         </ThemedText>
 
-        {/* Manual Y-Axis Labels */}
         <View style={[styles.yAxisLabelsContainer, { height: height }]}>
           {yTickValues
             .slice()
@@ -195,21 +222,38 @@ const ProfitProductChart: React.FC<ProfitChartProps> = ({
         </View>
 
         <ScrollView
+          ref={scrollViewRef} // Atur ref di sini
           horizontal
-          contentContainerStyle={{ flexGrow: 1, justifyContent: "center" }}
+          // `justifyContent` di `contentContainerStyle` tetap penting untuk Flexbox,
+          // tetapi `scrollTo` akan mengatur posisi awal gulir.
+          contentContainerStyle={{
+            flexGrow: 1, // Penting agar contentContainerStyle mengisi ruang ScrollView
+            justifyContent: isCentered ? "center" : "flex-start", // Tetap jaga ini
+            alignItems: 'flex-start',
+          }}
+          onLayout={(event) => { // Dapatkan lebar ScrollView setelah render
+            containerWidthRef.current = event.nativeEvent.layout.width;
+            // Ini akan memicu useEffect jika `containerWidthRef.current` sebelumnya 0
+            if (isCentered && scrollViewRef.current && chartWidth > 0 && containerWidthRef.current > 0) {
+              const scrollXOffset = (chartWidth - containerWidthRef.current) / 2;
+              if (scrollXOffset > 0) { // Hanya gulir jika konten lebih lebar dari viewport
+                scrollViewRef.current.scrollTo({ x: scrollXOffset, animated: false, y: 0 }); // animated: false untuk inisialisasi
+              } else {
+                scrollViewRef.current.scrollTo({ x: 0, animated: false, y: 0 });
+              }
+            }
+          }}
         >
           {hasValidData ? (
             <VictoryChart
-              width={chartScrollWidth}
+              width={chartWidth}
               height={height}
               domain={{ y: [minVal, domainYMax] }}
               domainPadding={{ x: 50 }}
               theme={VictoryTheme.material}
               padding={chartPadding}
             >
-              {/* X-axis */}
               <VictoryAxis
-                label="Nama Produk"
                 tickValues={productNames}
                 style={{
                   axisLabel: { padding: 40, fill: chartColors.text },
@@ -221,7 +265,6 @@ const ProfitProductChart: React.FC<ProfitChartProps> = ({
                 }}
               />
 
-              {/* Y-axis */}
               <VictoryAxis
                 dependentAxis
                 tickValues={yTickValues}
@@ -240,7 +283,6 @@ const ProfitProductChart: React.FC<ProfitChartProps> = ({
                 }}
               />
 
-              {/* Bar chart */}
               <VictoryGroup
                 offset={50}
                 colorScale={[chartColors.capital, chartColors.income]}
@@ -251,7 +293,7 @@ const ProfitProductChart: React.FC<ProfitChartProps> = ({
               </VictoryGroup>
             </VictoryChart>
           ) : (
-            <View style={styles.noDataMessageContainer}>
+            <View style={[styles.noDataMessageContainer, { width: chartWidth }]}>
               <ThemedText style={styles.noDataMessageText}>
                 No product profit data available.
               </ThemedText>
@@ -319,7 +361,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     height: 300,
-    width: "100%",
   },
   noDataMessageText: {
     fontSize: 16,

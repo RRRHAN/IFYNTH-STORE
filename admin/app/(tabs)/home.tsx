@@ -13,6 +13,7 @@ import {
   fetchTotalCapital,
   fetchTotalIncome,
   fetchTotalTransactionUser,
+  fetchProductProfit,
 } from "@/src/api/home";
 import ProductCountTable from "@/components/home/ProductCountTable";
 import TransactionCountTable from "@/components/home/TransactionCountTable";
@@ -21,6 +22,7 @@ import {
   TransactionCount,
   TransactionReport,
   TotalTransactionUser,
+  ProfitProduct,
 } from "@/src/types/home";
 import styles from "../styles/HomeStyles";
 import TotalCapitalTable from "@/components/home/TotalCapitalTable";
@@ -53,6 +55,9 @@ export default function HomeScreen() {
   >(null);
   const [totalTransactionUser, setTotalTransactionUser] = useState<
     TotalTransactionUser[] | null
+  >(null);
+    const [ProfitProduct, setProfitProduct] = useState<
+    ProfitProduct[] | null
   >(null);
   const [totalCapital, setTotalCapital] = useState<number | null>(null);
   const [totalIncome, setTotalIncome] = useState<number | null>(null);
@@ -99,6 +104,9 @@ export default function HomeScreen() {
 
         const usersData = await fetchTotalTransactionUser();
         setTotalTransactionUser(usersData);
+
+        const profitProduct = await fetchProductProfit();
+        setProfitProduct(profitProduct);
       } catch (err: any) {
         console.error("Failed to fetch home data", err);
         setHasError(true);
@@ -108,6 +116,7 @@ export default function HomeScreen() {
         setTotalCapital(0);
         setTotalIncome(0);
         setTotalTransactionUser([]);
+        setProfitProduct([]);
       } finally {
         setLoading(false);
       }
@@ -235,7 +244,7 @@ export default function HomeScreen() {
                       }}
                     >
                       <ProfitProductChart
-                        ProfitProduct={dummyProfitProducts}
+                        ProfitProduct={ProfitProduct}
                         height={320}
                       />
                     </View>

@@ -25,7 +25,7 @@ export type TotalTransactionUser = {
 
 export type ProfitProduct = {
   ProductID: string;
-  ProductName: string;
+  Name: string;
   TotalCapital: number;
-  TotalIncome: number;
+  TotalRevenue: number;
 };
