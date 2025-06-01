@@ -104,7 +104,7 @@ const ProfitProductChart: React.FC<ProfitChartProps> = ({
 
   const tickLabelFontSize = 10;
 
-  const minChartWidthPerProduct = 100;
+  const minChartWidthPerProduct = screenWidth > 1000 ? 100 : 150;
   const calculatedChartWidth = productNames.length * minChartWidthPerProduct;
 
   const chartWidth = Math.max(
