@@ -9,7 +9,6 @@ import { useColorScheme } from "@/hooks/useColorScheme";
 import { MyLightTheme, MyDarkTheme } from "@/constants/Theme";
 import { checkLoginStatus } from "@/src/api/admin";
 import * as Font from "expo-font";
-import { FontAwesome } from "@expo/vector-icons";
 
 SplashScreen.preventAutoHideAsync();
 

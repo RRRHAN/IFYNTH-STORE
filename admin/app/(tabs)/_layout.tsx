@@ -30,11 +30,7 @@ export default function TabLayout() {
   if (!fontsLoaded) {
     return null;
   }
-
-  const handleLogout = async () => {
-    // ...kode logout
-  };
-
+  
   const showTabBarLabel = width >= 900;
 
   return (

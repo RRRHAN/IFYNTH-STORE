@@ -64,7 +64,7 @@ export default function HomeScreen() {
   const [contentTotalHeight, setContentTotalHeight] = useState(0);
   const [productTableHeight, setProductTableHeight] = useState(0);
   const [transactionTableHeight, setTransactionTableHeight] = useState(0);
-  const [totalTableHeight, setTotalTableHeight] = useState(0); // This state isn't directly used in rendering logic to affect layout based on its value.
+  const [totalTableHeight, setTotalTableHeight] = useState(0);
 
   useEffect(() => {
     const loadAllDataSequentially = async () => {
@@ -73,7 +73,7 @@ export default function HomeScreen() {
 
       const isLoggedIn = await checkLoginStatus(router);
       if (!isLoggedIn) {
-        setLoading(false); // Ensure loading is false if not logged in
+        setLoading(false);
         return;
       }
 

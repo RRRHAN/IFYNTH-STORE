@@ -40,11 +40,11 @@ export default function Login() {
         await AsyncStorage.setItem("is_logged_in", "true");
       }
       setVisible(true);
+      setIsLoggedIn(true);
     } else {
       setErrorMessage(result.message);
       setVisible(true);
     }
-    setIsLoggedIn(true);
   };
 
   useEffect(() => {
