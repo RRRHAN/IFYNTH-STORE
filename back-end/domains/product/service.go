@@ -25,6 +25,7 @@ type Service interface {
 	DeleteProduct(ctx context.Context, productID string) error
 	GetProductCountByDepartment(ctx context.Context) ([]DepartmentCount, error)
 	GetTotalCapital(ctx context.Context) (float64, error)
+	GetProductProfit(ctx context.Context) ([]ProductProfit, error)
 }
 
 type service struct {
@@ -387,4 +388,27 @@ func (s *service) GetTotalCapital(ctx context.Context) (float64, error) {
 	}
 
 	return totalCapital, nil
+}
+
+func (s *service) GetProductProfit(ctx context.Context) ([]ProductProfit, error) {
+	var productProfits []ProductProfit
+
+	err := s.db.WithContext(ctx).
+		Model(&ProductCapital{}).
+		Select(`
+		capital.product_id,
+		product.name,
+		capital.total_capital,
+		COALESCE(SUM(transaction_details.quantity * product.price), 0) AS total_revenue
+	`).
+		Joins("LEFT JOIN transaction_details ON transaction_details.product_id = capital.product_id::uuid").
+		Joins("LEFT JOIN product ON product.id = capital.product_id::uuid").
+		Group("capital.product_id, capital.total_capital, product.name").
+		Scan(&productProfits).Error
+
+	if err != nil {
+		return nil, err
+	}
+
+	return productProfits, nil
 }

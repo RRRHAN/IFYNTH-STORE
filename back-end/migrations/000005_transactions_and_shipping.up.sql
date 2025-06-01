@@ -28,7 +28,7 @@ CREATE TABLE shipping_address (
 CREATE TABLE transaction_details (
     id UUID PRIMARY KEY,
     transaction_id UUID NOT NULL,
-    product_id VARCHAR(255) NOT NULL,
+    product_id UUID NOT NULL,
     size VARCHAR(255) NOT NULL,
     quantity INT NOT NULL,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),

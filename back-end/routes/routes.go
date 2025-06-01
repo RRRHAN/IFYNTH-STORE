@@ -85,6 +85,7 @@ func NewDependency(
 		product.PUT("/update/:id", mw.JWT(constants.ADMIN), productHandler.UpdateProduct)
 		product.GET("/count", mw.JWT(constants.ADMIN), productHandler.GetProductCountByDepartment)
 		product.GET("/totalCapital", mw.JWT(constants.ADMIN), productHandler.GetTotalCapital)
+		product.GET("/productProfit", mw.JWT(constants.ADMIN), productHandler.GetProductProfit)
 	}
 
 	cart := api.Group("/cart")
