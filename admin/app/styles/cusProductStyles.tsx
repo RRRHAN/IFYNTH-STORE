@@ -69,8 +69,8 @@ const styles = StyleSheet.create({
   },
   badgeContainer: {
     position: "absolute",
-    right: screenWidth > 450 ? 25 : 0,
-    top: 60,
+    right: screenWidth > 1000 ? 50 : screenWidth > 450 ? 25 : 0,
+    top: screenWidth > 1000 ? 10 : 60,
     backgroundColor: "red",
     borderRadius: 9,
     width: 18,

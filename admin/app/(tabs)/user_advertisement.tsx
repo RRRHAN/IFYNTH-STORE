@@ -71,7 +71,7 @@ const UserAdvertisementScreen = () => {
 
   // Pagination states
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 10;
+  const itemsPerPage = screenWidth > 1000 ? 8 : 4;
   const totalPages = Math.ceil(offers.length / itemsPerPage);
 
   const getData = async () => {

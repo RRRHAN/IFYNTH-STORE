@@ -108,7 +108,7 @@ const ProfitProductChart: React.FC<ProfitChartProps> = ({
   const calculatedChartWidth = productNames.length * minChartWidthPerProduct;
 
   const chartWidth = Math.max(
-    screenWidth - chartPadding.left - chartPadding.right - 60, // Kurangi juga lebar Y-axis manual
+    screenWidth - chartPadding.left - chartPadding.right - 60,
     calculatedChartWidth
   );
 
@@ -121,26 +121,29 @@ const ProfitProductChart: React.FC<ProfitChartProps> = ({
   useEffect(() => {
     // Jalankan efek ini setiap kali `isCentered` atau `chartWidth` berubah
     // atau ketika komponen di-mount.
-    if (isCentered && scrollViewRef.current && containerWidthRef.current > 0 && chartWidth > 0) {
-      // Hitung posisi tengah: (lebar konten - lebar ScrollView) / 2
-      // Atau, jika kita ingin memusatkan konten di dalam ScrollView,
-      // kita perlu tahu lebar yang sebenarnya dari konten VictoryChart dan lebar ScrollView itu sendiri.
-      // Offset yang dibutuhkan adalah (chartWidth - lebar_visual_viewport_ScrollView) / 2
-      // Lebar visual viewport ScrollView bisa kita dapatkan dari Dimensions.get('window').width
-      // dikurangi padding horizontal kontainer luar dan lebar sumbu Y manual.
+    if (
+      isCentered &&
+      scrollViewRef.current &&
+      containerWidthRef.current > 0 &&
+      chartWidth > 0
+    ) {
+      const visibleScrollViewWidth =
+        screenWidth -
+        (styles.themedViewContainer.padding * 2 || 0) -
+        styles.yAxisLabelsContainer.width;
 
-      const visibleScrollViewWidth = screenWidth - (styles.themedViewContainer.padding * 2 || 0) - styles.yAxisLabelsContainer.width;
-
-      if (chartWidth < visibleScrollViewWidth) { // Pastikan konten tidak lebih lebar dari layar
+      if (chartWidth < visibleScrollViewWidth) {
         const scrollXOffset = (chartWidth - visibleScrollViewWidth) / 2;
-        // Hanya gulir jika konten lebih kecil dari viewport dan justify-content: center aktif
-        scrollViewRef.current.scrollTo({ x: scrollXOffset, animated: true, y: 0 });
+        scrollViewRef.current.scrollTo({
+          x: scrollXOffset,
+          animated: true,
+          y: 0,
+        });
       } else {
-        // Jika konten lebih lebar dari viewport, kita ingin mulai dari awal
         scrollViewRef.current.scrollTo({ x: 0, animated: true, y: 0 });
       }
     }
-  }, [isCentered, chartWidth, screenWidth]); // Tambahkan screenWidth ke dependency array
+  }, [isCentered, chartWidth, screenWidth]);
 
   // --- END: Perubahan untuk Auto-Scroll ke Tengah ---
 
@@ -222,22 +225,29 @@ const ProfitProductChart: React.FC<ProfitChartProps> = ({
         </View>
 
         <ScrollView
-          ref={scrollViewRef} // Atur ref di sini
+          ref={scrollViewRef}
           horizontal
-          // `justifyContent` di `contentContainerStyle` tetap penting untuk Flexbox,
-          // tetapi `scrollTo` akan mengatur posisi awal gulir.
           contentContainerStyle={{
-            flexGrow: 1, // Penting agar contentContainerStyle mengisi ruang ScrollView
-            justifyContent: isCentered ? "center" : "flex-start", // Tetap jaga ini
-            alignItems: 'flex-start',
+            flexGrow: 1,
+            justifyContent: isCentered ? "center" : "flex-start",
+            alignItems: "flex-start",
           }}
-          onLayout={(event) => { // Dapatkan lebar ScrollView setelah render
+          onLayout={(event) => {
             containerWidthRef.current = event.nativeEvent.layout.width;
-            // Ini akan memicu useEffect jika `containerWidthRef.current` sebelumnya 0
-            if (isCentered && scrollViewRef.current && chartWidth > 0 && containerWidthRef.current > 0) {
-              const scrollXOffset = (chartWidth - containerWidthRef.current) / 2;
-              if (scrollXOffset > 0) { // Hanya gulir jika konten lebih lebar dari viewport
-                scrollViewRef.current.scrollTo({ x: scrollXOffset, animated: false, y: 0 }); // animated: false untuk inisialisasi
+            if (
+              isCentered &&
+              scrollViewRef.current &&
+              chartWidth > 0 &&
+              containerWidthRef.current > 0
+            ) {
+              const scrollXOffset =
+                (chartWidth - containerWidthRef.current) / 2;
+              if (scrollXOffset > 0) {
+                scrollViewRef.current.scrollTo({
+                  x: scrollXOffset,
+                  animated: false,
+                  y: 0,
+                });
               } else {
                 scrollViewRef.current.scrollTo({ x: 0, animated: false, y: 0 });
               }
@@ -293,7 +303,9 @@ const ProfitProductChart: React.FC<ProfitChartProps> = ({
               </VictoryGroup>
             </VictoryChart>
           ) : (
-            <View style={[styles.noDataMessageContainer, { width: chartWidth }]}>
+            <View
+              style={[styles.noDataMessageContainer, { width: chartWidth }]}
+            >
               <ThemedText style={styles.noDataMessageText}>
                 No product profit data available.
               </ThemedText>

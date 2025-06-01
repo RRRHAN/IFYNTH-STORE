@@ -70,7 +70,7 @@ const ProductsScreen = () => {
 
   // Pagination states
   const [currentPage, setCurrentPage] = useState(1);
-  const productsPerPage = 8;
+  const productsPerPage = screenWidth > 1000 ? 8 : 4;
   const totalPages = Math.ceil(products.length / productsPerPage);
 
   const getData = async () => {
