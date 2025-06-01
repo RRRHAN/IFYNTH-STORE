@@ -7,7 +7,6 @@ import {
   Platform,
   ScrollView,
   TouchableWithoutFeedback,
-  // Removed unused View and TextInput imports here for clarity
 } from "react-native";
 import { ThemedView } from "@/components/ThemedView";
 import { ThemedText } from "@/components/ThemedText";
@@ -16,14 +15,14 @@ import ModalComponent from "@/components/ModalComponent";
 import { register } from "@/src/api/admin";
 import { PaperProvider } from "react-native-paper";
 
-// Import MaterialCommunityIcons
-import { MaterialCommunityIcons } from '@expo/vector-icons';
+// Import FontAwesome
+import { FontAwesome } from '@expo/vector-icons';
 
 export default function RegisterScreen() {
   const [username, setUsername] = useState("");
   const [fullName, setFullName] = useState("");
   const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState(""); // Corrected typo
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
   const [visible, setVisible] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
@@ -141,8 +140,7 @@ export default function RegisterScreen() {
                 ]}
                 onPress={handleRegister}
               >
-                {/* MaterialCommunityIcons for the button */}
-                <MaterialCommunityIcons name="account-plus" size={20} color="white" style={{ marginRight: 10 }} />
+                <FontAwesome name="user-plus" size={20} color="white" style={{ marginRight: 10 }} />
                 <Text style={styles.btnText}>Create Account</Text>
               </TouchableOpacity>
               <ModalComponent

@@ -4,15 +4,15 @@ import {
   StyleSheet,
   TouchableOpacity,
   Text,
-} from "react-native"; // Hapus TextInput yang tidak digunakan
+} from "react-native";
 import { ThemedView } from "@/components/ThemedView";
 import { ThemedText } from "@/components/ThemedText";
 import { changePassword } from "@/src/api/admin";
 import { ThemedTextInput } from "@/components/ThemedTextInput";
 import ModalComponent from "@/components/ModalComponent";
 
-// Impor MaterialCommunityIcons
-import { MaterialCommunityIcons } from '@expo/vector-icons';
+// Impor FontAwesome
+import { FontAwesome } from '@expo/vector-icons';
 
 export default function SecurityScreen() {
   const [currentPassword, setCurrentPassword] = useState("");
@@ -88,11 +88,12 @@ export default function SecurityScreen() {
       <TouchableOpacity
         style={[
           styles.btn,
-          { flexDirection: 'row', alignItems: 'center', justifyContent: 'center' } // Tambahkan gaya untuk ikon
+          { flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }
         ]}
         onPress={handleChangePassword}
       >
-        <MaterialCommunityIcons name="lock-reset" size={20} color="white" style={{ marginRight: 8 }} /> {/* Ikon */}
+        {/* Mengubah MaterialCommunityIcons menjadi FontAwesome */}
+        <FontAwesome name="lock" size={20} color="white" style={{ marginRight: 8 }} /> {/* Menggunakan "lock" atau "key" */}
         <Text style={styles.btnText}>Change Password</Text>
       </TouchableOpacity>
       <ModalComponent

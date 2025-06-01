@@ -29,7 +29,7 @@ import { generateVideoThumbnailJS } from "@/hooks/helpers/ThumbnailProcessor";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import * as VideoThumbnails from "expo-video-thumbnails";
 import StatusOfferIOS from "@/components/StatusOfferIOS";
-import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { FontAwesome } from '@expo/vector-icons'; // Mengubah import menjadi FontAwesome
 
 const UserAdvertisementScreen = () => {
   const colorScheme = useColorScheme();
@@ -268,7 +268,7 @@ const UserAdvertisementScreen = () => {
         <ThemedCell style={[{ width: columnWidths.action }]}>
           <IconButton
             icon={({ color, size }) => (
-              <MaterialCommunityIcons name="eye" size={size} color={color} />
+              <FontAwesome name="eye" size={size} color={color} /> // Menggunakan FontAwesome
             )}
             size={20}
             iconColor="#00FFFF"
@@ -279,7 +279,7 @@ const UserAdvertisementScreen = () => {
           />
           <IconButton
             icon={({ color, size }) => (
-              <MaterialCommunityIcons name="message" size={size} color={color} />
+              <FontAwesome name="comment" size={size} color={color} /> // Menggunakan FontAwesome untuk "comment"
             )}
             size={20}
             iconColor="#4169E1"
@@ -333,8 +333,8 @@ const UserAdvertisementScreen = () => {
               elevation: 10,
             }}
           >
-            {/* Gunakan ikon MaterialCommunityIcons untuk tombol close modal */}
-            <MaterialCommunityIcons name="close" size={24} color="black" />
+            {/* Gunakan ikon FontAwesome untuk tombol close modal */}
+            <FontAwesome name="times" size={24} color="black" />
           </TouchableOpacity>
 
           <OfferDetailModal product={selectedProduct} />
@@ -414,9 +414,9 @@ const UserAdvertisementScreen = () => {
       <View style={styles.paginationContainer}>
         <IconButton
           icon={({ color, size }) => (
-            <MaterialCommunityIcons name="chevron-left" size={size} color={color} />
+            <FontAwesome name="chevron-left" size={size} color={color} />
           )}
-          size={30}
+          size={20}
           onPress={() => paginate(currentPage - 1)}
           disabled={currentPage === 1}
           iconColor={colorScheme === "dark" ? "#ffffff" : "#111827"}
@@ -426,9 +426,9 @@ const UserAdvertisementScreen = () => {
         </ThemedText>
         <IconButton
           icon={({ color, size }) => (
-            <MaterialCommunityIcons name="chevron-right" size={size} color={color} />
+            <FontAwesome name="chevron-right" size={size} color={color} />
           )}
-          size={30}
+          size={20}
           onPress={() => paginate(currentPage + 1)}
           disabled={currentPage === totalPages}
           iconColor={colorScheme === "dark" ? "#ffffff" : "#111827"}

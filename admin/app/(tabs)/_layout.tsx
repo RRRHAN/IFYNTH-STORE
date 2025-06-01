@@ -7,7 +7,7 @@ import { Colors } from "@/constants/Colors";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { useRouter } from "expo-router";
 import * as Font from "expo-font";
-import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { FontAwesome } from "@expo/vector-icons";
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
@@ -19,7 +19,7 @@ export default function TabLayout() {
   useEffect(() => {
     async function loadFonts() {
       await Font.loadAsync({
-        ...MaterialCommunityIcons.font,
+        'FontAwesome': require('@/assets/fonts/FontAwesome.ttf'),
       });
       setFontsLoaded(true);
     }
@@ -62,7 +62,8 @@ export default function TabLayout() {
         options={{
           tabBarLabel: showTabBarLabel ? "Home" : undefined,
           tabBarIcon: ({ color, size }) => (
-            <MaterialCommunityIcons name="home" size={size ?? 28} color={color} />
+            // Menggunakan ikon FontAwesome. Sesuaikan nama ikon dengan daftar FontAwesome.
+            <FontAwesome name="home" size={size ?? 28} color={color} />
           ),
         }}
       />
@@ -71,7 +72,8 @@ export default function TabLayout() {
         options={{
           tabBarLabel: showTabBarLabel ? "Transactions" : undefined,
           tabBarIcon: ({ color, size }) => (
-            <MaterialCommunityIcons name="file-document" size={size ?? 28} color={color} />
+            // Contoh ikon FontAwesome untuk transaksi: "file-text" atau "exchange"
+            <FontAwesome name="truck" size={size ?? 28} color={color} />
           ),
         }}
       />
@@ -80,7 +82,8 @@ export default function TabLayout() {
         options={{
           tabBarLabel: showTabBarLabel ? "Product Management" : undefined,
           tabBarIcon: ({ color, size }) => (
-            <MaterialCommunityIcons name="package-variant" size={size ?? 28} color={color} />
+            // Contoh ikon FontAwesome untuk produk: "dropbox" atau "cube"
+            <FontAwesome name="cube" size={size ?? 28} color={color} />
           ),
         }}
       />
@@ -89,7 +92,8 @@ export default function TabLayout() {
         options={{
           tabBarLabel: showTabBarLabel ? "User Advertisement" : undefined,
           tabBarIcon: ({ color, size }) => (
-            <MaterialCommunityIcons name="bullhorn" size={size ?? 28} color={color} />
+            // Contoh ikon FontAwesome untuk iklan: "bullhorn" atau "newspaper-o"
+            <FontAwesome name="bullhorn" size={size ?? 28} color={color} />
           ),
         }}
       />
@@ -98,7 +102,8 @@ export default function TabLayout() {
         options={{
           tabBarLabel: showTabBarLabel ? "Setting" : undefined,
           tabBarIcon: ({ color, size }) => (
-            <MaterialCommunityIcons name="account-cog-outline" size={size ?? 28} color={color} />
+            // Contoh ikon FontAwesome untuk pengaturan: "cog" atau "gear"
+            <FontAwesome name="cog" size={size ?? 28} color={color} />
           ),
         }}
       />

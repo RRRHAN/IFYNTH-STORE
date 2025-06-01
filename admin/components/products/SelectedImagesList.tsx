@@ -1,15 +1,15 @@
 import React from "react";
-import { View, Image, TouchableOpacity } from "react-native";
+import { View, Image, TouchableOpacity, StyleSheet } from "react-native"; // Import StyleSheet
 import { ThemedText } from "@/components/ThemedText";
-import { IconButton } from "react-native-paper";
+// Removed unused IconButton import
 
-// Impor MaterialCommunityIcons
-import { MaterialCommunityIcons } from '@expo/vector-icons';
+// Import FontAwesome
+import { FontAwesome } from '@expo/vector-icons';
 
 interface SelectedImagesListProps {
   images: { uri: string }[];
   handleRemoveImage: (index: number) => void;
-  styles: any;
+  styles: any; // Consider defining a more specific type for 'styles'
 }
 
 export default function SelectedImagesList({
@@ -26,15 +26,14 @@ export default function SelectedImagesList({
         <View key={index} style={styles.imageContainer}>
           <Image source={{ uri: img.uri }} style={styles.image} />
           <TouchableOpacity
-            style={styles.removeButton}
+            style={[
+              styles.removeButton, // Existing styles
+              styles.iconButtonContainer
+            ]}
             onPress={() => handleRemoveImage(index)}
           >
-            <IconButton
-              icon={({ color, size }) => (
-                <MaterialCommunityIcons name="trash-can" size={size} color={color} />
-              )}
-              size={24}
-            />
+            {/* Using FontAwesome directly */}
+            <FontAwesome name="trash" size={24} color="red" />
           </TouchableOpacity>
         </View>
       ))}

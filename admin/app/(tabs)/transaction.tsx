@@ -26,8 +26,7 @@ import TransactionDetailModal from "@/components/TransactionDetailModal";
 import { Picker } from "@react-native-picker/picker";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import StatusTransactionIOS from "@/components/StatusTransactionIOS";
-import { MaterialCommunityIcons } from '@expo/vector-icons';
-
+import { FontAwesome } from '@expo/vector-icons'; // Mengubah import menjadi FontAwesome
 
 const TransactionsScreen = () => {
   const colorScheme = useColorScheme();
@@ -180,9 +179,9 @@ const TransactionsScreen = () => {
           )}
           <ThemedCell style={{ width: columnWidths.action }}>
             <IconButton
-              // Gunakan ikon MaterialCommunityIcons sebagai children
+              // Gunakan ikon FontAwesome sebagai children
               icon={({ color, size }) => (
-                <MaterialCommunityIcons name="eye" size={size} color={color} />
+                <FontAwesome name="eye" size={size} color={color} /> // Ikon "eye" tersedia di FontAwesome
               )}
               size={20}
               iconColor="#00FFFF"
@@ -273,9 +272,9 @@ const TransactionsScreen = () => {
 
           <ThemedCell style={[{ width: columnWidths.action }]}>
             <IconButton
-              // Gunakan ikon MaterialCommunityIcons sebagai children
+              // Gunakan ikon FontAwesome sebagai children
               icon={({ color, size }) => (
-                <MaterialCommunityIcons name="eye" size={size} color={color} />
+                <FontAwesome name="eye" size={size} color={color} /> // Ikon "eye" tersedia di FontAwesome
               )}
               size={25}
               iconColor="#00FFFF"
@@ -406,11 +405,11 @@ const TransactionsScreen = () => {
       {/* Pagination controls */}
       <View style={styles.paginationContainer}>
         <IconButton
-          // Gunakan ikon MaterialCommunityIcons untuk chevron-left
+          // Gunakan ikon FontAwesome untuk chevron-left
           icon={({ color, size }) => (
-            <MaterialCommunityIcons name="chevron-left" size={size} color={color} />
+            <FontAwesome name="chevron-left" size={size} color={color} />
           )}
-          size={30}
+          size={20}
           onPress={() => paginate(currentPage - 1)}
           disabled={currentPage === 1}
           iconColor={colorScheme === "dark" ? "#ffffff" : "#111827"}
@@ -419,11 +418,11 @@ const TransactionsScreen = () => {
           Page {currentPage} of {totalPages}
         </ThemedText>
         <IconButton
-          // Gunakan ikon MaterialCommunityIcons untuk chevron-right
+          // Gunakan ikon FontAwesome untuk chevron-right
           icon={({ color, size }) => (
-            <MaterialCommunityIcons name="chevron-right" size={size} color={color} />
+            <FontAwesome name="chevron-right" size={size} color={color} />
           )}
-          size={30}
+          size={20}
           onPress={() => paginate(currentPage + 1)}
           disabled={currentPage === totalPages}
           iconColor={colorScheme === "dark" ? "#ffffff" : "#111827"}

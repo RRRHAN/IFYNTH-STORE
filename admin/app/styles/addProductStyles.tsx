@@ -90,6 +90,12 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
+    iconButtonContainer: {
+    padding: 8,
+    borderRadius: 24, 
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
 });
 
 export default styles;

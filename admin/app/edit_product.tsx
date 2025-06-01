@@ -18,7 +18,7 @@ import ActionButtons from "@/components/products/ActionButtons";
 import SelectedImagesList from "@/components/products/SelectedImagesList";
 import useProductForm from "@/hooks/helpers/useEditProductForm";
 import useImages from "@/hooks/helpers/useImages";
-import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { FontAwesome } from '@expo/vector-icons'; // Mengubah import menjadi FontAwesome
 
 export default function EditProductScreen() {
   const [isEditing, setIsEditing] = useState(true);
@@ -144,7 +144,7 @@ export default function EditProductScreen() {
       />
       <IconButton
         icon={({ color, size }) => (
-          <MaterialCommunityIcons name="arrow-left" size={size} color={color} />
+          <FontAwesome name="arrow-left" size={size} color={color} /> // Menggunakan FontAwesome
         )}
         size={30}
         onPress={() => router.replace("/products")}
@@ -173,7 +173,7 @@ export default function EditProductScreen() {
         setCategory={setCategory}
         isDark={isDark}
         styles={styles}
-        isEditing={isEditing} 
+        isEditing={isEditing}
       />
 
       <View style={styles.sizeContainer}>

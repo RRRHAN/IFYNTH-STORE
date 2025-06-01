@@ -12,7 +12,7 @@ import { ThemedText } from "@/components/ThemedText";
 import { logoutAdmin } from "@/src/api/admin";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useEffect, useState } from "react";
-import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { FontAwesome } from '@expo/vector-icons'; // Mengubah import menjadi FontAwesome
 
 function NavButton({
   title,
@@ -22,7 +22,7 @@ function NavButton({
 }: {
   title: string;
   onPress: (event: GestureResponderEvent) => void;
-  icon?: keyof typeof MaterialCommunityIcons.glyphMap;
+  icon?: keyof typeof FontAwesome.glyphMap; // Mengubah tipe icon menjadi FontAwesome.glyphMap
   color?: string;
 }) {
   const [pressed, setPressed] = useState(false);
@@ -60,11 +60,11 @@ function NavButton({
     >
       {/* Render ikon jika prop icon diberikan */}
       {icon && (
-        <MaterialCommunityIcons
+        <FontAwesome // Mengubah komponen ikon menjadi FontAwesome
           name={icon}
           size={20}
           color="white"
-          style={styles.btnIcon} 
+          style={styles.btnIcon}
         />
       )}
       <Text style={styles.btnText}>{title}</Text>
@@ -115,24 +115,24 @@ export default function SettingScreen() {
         <NavButton
           title="Create Account Admin"
           onPress={() => router.push("/register")}
-          icon="account-plus"
+          icon="user-plus"
         />
       )}
 
       <NavButton
         title="Personal"
         onPress={() => router.push("/personal")}
-        icon="account"
+        icon="user"
       />
       <NavButton
         title="Security"
         onPress={() => router.push("/security")}
-        icon="shield-lock"
+        icon="lock"
       />
       <NavButton
         title="Logout"
         onPress={handleLogout}
-        icon="logout"
+        icon="sign-out"
         color="#e53935"
       />
     </ThemedView>

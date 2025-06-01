@@ -4,8 +4,8 @@ import { ThemedText } from "@/components/ThemedText";
 import { IconButton } from "react-native-paper";
 import { BASE_URL } from "@/src/api/constants";
 
-// Impor MaterialCommunityIcons
-import { MaterialCommunityIcons } from '@expo/vector-icons';
+// Impor FontAwesome
+import { FontAwesome } from "@expo/vector-icons";
 
 interface ProductImage {
   ProductID: string;
@@ -36,18 +36,13 @@ export default function CurrentImagesList({
               style={styles.image}
             />
             <TouchableOpacity
-              style={styles.removeButton}
+              style={[styles.removeButton, styles.iconButtonContainer]}
               onPress={() => handleToggleImage(index)}
             >
-              <IconButton
-                icon={({ color, size }) => (
-                  <MaterialCommunityIcons
-                    name={checkedImages[index] ? "check-circle" : "trash-can"}
-                    size={size}
-                    color={checkedImages[index] ? "green" : "red"}
-                  />
-                )}
+              <FontAwesome
+                name={checkedImages[index] ? "check-circle" : "trash"}
                 size={24}
+                color={checkedImages[index] ? "green" : "red"}
               />
             </TouchableOpacity>
           </View>

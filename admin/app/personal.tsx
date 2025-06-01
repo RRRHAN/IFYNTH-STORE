@@ -3,7 +3,7 @@ import { View, Text, Alert, StyleSheet, TouchableOpacity } from "react-native";
 import { ThemedView } from "@/components/ThemedView";
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedTextInput } from "@/components/ThemedTextInput";
-import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { FontAwesome } from '@expo/vector-icons';
 
 export default function PersonalScreen() {
   const [username, setUsername] = useState("");
@@ -28,7 +28,7 @@ export default function PersonalScreen() {
         style={styles.input}
         value={username}
         onChangeText={setUsername}
-        autoCapitalize="none" // Username biasanya tidak kapital
+        autoCapitalize="none"
       />
 
       <ThemedText style={styles.label}>Nama Lengkap</ThemedText>
@@ -62,7 +62,8 @@ export default function PersonalScreen() {
         ]}
         onPress={handleSave}
       >
-        <MaterialCommunityIcons name="content-save" size={20} color="white" style={{ marginRight: 8 }} />
+        {/* Mengubah MaterialCommunityIcons menjadi FontAwesome */}
+        <FontAwesome name="save" size={20} color="white" style={{ marginRight: 8 }} />
         <Text style={styles.btnText}>Save</Text>
       </TouchableOpacity>
     </ThemedView>

@@ -27,7 +27,7 @@ import ModalComponent from "@/components/ModalComponent";
 import ProductDetailModal from "@/app/detail_product";
 import { BASE_URL } from "@/src/api/constants";
 import { useColorScheme } from "@/hooks/useColorScheme";
-import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { FontAwesome } from '@expo/vector-icons'; // Mengubah import menjadi FontAwesome
 
 const ProductsScreen = () => {
   const colorScheme = useColorScheme();
@@ -169,9 +169,9 @@ const ProductsScreen = () => {
       </ThemedCell>
       <ThemedCell style={[{ width: columnWidths.action }]}>
         <IconButton
-          // Gunakan ikon MaterialCommunityIcons sebagai children
+          // Gunakan ikon FontAwesome sebagai children
           icon={({ color, size }) => (
-            <MaterialCommunityIcons name="eye" size={size} color={color} />
+            <FontAwesome name="eye" size={size} color={color} /> // Ikon "eye" tersedia di FontAwesome
           )}
           size={20}
           iconColor="#00FFFF" // Warna untuk ikon itu sendiri
@@ -181,9 +181,9 @@ const ProductsScreen = () => {
           }}
         />
         <IconButton
-          // Gunakan ikon MaterialCommunityIcons sebagai children
+          // Gunakan ikon FontAwesome sebagai children
           icon={({ color, size }) => (
-            <MaterialCommunityIcons name="pencil" size={size} color={color} />
+            <FontAwesome name="edit" size={size} color={color} /> // Ikon "pencil" (atau "edit") tersedia
           )}
           size={20}
           iconColor="#4169E1" // Warna untuk ikon itu sendiri
@@ -196,9 +196,9 @@ const ProductsScreen = () => {
           }}
         />
         <IconButton
-          // Gunakan ikon MaterialCommunityIcons sebagai children
+          // Gunakan ikon FontAwesome sebagai children
           icon={({ color, size }) => (
-            <MaterialCommunityIcons name="delete" size={size} color={color} />
+            <FontAwesome name="trash" size={size} color={color} /> // Ikon "trash" (atau "remove") tersedia
           )}
           size={20}
           iconColor="#FF0000" // Warna untuk ikon itu sendiri
@@ -226,7 +226,7 @@ const ProductsScreen = () => {
             backgroundColor: "rgba(0, 0, 0, 0.7)",
           }}
         >
-          {/* Tombol silang dengan MaterialCommunityIcons */}
+          {/* Tombol silang dengan FontAwesome */}
           <TouchableOpacity
             onPress={() => {
               console.log("Tombol close diklik");
@@ -246,7 +246,7 @@ const ProductsScreen = () => {
               elevation: 10,
             }}
           >
-            <MaterialCommunityIcons name="close" size={24} color="black" />
+            <FontAwesome name="times" size={24} color="black" /> {/* Menggunakan "times" untuk silang */}
           </TouchableOpacity>
 
           {/* Konten modal */}
@@ -261,9 +261,9 @@ const ProductsScreen = () => {
       <ThemedView style={styles.headerContainer}>
         <ThemedText style={[styles.title]}>LIST PRODUCTS</ThemedText>
         <IconButton
-          // Gunakan ikon MaterialCommunityIcons untuk "plus"
+          // Gunakan ikon FontAwesome untuk "plus"
           icon={({ color, size }) => (
-            <MaterialCommunityIcons name="plus" size={size} color={color} />
+            <FontAwesome name="plus" size={size} color={color} /> // Ikon "plus" tersedia di FontAwesome
           )}
           size={24}
           // Default iconColor untuk IconButton paper adalah tema, jadi bisa diabaikan
@@ -346,9 +346,9 @@ const ProductsScreen = () => {
       <View style={styles.paginationContainer}>
         <IconButton
           icon={({ color, size }) => (
-            <MaterialCommunityIcons name="chevron-left" size={size} color={color} />
+            <FontAwesome name="chevron-left" size={size} color={color} />
           )}
-          size={30}
+          size={20}
           onPress={() => paginate(currentPage - 1)}
           disabled={currentPage === 1}
           iconColor={colorScheme === "dark" ? "#ffffff" : "#111827"}
@@ -358,9 +358,9 @@ const ProductsScreen = () => {
         </ThemedText>
         <IconButton
           icon={({ color, size }) => (
-            <MaterialCommunityIcons name="chevron-right" size={size} color={color} />
+            <FontAwesome name="chevron-right" size={size} color={color} />
           )}
-          size={30}
+          size={20}
           onPress={() => paginate(currentPage + 1)}
           disabled={currentPage === totalPages}
           iconColor={colorScheme === "dark" ? "#ffffff" : "#111827"}

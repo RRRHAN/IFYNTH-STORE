@@ -9,8 +9,7 @@ import {
   KeyboardAvoidingView,
   Platform,
 } from "react-native";
-// import { Ionicons } from "@expo/vector-icons"; // Hapus impor Ionicons
-import { MaterialCommunityIcons } from "@expo/vector-icons"; // Impor MaterialCommunityIcons
+import { FontAwesome } from "@expo/vector-icons"; // Mengubah impor menjadi FontAwesome
 import { useRouter, useLocalSearchParams } from "expo-router";
 import { ThemedView } from "@/components/ThemedView";
 import { ThemedTextInput } from "@/components/ThemedTextInput";
@@ -29,11 +28,6 @@ export default function ChatScreen() {
   const [selectedItem, setSelectedItem] = useState(item);
   const [messages, setMessages] = useState<Message[]>([]);
   const [text, setText] = useState("");
-  // timeOnly ini tidak digunakan, bisa dihapus jika tidak ada rencana menggunakannya.
-  // const timeOnly = new Date(item.CreatedAt).toLocaleTimeString([], {
-  //   hour: "2-digit",
-  //   minute: "2-digit",
-  // });
   const [thumbnailUrls, setThumbnailUrls] = useState<{ [key: string]: string }>(
     {}
   );
@@ -56,9 +50,6 @@ export default function ChatScreen() {
       setText("");
 
       // Fetch updated messages from backend
-      // Lebih baik perbarui state secara optimis jika API Anda mengembalikan pesan yang baru ditambahkan
-      // atau setidaknya tambahkan pesan baru ke array messages secara manual.
-      // fetch ulang semua pesan bisa memakan waktu dan resource.
       const updatedMessages = await fetchMessage(selectedItem.ID);
       setMessages(updatedMessages);
     } catch (error) {
@@ -90,11 +81,11 @@ export default function ChatScreen() {
     }, 3000);
 
     return () => clearInterval(interval); // Bersihkan interval saat komponen dilepas
-  }, [selectedItem, messages]); // Tambahkan `messages` ke dependency array agar interval re-render jika messages berubah dari luar
+  }, [selectedItem, messages]);
 
   useEffect(() => {
     async function generateThumbnails() {
-      if (item && item.Files && item.Files.length > 0) { // Tambahkan cek `item`
+      if (item && item.Files && item.Files.length > 0) {
         const fileUrl = item.Files[0].URL;
         if (/\.(mp4|webm|ogg)$/i.test(fileUrl)) {
           try {
@@ -125,22 +116,20 @@ export default function ChatScreen() {
             [item.ID]: `${BASE_URL}/api${fileUrl}`,
           }));
         }
-      } else if (item && item.ID) { // Jika tidak ada Files, pastikan tetap ada thumbnail default
+      } else if (item && item.ID) {
           setThumbnailUrls((prev) => ({
             ...prev,
             [item.ID]: "https://img.lovepik.com/free-png/20210919/lovepik-question-element-png-image_401016497_wh1200.png",
           }));
       }
     }
-    // Hanya panggil jika item sudah ada
     if (item) {
       generateThumbnails();
     }
-  }, [item]); // Depend pada item
+  }, [item]);
 
   const renderItem = ({ item }: { item: Message }) => {
-    // console.log("Rendered Item:", item); // Log ini bisa dihapus di produksi
-    const isMe = item.Role === "ADMIN"; // Sesuaikan jika role admin punya nama lain
+    const isMe = item.Role === "ADMIN";
 
     return (
       <ThemedView
@@ -178,7 +167,6 @@ export default function ChatScreen() {
     );
   };
 
-  // Pastikan `thumbnailUrl` dihitung setelah `item` tersedia
   const thumbnailUrl =
     (item && thumbnailUrls[item.ID]) ||
     "https://img.lovepik.com/free-png/20210919/lovepik-question-element-png-image_401016497_wh1200.png";
@@ -188,8 +176,8 @@ export default function ChatScreen() {
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity onPress={handleBack}>
-          {/* Ganti Ionicons dengan MaterialCommunityIcons */}
-          <MaterialCommunityIcons name="arrow-left" size={24} color="#333" />
+          {/* Mengganti MaterialCommunityIcons dengan FontAwesome */}
+          <FontAwesome name="arrow-left" size={24} color="#333" />
         </TouchableOpacity>
         <ThemedText style={styles.headerTitle}>Chat</ThemedText>
       </View>
@@ -237,7 +225,7 @@ export default function ChatScreen() {
             returnKeyType="send"
           />
           <TouchableOpacity onPress={handleSend} style={styles.sendButton}>
-            <MaterialCommunityIcons name="send" size={20} color="#A9A9A9" />
+            <FontAwesome name="send" size={20} color="#A9A9A9" />
           </TouchableOpacity>
         </ThemedView>
       </KeyboardAvoidingView>

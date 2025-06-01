@@ -16,8 +16,8 @@ import ActionButtons from "@/components/products/ActionButtons";
 import SelectedImagesList from "@/components/products/SelectedImagesList";
 import { useProductForm } from "@/hooks/helpers/useAddProductForm";
 
-// Impor MaterialCommunityIcons
-import { MaterialCommunityIcons } from '@expo/vector-icons';
+// Impor FontAwesome
+import { FontAwesome } from '@expo/vector-icons';
 
 export default function AddProductScreen() {
   const router = useRouter();
@@ -139,9 +139,9 @@ export default function AddProductScreen() {
         message={errorMessage || successMessage}
       />
       <IconButton
-        // Gunakan ikon MaterialCommunityIcons sebagai children
+        // Gunakan ikon FontAwesome sebagai children
         icon={({ color, size }) => (
-          <MaterialCommunityIcons name="arrow-left" size={size} color={color} />
+          <FontAwesome name="arrow-left" size={size} color={color} /> // Ikon "arrow-left" tersedia di FontAwesome
         )}
         size={30}
         onPress={() => router.replace("/products")}

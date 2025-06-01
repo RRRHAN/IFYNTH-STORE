@@ -79,12 +79,6 @@ export const checkLoginStatus = async (
   router: ReturnType<typeof useRouter>
 ): Promise<boolean> => {
   const jwtToken = await AsyncStorage.getItem("auth_token");
-  const isLoggedInLocally = await AsyncStorage.getItem("is_logged_in");
-
-  if (isLoggedInLocally === "false" || !isLoggedInLocally || !jwtToken) {
-    router.replace("/login");
-    return false;
-  }
 
   try {
     const response = await fetch(`${BASE_URL}/api/user/check-jwt`, {

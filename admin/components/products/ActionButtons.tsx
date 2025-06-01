@@ -2,8 +2,8 @@ import React from "react";
 import { View, TouchableOpacity } from "react-native";
 import { ThemedText } from "@/components/ThemedText";
 
-// Impor MaterialCommunityIcons
-import { MaterialCommunityIcons } from '@expo/vector-icons';
+// Import FontAwesome
+import { FontAwesome } from '@expo/vector-icons';
 
 interface ActionButtonsProps {
   pickImage: () => void;
@@ -24,7 +24,7 @@ export default function ActionButtons({
         style={[styles.button, { backgroundColor: "#28a745", flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }]}
         onPress={pickImage}
       >
-        <MaterialCommunityIcons name="image-plus" size={20} color="white" style={{ marginRight: 8 }} />
+        <FontAwesome name="image" size={20} color="white" style={{ marginRight: 8 }} />
         <ThemedText style={styles.buttonText}>Pick an Image</ThemedText>
       </TouchableOpacity>
 
@@ -33,9 +33,11 @@ export default function ActionButtons({
         onPress={handleUpdateProduct || handleAddProduct}
       >
         {handleUpdateProduct ? (
-          <MaterialCommunityIcons name="update" size={20} color="white" style={{ marginRight: 8 }} />
+          // FontAwesome for "Update Product"
+          <FontAwesome name="edit" size={20} color="white" style={{ marginRight: 8 }} />
         ) : (
-          <MaterialCommunityIcons name="plus-circle" size={20} color="white" style={{ marginRight: 8 }} />
+          // FontAwesome for "Add Product"
+          <FontAwesome name="plus-circle" size={20} color="white" style={{ marginRight: 8 }} />
         )}
         <ThemedText style={styles.buttonText}>
           {handleUpdateProduct ? "Update Product" : "Add Product"}
