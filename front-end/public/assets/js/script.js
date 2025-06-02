@@ -663,7 +663,7 @@ CSS TABLE OF CONTENTS
     var searchInput = searchWrapper.find("input[name='keyword']");
     var searchButton = searchWrapper.find("button"); // Get the button within the wrapper
 
-    searchButton.on("click", function(e) {
+    searchButton.on("click", function (e) {
         // Prevent default form submission initially
         e.preventDefault();
 
@@ -678,21 +678,24 @@ CSS TABLE OF CONTENTS
 
                 // Optional: Listen for clicks outside to hide the input if it's empty
                 // This improves UX, but requires a way to disable it when user types
-                setTimeout(() => { // Add a slight delay to allow focus
-                    $(document).one("click", function(event) {
-                        if (!searchWrapper.is(event.target) && searchWrapper.has(event.target).length === 0) {
+                setTimeout(() => {
+                    // Add a slight delay to allow focus
+                    $(document).one("click", function (event) {
+                        if (
+                            !searchWrapper.is(event.target) &&
+                            searchWrapper.has(event.target).length === 0
+                        ) {
                             if (searchInput.val().trim() === "") {
                                 searchWrapper.removeClass("search-active");
                             }
                         }
                     });
                 }, 100);
-
             } else {
                 // If input is currently visible
                 if (searchInput.val().trim() !== "") {
                     // If there's text, submit the form
-                    $(this).closest('form').submit();
+                    $(this).closest("form").submit();
                 } else {
                     // If input is empty, hide it again
                     searchWrapper.removeClass("search-active");
@@ -701,12 +704,12 @@ CSS TABLE OF CONTENTS
             }
         } else {
             // On larger screens, just submit the form normally
-            $(this).closest('form').submit();
+            $(this).closest("form").submit();
         }
     });
 
     // Handle pressing 'Enter' key inside the search input
-    searchInput.on("keydown", function(e) {
+    searchInput.on("keydown", function (e) {
         if (e.key === "Enter") {
             // Prevent default behavior (e.g., newline in some inputs)
             e.preventDefault();
@@ -716,16 +719,21 @@ CSS TABLE OF CONTENTS
     });
 
     // Optional: Hide input if Esc key is pressed and input is empty
-    $(document).on("keydown", function(e) {
+    $(document).on("keydown", function (e) {
         var isSmallScreen = window.matchMedia("(max-width: 1199px)").matches;
-        if (isSmallScreen && e.key === "Escape" && searchWrapper.hasClass("search-active") && searchInput.val().trim() === "") {
+        if (
+            isSmallScreen &&
+            e.key === "Escape" &&
+            searchWrapper.hasClass("search-active") &&
+            searchInput.val().trim() === ""
+        ) {
             searchWrapper.removeClass("search-active");
             searchInput.blur();
         }
     });
 
     // Optional: If screen resizes from small to large, ensure input is visible
-    $(window).on("resize", function() {
+    $(window).on("resize", function () {
         var isSmallScreen = window.matchMedia("(max-width: 1199px)").matches;
         if (!isSmallScreen) {
             searchWrapper.removeClass("search-active"); // Remove active class if it was there
@@ -734,5 +742,204 @@ CSS TABLE OF CONTENTS
     });
 
     // ... (Your other JavaScript code) ...
+})(jQuery);
+(function ($) {
+    "use strict";
+
+    $(document).ready(function () {
+        // --- 1. INISIALISASI SEMUA FITUR SAAT DOM SIAP ---
+
+        // Fungsi untuk mengelola fitur "View More Products" / "Hide Products"
+        initProductToggle();
+
+        // Fungsi untuk mengelola fitur "Payment Modal"
+        initPaymentModal();
+
+        // Fungsi untuk mengelola fitur "Shipping Address Modal"
+        initShippingAddressModal();
+
+    }); // End of $(document).ready()
+
+
+    // --- 2. DEFINISI FUNGSI-FUNGSI FITUR SECARA TERPISAH ---
+
+    /**
+     * Menginisialisasi logika untuk menampilkan/menyembunyikan produk di pesanan.
+     */
+    function initProductToggle() {
+        $("#my-order").on("click", ".view-more-btn", function () {
+            const $button = $(this);
+            const $orderBody = $button.closest(".order-body");
+            const $hiddenItems = $orderBody.find(
+                ".product-item-order.hidden-product-item-order"
+            );
+
+            $hiddenItems.slideToggle("fast", function () {
+                if ($(this).is(":visible")) {
+                    $(this).css("display", "flex");
+                }
+                if ($hiddenItems.first().is(":visible")) {
+                    $button.html(
+                        'Hide Products <i class="fas fa-chevron-up ms-2"></i>'
+                    );
+                } else {
+                    const totalHidden = $hiddenItems.length;
+                    $button.html(
+                        `View All Products (${totalHidden} more) <i class="fas fa-chevron-down ms-2"></i>`
+                    );
+                }
+            });
+        });
+    }
+    function initPaymentModal() {
+        const paymentModal = $("#paymentModal");
+        const modalTransactionId = $("#modalTransactionId");
+        const modalTotalAmountDisplay = $("#modalTotalAmount");
+        const modalPaymentMethodDisplay = $("#modalPaymentMethod");
+        const modalTotalAmountValueInput = $("#modalTotalAmountValue");
+        const modalPaymentMethodValueInput = $("#modalPaymentMethodValue");
+        const paymentProofInput = $("#paymentProof");
+        const imagePreview = $("#imagePreview");
+        const paymentProofForm = $("#paymentProofForm");
+        const submitPaymentProofBtn = $("#submitPaymentProofBtn");
+
+        paymentModal.on("show.bs.modal", function (event) {
+            const button = $(event.relatedTarget);
+            const transactionId = button.data("transaction-id");
+            const totalAmount = button.data("total-amount");
+            const paymentMethod = button.data("payment-method");
+
+            modalTransactionId.val(transactionId);
+            modalTotalAmountDisplay.text(`Rp${totalAmount}`);
+            modalPaymentMethodDisplay.text(paymentMethod);
+            modalTotalAmountValueInput.val(totalAmount.replace(/,/g, ""));
+            modalPaymentMethodValueInput.val(paymentMethod);
+
+            paymentProofForm[0].reset();
+            imagePreview.attr("src", "#").hide();
+            submitPaymentProofBtn.prop("disabled", false).text("Confirm Payment");
+        });
+
+        paymentProofInput.on("change", function () {
+            const file = this.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    imagePreview.attr("src", e.target.result).show();
+                };
+                reader.readAsDataURL(file);
+            } else {
+                imagePreview.attr("src", "#").hide();
+            }
+        });
+
+        paymentProofForm.on("submit", function (e) {
+            e.preventDefault();
+
+            submitPaymentProofBtn.prop("disabled", true).text("Uploading...");
+
+            const formData = new FormData(this);
+            const transactionId = modalTransactionId.val();
+
+            $.ajax({
+                url: `${window.location.origin}/api/transactions/${transactionId}/upload-proof`,
+                type: "POST",
+                data: formData,
+                processData: false,
+                contentType: false,
+                headers: {
+                    // 'Authorization': 'Bearer ' + YOUR_AUTH_TOKEN
+                },
+                success: function (response) {
+                    alert(
+                        "Payment proof uploaded successfully! Your order status will be updated."
+                    );
+                    paymentModal.modal("hide");
+                    location.reload();
+                },
+                error: function (xhr, status, error) {
+                    console.error("Upload failed:", xhr.responseText);
+                    let errorMessage =
+                        "Failed to upload payment proof. Please try again.";
+                    try {
+                        const errorResponse = JSON.parse(xhr.responseText);
+                        if (errorResponse.message) {
+                            errorMessage = errorResponse.message;
+                        }
+                    } catch (e) {
+                        // ignore
+                    }
+                    alert(errorMessage);
+                    submitPaymentProofBtn
+                        .prop("disabled", false)
+                        .text("Confirm Payment");
+                },
+            });
+        });
+    }
+ function initShippingAddressModal() {
+    const shippingAddressModal = $('#shippingAddressModal');
+    const modalRecipientName = $('#modalRecipientName');
+    const modalPhoneNumber = $('#modalPhoneNumber');
+    const modalAddress = $('#modalAddress');
+    const modalZipCode = $('#modalZipCode');
+    const modalDestinationLabel = $('#modalDestinationLabel');
+    const modalCourier = $('#modalCourier');
+    // Target kontainer bagian dalam di mana langkah-langkah progress akan ditambahkan
+    const orderProgressBarContainer = $('#orderProgressBar .progress-bar-container');
+
+    shippingAddressModal.on('show.bs.modal', function(event) {
+        const button = $(event.relatedTarget);
+        const recipientName = button.data('recipient-name');
+        const phoneNumber = button.data('phone-number');
+        const address = button.data('address');
+        const zipCode = button.data('zip-code');
+        const destinationLabel = button.data('destination-label');
+        const courier = button.data('courier');
+        const currentOrderStatus = button.data('status'); // Ambil status saat ini
+
+        // Isi detail alamat pengiriman
+        modalRecipientName.text(recipientName);
+        modalPhoneNumber.text(phoneNumber);
+        modalAddress.text(address);
+        modalZipCode.text(zipCode);
+        modalDestinationLabel.text(destinationLabel);
+        modalCourier.text(courier);
+
+        // Bersihkan konten progress bar sebelumnya
+        orderProgressBarContainer.empty();
+
+        // Definisikan semua langkah yang mungkin untuk progress bar
+        const allPossibleSteps = [
+            { id: 'draft', label: 'Order Made', icon: 'far fa-file-alt' },
+            { id: 'pending', label: 'Waiting for Payment', icon: 'fas fa-hourglass-half' },
+            { id: 'paid', label: 'Payment Confirmed', icon: 'fas fa-money-bill-wave' },
+            { id: 'process', label: 'Order Shipped', icon: 'fas fa-truck' },
+            { id: 'delivered', label: 'Order Completed', icon: 'fas fa-download' },
+            { id: 'completed', label: 'Order Accepted', icon: 'fas fa-star' }
+        ];
+        const currentStatusIndex = allPossibleSteps.findIndex(step => step.id === currentOrderStatus);
+
+        // Bangun progress bar
+        allPossibleSteps.forEach((step, index) => {
+            const isActive = index <= currentStatusIndex;
+
+            const stepHtml = `
+                <div class="progress-step ${isActive ? 'active' : ''}">
+                    <div class="step-icon">
+                        <i class="${step.icon}"></i>
+                    </div>
+                    <div class="step-label">${step.label}</div>
+                </div>
+            `;
+            orderProgressBarContainer.append(stepHtml);
+        });
+        if (currentStatusIndex === -1 && currentOrderStatus) {
+            orderProgressBarContainer.append(`<p class="text-muted text-center">Status: ${currentOrderStatus.charAt(0).toUpperCase() + currentOrderStatus.slice(1)}</p>`);
+        } else if (!currentOrderStatus) {
+             orderProgressBarContainer.append('<p class="text-muted text-center">Status pesanan tidak tersedia.</p>');
+        }
+    });
+}
 
 })(jQuery);

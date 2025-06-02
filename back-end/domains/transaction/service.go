@@ -72,6 +72,9 @@ func (s *service) GetTransactionsByUserID(ctx context.Context) ([]Transaction, e
 		Preload("TransactionDetails.Product", func(db *gorm.DB) *gorm.DB {
 			return db.Select("id", "name", "price")
 		}).
+		Preload("TransactionDetails.Product.ProductImages", func(db *gorm.DB) *gorm.DB {
+			return db.Select("id", "product_id", "url").Order("id ASC")
+		}).
 		Where("user_id = ?", token.Claims.UserID).
 		Find(&transactions)
 

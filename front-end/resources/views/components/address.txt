@@ -1,0 +1,178 @@
+    <form action="" method="POST">
+        @csrf
+        <div class="row g-3">
+            <div class="mb-3">
+                <label for="address" class="form-label"> Address</label>
+                <textarea class="form-control" id="address" name="address" rows="3">{{ session('user')['CustomerDetails']['Address'] ?? '' }}
+</textarea>
+            </div>
+            <div class="mb-3 row">
+                <div class="col-md-8">
+                    <label for="searchDestinaton" class="form-label">City, Province</label>
+                    <input type="text" class="form-control" id="searchDestinaton" placeholder="e.g., Surabaya"
+                        value="{{ session('user')['CustomerDetails']['DestinationLabel'] ?? '' }}
+" autocomplete="off"
+                        name="destination_label">
+                    <input type="hidden" id="destination_id" name="destination_id">
+                    <ul id="suggestions" class="list-group position-absolute w-50 mt-1"
+                        style="z-index: 1000; max-height: 200px; overflow-y: auto;"></ul>
+                </div>
+                <div class="col-md-4">
+                    <label for="zip_code" class="form-label">Zip Code</label>
+                    <input type="text" class="form-control" id="zip_code" name="zip_code" maxlength="5"
+                        value="{{ session('user')['CustomerDetails']['ZipCode'] ?? '' }}
+" inputmode="numeric"
+                        pattern="\d{5}" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+                </div>
+            </div>
+        </div>
+        <button type="submit" class="btn btn-primary">Save
+            Changes</button>
+    </form>
+
+    <script>
+    const searchInput = document.getElementById('searchDestinaton');
+    const zipCodeInput = document.getElementById('zip_code');
+    const suggestionBox = document.getElementById('suggestions');
+
+    let debounceTimer;
+
+    // Event listener untuk input pencarian
+    searchInput.addEventListener('input', function() {
+        const query = this.value.trim();
+        clearTimeout(debounceTimer);
+
+        if (query.length < 3) {
+            suggestionBox.innerHTML = '';
+            return;
+        }
+
+        debounceTimer = setTimeout(() => {
+            fetch(`/search-destination?q=${encodeURIComponent(query)}&limit=5&offset=0`)
+                .then(res => res.json())
+                .then(data => {
+                    console.log('API Response:', data);
+                    suggestionBox.innerHTML = '';
+
+                    if (data.data && data.data.length > 0) {
+                        data.data.forEach(item => {
+                            const li = document.createElement('li');
+                            li.className = 'list-group-item list-group-item-action';
+                            li.textContent =
+                                `${item.subdistrict_name}, ${item.district_name}, ${item.city_name}, ${item.province_name}`;
+                            li.dataset.zip = item.zip_code || '';
+                            li.dataset.id = item.id;
+                            suggestionBox.appendChild(li);
+                        });
+                    } else {
+                        const li = document.createElement('li');
+                        li.className = 'list-group-item disabled';
+                        li.textContent = 'No results found';
+                        suggestionBox.appendChild(li);
+                    }
+                })
+                .catch(err => {
+                    console.error('Fetch error:', err);
+                    suggestionBox.innerHTML =
+                        '<li class="list-group-item disabled">Error loading</li>';
+                });
+        }, 300);
+    });
+
+    // Event listener untuk memilih suggestion dari daftar
+    suggestionBox.addEventListener('click', function(e) {
+        if (e.target && e.target.matches('li.list-group-item-action')) {
+            searchInput.value = e.target.textContent;
+            zipCodeInput.value = e.target.dataset.zip;
+            document.getElementById('destination_id').value = e.target.dataset.id;
+
+            console.log('Selected Destination ID:', e.target.dataset.id);
+
+            const receiverDestinationId = document.getElementById('destination_id').value;
+            const weight = parseFloat(
+                "{{ isset($cartItems['TotalWeight']) ? number_format($cartItems['TotalWeight'] / 1000, 2, '.', '') : 0 }}"
+            );
+            const itemValue = {{ isset($cartItems['TotalPrice']) ? $cartItems['TotalPrice'] : 0 }};
+
+            if (!receiverDestinationId || !weight || !itemValue) {
+                console.error("Missing required fields!");
+                return;
+            }
+
+            fetch('/check-tariff', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute(
+                            'content')
+                    },
+                    body: JSON.stringify({
+                        receiver_destination_id: receiverDestinationId,
+                        weight: weight,
+                        item_value: itemValue
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    console.log('Shipping Cost Response:', data);
+
+                    // Kosongkan isi dropdown tarif
+                    tariffDropdown.innerHTML = '<option value="">Select a Courir</option>';
+
+                    const tarifList = [];
+
+                    if (data.data) {
+                        const {
+                            calculate_reguler = [], calculate_cargo = []
+                        } = data.data;
+
+                        // Menambahkan tarif reguler
+                        calculate_reguler.forEach((item, index) => {
+                            tarifList.push({
+                                ...item,
+                                type: 'Reguler',
+                                index
+                            });
+                        });
+
+                        // Menambahkan tarif cargo
+                        calculate_cargo.forEach((item, index) => {
+                            tarifList.push({
+                                ...item,
+                                type: 'Cargo',
+                                index
+                            });
+                        });
+                    }
+
+                    if (tarifList.length > 0) {
+                        shippingTariffDiv.style.display = 'block';
+
+                        tarifList.forEach(item => {
+                            const option = document.createElement('option');
+                            option.value =
+                                `${item.shipping_name}-${item.service_name}-${item.type}-${item.index}`;
+                            option.textContent =
+                                `${item.shipping_name} ${item.service_name} (${item.type}) - Rp${item.shipping_cost.toLocaleString()} - ETA: ${item.etd}`;
+                            option.dataset.shipping = JSON.stringify(item);
+                            tariffDropdown.appendChild(option);
+                        });
+                    } else {
+                        shippingTariffDiv.style.display = 'none';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching shipping cost:', error);
+                });
+
+            suggestionBox.innerHTML = '';
+        }
+    });
+
+    // Menutup suggestion box jika klik di luar elemen pencarian
+    document.addEventListener('click', function(e) {
+        if (!searchInput.contains(e.target) && !suggestionBox.contains(e.target)) {
+            suggestionBox.innerHTML = '';
+        }
+    });
+</script>

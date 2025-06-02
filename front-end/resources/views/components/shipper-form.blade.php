@@ -44,25 +44,8 @@
             <input type="hidden" id="shipping_cost" name="shipping_cost">
             <input type="hidden" id="grandtotal">
         </div>
-        <div id="uploadProofContainer" class="mb-3" style="display: none;">
-            <h5>Bank Transfer :</h5>
-            <h5>BCA 1702321312 a/n Razzan</h5>
-            <label for="transfer_proof" class="form-label">
-                Upload Bukti Transfer</label>
-            <input type="file" class="form-control" id="transfer_proof" name="payment_proof" accept="image/*"
-                required>
-        </div>
     </form>
 </div>
-<script>
-    document.getElementById("transfer_proof").addEventListener("change", function(e) {
-        const file = e.target.files[0];
-        if (!file.type.startsWith("image/")) {
-            alert("Only image files are allowed!");
-            e.target.value = "";
-        }
-    });
-</script>
 <script>
     // Ambil elemen penting
     const searchInput = document.getElementById('searchDestination');

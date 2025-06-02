@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Collection;
+use Illuminate\Pagination\LengthAwarePaginator;
 class TransactionController extends Controller
 {
     public function addTransaction(Request $request)
@@ -101,7 +102,7 @@ class TransactionController extends Controller
         try {
             $response = Http::withHeaders([
                 'Authorization' => 'Bearer ' . $token,
-            ])->get(config('app.back_end_base_url') . '/api/transaction');
+            ])->get('localhost:7777/api/transaction');
 
             if (in_array('Unauthorized!', $response->json('errors') ?? [])) {
                 return redirect()->route('login')->with('error', 'Session expired. Please log in again.');
