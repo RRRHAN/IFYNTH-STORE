@@ -5,12 +5,12 @@
         <div class="mb-3">
             <label for="name" class="form-label">Full Name</label>
             <input type="text" class="form-control" id="name" name="name"
-                value="{{ session('user')['Name'] ?? 'Enter your Full Name' }}" required>
+                value="{{ session('user')['Name'] ?? '' }}" required>
         </div>
         <div class="mb-3">
             <label for="phone" class="form-label">Phone Number</label>
             <input type="text" class="form-control" id="phone" name="phone_number"
-                value="{{ session('user')['PhoneNumber'] ?? 'Enter your Phone Number' }}" required>
+                value="{{ session('user')['PhoneNumber'] ?? '' }}" required>
         </div>
         <div class="mb-3">
             <label for="address" class="form-label">Shipping Address</label>
