@@ -1,99 +1,37 @@
-<!-- Personal Information -->
 <div class="tab-pane fade" id="address" role="tabpanel">
-    <h5 class="mb-4">Personal Address</h5>
     <div class="container mt-4">
         <div class="d-flex justify-content-between align-items-center mb-3">
-            <h5>Alamat Saya</h5>
-            <button class="btn btn-primary">
-                <i class="fas fa-plus me-2"></i> Tambah Alamat Baru
+            <h2 class="text-dark">My Address</h2>
+            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addAddressModal">
+                <i class="fas fa-plus me-2"></i> Add New Address
             </button>
         </div>
 
-        <h5 class="mb-3">Alamat</h5>
+        <h5 class="mb-3 text-dark">List Address</h5>
 
-        <div class="address-item shadow-sm">
-            <div class="address-item-header">
-                <div>
-                    <strong>deva nadindra</strong> (+62) 813 3023 4066
+        @foreach ($addresses as $address)
+            <div class="address-item shadow-sm">
+                <div class="address-item-header">
+                    <div>
+                        <strong>{{ $address['RecipientsName'] ?? 'Nama tidak tersedia' }}</strong>
+                        (+62)
+                        {{ $address['RecipientsNumber'] ?? 'Nomor tidak tersedia' }}
+                    </div>
+                    <div class="address-item-actions">
+                        <button class="btn btn-link p-0 text-decoration-none edit-address-btn" data-bs-toggle="modal"
+                            data-bs-target="#updateAddressModal" data-address="{{ json_encode($address) }}">
+                            Ubah
+                        </button>
+                        <a href="{{ route('deleteAddress', ['id' => $address['ID']]) }}">Hapus</a>
+                    </div>
                 </div>
-                <div class="address-item-actions">
-                    <a href="#">Ubah</a>
-                    <button class="btn btn-outline-secondary btn-sm">Atur sebagai utama</button>
+                <div class="address-item-details">
+                    {{ $address['Address'] ?? '' }}<br>
+                    {{ $address['DestinationLabel'] ?? '' }}, {{ $address['ZipCode'] ?? '' }}
                 </div>
             </div>
-            <div class="address-item-details">
-                Fanihah Wendit Regency, Jalan Simpang Anggodo No. 2, RT.2/RW.9, Mangliawan, Pakis (kavling 3)<br>
-                PAKIS, KAB. MALANG, JAWA TIMUR, ID, 65154
-            </div>
-            <span class="main-address-tag">Utama</span>
-        </div>
+        @endforeach
 
-        <div class="address-item shadow-sm">
-            <div class="address-item-header">
-                <div>
-                    <strong>deva nadindra</strong> (+62) 813 3023 4066
-                </div>
-                <div class="address-item-actions">
-                    <a href="#">Ubah</a>
-                    <a href="#">Hapus</a>
-                    <button class="btn btn-outline-secondary btn-sm">Atur sebagai utama</button>
-                </div>
-            </div>
-            <div class="address-item-details">
-                Jalan Barito No. 35, Kauman, Kepanjen Kidul (rumah warna coklat)<br>
-                KEPANJEN KIDUL, KOTA BLITAR, JAWA TIMUR, ID, 66117
-            </div>
-        </div>
-
-        <div class="address-item shadow-sm">
-            <div class="address-item-header">
-                <div>
-                    <strong>yossi</strong> (+62) 813 3023 4066
-                </div>
-                <div class="address-item-actions">
-                    <a href="#">Ubah</a>
-                    <a href="#">Hapus</a>
-                    <button class="btn btn-outline-secondary btn-sm">Atur sebagai utama</button>
-                </div>
-            </div>
-            <div class="address-item-details">
-                Jalan Ontoseno IV No. 23a, Polehan, Blimbing (No 23A)<br>
-                BLIMBING, KOTA MALANG, JAWA TIMUR, ID, 65121
-            </div>
-        </div>
-
-        <div class="address-item shadow-sm">
-            <div class="address-item-header">
-                <div>
-                    <strong>risky aby</strong> (+62) 877 6423 4314
-                </div>
-                <div class="address-item-actions">
-                    <a href="#">Ubah</a>
-                    <a href="#">Hapus</a>
-                    <button class="btn btn-outline-secondary btn-sm">Atur sebagai utama</button>
-                </div>
-            </div>
-            <div class="address-item-details">
-                Jl manyar rt 38 rw 02, mojopurno madiun<br>
-                WUNGU, KAB. MADIUN, JAWA TIMUR, ID, 63181
-            </div>
-        </div>
-
-        <div class="address-item shadow-sm">
-            <div class="address-item-header">
-                <div>
-                    <strong>deva nadindra pramudya</strong> (+62) 813 3023 4066
-                </div>
-                <div class="address-item-actions">
-                    <a href="#">Ubah</a>
-                    <a href="#">Hapus</a>
-                    <button class="btn btn-outline-secondary btn-sm">Atur sebagai utama</button>
-                </div>
-            </div>
-            <div class="address-item-details">
-                Jalan Thamrin No.86B, Klegen, Kartoharjo (utara bakso pakrebo)<br>
-                KARTOHARJO, KOTA MADIUN, JAWA TIMUR, ID, 63117
-            </div>
-        </div>
     </div>
-</div>
+    @include('components.addressModal')
+    @include('components.updateAddressModal')

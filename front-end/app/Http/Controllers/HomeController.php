@@ -62,34 +62,37 @@ class HomeController extends Controller
 
     public function dashboard(Request $request)
     {
-        $keyword = $request->query('keyword');
         $token = session('api_token');
 
         $response = Http::withHeaders([
             'Authorization' => 'Bearer ' . $token
         ])->get(config('app.back_end_base_url') . '/api/user/check-jwt');
 
-        if ($response->successful()){
+        if ($response->successful()) {
 
-        $cusproductController = new CustomerProductController();
-        $resultProducts = $cusproductController->fetchOffers($request);
-        $products = $resultProducts->get('products');
+            $cusproductController = new CustomerProductController();
+            $resultProducts = $cusproductController->fetchOffers($request);
+            $products = $resultProducts->get('products');
 
-        $userController = new UserController();
-        $user = $userController->getPersonal();
+            $userController = new UserController();
+            $user = $userController->getPersonal();
 
-        $transactionController = new TransactionController();
-        $resultTransactions = $transactionController->getTransaction();
-        $transactions = $resultTransactions->get('transactions');
+            $transactionController = new TransactionController();
+            $resultTransactions = $transactionController->getTransaction();
+            $transactions = $resultTransactions->get('transactions');
 
-        return view('dashboard', [
-            'products' => $products,
-            'user' => $user,
-            'transactions' => $transactions,
-        ]);
-        } else {
-            return redirect()->route('login')->with('error', 'Session expired. Please log in again.');
+            $addressController = new AddressController();
+            $addresses = $addressController->getAddress($request);
+
+            return view('dashboard', [
+                'products' => $products,
+                'user' => $user,
+                'transactions' => $transactions,
+                'addresses' => $addresses,
+            ]);
         }
+
+        return redirect()->route('login')->with('error', 'Session expired. Please log in again.');
     }
 
     public function countUnread(Request $request)

@@ -10,6 +10,7 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\MessageController;
 use App\Http\Controllers\TryonController;
+use App\Http\Controllers\AddressController;
 use Illuminate\Support\Facades\Http;
 
 Route::get('/', function () {
@@ -89,6 +90,13 @@ Route::controller(MessageController::class)->group(function () {
 Route::controller(OngkirController::class)->group(function () {
     Route::get('/search-destination', 'searchDestination');
     Route::post('/check-tariff', 'getShippingCost');
+});
+
+// Route address
+Route::controller(AddressController::class)->group(function () {
+    Route::post('/addAddress', 'addAddress') -> name('addAddress');
+    Route::get('/deleteAddress/{id}', 'deleteAddress')->name('deleteAddress');
+    Route::put('/updateAddress/{id}', 'updateAddress')->name('updateAddress');
 });
 
 

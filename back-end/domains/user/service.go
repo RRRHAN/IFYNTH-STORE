@@ -58,7 +58,7 @@ func (s *service) GetPersonal(ctx context.Context) (interface{}, error) {
 
 	case constants.CUSTOMER:
 		var customer Customer
-		err = s.db.WithContext(ctx).Preload("Address").Where("id = ?", token.Claims.UserID).First(&customer).Error
+		err = s.db.WithContext(ctx).Where("id = ?", token.Claims.UserID).First(&customer).Error
 		if err != nil {
 			return nil, err
 		}

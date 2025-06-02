@@ -8,7 +8,9 @@ import (
 
 type CustomerAddress struct {
 	ID               uuid.UUID `gorm:"type:uuid;default:gen_random_uuid();primaryKey"`
-	UserID           uuid.UUID
+	CustomerID       uuid.UUID
+	RecipientsName   string
+	RecipientsNumber string
 	DestinationID    string
 	Address          string
 	ZipCode          string
