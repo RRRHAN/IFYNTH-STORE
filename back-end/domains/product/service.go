@@ -12,7 +12,9 @@ import (
 
 	"gorm.io/gorm"
 
+	"github.com/RRRHAN/IFYNTH-STORE/back-end/domains/user"
 	"github.com/RRRHAN/IFYNTH-STORE/back-end/utils/config"
+	contextUtil "github.com/RRRHAN/IFYNTH-STORE/back-end/utils/context"
 	fileutils "github.com/RRRHAN/IFYNTH-STORE/back-end/utils/file"
 	"github.com/google/uuid"
 )
@@ -83,30 +85,48 @@ func (s *service) GetProductByID(ctx context.Context, id uuid.UUID) (*Product, e
 }
 
 func (s *service) AddProduct(ctx context.Context, req AddProductRequest) error {
+	token, err := contextUtil.GetTokenClaims(ctx)
+	if err != nil {
+		return err
+	}
+
+	UserID := token.Claims.UserID
+
+	tx := s.db.WithContext(ctx).Begin()
+	if tx.Error != nil {
+		return tx.Error
+	}
+
+	defer func() {
+		if r := recover(); r != nil {
+			tx.Rollback()
+		}
+	}()
+
 	totalStock := 0
 	for _, detail := range req.StockDetails {
 		totalStock += int(detail.Stock)
 	}
 
 	product := Product{
-		ID:          uuid.New(),
-		Name:        req.Name,
-		TotalStock:  totalStock,
-		Description: req.Description,
-		Price:       req.Price,
-		Weight:      req.Weight,
-		Department:  req.Department,
-		Category:    req.Category,
-		CreatedAt:   time.Now(),
-		UpdatedAt:   time.Now(),
+		ID:           uuid.New(),
+		Name:         req.Name,
+		TotalStock:   totalStock,
+		Description:  req.Description,
+		Price:        req.Price,
+		Weight:       req.Weight,
+		Department:   req.Department,
+		Category:     req.Category,
+		LastHandleBy: UserID,
+		CreatedAt:    time.Now(),
+		UpdatedAt:    time.Now(),
 	}
 
-	// save to db
-	if err := s.db.Create(&product).Error; err != nil {
+	if err := tx.Create(&product).Error; err != nil {
+		tx.Rollback()
 		return err
 	}
 
-	// Save capital info to ProductCapital table
 	productCapital := ProductCapital{
 		ID:             uuid.New(),
 		ProductID:      product.ID,
@@ -117,17 +137,18 @@ func (s *service) AddProduct(ctx context.Context, req AddProductRequest) error {
 		UpdatedAt:      time.Now(),
 	}
 
-	if err := s.db.Create(&productCapital).Error; err != nil {
+	if err := tx.Create(&productCapital).Error; err != nil {
+		tx.Rollback()
 		return fmt.Errorf("failed to save capital: %w", err)
 	}
 
-	// save img if exist
 	var productImages []ProductImage
 	for _, file := range req.Images {
 		ext := filepath.Ext(file.Filename)
 
 		filename, err := fileutils.GenerateMediaName(product.ID.String())
 		if err != nil {
+			tx.Rollback()
 			return fmt.Errorf("error generating image name: %v", err)
 		}
 
@@ -135,10 +156,12 @@ func (s *service) AddProduct(ctx context.Context, req AddProductRequest) error {
 		path := filepath.Join("uploads", "products", filename)
 
 		if err := os.MkdirAll(filepath.Dir(path), os.ModePerm); err != nil {
+			tx.Rollback()
 			return fmt.Errorf("failed to create directory: %w", err)
 		}
 
 		if err := fileutils.SaveMedia(ctx, file, path); err != nil {
+			tx.Rollback()
 			return err
 		}
 
@@ -150,7 +173,8 @@ func (s *service) AddProduct(ctx context.Context, req AddProductRequest) error {
 	}
 
 	if len(productImages) > 0 {
-		if err := s.db.Create(&productImages).Error; err != nil {
+		if err := tx.Create(&productImages).Error; err != nil {
+			tx.Rollback()
 			return err
 		}
 	}
@@ -167,15 +191,35 @@ func (s *service) AddProduct(ctx context.Context, req AddProductRequest) error {
 	}
 
 	if len(stockDetails) > 0 {
-		if err := s.db.Create(&stockDetails).Error; err != nil {
+		if err := tx.Create(&stockDetails).Error; err != nil {
+			tx.Rollback()
 			return err
 		}
 	}
 
-	return nil
+	activity := user.AdminActivity{
+		ID:          uuid.New(),
+		AdminID:     UserID,
+		Description: fmt.Sprintf("create a product %s", product.ID.String()),
+		CreatedAt:   time.Now(),
+	}
+
+	if err := tx.Create(&activity).Error; err != nil {
+		tx.Rollback()
+		return fmt.Errorf("failed to create admin activity: %w", err)
+	}
+
+	return tx.Commit().Error
 }
 
 func (s *service) DeleteProduct(ctx context.Context, productID string) error {
+	token, err := contextUtil.GetTokenClaims(ctx)
+	if err != nil {
+		return err
+	}
+
+	UserID := token.Claims.UserID
+
 	var product Product
 	if err := s.db.WithContext(ctx).First(&product, "id = ?", productID).Error; err != nil {
 		return fmt.Errorf("product not found: %v", err)
@@ -210,10 +254,28 @@ func (s *service) DeleteProduct(ctx context.Context, productID string) error {
 		return fmt.Errorf("error deleting product: %v", err)
 	}
 
+	activity := user.AdminActivity{
+		ID:          uuid.New(),
+		AdminID:     UserID,
+		Description: fmt.Sprintf("deleted a product %s", product.ID.String()),
+		CreatedAt:   time.Now(),
+	}
+
+	if err := s.db.WithContext(ctx).Create(&activity).Error; err != nil {
+		return fmt.Errorf("failed to create admin activity: %w", err)
+	}
+
 	return nil
 }
 
 func (s *service) UpdateProduct(ctx context.Context, productID string, req UpdateProductRequest, images []*multipart.FileHeader) error {
+	token, err := contextUtil.GetTokenClaims(ctx)
+	if err != nil {
+		return err
+	}
+
+	UserID := token.Claims.UserID
+
 	var product Product
 	if err := s.db.WithContext(ctx).First(&product, "id = ?", productID).Error; err != nil {
 		return fmt.Errorf("product not found: %v", err)
@@ -231,6 +293,7 @@ func (s *service) UpdateProduct(ctx context.Context, productID string, req Updat
 	product.Weight = req.Weight
 	product.Department = req.Department
 	product.Category = req.Category
+	product.LastHandleBy = UserID
 	product.UpdatedAt = time.Now()
 
 	if err := s.db.WithContext(ctx).Save(&product).Error; err != nil {
@@ -259,7 +322,7 @@ func (s *service) UpdateProduct(ctx context.Context, productID string, req Updat
 	}
 
 	var capital ProductCapital
-	err := s.db.WithContext(ctx).First(&capital, "product_id = ?", product.ID).Error
+	err = s.db.WithContext(ctx).First(&capital, "product_id = ?", product.ID).Error
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 
@@ -358,6 +421,20 @@ func (s *service) UpdateProduct(ctx context.Context, productID string, req Updat
 				return fmt.Errorf("error updating stock detail: %v", err)
 			}
 		}
+	}
+	// Buat activity log
+	activity := user.AdminActivity{
+		ID:      uuid.New(),
+		AdminID: UserID,
+		Description: fmt.Sprintf(
+			"update product %s",
+			product.ID.String(),
+		),
+		CreatedAt: time.Now(),
+	}
+
+	if err := s.db.WithContext(ctx).Create(&activity).Error; err != nil {
+		return fmt.Errorf("failed to create admin activity: %w", err)
 	}
 
 	return nil

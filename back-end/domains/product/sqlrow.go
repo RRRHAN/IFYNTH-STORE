@@ -9,14 +9,15 @@ import (
 type Product struct {
 	ID             uuid.UUID `gorm:"type:uuid;default:gen_random_uuid();primaryKey"`
 	Name           string
-	TotalStock     int     `gorm:"type:integer"`
-	Description    string  `gorm:"type:text"`
-	Price          float64 `gorm:"type:decimal;not null"`
-	Weight         float64 `gorm:"not null"`
-	Department     string  `gorm:"type:varchar(3);check(department in ('IFY', 'NTH'))"`
-	Category       string  `gorm:"type:varchar(50);not null"`
-	CreatedAt      time.Time
-	UpdatedAt      time.Time
+	TotalStock     int                  `gorm:"type:integer"`
+	Description    string               `gorm:"type:text"`
+	Price          float64              `gorm:"type:decimal;not null"`
+	Weight         float64              `gorm:"not null"`
+	Department     string               `gorm:"type:varchar(3);check(department in ('IFY', 'NTH'))"`
+	Category       string               `gorm:"type:varchar(50);not null"`
+	LastHandleBy   uuid.UUID            `gorm:"type:uuid"`
+	CreatedAt      time.Time            `gorm:"autoCreateTime"`
+	UpdatedAt      time.Time            `gorm:"autoUpdateTime"`
 	ProductImages  []ProductImage       `gorm:"foreignKey:ProductID"`
 	StockDetails   []ProductStockDetail `gorm:"foreignKey:ProductID"`
 	ProductCapital ProductCapital       `gorm:"foreignKey:ProductID"`
@@ -32,8 +33,8 @@ type ProductCapital struct {
 	TotalStock     int       `gorm:"type:integer;not null"`
 	CapitalPerItem float64   `gorm:"type:decimal;not null"`
 	TotalCapital   float64   `gorm:"type:decimal;not null"`
-	CreatedAt      time.Time
-	UpdatedAt      time.Time
+	CreatedAt      time.Time `gorm:"autoCreateTime"`
+	UpdatedAt      time.Time `gorm:"autoUpdateTime"`
 }
 
 func (ProductCapital) TableName() string {
@@ -45,8 +46,8 @@ type ProductStockDetail struct {
 	ProductID uuid.UUID `gorm:"type:uuid;not null"`
 	Size      string    `gorm:"type:varchar(10);not null"`
 	Stock     int       `gorm:"type:decimal;not null"`
-	CreatedAt time.Time
-	UpdatedAt time.Time
+	CreatedAt time.Time `gorm:"autoCreateTime"`
+	UpdatedAt time.Time `gorm:"autoUpdateTime"`
 }
 
 func (ProductStockDetail) TableName() string {
@@ -57,7 +58,7 @@ type ProductImage struct {
 	ID        uuid.UUID `gorm:"type:uuid;default:gen_random_uuid();primaryKey"`
 	ProductID uuid.UUID `gorm:"type:uuid;not null"`
 	URL       string
-	CreatedAt time.Time
+	CreatedAt time.Time `gorm:"autoCreateTime"`
 }
 
 func (ProductImage) TableName() string {

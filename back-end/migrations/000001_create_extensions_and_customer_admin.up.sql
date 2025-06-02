@@ -20,6 +20,14 @@ CREATE TABLE IF NOT EXISTS admin (
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
+CREATE TABLE IF NOT EXISTS admin_activity (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    admin_id UUID NOT NULL,
+    description text NOT NULL,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+
 INSERT INTO admin (id, name, username, password, phone_number)
 VALUES (
     gen_random_uuid(),

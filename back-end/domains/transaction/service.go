@@ -13,6 +13,7 @@ import (
 
 	"github.com/RRRHAN/IFYNTH-STORE/back-end/domains/cart"
 	"github.com/RRRHAN/IFYNTH-STORE/back-end/domains/product"
+	"github.com/RRRHAN/IFYNTH-STORE/back-end/domains/user"
 	apierror "github.com/RRRHAN/IFYNTH-STORE/back-end/utils/api-error"
 	"github.com/RRRHAN/IFYNTH-STORE/back-end/utils/config"
 	contextUtil "github.com/RRRHAN/IFYNTH-STORE/back-end/utils/context"
@@ -108,6 +109,7 @@ func (s *service) AddTransaction(ctx context.Context, req AddTransactionRequest)
 		PaymentMethod: req.PaymentMethod,
 		PaymentProof:  "",
 		Status:        "draft",
+		LastHandleBy:  nil,
 		CreatedAt:     time.Now(),
 		UpdatedAt:     time.Now(),
 	}
@@ -167,36 +169,61 @@ func (s *service) AddTransaction(ctx context.Context, req AddTransactionRequest)
 }
 
 func (s *service) UpdateStatus(ctx context.Context, req UpdateStatusRequest) error {
-	var transaction Transaction
-
-	if err := s.db.WithContext(ctx).First(&transaction, "id = ?", req.TransactionID).Error; err != nil {
-		return fmt.Errorf("transaction not found: %v", err)
+	token, err := contextUtil.GetTokenClaims(ctx)
+	if err != nil {
+		return err
 	}
+	userID := token.Claims.UserID
 
-	if req.NewStatus == "paid" {
-		var details []TransactionDetails
-		if err := s.db.WithContext(ctx).
-			Where("transaction_id = ?", transaction.ID).
-			Find(&details).Error; err != nil {
-			return fmt.Errorf("failed to fetch transaction details: %w", err)
+	return s.db.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
+		var transaction Transaction
+
+		if err := tx.First(&transaction, "id = ?", req.TransactionID).Error; err != nil {
+			return fmt.Errorf("transaction not found: %v", err)
 		}
 
-		for _, detail := range details {
-			err := s.db.WithContext(ctx).Model(&product.ProductStockDetail{}).
-				Where("product_id = ? AND size = ?", detail.ProductID, detail.Size).
-				UpdateColumn("stock", gorm.Expr("stock - ?", detail.Quantity)).Error
-			if err != nil {
-				return fmt.Errorf("failed to update stock: %w", err)
+		// Jika status baru "paid", update stock
+		if req.NewStatus == "paid" {
+			var details []TransactionDetails
+			if err := tx.Where("transaction_id = ?", transaction.ID).Find(&details).Error; err != nil {
+				return fmt.Errorf("failed to fetch transaction details: %w", err)
+			}
+
+			for _, detail := range details {
+				if err := tx.Model(&product.ProductStockDetail{}).
+					Where("product_id = ? AND size = ?", detail.ProductID, detail.Size).
+					UpdateColumn("stock", gorm.Expr("stock - ?", detail.Quantity)).Error; err != nil {
+					return fmt.Errorf("failed to update stock: %w", err)
+				}
 			}
 		}
-	}
 
-	transaction.Status = req.NewStatus
-	if err := s.db.WithContext(ctx).Save(&transaction).Error; err != nil {
-		return fmt.Errorf("failed to update transaction status: %v", err)
-	}
+		// Buat activity log
+		activity := user.AdminActivity{
+			ID:      uuid.New(),
+			AdminID: userID,
+			Description: fmt.Sprintf(
+				"update status of transaction_id %s from %s to %s",
+				transaction.ID.String(),
+				transaction.Status,
+				req.NewStatus,
+			),
+			CreatedAt: time.Now(),
+		}
 
-	return nil
+		if err := tx.Create(&activity).Error; err != nil {
+			return fmt.Errorf("failed to create admin activity: %w", err)
+		}
+
+		// Update transaksi
+		transaction.LastHandleBy = &userID
+		transaction.Status = req.NewStatus
+		if err := tx.Save(&transaction).Error; err != nil {
+			return fmt.Errorf("failed to update transaction status: %v", err)
+		}
+
+		return nil
+	})
 }
 
 func (s *service) GetTransactionCountByStatus(ctx context.Context) ([]StatusCount, error) {

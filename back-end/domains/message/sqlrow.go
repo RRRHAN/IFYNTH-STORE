@@ -27,7 +27,7 @@ type CustomerProductFile struct {
 	ID        uuid.UUID `gorm:"type:uuid;default:gen_random_uuid();primaryKey"`
 	ProductID uuid.UUID `gorm:"type:uuid;not null"`
 	URL       string
-	CreatedAt time.Time
+	CreatedAt time.Time `gorm:"autoCreateTime"`
 }
 
 func (CustomerProductFile) TableName() string {
@@ -46,8 +46,8 @@ type Message struct {
 	AdminID    *uuid.UUID `gorm:"type:uuid"`
 	Message    string
 	Role       constants.ROLE
-	IsRead     bool `gorm:"column:is_read"`
-	CreatedAt  time.Time
+	IsRead     bool      `gorm:"column:is_read"`
+	CreatedAt  time.Time `gorm:"autoCreateTime"`
 }
 
 func (Message) TableName() string {

@@ -5,9 +5,11 @@ CREATE TABLE cus_product (
     description TEXT,
     price DECIMAL NOT NULL,
     status VARCHAR(255) DEFAULT 'pending',
+    last_handle_by UUID,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    FOREIGN KEY (user_id) REFERENCES customer(id) ON DELETE CASCADE
+    FOREIGN KEY (user_id) REFERENCES customer(id) ON DELETE CASCADE,
+    FOREIGN KEY (last_handle_by) REFERENCES admin(id)
 );
 
 CREATE TABLE customer_product_files (

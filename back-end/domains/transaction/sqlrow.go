@@ -14,6 +14,7 @@ type Transaction struct {
 	PaymentMethod      string               `gorm:"not null"`
 	PaymentProof       string               `gorm:"not null"`
 	Status             string               `gorm:"not null"`
+	LastHandleBy       *uuid.UUID           `gorm:"type:uuid"`
 	CreatedAt          time.Time            `gorm:"autoCreateTime"`
 	UpdatedAt          time.Time            `gorm:"autoUpdateTime"`
 	TransactionDetails []TransactionDetails `json:"TransactionDetails" gorm:"foreignKey:TransactionID"`
