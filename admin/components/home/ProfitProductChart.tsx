@@ -262,6 +262,7 @@ const ProfitProductChart: React.FC<ProfitChartProps> = ({
                     textAnchor: "middle",
                     fontSize: 10,
                     fill: chartColors.text,
+                    angle: 10,
                   },
                 }}
               />
