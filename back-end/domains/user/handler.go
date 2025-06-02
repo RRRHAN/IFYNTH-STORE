@@ -20,6 +20,7 @@ type Handler interface {
 	ChangePassword(ctx *gin.Context)
 	GetPersonal(ctx *gin.Context)
 	UpdateProfile(ctx *gin.Context)
+	GetAdminActivity(ctx *gin.Context)
 }
 
 type handler struct {
@@ -35,6 +36,16 @@ func NewHandler(service Service, validate *validator.Validate) Handler {
 }
 func (h *handler) GetPersonal(ctx *gin.Context) {
 	res, err := h.service.GetPersonal(ctx)
+	if err != nil {
+		respond.Error(ctx, apierror.FromErr(err))
+		return
+	}
+
+	respond.Success(ctx, http.StatusOK, res)
+}
+
+func (h *handler) GetAdminActivity(ctx *gin.Context) {
+	res, err := h.service.GetAdminActivity(ctx)
 	if err != nil {
 		respond.Error(ctx, apierror.FromErr(err))
 		return

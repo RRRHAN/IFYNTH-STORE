@@ -3,6 +3,7 @@ package user
 import (
 	"context"
 	"errors"
+	"fmt"
 	"net/http"
 	"time"
 
@@ -25,6 +26,7 @@ type Service interface {
 	ChangePassword(ctx context.Context, input ChangePasswordReq) error
 	GetPersonal(ctx context.Context) (interface{}, error)
 	UpdateProfile(ctx context.Context, input UpdateProfileReq) (res *Customer, err error)
+	GetAdminActivity(ctx context.Context) ([]ActivityRes, error)
 }
 
 type service struct {
@@ -266,11 +268,32 @@ func (s *service) ChangePassword(ctx context.Context, input ChangePasswordReq) e
 	return nil
 }
 
-func optionalString(s string) *string {
-	if s == "" {
-		return nil
+func (s *service) GetAdminActivity(ctx context.Context) ([]ActivityRes, error) {
+	token, err := contextUtil.GetTokenClaims(ctx)
+	if err != nil {
+		return nil, err
 	}
-	return &s
+
+	username := token.Claims.Username
+	userID := token.Claims.UserID
+
+	var results []ActivityRes
+
+	query := s.db.WithContext(ctx).
+		Table("admin_activity AS a").
+		Select("a.admin_id AS user_id, u.name, a.description, a.created_at").
+		Joins("JOIN admin u ON a.admin_id = u.id").
+		Order("a.created_at DESC")
+
+	if username != "owner" {
+		query = query.Where("a.admin_id = ?", userID)
+	}
+
+	if err := query.Scan(&results).Error; err != nil {
+		return nil, fmt.Errorf("failed to get admin activities: %w", err)
+	}
+
+	return results, nil
 }
 
 func (s *service) UpdateProfile(ctx context.Context, input UpdateProfileReq) (res *Customer, err error) {

@@ -71,6 +71,7 @@ func NewDependency(
 		user.PATCH("/updateCustomer", mw.JWT(constants.CUSTOMER), userHandler.UpdateProfile)
 		user.PATCH("/password", mw.JWT(constants.ADMIN, constants.CUSTOMER), userHandler.ChangePassword)
 		user.GET("/get-personal", mw.JWT(constants.ADMIN, constants.CUSTOMER), userHandler.GetPersonal)
+		user.GET("/adminLog", mw.JWT(constants.ADMIN), userHandler.GetAdminActivity)
 		user.GET("/check-jwt", mw.JWT(constants.ADMIN, constants.CUSTOMER), func(ctx *gin.Context) {
 			respond.Success(ctx, http.StatusOK, "JWT is valid")
 		})
