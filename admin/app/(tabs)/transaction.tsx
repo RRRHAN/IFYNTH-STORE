@@ -78,7 +78,7 @@ const TransactionsScreen = () => {
     } finally {
       setTimeout(() => {
         setLoading(false);
-      }, 1000);
+      }, 500);
     }
   };
 

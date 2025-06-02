@@ -49,7 +49,7 @@ const LogsScreen = () => {
 
   const [currentPage, setCurrentPage] = useState(1);
   const dataPerPage = screenWidth > 1000 ? 12 : 10;
-  const totalPages = Math.ceil(activity.length / dataPerPage);
+  const totalPages = Math.ceil((activity?.length || 0) / dataPerPage);
 
   const formatTime = (timestamp: string, currentScreenWidth: number) => {
     const date = new Date(timestamp);
@@ -81,7 +81,7 @@ const LogsScreen = () => {
     } finally {
       setTimeout(() => {
         setLoading(false);
-      }, 1000);
+      }, 500);
     }
   };
 
@@ -97,7 +97,7 @@ const LogsScreen = () => {
 
   const indexOfLastProduct = currentPage * dataPerPage;
   const indexOfFirstProduct = indexOfLastProduct - dataPerPage;
-  const currentProducts = activity.slice(
+  const currentProducts = (activity || []).slice(
     indexOfFirstProduct,
     indexOfLastProduct
   );

@@ -89,7 +89,7 @@ const UserAdvertisementScreen = () => {
     } finally {
       setTimeout(() => {
         setLoading(false);
-      }, 1000);
+      }, 500);
     }
   };
 

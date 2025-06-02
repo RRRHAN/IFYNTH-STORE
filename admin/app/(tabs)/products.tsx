@@ -83,7 +83,7 @@ const ProductsScreen = () => {
     } finally {
       setTimeout(() => {
         setLoading(false);
-      }, 1000);
+      }, 500);
     }
   };
 
