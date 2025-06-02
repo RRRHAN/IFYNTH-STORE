@@ -1,7 +1,8 @@
-import { BASE_URL } from "./constants";
+import { BASE_URL, getAuthToken } from "./constants";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useRouter } from "expo-router";
 import { Register } from "../types/setting";
+import { AdminActivity } from "../types/setting";
 
 export const loginAdmin = async (username: string, password: string) => {
   try {
@@ -189,4 +190,22 @@ export const register = async (
     console.error(error);
     return { success: false, message: "Network error. Please try again." };
   }
+};
+
+export const fetchAdminActivity = async (): Promise<AdminActivity[]> => {
+  const token = await getAuthToken();
+  const getLogUrl = `${BASE_URL}/api/user/adminLog`;
+
+  const response = await fetch(getLogUrl, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  if (!response.ok) {
+    throw new Error(`HTTP error! status: ${response.status}`);
+  }
+
+  const result = await response.json();
+  return result.data;
 };

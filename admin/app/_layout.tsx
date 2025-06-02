@@ -52,6 +52,7 @@ export default function RootLayout() {
         <Stack.Screen name="personal" options={{ headerShown: false }} />
         <Stack.Screen name="register" options={{ headerShown: false }} />
         <Stack.Screen name="security" options={{ headerShown: false }} />
+        <Stack.Screen name="admin_activity" options={{ headerShown: false }} />
       </Stack>
       <StatusBar style="auto" />
     </ThemeProvider>

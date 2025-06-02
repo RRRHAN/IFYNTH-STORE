@@ -12,7 +12,7 @@ import { ThemedText } from "@/components/ThemedText";
 import { logoutAdmin } from "@/src/api/admin";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useEffect, useState } from "react";
-import { FontAwesome } from '@expo/vector-icons';
+import { FontAwesome } from "@expo/vector-icons";
 
 function NavButton({
   title,
@@ -103,7 +103,9 @@ export default function SettingScreen() {
       {/* Avatar dan Username */}
       <View style={styles.profileContainer}>
         <Image
-          source={{ uri: "https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava1-bg.webp" }}
+          source={{
+            uri: "https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava1-bg.webp",
+          }}
           style={styles.avatar}
         />
         <ThemedText style={styles.username}>{username ?? "User"}</ThemedText>
@@ -124,6 +126,11 @@ export default function SettingScreen() {
         onPress={() => router.push("/personal")}
         icon="user"
       /> */}
+      <NavButton
+        title="Activities"
+        onPress={() => router.push("/admin_activity")}
+        icon="file-text"
+      />
       <NavButton
         title="Security"
         onPress={() => router.push("/security")}
@@ -155,14 +162,19 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: "bold",
   },
-  title: { fontSize: 24, fontWeight: "bold", marginBottom: 20, textAlign: "center" },
+  title: {
+    fontSize: 24,
+    fontWeight: "bold",
+    marginBottom: 20,
+    textAlign: "center",
+  },
   btn: {
     paddingVertical: 12,
     borderRadius: 8,
     marginVertical: 8,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
   },
   btnIcon: {
     marginRight: 10,
