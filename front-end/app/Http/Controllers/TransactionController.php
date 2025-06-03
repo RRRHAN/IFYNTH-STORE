@@ -20,13 +20,10 @@ class TransactionController extends Controller
             'zip_code' => 'required',
             'courir' => 'required',
             'shipping_cost' => 'required|numeric',
-            'payment_proof' => 'required|file|mimes:jpeg,png,jpg',
+            // 'payment_proof' dihapus
         ]);
 
         try {
-            // Siapkan file sebagai resource stream
-            $file = $request->file('payment_proof');
-
             $multipartData = [
                 [
                     'name' => 'name',
@@ -54,17 +51,13 @@ class TransactionController extends Controller
                 ],
                 [
                     'name' => 'shipping_cost',
-                    'contents' => $validatedData['shipping_cost'] = intval($validatedData['shipping_cost']),
+                    'contents' => intval($validatedData['shipping_cost']),
                 ],
                 [
                     'name' => 'payment_method',
                     'contents' => "Bank Transfer",
                 ],
-                [
-                    'name' => 'payment_proof',
-                    'contents' => fopen($file->getPathname(), 'r'),
-                    'filename' => $file->getClientOriginalName(),
-                ],
+                // 'payment_proof' dihapus
             ];
 
             $client = new \GuzzleHttp\Client();

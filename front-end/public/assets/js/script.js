@@ -896,11 +896,11 @@ CSS TABLE OF CONTENTS
         const zipCode = button.data('zip-code');
         const destinationLabel = button.data('destination-label');
         const courier = button.data('courier');
-        const currentOrderStatus = button.data('status'); // Ambil status saat ini
+        const currentOrderStatus = button.data('status');
 
         // Isi detail alamat pengiriman
         modalRecipientName.text(recipientName);
-        modalPhoneNumber.text(phoneNumber);
+        modalPhoneNumber.text('(+62) ' + phoneNumber);
         modalAddress.text(address);
         modalZipCode.text(zipCode);
         modalDestinationLabel.text(destinationLabel);

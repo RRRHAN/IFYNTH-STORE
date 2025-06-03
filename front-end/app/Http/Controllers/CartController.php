@@ -48,7 +48,7 @@ class CartController extends Controller
 
     }
 
-    public function getCart()
+    public function getCart(Request $request)
     {
         $token = session('api_token');
 
@@ -65,9 +65,11 @@ class CartController extends Controller
                 $cart = collect($response->json()['data']);
                 session()->put('total_cart', $cart['TotalQuantity']);
 
-                return view('cart', ['cartItems' => $cart]);
+                $addressController = new AddressController();
+                $addresses = $addressController->getAddress($request);
+
+                return view('cart', ['cartItems' => $cart, 'addresses' => $addresses,]);
             } else {
-                $errors = $response->json()['errors'] ?? ['Failed to get cart'];
                 return view('cart');
             }
         } catch (\Exception $e) {

@@ -26,7 +26,7 @@
                                         !empty($item['Product']['ProductImages']) &&
                                             is_array($item['Product']['ProductImages']) &&
                                             isset($item['Product']['ProductImages'][0]['URL']))
-                                        <img src="{{ url(config('app.back_end_base_url').'/api' . $item['Product']['ProductImages'][0]['URL']) }}"
+                                        <img src="{{ url(config('app.back_end_base_url') . '/api' . $item['Product']['ProductImages'][0]['URL']) }}"
                                             alt="image">
                                     @else
                                         <p>No image available</p>
@@ -72,7 +72,7 @@
                                         !empty($item['Product']['ProductImages']) &&
                                             is_array($item['Product']['ProductImages']) &&
                                             isset($item['Product']['ProductImages'][0]['URL']))
-                                        <img src="{{ url(config('app.back_end_base_url').'/api' . $item['Product']['ProductImages'][0]['URL']) }}"
+                                        <img src="{{ url(config('app.back_end_base_url') . '/api' . $item['Product']['ProductImages'][0]['URL']) }}"
                                             alt="image">
                                     @else
                                         <p>No image available</p>
@@ -108,39 +108,39 @@
                             </div>
                         @endforeach
                     </div>
+                    @include('components.shipper-form')
                 @else
                     <p class="text-center text-white">Your cart is empty.</p>
                 @endif
-                @include('components.shipper-form')
                 @if (!empty($cartItems) && isset($cartItems['TotalPrice']))
-                <div class="totals">
-                    <div class="totals-item theme-color float-end mt-3">
-                        <!-- Cart Total -->
-                        <span class="fw-bold text-uppercase py-2">Cart total =</span>
-                        <div id="totalDisplay" class="totals-value d-inline py-2 pe-2">
-                            Rp.{{ number_format($cartItems['TotalPrice']) }}
+                    <div class="totals">
+                        <div class="totals-item theme-color float-end mt-3">
+                            <!-- Cart Total -->
+                            <span class="fw-bold text-uppercase py-2">Cart total =</span>
+                            <div id="totalDisplay" class="totals-value d-inline py-2 pe-2">
+                                Rp.{{ number_format($cartItems['TotalPrice']) }}
+                            </div>
+
+                            <!-- Shipping Cost -->
+                            <div id="shippingCostDisplay" style="display:none;">
+                                <span class="fw-bold text-uppercase py-2">Shipping Cost =</span>
+                                <div id="shippingCostAmount" class="totals-value d-inline py-2 pe-2"></div>
+                            </div>
+
+                            <!-- Grand Total -->
+                            <div id="grandTotalDisplay" style="display:none;">
+                                <span class="fw-bold text-uppercase py-2">GRANDTOTAL =</span>
+                                <div id="grandTotalAmount" class="totals-value d-inline py-2 pe-2"></div>
+                            </div>
+
+                            <!-- Checkout Button -->
+                            <a href="#" id="checkoutBtn" class="btn-one py-2 px-4" data-bs-toggle="modal"
+                                data-bs-target="#shippingModal">
+                                <span>Checkout</span>
+                            </a>
                         </div>
-            
-                        <!-- Shipping Cost -->
-                        <div id="shippingCostDisplay" style="display:none;">
-                            <span class="fw-bold text-uppercase py-2">Shipping Cost =</span>
-                            <div id="shippingCostAmount" class="totals-value d-inline py-2 pe-2"></div>
-                        </div>
-            
-                        <!-- Grand Total -->
-                        <div id="grandTotalDisplay" style="display:none;">
-                            <span class="fw-bold text-uppercase py-2">GRANDTOTAL =</span>
-                            <div id="grandTotalAmount" class="totals-value d-inline py-2 pe-2"></div>
-                        </div>
-            
-                        <!-- Checkout Button -->
-                        <a href="#" id="checkoutBtn" class="btn-one py-2 px-4" data-bs-toggle="modal"
-                            data-bs-target="#shippingModal">
-                            <span>Checkout</span>
-                        </a>
                     </div>
-                </div>
-            @endif            
+                @endif
             </div>
         </section>
         <!-- cart page area end here -->
