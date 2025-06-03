@@ -9,7 +9,7 @@
 
         <h5 class="mb-3 text-dark">List Address</h5>
 
-        @foreach ($addresses as $address)
+        @forelse ($addresses as $address)
             <div class="address-item shadow-sm">
                 <div class="address-item-header">
                     <div>
@@ -30,7 +30,11 @@
                     {{ $address['DestinationLabel'] ?? '' }}, {{ $address['ZipCode'] ?? '' }}
                 </div>
             </div>
-        @endforeach
+        @empty
+            <div class="alert alert-secondary text-center" role="alert">
+                No orders available.
+            </div>
+        @endforelse
 
     </div>
     @include('components.addressModal')

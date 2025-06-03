@@ -1,4 +1,3 @@
-<!-- Personal Information -->
 <div class="tab-pane fade show active" id="personal" role="tabpanel">
     <h5 class="mb-4">Personal Information</h5>
     <form action="{{ route('update.profile') }}" method="POST">
@@ -11,8 +10,11 @@
             </div>
             <div class="col-md-6">
                 <label class="form-label">Phone</label>
-                <input type="tel" class="form-control" name="phone_number"
-                    value="{{ session('user')['PhoneNumber'] ?? '' }}">
+                <div class="input-group">
+                    <span class="input-group-text">+62</span>
+                    <input type="tel" class="form-control" name="phone_number"
+                        value="{{ session('user')['PhoneNumber'] ?? '' }}" placeholder="e.g., 81234567890">
+                </div>
             </div>
             <div class="col-md-6">
                 <label class="form-label">Full Name</label>
@@ -23,8 +25,7 @@
                 <input type="email" class="form-control" name="email" value="{{ session('user')['Email'] ?? '' }}">
             </div>
         </div>
-        <button type="submit" class="btn btn-primary mt-2">Save
+        <button type="submit" class="btn btn-secondary mt-2">Save
             Changes</button>
     </form>
 </div>
-

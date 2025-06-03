@@ -112,7 +112,7 @@
                         </button>
                     @endif
                     @if ($transaction['Status'] !== 'cancelled')
-                        <button class="btn btn-info shipping-address-btn" data-bs-toggle="modal"
+                        <button class="btn btn-secondary shipping-address-btn" data-bs-toggle="modal"
                             data-bs-target="#shippingAddressModal" data-transaction-id="{{ $transaction['ID'] }}"
                             data-recipient-name="{{ $transaction['ShippingAddress']['Name'] ?? 'N/A' }}"
                             data-phone-number="{{ $transaction['ShippingAddress']['PhoneNumber'] ?? 'N/A' }}"
@@ -128,7 +128,7 @@
             </div>
         </div>
     @empty
-        <div class="alert alert-info text-center" role="alert">
+        <div class="alert alert-secondary text-center" role="alert">
             No orders available.
         </div>
     @endforelse
