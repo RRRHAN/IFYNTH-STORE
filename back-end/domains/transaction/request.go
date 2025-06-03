@@ -7,14 +7,8 @@ import (
 )
 
 type AddTransactionRequest struct {
-	Name             string  `json:"name" form:"name" binding:"required"`
-	PhoneNumber      string  `json:"phone_number" form:"phone_number" binding:"required"`
-	PaymentMethod    string  `json:"payment_method" form:"payment_method" binding:"required"`
-	Address          string  `json:"address" form:"address" binding:"required"`
-	ZipCode          string  `json:"zip_code" form:"zip_code" binding:"required"`
-	DestinationLabel string  `json:"destination_label" form:"destination_label" binding:"required"`
-	Courir           string  `json:"courir" form:"courir" courir:"required"`
-	ShippingCost     float64 `json:"shipping_cost" form:"shipping_cost" binding:"required"`
+	CustomerAddressID string
+	CourierIndex      int
 }
 
 type UpdateStatusRequest struct {

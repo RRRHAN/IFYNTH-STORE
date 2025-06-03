@@ -3,15 +3,20 @@ package transaction
 import (
 	"context"
 	"fmt"
+	"math"
 	"net/http"
 	"os"
 	"path/filepath"
+	"strconv"
 	"time"
 
 	"github.com/google/uuid"
 	"gorm.io/gorm"
 
+	rajaongkir "github.com/RRRHAN/IFYNTH-STORE/back-end/client/raja-ongkir"
+	"github.com/RRRHAN/IFYNTH-STORE/back-end/domains/address"
 	"github.com/RRRHAN/IFYNTH-STORE/back-end/domains/cart"
+	"github.com/RRRHAN/IFYNTH-STORE/back-end/domains/ongkir"
 	"github.com/RRRHAN/IFYNTH-STORE/back-end/domains/product"
 	"github.com/RRRHAN/IFYNTH-STORE/back-end/domains/user"
 	apierror "github.com/RRRHAN/IFYNTH-STORE/back-end/utils/api-error"
@@ -33,14 +38,16 @@ type Service interface {
 }
 
 type service struct {
-	authConfig config.Auth
-	db         *gorm.DB
+	authConfig    config.Auth
+	db            *gorm.DB
+	ongkirService ongkir.Service
 }
 
-func NewService(config *config.Config, db *gorm.DB) Service {
+func NewService(config *config.Config, db *gorm.DB, rajaOngkirClient rajaongkir.Client) Service {
 	return &service{
-		authConfig: config.Auth,
-		db:         db,
+		authConfig:    config.Auth,
+		db:            db,
+		ongkirService: ongkir.NewService(rajaOngkirClient, db),
 	}
 }
 
@@ -103,13 +110,34 @@ func (s *service) AddTransaction(ctx context.Context, req AddTransactionRequest)
 		return fmt.Errorf("no items in cart: %w", err)
 	}
 
+	var customerAddress address.CustomerAddress
+	if err := s.db.First(&customerAddress, "id = ?", req.CustomerAddressID).Error; err != nil {
+		return fmt.Errorf("failed to fetch customer address data: %w", err)
+	}
+
+	costs, err := s.ongkirService.GetShippingCost(context.Background(), ongkir.GetShippingCostReq{
+		AddressId: customerAddress.ID,
+		Weight:    strconv.Itoa(int(math.Ceil(user_cart.TotalWeight / 1000))),
+		ItemValue: strconv.Itoa(int(math.Ceil(user_cart.TotalPrice))),
+	})
+
+	if err != nil {
+		return err
+	}
+
+	if req.CourierIndex < 0 || req.CourierIndex >= len(costs) {
+		return fmt.Errorf("invalid courier index: %d, available options: %d", req.CourierIndex, len(costs))
+	}
+
+	selected := costs[req.CourierIndex]
+
 	tx := s.db.WithContext(ctx).Begin()
 
 	transaction := Transaction{
 		ID:            uuid.New(),
 		UserID:        user_cart.UserID,
-		TotalAmount:   user_cart.TotalPrice + req.ShippingCost,
-		PaymentMethod: req.PaymentMethod,
+		TotalAmount:   user_cart.TotalPrice + float64(selected.ShippingCost),
+		PaymentMethod: "bank transfer",
 		PaymentProof:  "",
 		Status:        "draft",
 		LastHandleBy:  nil,
@@ -142,13 +170,13 @@ func (s *service) AddTransaction(ctx context.Context, req AddTransactionRequest)
 	shipping := ShippingAddress{
 		ID:               uuid.New(),
 		TransactionID:    transaction.ID,
-		Name:             req.Name,
-		PhoneNumber:      req.PhoneNumber,
-		Address:          req.Address,
-		ZipCode:          req.ZipCode,
-		DestinationLabel: req.DestinationLabel,
-		Courir:           req.Courir,
-		ShippingCost:     req.ShippingCost,
+		Name:             customerAddress.RecipientsName,
+		PhoneNumber:      customerAddress.RecipientsNumber,
+		Address:          customerAddress.Address,
+		ZipCode:          customerAddress.ZipCode,
+		DestinationLabel: customerAddress.DestinationLabel,
+		Courir:           selected.ShippingName + "-" + selected.ServiceName,
+		ShippingCost:     float64(selected.ShippingCost),
 		CreatedAt:        time.Now(),
 		UpdatedAt:        time.Now(),
 	}
