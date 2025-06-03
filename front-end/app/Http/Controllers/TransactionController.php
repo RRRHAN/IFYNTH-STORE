@@ -20,7 +20,7 @@ class TransactionController extends Controller
         try {
             $response = Http::withHeaders([
                 'Authorization' => 'Bearer ' . $token,
-            ])->post('localhost:7777/api/transaction', [
+            ])->post(config('app.back_end_base_url') . '/api/transaction', [
                         'CustomerAddressID' => $validatedData['addressId'],
                         'CourierIndex' => (int) $validatedData['courierIndex'],
                     ]);

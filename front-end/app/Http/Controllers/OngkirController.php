@@ -46,7 +46,7 @@ class OngkirController extends Controller
 
         $token = session("api_token");
 
-        $response = $client->request('GET', 'http://localhost:7777/api/ongkir/cost', [
+        $response = $client->request('GET', config('app.back_end_base_url') . '/api/ongkir/cost', [
             'headers' => [
                 'Authorization' => 'Bearer ' . $token,
                 'Content-Type' => 'application/json',
