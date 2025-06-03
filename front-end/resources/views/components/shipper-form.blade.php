@@ -21,13 +21,9 @@
             </select>
         </div>
 
-        {{-- Hidden fields to hold selected address details --}}
-        <input type="hidden" id="name" name="name">
-        <input type="hidden" id="phone" name="phone_number">
-        <input type="hidden" id="address" name="address">
-        <input type="hidden" id="searchDestination" name="destination_label">
-        <input type="hidden" id="destination_id" name="destination_id">
-        <input type="hidden" id="zip_code" name="zip_code">
+        {{-- Hidden fields for checkout --}}
+        <input type="hidden" id="courierIndex" name="courierIndex">
+        <input type="hidden" id="addressId" name="addressId">
 
 
         <div id="shippingTariff" class="mb-3" style="display: none;">
@@ -41,15 +37,18 @@
         </div>
     </form>
 </div>
-
 <script>
     const selectAddressDropdown = document.getElementById('selectAddress');
-    const nameInput = document.getElementById('name');
-    const phoneInput = document.getElementById('phone');
-    const addressInput = document.getElementById('address');
-    const searchDestinationInput = document.getElementById('searchDestination');
-    const destinationIdInput = document.getElementById('destination_id');
-    const zipCodeInput = document.getElementById('zip_code');
+    // Variabel input yang tidak lagi digunakan sudah dihapus di HTML
+    // const nameInput = document.getElementById('name');
+    // const phoneInput = document.getElementById('phone');
+    // const addressInput = document.getElementById('address');
+    // const searchDestinationInput = document.getElementById('searchDestination');
+    // const zipCodeInput = document.getElementById('zip_code');
+
+    const addressIdInput = document.getElementById('addressId');
+    const courierIndexInput = document.getElementById('courierIndex');
+
 
     const tariffDropdown = document.getElementById('tariff');
     const shippingTariffDiv = document.getElementById('shippingTariff');
@@ -57,48 +56,91 @@
     const grandTotalInput = document.getElementById('grandtotal');
     const courierInput = document.getElementById('courierInput');
 
-    let debounceTimer;
 
     // Fungsi render option tarif pengiriman
     function renderTariffOptions(data) {
         tariffDropdown.innerHTML = '<option value="">Select a Courier</option>';
-        const tarifList = [];
+        let tarifList = [];
 
-        if (data.data) {
-            const {
-                calculate_reguler = [], calculate_cargo = []
-            } = data.data;
-
-            calculate_reguler.forEach((item, index) => {
-                tarifList.push({
-                    ...item,
-                    type: 'Reguler',
-                    index
-                });
-            });
-
-            calculate_cargo.forEach((item, index) => {
-                tarifList.push({
-                    ...item,
-                    type: 'Cargo',
-                    index
-                });
-            });
+        if (data.data && Array.isArray(data.data)) {
+            tarifList = data.data.map((item, index) => ({
+                ...item,
+                originalIndex: index
+            }));
         }
 
         if (tarifList.length > 0) {
             shippingTariffDiv.style.display = 'block';
             tarifList.forEach(item => {
                 const option = document.createElement('option');
-                option.value = `${item.shipping_name}-${item.service_name}-${item.type}-${item.index}`;
+                // FIX: Hapus ARTEFAK SINTAKS MARKDOWN di option.value
+                option.value = `${item.shipping_name}-${item.service_name}-${item.originalIndex}`;
+                // FIX: Hapus ARTEFAK SINTAKS MARKDOWN di option.textContent
                 option.textContent =
-                    `${item.shipping_name} ${item.service_name} (${item.type}) - Rp${item.shipping_cost.toLocaleString()} - ETA: ${item.etd}`;
+                    `${item.shipping_name} ${item.service_name} - Rp${item.shipping_cost.toLocaleString()} - ETA: ${item.etd}`;
                 option.dataset.shipping = JSON.stringify(item);
                 tariffDropdown.appendChild(option);
             });
         } else {
             shippingTariffDiv.style.display = 'none';
         }
+    }
+
+    // Fungsi fetchAndCalculateTariff (Tidak ada perubahan di sini)
+    function fetchAndCalculateTariff(addressIdToUse) {
+        console.log("fetchAndCalculateTariff called with addressId:", addressIdToUse);
+        const weightInGram = parseFloat(
+            "{{ isset($cartItems['TotalWeight']) ? $cartItems['TotalWeight'] : 0 }}"
+        ) || 0;
+
+        // Konversi ke kilogram
+        const weight = weightInGram / 1000;
+
+        const itemValue = parseFloat(
+            "{{ isset($cartItems['TotalPrice']) ? $cartItems['TotalPrice'] : 0 }}"
+        ) || 0;
+
+
+
+        if (!weight || !itemValue || !addressIdToUse) {
+            console.error("Missing addressId, weight, or item value! Cannot fetch tariff.");
+            shippingTariffDiv.style.display = 'none';
+            tariffDropdown.innerHTML = '<option value="">Select a Courier</option>';
+            return;
+        }
+
+        fetch('/check-tariff', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute(
+                        'content')
+                },
+                body: JSON.stringify({
+                    addressId: addressIdToUse,
+                    weight: weight.toString(),
+                    item_value: itemValue.toString()
+                })
+            })
+            .then(response => {
+                console.log("Raw API response from check-tariff:", response);
+                if (!response.ok) {
+                    return response.text().then(text => {
+                        throw new Error(`HTTP error! status: ${response.status}, body: ${text}`);
+                    });
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log("Parsed API data from check-tariff:", data);
+                renderTariffOptions(data);
+            })
+            .catch(error => {
+                console.error('Error fetching shipping cost:', error);
+                shippingTariffDiv.style.display = 'none';
+                tariffDropdown.innerHTML =
+                    '<option value="">Select a Courier</option>';
+            });
     }
 
     // Event listener for when an address is selected from the dropdown
@@ -108,87 +150,32 @@
         if (selectedOption && selectedOption.dataset.address) {
             const selectedAddress = JSON.parse(selectedOption.dataset.address);
 
-            // Populate hidden fields with selected address data
-            nameInput.value = selectedAddress.RecipientsName || '';
-            phoneInput.value = selectedAddress.RecipientsNumber || '';
-            addressInput.value = selectedAddress.Address || '';
-            searchDestinationInput.value = selectedAddress.DestinationLabel || '';
-            destinationIdInput.value = selectedAddress.DestinationID || '';
-            zipCodeInput.value = selectedAddress.ZipCode || '';
-
-            // Now, trigger tariff calculation based on the selected address
-            const destinationId = selectedAddress.DestinationID;
-
-            if (destinationId) {
-                // Ambil data berat dan nilai item dari server-side blade (atau data JS lain)
-                const weight = parseFloat(
-                    "{{ isset($cartItems['TotalWeight']) ? number_format($cartItems['TotalWeight'] / 1000, 2, '.', '') : 0 }}"
-                );
-                const itemValue =
-                    {{ isset($cartItems['TotalPrice']) ? $cartItems['TotalPrice'] : 0 }};
-
-                if (!weight || !itemValue) {
-                    console.error("Missing weight or item value!");
-                    return;
-                }
-
-                fetch('/check-tariff', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-CSRF-TOKEN': document
-                                .querySelector('meta[name="csrf-token"]')
-                                .getAttribute('content')
-                        },
-                        body: JSON.stringify({
-                            receiver_destination_id: destinationId,
-                            weight: weight,
-                            item_value: itemValue
-                        })
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        renderTariffOptions(data);
-                    })
-                    .catch(error => {
-                        console.error('Error fetching shipping cost:', error);
-                    });
-            } else {
-                // If no destination ID, hide tariff options
-                shippingTariffDiv.style.display = 'none';
-                tariffDropdown.innerHTML = '<option value="">Select a Courier</option>';
-            }
+            addressIdInput.value = selectedAddress.ID;
+            fetchAndCalculateTariff(selectedAddress.ID);
         } else {
-            // If "-- Select an existing address --" is chosen, clear fields and hide tariff
-            nameInput.value = '';
-            phoneInput.value = '';
-            addressInput.value = '';
-            searchDestinationInput.value = '';
-            destinationIdInput.value = '';
-            zipCodeInput.value = '';
+            addressIdInput.value = '';
 
             shippingTariffDiv.style.display = 'none';
             tariffDropdown.innerHTML = '<option value="">Select a Courier</option>';
         }
     });
+
+    // Auto-select address and fetch tariff (Tidak ada perubahan di sini)
     document.addEventListener('DOMContentLoaded', () => {
-        // Find the option that matches the initially loaded destination_id
-        const initialDestinationId = destinationIdInput.value;
-        if (initialDestinationId) {
+        const initialAddressId = addressIdInput.value;
+        if (initialAddressId) {
             const options = Array.from(selectAddressDropdown.options);
             const preSelectedOption = options.find(option => {
                 if (option.dataset.address) {
                     const addressData = JSON.parse(option.dataset.address);
-                    return addressData.DestinationID === initialDestinationId;
+                    return addressData.ID === initialAddressId;
                 }
                 return false;
             });
 
             if (preSelectedOption) {
-                // Set the dropdown's value
                 selectAddressDropdown.value = preSelectedOption.value;
-                // Manually trigger the change event to populate fields and fetch tariff
-                selectAddressDropdown.dispatchEvent(new Event('change'));
+                fetchAndCalculateTariff(initialAddressId);
             }
         }
     });
@@ -201,12 +188,17 @@
             const shippingData = JSON.parse(selectedOption.dataset.shipping);
             const shippingCost = shippingData.shipping_cost || 0;
             const grandTotal = shippingData.grandtotal || 0;
-            const courier = `${shippingData.shipping_name}-${shippingData.service_name}-(${shippingData.type})`;
-            console.log(shippingData);
+
+            // FIX: Hapus ARTEFAK SINTAKS MARKDOWN di courier
+            const courier = `${shippingData.shipping_name}-${shippingData.service_name}`;
+            const courierIndex = shippingData.originalIndex;
+            console.log('Selected Shipping Data:', shippingData);
 
             shippingCostInput.value = shippingCost;
             grandTotalInput.value = grandTotal;
             courierInput.value = courier;
+            courierIndexInput.value = courierIndex;
+
             const shippingCostAmountElem = document.getElementById('shippingCostAmount');
             const shippingCostDisplayElem = document.getElementById('shippingCostDisplay');
             const grandTotalAmountElem = document.getElementById('grandTotalAmount');
@@ -214,7 +206,8 @@
             const uploadProofContainerElem = document.getElementById('uploadProofContainer');
 
 
-            if (shippingCostAmountElem) shippingCostAmountElem.textContent = `Rp.${shippingCost.toLocaleString()}`;
+            if (shippingCostAmountElem) shippingCostAmountElem.textContent =
+                `Rp.${shippingCost.toLocaleString()}`;
             if (shippingCostDisplayElem) shippingCostDisplayElem.style.display = 'block';
 
             if (grandTotalAmountElem) grandTotalAmountElem.textContent = `Rp.${grandTotal.toLocaleString()}`;
@@ -224,11 +217,12 @@
 
 
             console.log('Selected Shipping Cost:', shippingCost);
+            console.log('Selected Courier Index:', courierIndex);
         } else {
-            // Clear shipping cost and grand total if no valid option is selected
             shippingCostInput.value = 0;
             grandTotalInput.value = 0;
             courierInput.value = '';
+            courierIndexInput.value = '';
 
             const shippingCostAmountElem = document.getElementById('shippingCostAmount');
             const shippingCostDisplayElem = document.getElementById('shippingCostDisplay');

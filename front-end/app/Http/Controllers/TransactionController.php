@@ -13,69 +13,25 @@ class TransactionController extends Controller
         $token = session("api_token");
 
         $validatedData = $request->validate([
-            'name' => 'required',
-            'phone_number' => 'required',
-            'address' => 'required',
-            'destination_label' => 'required',
-            'zip_code' => 'required',
-            'courir' => 'required',
-            'shipping_cost' => 'required|numeric',
-            // 'payment_proof' dihapus
+            'addressId' => 'required',
+            'courierIndex' => 'required',
         ]);
 
         try {
-            $multipartData = [
-                [
-                    'name' => 'name',
-                    'contents' => $validatedData['name'],
-                ],
-                [
-                    'name' => 'phone_number',
-                    'contents' => $validatedData['phone_number'],
-                ],
-                [
-                    'name' => 'address',
-                    'contents' => $validatedData['address'],
-                ],
-                [
-                    'name' => 'destination_label',
-                    'contents' => $validatedData['destination_label'],
-                ],
-                [
-                    'name' => 'zip_code',
-                    'contents' => $validatedData['zip_code'],
-                ],
-                [
-                    'name' => 'courir',
-                    'contents' => $validatedData['courir'],
-                ],
-                [
-                    'name' => 'shipping_cost',
-                    'contents' => intval($validatedData['shipping_cost']),
-                ],
-                [
-                    'name' => 'payment_method',
-                    'contents' => "Bank Transfer",
-                ],
-                // 'payment_proof' dihapus
-            ];
+            $response = Http::withHeaders([
+                'Authorization' => 'Bearer ' . $token,
+            ])->post('localhost:7777/api/transaction', [
+                        'CustomerAddressID' => $validatedData['addressId'],
+                        'CourierIndex' => (int) $validatedData['courierIndex'],
+                    ]);
 
-            $client = new \GuzzleHttp\Client();
-
-            $response = $client->request('POST', config('app.back_end_base_url') . '/api/transaction', [
-                'headers' => [
-                    'Authorization' => 'Bearer ' . $token,
-                ],
-                'multipart' => $multipartData,
-            ]);
-
-            $responseBody = json_decode($response->getBody(), true);
+            $responseBody = $response->json();
 
             if (in_array('Unauthorized!', $responseBody['errors'] ?? [])) {
                 return redirect()->route('login')->with('error', 'Session expired. Please log in again.');
             }
 
-            if ($response->getStatusCode() === 201) {
+            if ($response->status() === 201) {
                 Session::forget('total_cart');
                 return redirect()->back()->with('success', 'Transaction added successfully!');
             } else {
@@ -85,6 +41,7 @@ class TransactionController extends Controller
             return redirect()->back()->with('error', $e->getMessage());
         }
     }
+
 
     public function getTransaction()
     {
