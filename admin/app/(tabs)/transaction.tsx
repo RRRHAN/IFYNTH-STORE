@@ -178,7 +178,7 @@ const TransactionsScreen = () => {
                 )}
                 {item.Status !== "draft" && (
                   <>
-                    <Picker.Item label="Proccess" value="proccess" />
+                    <Picker.Item label="Process" value="process" />
                     <Picker.Item label="Delivered" value="delivered" />
                     <Picker.Item label="Cancelled" value="cancelled" />
                   </>
@@ -278,7 +278,7 @@ const TransactionsScreen = () => {
                 )}
                 {item.Status !== "draft" && (
                   <>
-                    <Picker.Item label="Proccess" value="proccess" />
+                    <Picker.Item label="Process" value="process" />
                     <Picker.Item label="Delivered" value="delivered" />
                     <Picker.Item label="Cancelled" value="cancelled" />
                   </>

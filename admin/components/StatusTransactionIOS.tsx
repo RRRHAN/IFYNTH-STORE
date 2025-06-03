@@ -52,7 +52,7 @@ export default function StatusTransactionIOS({
   }
 
   pickerItems.push(
-    <Picker.Item key="proccess" label="Proccess" value="proccess" />,
+    <Picker.Item key="proccess" label="Process" value="process" />,
     <Picker.Item key="delivered" label="Delivered" value="delivered" />,
     <Picker.Item key="cancelled" label="Cancelled" value="cancelled" />
   );
