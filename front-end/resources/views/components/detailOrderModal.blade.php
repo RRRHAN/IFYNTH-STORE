@@ -15,7 +15,8 @@
                     <strong>Payment Method:</strong> <span id="modalPaymentMethod" class="fw-bold"></span>
                 </div>
 
-                <form id="paymentProofForm" enctype="multipart/form-data">
+                <form id="paymentProofForm" action="/pay" method="POST" enctype="multipart/form-data">
+                    @csrf
                     <input type="hidden" id="modalTransactionId" name="transaction_id">
                     <div class="mb-3">
                         <label for="paymentProof" class="form-label">Upload Payment Proof</label>

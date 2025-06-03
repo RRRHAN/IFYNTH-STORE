@@ -798,10 +798,6 @@ CSS TABLE OF CONTENTS
         const modalPaymentMethodDisplay = $("#modalPaymentMethod");
         const modalTotalAmountValueInput = $("#modalTotalAmountValue");
         const modalPaymentMethodValueInput = $("#modalPaymentMethodValue");
-        const paymentProofInput = $("#paymentProof");
-        const imagePreview = $("#imagePreview");
-        const paymentProofForm = $("#paymentProofForm");
-        const submitPaymentProofBtn = $("#submitPaymentProofBtn");
 
         paymentModal.on("show.bs.modal", function (event) {
             const button = $(event.relatedTarget);
@@ -814,67 +810,6 @@ CSS TABLE OF CONTENTS
             modalPaymentMethodDisplay.text(paymentMethod);
             modalTotalAmountValueInput.val(totalAmount.replace(/,/g, ""));
             modalPaymentMethodValueInput.val(paymentMethod);
-
-            paymentProofForm[0].reset();
-            imagePreview.attr("src", "#").hide();
-            submitPaymentProofBtn.prop("disabled", false).text("Confirm Payment");
-        });
-
-        paymentProofInput.on("change", function () {
-            const file = this.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function (e) {
-                    imagePreview.attr("src", e.target.result).show();
-                };
-                reader.readAsDataURL(file);
-            } else {
-                imagePreview.attr("src", "#").hide();
-            }
-        });
-
-        paymentProofForm.on("submit", function (e) {
-            e.preventDefault();
-
-            submitPaymentProofBtn.prop("disabled", true).text("Uploading...");
-
-            const formData = new FormData(this);
-            const transactionId = modalTransactionId.val();
-
-            $.ajax({
-                url: `${window.location.origin}/api/transactions/${transactionId}/upload-proof`,
-                type: "POST",
-                data: formData,
-                processData: false,
-                contentType: false,
-                headers: {
-                    // 'Authorization': 'Bearer ' + YOUR_AUTH_TOKEN
-                },
-                success: function (response) {
-                    alert(
-                        "Payment proof uploaded successfully! Your order status will be updated."
-                    );
-                    paymentModal.modal("hide");
-                    location.reload();
-                },
-                error: function (xhr, status, error) {
-                    console.error("Upload failed:", xhr.responseText);
-                    let errorMessage =
-                        "Failed to upload payment proof. Please try again.";
-                    try {
-                        const errorResponse = JSON.parse(xhr.responseText);
-                        if (errorResponse.message) {
-                            errorMessage = errorResponse.message;
-                        }
-                    } catch (e) {
-                        // ignore
-                    }
-                    alert(errorMessage);
-                    submitPaymentProofBtn
-                        .prop("disabled", false)
-                        .text("Confirm Payment");
-                },
-            });
         });
     }
  function initShippingAddressModal() {
@@ -885,7 +820,6 @@ CSS TABLE OF CONTENTS
     const modalZipCode = $('#modalZipCode');
     const modalDestinationLabel = $('#modalDestinationLabel');
     const modalCourier = $('#modalCourier');
-    // Target kontainer bagian dalam di mana langkah-langkah progress akan ditambahkan
     const orderProgressBarContainer = $('#orderProgressBar .progress-bar-container');
 
     shippingAddressModal.on('show.bs.modal', function(event) {
@@ -898,7 +832,6 @@ CSS TABLE OF CONTENTS
         const courier = button.data('courier');
         const currentOrderStatus = button.data('status');
 
-        // Isi detail alamat pengiriman
         modalRecipientName.text(recipientName);
         modalPhoneNumber.text('(+62) ' + phoneNumber);
         modalAddress.text(address);
@@ -911,8 +844,8 @@ CSS TABLE OF CONTENTS
 
         // Definisikan semua langkah yang mungkin untuk progress bar
         const allPossibleSteps = [
-            { id: 'draft', label: 'Order Made', icon: 'far fa-file-alt' },
-            { id: 'pending', label: 'Waiting for Payment', icon: 'fas fa-hourglass-half' },
+            { id: 'draft', label: 'Waiting for Payment', icon: 'far fa-file-alt' },
+            { id: 'pending', label: 'Waiting Payment Confirmed', icon: 'fas fa-hourglass-half' },
             { id: 'paid', label: 'Payment Confirmed', icon: 'fas fa-money-bill-wave' },
             { id: 'process', label: 'Order Shipped', icon: 'fas fa-truck' },
             { id: 'delivered', label: 'Order Completed', icon: 'fas fa-download' },

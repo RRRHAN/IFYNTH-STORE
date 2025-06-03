@@ -19,11 +19,11 @@
                     @elseif ($transaction['Status'] === 'process')
                         The order is in transit.
                     @elseif ($transaction['Status'] === 'paid')
-                        Have made payment, waiting for store confirmation.
+                        The store has confirmed payment, the product is being processed.
                     @elseif ($transaction['Status'] === 'pending')
-                        Waiting for payment.
+                        Payment placed, awaiting store confirmation.
                     @elseif ($transaction['Status'] === 'draft')
-                        Order placed, awaiting store confirmation.
+                        Waiting for payment.
                     @else
                         Status: {{ ucfirst($transaction['Status'] ?? '-') }}
                     @endif
@@ -103,7 +103,7 @@
                     @endif
 
                     {{-- Tombol "Pay Now" (tetap sama) --}}
-                    @if ($transaction['Status'] === 'pending')
+                    @if ($transaction['Status'] === 'draft')
                         <button class="btn btn-primary pay-now-btn" data-bs-toggle="modal"
                             data-bs-target="#paymentModal" data-transaction-id="{{ $transaction['ID'] }}"
                             data-total-amount="{{ number_format($transaction['TotalAmount'] ?? 0) }}"

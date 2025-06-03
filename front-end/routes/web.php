@@ -99,9 +99,9 @@ Route::controller(AddressController::class)->group(function () {
     Route::put('/updateAddress/{id}', 'updateAddress')->name('updateAddress');
 });
 
-
 Route::controller(TransactionController::class)->group(function () {
     Route::post('/checkout', 'addTransaction');
+    Route::post('/pay', 'payTransaction');
 });
 
 Route::post('/tryon', [TryonController::class, 'tryon']);

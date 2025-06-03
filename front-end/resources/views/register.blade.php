@@ -159,9 +159,6 @@
                 }
 
                 try {
-                    // Ensure config('app.back_end_base_url') is defined in your Laravel config
-                    // Example: .env -> BACK_END_BASE_URL="http://localhost:7777"
-                    // config/app.php -> 'back_end_base_url' => env('BACK_END_BASE_URL'),
                     let baseUrl = "{{ config('app.back_end_base_url') }}"; // Get from Laravel config
                     if (!baseUrl) {
                         console.error("`config('app.back_end_base_url')` is not set. Please define it in your Laravel config.");

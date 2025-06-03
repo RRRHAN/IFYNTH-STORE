@@ -352,8 +352,8 @@ func (s *service) PayTransaction(ctx context.Context, input PayTransactionReq) e
 		return err
 	}
 
-	var transaction *Transaction
-	err = s.db.First(transaction, input.TransactionId).Error
+	transaction := &Transaction{}
+	err = s.db.First(transaction, "id = ?", input.TransactionId).Error
 	if err != nil {
 		return err
 	}

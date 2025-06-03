@@ -2,8 +2,6 @@ package transaction
 
 import (
 	"mime/multipart"
-
-	"github.com/google/uuid"
 )
 
 type AddTransactionRequest struct {
@@ -17,6 +15,6 @@ type UpdateStatusRequest struct {
 }
 
 type PayTransactionReq struct {
-	TransactionId uuid.UUID             `json:"transactionId" form:"transactionId" binding:"required"`
+	TransactionId string                `json:"transactionId" form:"transactionId" binding:"required"`
 	PaymentProof  *multipart.FileHeader `json:"payment_proof" form:"payment_proof" binding:"required"`
 }

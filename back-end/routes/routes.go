@@ -132,7 +132,7 @@ func NewDependency(
 		transaction.GET("/report", mw.JWT(constants.ADMIN), transactionHandler.GetTotalAmountByDate)
 		transaction.GET("/totalIncome", mw.JWT(constants.ADMIN), transactionHandler.GetTotalIncome)
 		transaction.GET("/totalTransactionUser", mw.JWT(constants.ADMIN), transactionHandler.GetTotalTransactionByCustomer)
-		transaction.POST("/pay", mw.JWT(constants.ADMIN), transactionHandler.PayTransaction)
+		transaction.POST("/pay", mw.JWT(constants.CUSTOMER), transactionHandler.PayTransaction)
 	}
 
 	address := api.Group("/address")
