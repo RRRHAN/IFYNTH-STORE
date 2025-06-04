@@ -28,7 +28,7 @@ const maxWidth =
             ? screenWidth / 2.3
             : screenWidth / 1.1
       }
-    : { width: 380 };
+    : { width: screenWidth / 1.1 };
 
 type ProfitChartProps = {
   ProfitProduct: ProfitProduct[] | null;

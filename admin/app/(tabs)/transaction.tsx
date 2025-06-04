@@ -312,146 +312,304 @@ const TransactionsScreen = () => {
   };
 
   return (
-    <ScrollView
-      contentContainerStyle={{
-        paddingBottom: Platform.OS === "web" ? 100 : 150,
-      }}
-    >
-      <ThemedView
-        style={[styles.center, { marginTop: Platform.OS === "web" ? 20 : 80 }]}
-      >
-        {selectedTransaction && (
-          <TransactionDetailModal
-            transaction={selectedTransaction}
-            visible={isTransactionModalVisible}
-            onClose={() => setIsTransactionModalVisible(false)}
-          />
-        )}
-        <ThemedView style={styles.headerContainer}>
-          <ThemedText style={[styles.title]}>LIST TRANSACTIONS</ThemedText>
-        </ThemedView>
-        <ThemedTable>
-          <ThemedHeader style={[styles.row]}>
-            {isTinyScreen ? (
-              <>
-                <ThemedHeader style={{ width: columnWidths.id }}>
-                  <ThemedText
-                    type="subtitle"
-                    style={{ fontSize: fontSizeHeader, textAlign: "center" }}
-                  >
-                    Transaction ID
-                  </ThemedText>
-                </ThemedHeader>
-                <ThemedHeader style={{ width: columnWidths.status }}>
-                  <ThemedText
-                    type="subtitle"
-                    style={{ fontSize: fontSizeHeader, textAlign: "center" }}
-                  >
-                    Status
-                  </ThemedText>
-                </ThemedHeader>
-                <ThemedHeader style={{ width: columnWidths.action }}>
-                  <ThemedText
-                    type="subtitle"
-                    style={{ fontSize: fontSizeHeader, textAlign: "center" }}
-                  >
-                    Action
-                  </ThemedText>
-                </ThemedHeader>
-              </>
-            ) : (
-              <>
-                <ThemedHeader style={[{ width: columnWidths.name }]}>
-                  <ThemedText
-                    type="subtitle"
-                    style={[styles.header, { fontSize: fontSizeHeader }]}
-                  >
-                    Transaction ID
-                  </ThemedText>
-                </ThemedHeader>
-                <ThemedHeader style={[{ width: columnWidths.name }]}>
-                  <ThemedText
-                    type="subtitle"
-                    style={[styles.header, { fontSize: fontSizeHeader }]}
-                  >
-                    Customer Name
-                  </ThemedText>
-                </ThemedHeader>
-                <ThemedHeader style={[{ width: columnWidths.amount }]}>
-                  <ThemedText
-                    type="subtitle"
-                    style={[styles.header, { fontSize: fontSizeHeader }]}
-                  >
-                    Total Amount
-                  </ThemedText>
-                </ThemedHeader>
-                <ThemedHeader style={[{ width: columnWidths.method }]}>
-                  <ThemedText
-                    type="subtitle"
-                    style={[styles.header, { fontSize: fontSizeHeader }]}
-                  >
-                    Payment Method
-                  </ThemedText>
-                </ThemedHeader>
-                <ThemedHeader style={[{ width: columnWidths.status }]}>
-                  <ThemedText
-                    type="subtitle"
-                    style={[styles.header, { fontSize: fontSizeHeader }]}
-                  >
-                    Status
-                  </ThemedText>
-                </ThemedHeader>
-                <ThemedHeader style={[{ width: columnWidths.action }]}>
-                  <ThemedText
-                    type="subtitle"
-                    style={[styles.header, { fontSize: fontSizeHeader }]}
-                  >
-                    Action
-                  </ThemedText>
-                </ThemedHeader>
-              </>
+    <>
+      {Platform.OS === "web" ? (
+        <ScrollView
+          contentContainerStyle={{
+            paddingBottom: Platform.OS === "web" ? 100 : 150,
+          }}
+        >
+          <ThemedView
+            style={[
+              styles.center,
+              { marginTop: Platform.OS === "web" ? 20 : 80 },
+            ]}
+          >
+            {selectedTransaction && (
+              <TransactionDetailModal
+                transaction={selectedTransaction}
+                visible={isTransactionModalVisible}
+                onClose={() => setIsTransactionModalVisible(false)}
+              />
             )}
-          </ThemedHeader>
-          <FlatList
-            data={currentTransactions} // Use paginated data
-            renderItem={renderItem}
-            keyExtractor={(item) => item.ID}
-            ListEmptyComponent={
-              <ThemedText style={{ textAlign: "center", paddingVertical: 20 }}>
-                No transactions found.
-              </ThemedText>
-            }
-          />
-        </ThemedTable>
+            <ThemedView style={styles.headerContainer}>
+              <ThemedText style={[styles.title]}>LIST TRANSACTIONS</ThemedText>
+            </ThemedView>
+            <ThemedTable>
+              <ThemedHeader style={[styles.row]}>
+                {isTinyScreen ? (
+                  <>
+                    <ThemedHeader style={{ width: columnWidths.id }}>
+                      <ThemedText
+                        type="subtitle"
+                        style={{
+                          fontSize: fontSizeHeader,
+                          textAlign: "center",
+                        }}
+                      >
+                        Transaction ID
+                      </ThemedText>
+                    </ThemedHeader>
+                    <ThemedHeader style={{ width: columnWidths.status }}>
+                      <ThemedText
+                        type="subtitle"
+                        style={{
+                          fontSize: fontSizeHeader,
+                          textAlign: "center",
+                        }}
+                      >
+                        Status
+                      </ThemedText>
+                    </ThemedHeader>
+                    <ThemedHeader style={{ width: columnWidths.action }}>
+                      <ThemedText
+                        type="subtitle"
+                        style={{
+                          fontSize: fontSizeHeader,
+                          textAlign: "center",
+                        }}
+                      >
+                        Action
+                      </ThemedText>
+                    </ThemedHeader>
+                  </>
+                ) : (
+                  <>
+                    <ThemedHeader style={[{ width: columnWidths.name }]}>
+                      <ThemedText
+                        type="subtitle"
+                        style={[styles.header, { fontSize: fontSizeHeader }]}
+                      >
+                        Transaction ID
+                      </ThemedText>
+                    </ThemedHeader>
+                    <ThemedHeader style={[{ width: columnWidths.name }]}>
+                      <ThemedText
+                        type="subtitle"
+                        style={[styles.header, { fontSize: fontSizeHeader }]}
+                      >
+                        Customer Name
+                      </ThemedText>
+                    </ThemedHeader>
+                    <ThemedHeader style={[{ width: columnWidths.amount }]}>
+                      <ThemedText
+                        type="subtitle"
+                        style={[styles.header, { fontSize: fontSizeHeader }]}
+                      >
+                        Total Amount
+                      </ThemedText>
+                    </ThemedHeader>
+                    <ThemedHeader style={[{ width: columnWidths.method }]}>
+                      <ThemedText
+                        type="subtitle"
+                        style={[styles.header, { fontSize: fontSizeHeader }]}
+                      >
+                        Payment Method
+                      </ThemedText>
+                    </ThemedHeader>
+                    <ThemedHeader style={[{ width: columnWidths.status }]}>
+                      <ThemedText
+                        type="subtitle"
+                        style={[styles.header, { fontSize: fontSizeHeader }]}
+                      >
+                        Status
+                      </ThemedText>
+                    </ThemedHeader>
+                    <ThemedHeader style={[{ width: columnWidths.action }]}>
+                      <ThemedText
+                        type="subtitle"
+                        style={[styles.header, { fontSize: fontSizeHeader }]}
+                      >
+                        Action
+                      </ThemedText>
+                    </ThemedHeader>
+                  </>
+                )}
+              </ThemedHeader>
+              <FlatList
+                data={currentTransactions} // Use paginated data
+                renderItem={renderItem}
+                keyExtractor={(item) => item.ID}
+                ListEmptyComponent={
+                  <ThemedText
+                    style={{ textAlign: "center", paddingVertical: 20 }}
+                  >
+                    No transactions found.
+                  </ThemedText>
+                }
+              />
+            </ThemedTable>
 
-        {/* Pagination controls */}
-        <View style={styles.paginationContainer}>
-          <IconButton
-            // Gunakan ikon FontAwesome untuk chevron-left
-            icon={({ color, size }) => (
-              <FontAwesome name="chevron-left" size={size} color={color} />
-            )}
-            size={20}
-            onPress={() => paginate(currentPage - 1)}
-            disabled={currentPage === 1}
-            iconColor={colorScheme === "dark" ? "#ffffff" : "#111827"}
-          />
-          <ThemedText style={styles.paginationText}>
-            Page {currentPage} of {totalPages}
-          </ThemedText>
-          <IconButton
-            // Gunakan ikon FontAwesome untuk chevron-right
-            icon={({ color, size }) => (
-              <FontAwesome name="chevron-right" size={size} color={color} />
-            )}
-            size={20}
-            onPress={() => paginate(currentPage + 1)}
-            disabled={currentPage === totalPages}
-            iconColor={colorScheme === "dark" ? "#ffffff" : "#111827"}
-          />
-        </View>
-      </ThemedView>
-    </ScrollView>
+            {/* Pagination controls */}
+            <View style={styles.paginationContainer}>
+              <IconButton
+                // Gunakan ikon FontAwesome untuk chevron-left
+                icon={({ color, size }) => (
+                  <FontAwesome name="chevron-left" size={size} color={color} />
+                )}
+                size={20}
+                onPress={() => paginate(currentPage - 1)}
+                disabled={currentPage === 1}
+                iconColor={colorScheme === "dark" ? "#ffffff" : "#111827"}
+              />
+              <ThemedText style={styles.paginationText}>
+                Page {currentPage} of {totalPages}
+              </ThemedText>
+              <IconButton
+                // Gunakan ikon FontAwesome untuk chevron-right
+                icon={({ color, size }) => (
+                  <FontAwesome name="chevron-right" size={size} color={color} />
+                )}
+                size={20}
+                onPress={() => paginate(currentPage + 1)}
+                disabled={currentPage === totalPages}
+                iconColor={colorScheme === "dark" ? "#ffffff" : "#111827"}
+              />
+            </View>
+          </ThemedView>
+        </ScrollView>
+      ) : (
+        <ThemedView
+          style={[
+            styles.center,
+            { marginTop: 80 },
+          ]}
+        >
+          {selectedTransaction && (
+            <TransactionDetailModal
+              transaction={selectedTransaction}
+              visible={isTransactionModalVisible}
+              onClose={() => setIsTransactionModalVisible(false)}
+            />
+          )}
+          <ThemedView style={styles.headerContainer}>
+            <ThemedText style={[styles.title]}>LIST TRANSACTIONS</ThemedText>
+          </ThemedView>
+          <ThemedTable>
+            <ThemedHeader style={[styles.row]}>
+              {isTinyScreen ? (
+                <>
+                  <ThemedHeader style={{ width: columnWidths.id }}>
+                    <ThemedText
+                      type="subtitle"
+                      style={{ fontSize: fontSizeHeader, textAlign: "center" }}
+                    >
+                      Transaction ID
+                    </ThemedText>
+                  </ThemedHeader>
+                  <ThemedHeader style={{ width: columnWidths.status }}>
+                    <ThemedText
+                      type="subtitle"
+                      style={{ fontSize: fontSizeHeader, textAlign: "center" }}
+                    >
+                      Status
+                    </ThemedText>
+                  </ThemedHeader>
+                  <ThemedHeader style={{ width: columnWidths.action }}>
+                    <ThemedText
+                      type="subtitle"
+                      style={{ fontSize: fontSizeHeader, textAlign: "center" }}
+                    >
+                      Action
+                    </ThemedText>
+                  </ThemedHeader>
+                </>
+              ) : (
+                <>
+                  <ThemedHeader style={[{ width: columnWidths.name }]}>
+                    <ThemedText
+                      type="subtitle"
+                      style={[styles.header, { fontSize: fontSizeHeader }]}
+                    >
+                      Transaction ID
+                    </ThemedText>
+                  </ThemedHeader>
+                  <ThemedHeader style={[{ width: columnWidths.name }]}>
+                    <ThemedText
+                      type="subtitle"
+                      style={[styles.header, { fontSize: fontSizeHeader }]}
+                    >
+                      Customer Name
+                    </ThemedText>
+                  </ThemedHeader>
+                  <ThemedHeader style={[{ width: columnWidths.amount }]}>
+                    <ThemedText
+                      type="subtitle"
+                      style={[styles.header, { fontSize: fontSizeHeader }]}
+                    >
+                      Total Amount
+                    </ThemedText>
+                  </ThemedHeader>
+                  <ThemedHeader style={[{ width: columnWidths.method }]}>
+                    <ThemedText
+                      type="subtitle"
+                      style={[styles.header, { fontSize: fontSizeHeader }]}
+                    >
+                      Payment Method
+                    </ThemedText>
+                  </ThemedHeader>
+                  <ThemedHeader style={[{ width: columnWidths.status }]}>
+                    <ThemedText
+                      type="subtitle"
+                      style={[styles.header, { fontSize: fontSizeHeader }]}
+                    >
+                      Status
+                    </ThemedText>
+                  </ThemedHeader>
+                  <ThemedHeader style={[{ width: columnWidths.action }]}>
+                    <ThemedText
+                      type="subtitle"
+                      style={[styles.header, { fontSize: fontSizeHeader }]}
+                    >
+                      Action
+                    </ThemedText>
+                  </ThemedHeader>
+                </>
+              )}
+            </ThemedHeader>
+            <FlatList
+              data={currentTransactions} // Use paginated data
+              renderItem={renderItem}
+              keyExtractor={(item) => item.ID}
+              ListEmptyComponent={
+                <ThemedText
+                  style={{ textAlign: "center", paddingVertical: 20 }}
+                >
+                  No transactions found.
+                </ThemedText>
+              }
+            />
+          </ThemedTable>
+
+          {/* Pagination controls */}
+          <View style={styles.paginationContainer}>
+            <IconButton
+              // Gunakan ikon FontAwesome untuk chevron-left
+              icon={({ color, size }) => (
+                <FontAwesome name="chevron-left" size={size} color={color} />
+              )}
+              size={20}
+              onPress={() => paginate(currentPage - 1)}
+              disabled={currentPage === 1}
+              iconColor={colorScheme === "dark" ? "#ffffff" : "#111827"}
+            />
+            <ThemedText style={styles.paginationText}>
+              Page {currentPage} of {totalPages}
+            </ThemedText>
+            <IconButton
+              // Gunakan ikon FontAwesome untuk chevron-right
+              icon={({ color, size }) => (
+                <FontAwesome name="chevron-right" size={size} color={color} />
+              )}
+              size={20}
+              onPress={() => paginate(currentPage + 1)}
+              disabled={currentPage === totalPages}
+              iconColor={colorScheme === "dark" ? "#ffffff" : "#111827"}
+            />
+          </View>
+        </ThemedView>
+      )}
+    </>
   );
 };
 

@@ -1,12 +1,15 @@
 <meta name="csrf-token" content="{{ csrf_token() }}">
-<div id="shipperForm" class="shipper-form mt-2" style="display: none;">
+@include('components.addressModal')
+<div id="shipperForm" class="shipper-form mt-2" style="display: none; margin-left: 25px; margin-right: 25px;">
     <form id="formShip" action="/checkout" method="POST" enctype="multipart/form-data">
         @csrf
-
         <div class="mb-3">
             <label for="selectAddress" class="form-label">Select Shipping Address</label>
-            <select class="form-control" id="selectAddress" name="selected_address_id" required>
-                <option value="">-- Select an existing address --</option>
+            <select class="form-control" id="selectAddress" name="selected_address_id" required
+                {{ $addresses->isEmpty() ? 'disabled' : '' }}>
+                <option value="">
+                    {{ $addresses->isEmpty() ? 'No addresses available. Please add one first.' : '-- Select an existing address --' }}
+                </option>
                 @forelse ($addresses as $address)
                     <option value="{{ $address['ID'] }}" data-address="{{ json_encode($address) }}">
                         {{ $address['RecipientsName'] ?? 'Name not available' }} (+62)
@@ -20,11 +23,9 @@
                 @endforelse
             </select>
         </div>
-
         {{-- Hidden fields for checkout --}}
         <input type="hidden" id="courierIndex" name="courierIndex">
         <input type="hidden" id="addressId" name="addressId">
-
 
         <div id="shippingTariff" class="mb-3" style="display: none;">
             <label for="tariff" class="form-label">Courier</label>
@@ -36,6 +37,11 @@
             <input type="hidden" id="grandtotal">
         </div>
     </form>
+    @if ($addresses->isEmpty())
+        <button class="btn btn-secondary mb-3" data-bs-toggle="modal" data-bs-target="#addAddressModal">
+            <i class="fas fa-plus me-2"></i> Add New Address
+        </button>
+    @endif
 </div>
 <script>
     const selectAddressDropdown = document.getElementById('selectAddress');

@@ -74,8 +74,6 @@ export default function ProductDetailModal({
             ))}
           </ScrollView>
         </View>
-
-        {/* Detail produk */}
         <View
           style={[
             styles.details,

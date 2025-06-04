@@ -23,7 +23,7 @@ const maxWidth =
             ? screenWidth / 2.3
             : screenWidth / 1.1
       }
-    : { width: 380 };
+    : { width: screenWidth / 1.1 };
 
 const getMaxVisibleData = (width: number) => {
   if (width < 401) return 4;

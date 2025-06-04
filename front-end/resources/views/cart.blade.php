@@ -135,7 +135,7 @@
 
                             <!-- Checkout Button -->
                             <a href="#" id="checkoutBtn" class="btn-one py-2 px-4" data-bs-toggle="modal"
-                                data-bs-target="#shippingModal">
+                                data-bs-target="#shippingModal" style="margin-right: 20px">
                                 <span>Checkout</span>
                             </a>
                         </div>

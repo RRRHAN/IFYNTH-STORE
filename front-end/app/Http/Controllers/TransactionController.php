@@ -11,6 +11,7 @@ class TransactionController extends Controller
 {
     public function addTransaction(Request $request)
     {
+        session()->flash('preloader', false);
         $token = session("api_token");
 
         $validatedData = $request->validate([
@@ -34,17 +35,22 @@ class TransactionController extends Controller
 
             if ($response->status() === 201) {
                 Session::forget('total_cart');
-                return redirect()->back()->with('success', 'Transaction added successfully!');
+                session()->flash('success', 'Transaction added successfully!');
+                return redirect()->back();
             } else {
-                return redirect()->back()->with('error', 'Failed to add transaction');
+                $errors = $response->json()['errors'] ?? ['Failed to add transaction'];
+                session()->flash('error', $errors[0]);
+                return redirect()->back();
             }
         } catch (\Exception $e) {
-            return redirect()->back()->with('error', $e->getMessage());
+            session()->flash('error', $e->getMessage());
+            return redirect()->back();
         }
     }
 
     public function payTransaction(Request $request)
     {
+        session()->flash('preloader', false);
         $token = session("api_token");
 
         $validatedData = $request->validate([
