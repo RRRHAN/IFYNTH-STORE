@@ -3,7 +3,7 @@ import json
 import uuid
 import numpy as np
 import tensorflow as tf
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, Blueprint
 from tensorflow.keras.preprocessing import image
 from werkzeug.utils import secure_filename
 
@@ -21,6 +21,7 @@ except Exception as e:
 
 app = Flask(__name__)
 
+ai_bp = Blueprint("ai", __name__)
 
 def preprocess_image(img_path):
     img = image.load_img(img_path, target_size=(224, 224))
@@ -36,7 +37,7 @@ def respond_errors(error, http_status):
     return jsonify({"data": None, "errors": error}), http_status
 
 
-@app.route("/ai/predict-image", methods=["POST"])
+@ai_bp.route("/predict-image", methods=["POST"])
 def predict():
     
     errors = []
@@ -70,6 +71,10 @@ def predict():
         if os.path.exists(temp_path):
             os.remove(temp_path)
 
+@ai_bp.route("/health-check", methods=["GET"])
+def health_check():
+    return respond_success("server running properly",200)
 
+app.register_blueprint(ai_bp, url_prefix="/ai")
 if __name__ == "__main__":
     app.run(debug=True)
