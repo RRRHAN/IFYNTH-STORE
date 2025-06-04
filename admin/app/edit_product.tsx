@@ -18,6 +18,7 @@ import ActionButtons from "@/components/products/ActionButtons";
 import SelectedImagesList from "@/components/products/SelectedImagesList";
 import useProductForm from "@/hooks/helpers/useEditProductForm";
 import useImages from "@/hooks/helpers/useImages";
+import { FontAwesome } from '@expo/vector-icons'; // Mengubah import menjadi FontAwesome
 
 export default function EditProductScreen() {
   const [isEditing, setIsEditing] = useState(true);
@@ -142,7 +143,9 @@ export default function EditProductScreen() {
         message={errorMessage || successMessage}
       />
       <IconButton
-        icon="arrow-left"
+        icon={({ color, size }) => (
+          <FontAwesome name="arrow-left" size={size} color={color} /> // Menggunakan FontAwesome
+        )}
         size={30}
         onPress={() => router.replace("/products")}
       />
@@ -170,11 +173,12 @@ export default function EditProductScreen() {
         setCategory={setCategory}
         isDark={isDark}
         styles={styles}
-        isEditing={isEditing} 
+        isEditing={isEditing}
       />
 
       <View style={styles.sizeContainer}>
-        {sizes.map((size, index) => (
+        {/* Pastikan `sizes` adalah array sebelum memetakan */}
+        {Array.isArray(sizes) && sizes.map((size, index) => (
           <SizeInputItem
             key={index}
             size={size.size}

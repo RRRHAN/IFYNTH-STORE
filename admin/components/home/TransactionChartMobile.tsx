@@ -1,10 +1,11 @@
-import React, { useRef, useState } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import {
   Dimensions,
   StyleSheet,
   ScrollView,
   TouchableOpacity,
   Platform,
+  View,
 } from "react-native";
 import { LineChart } from "react-native-chart-kit";
 import { ThemedView } from "@/components/ThemedView";
@@ -18,15 +19,11 @@ const maxWidth =
   Platform.OS === "web"
     ? {
         width:
-          screenWidth > 1500
-            ? 750
-            : screenWidth > 1000
-            ? 800
-            : screenWidth > 400
-            ? 700
-            : 900,
+          screenWidth > 1000
+            ? screenWidth / 2.3
+            : screenWidth / 1.1
       }
-    : { width: 380 };
+    : { width: screenWidth / 1.1 };
 
 const getMaxVisibleData = (width: number) => {
   if (width < 401) return 4;
@@ -62,6 +59,7 @@ const MTransactionReportChart: React.FC<TransactionChartProps> = ({
 }) => {
   const colorScheme = useColorScheme();
   const scrollRef = useRef<ScrollView>(null);
+  const scrollViewWidth = useRef(0);
 
   const [tooltipData, setTooltipData] = useState<{
     value: number;
@@ -70,30 +68,39 @@ const MTransactionReportChart: React.FC<TransactionChartProps> = ({
     date: string;
   } | null>(null);
 
-  const labels = (transactionReport ?? []).map((r) => {
-    const date = new Date(r.Date);
-    const day = String(date.getDate()).padStart(2, "0");
-    const month = String(date.getMonth() + 1).padStart(2, "0");
-    const year = date.getFullYear();
-    return maxWidth.width > 400 ? `${day}-${month}-${year}` : `${day}-${month}`;
-  });
+  const hasData =
+    Array.isArray(transactionReport) && transactionReport.length > 0;
 
-  const data = (transactionReport ?? []).map((r) => r.TotalAmount / 1000);
-  const actualTotalAmounts = (transactionReport ?? []).map(
-    (r) => r.TotalAmount
-  );
+  const labels = hasData
+    ? transactionReport.map((r) => {
+        const date = new Date(r.Date);
+        const day = String(date.getDate()).padStart(2, "0");
+        const month = String(date.getMonth() + 1).padStart(2, "0");
+        const year = date.getFullYear();
+        return maxWidth.width > 400
+          ? `${day}-${month}-${year}`
+          : `${day}-${month}`;
+      })
+    : [];
+
+  const data = hasData
+    ? transactionReport.map((r) => r.TotalAmount / 1000)
+    : [];
+
+  const actualTotalAmounts = hasData
+    ? transactionReport.map((r) => r.TotalAmount)
+    : [];
 
   const MAX_VISIBLE_DATA = getMaxVisibleData(screenWidth);
   const LABEL_WIDTH = 70;
   const MIN_WIDTH = getMinWidth(screenWidth);
 
-  const visibleCount = Math.min(labels.length, MAX_VISIBLE_DATA);
   const scrollContentWidth = Math.max(labels.length * LABEL_WIDTH, MIN_WIDTH);
 
   const chartConfig = {
-    backgroundColor: colorScheme === "dark" ? "#151718" : "#fff",
-    backgroundGradientFrom: colorScheme === "dark" ? "#151718" : "#fff",
-    backgroundGradientTo: colorScheme === "dark" ? "#151718" : "#fff",
+    backgroundColor: colorScheme === "dark" ? "#1c1c1c" : "#f0f0f0",
+    backgroundGradientFrom: colorScheme === "dark" ? "#1c1c1c" : "#f0f0f0",
+    backgroundGradientTo: colorScheme === "dark" ? "#1c1c1c" : "#f0f0f0",
     decimalPlaces: 0,
     color: (opacity = 1) => (colorScheme === "dark" ? "#ffffff" : "#111827"),
     labelColor: (opacity = 1) =>
@@ -111,24 +118,47 @@ const MTransactionReportChart: React.FC<TransactionChartProps> = ({
   const LABEL_COUNT = 5;
   const adjustedChartHeight = screenWidth > 1000 ? height - 25 : 250;
   const [productTableHeight, setProductTableHeight] = useState(0);
-  const labelVerticalSpacing = productTableHeight / 8.5;
+  const labelVerticalSpacing =
+    productTableHeight > 0 ? productTableHeight / 8.5 : 0;
+
+  useEffect(() => {
+    if (scrollRef.current) {
+      if (!hasData || labels.length <= MAX_VISIBLE_DATA) {
+        const centerScroll = (scrollContentWidth - scrollViewWidth.current) / 2;
+        scrollRef.current.scrollTo({ x: centerScroll, animated: true });
+      } else {
+        scrollRef.current.scrollToEnd({ animated: true });
+      }
+    }
+  }, [hasData, labels.length, scrollContentWidth, scrollViewWidth.current]);
 
   return (
     <ThemedView
-      style={[styles.container, maxWidth]}
+      style={[
+        styles.container,
+        maxWidth,
+        { backgroundColor: colorScheme === "dark" ? "#1c1c1c" : "#f0f0f0" },
+      ]}
       onLayout={(event) => {
         setProductTableHeight(event.nativeEvent.layout.height);
+        scrollViewWidth.current =
+          event.nativeEvent.layout.width - (styles.yAxisContainer.width || 0);
       }}
     >
       <ThemedText style={styles.title}>Transaction Report</ThemedText>
       <ThemedView style={{ flexDirection: "row" }}>
-        <ThemedView style={[styles.yAxisContainer]}>
+        <ThemedView
+          style={[
+            styles.yAxisContainer,
+            { backgroundColor: colorScheme === "dark" ? "#1c1c1c" : "#f0f0f0" },
+          ]}
+        >
           {[...Array(LABEL_COUNT)].map((_, i) => {
-            const max = Math.max(...data);
+            const max = hasData ? Math.max(...data) : 0;
             const yValue =
               data.length > 0
                 ? Math.round((max / (LABEL_COUNT - 1)) * (LABEL_COUNT - 1 - i))
-                : 0;
+                : (LABEL_COUNT - 1 - i) * (100 / (LABEL_COUNT - 1));
 
             const labelStyle: any = { ...styles.yAxisLabel };
             if (i === 0) {
@@ -146,42 +176,56 @@ const MTransactionReportChart: React.FC<TransactionChartProps> = ({
           })}
         </ThemedView>
 
-        {/* Chart with horizontal scroll */}
         <ScrollView
           horizontal
           showsHorizontalScrollIndicator={true}
           ref={scrollRef}
-          onContentSizeChange={() => {
-            if (scrollRef.current) {
-              scrollRef.current.scrollToEnd({ animated: true });
-            }
-          }}
+          contentContainerStyle={[
+            styles.chartScrollViewContent,
+            {
+              minWidth: scrollContentWidth,
+              backgroundColor: colorScheme === "dark" ? "#1c1c1c" : "#f0f0f0",
+            },
+          ]}
         >
-          <LineChart
-            data={{
-              labels,
-              datasets: [{ data }],
-            }}
-            width={scrollContentWidth}
-            height={adjustedChartHeight}
-            yAxisSuffix="k"
-            yAxisInterval={1}
-            chartConfig={chartConfig}
-            bezier
-            style={styles.chart}
-            fromZero
-            withHorizontalLabels={false}
-            onDataPointClick={({ value, index, x, y }) => {
-              setTooltipData({
-                value: actualTotalAmounts[index],
-                x: x,
-                y: y,
-                date: labels[index],
-              });
-            }}
-          />
+          {hasData ? (
+            <LineChart
+              data={{
+                labels,
+                datasets: [{ data }],
+              }}
+              width={scrollContentWidth}
+              height={adjustedChartHeight}
+              yAxisSuffix="k"
+              yAxisInterval={1}
+              chartConfig={chartConfig}
+              bezier
+              style={styles.chart}
+              fromZero
+              withHorizontalLabels={false}
+              onDataPointClick={({ value, index, x, y }) => {
+                setTooltipData({
+                  value: actualTotalAmounts[index],
+                  x: x,
+                  y: y,
+                  date: labels[index],
+                });
+              }}
+            />
+          ) : (
+            <View
+              style={[
+                styles.noDataMessageContainer,
+                { height: adjustedChartHeight },
+              ]}
+            >
+              <ThemedText style={styles.noDataMessageText}>
+                No transaction data available for this period.
+              </ThemedText>
+            </View>
+          )}
 
-          {tooltipData && (
+          {tooltipData && hasData && (
             <ThemedView
               style={[
                 styles.tooltipContainer,
@@ -212,6 +256,7 @@ const MTransactionReportChart: React.FC<TransactionChartProps> = ({
 const styles = StyleSheet.create({
   container: {
     borderRadius: 20,
+    padding: 10,
   },
   chart: {
     borderRadius: 20,
@@ -227,6 +272,7 @@ const styles = StyleSheet.create({
     width: 40,
     justifyContent: "space-between",
     marginRight: 2,
+    paddingBottom: screenWidth < 500 ? 0 : 10,
   },
   yAxisLabel: {
     fontSize: 12,
@@ -260,6 +306,21 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontSize: 10,
     fontWeight: "bold",
+  },
+  noDataMessageContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  noDataMessageText: {
+    fontSize: 16,
+    color: "#888",
+    textAlign: "center",
+  },
+  chartScrollViewContent: {
+    flexGrow: 1,
+    justifyContent: "center",
+    alignItems: "center",
   },
 });
 

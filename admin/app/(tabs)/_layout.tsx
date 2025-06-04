@@ -1,29 +1,34 @@
 import { Tabs } from "expo-router";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Platform, Dimensions } from "react-native";
 import { HapticTab } from "@/components/HapticTab";
 import TabBarBackground from "@/components/ui/TabBarBackground";
 import { Colors } from "@/constants/Colors";
 import { useColorScheme } from "@/hooks/useColorScheme";
-import { Icon } from "react-native-paper";
-import { logoutAdmin } from "@/src/api/admin";
-import { useRouter } from "expo-router";
+import * as Font from "expo-font";
+import { FontAwesome } from "@expo/vector-icons";
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
-  const router = useRouter();
   const { width } = Dimensions.get("window");
 
-  const handleLogout = async () => {
-    const result = await logoutAdmin();
-    if (result.success) {
-      console.log(result.message);
-      router.replace("/login");
-    } else {
-      console.error(result.message);
-    }
-  };
+  const [fontsLoaded, setFontsLoaded] = useState(false);
 
+  useEffect(() => {
+    async function loadFonts() {
+      await Font.loadAsync({
+        'FontAwesome': require('@/assets/fonts/FontAwesome.ttf'),
+      });
+      setFontsLoaded(true);
+    }
+
+    loadFonts();
+  }, []);
+
+  if (!fontsLoaded) {
+    return null;
+  }
+  
   const showTabBarLabel = width >= 900;
 
   return (
@@ -49,10 +54,10 @@ export default function TabLayout() {
       <Tabs.Screen
         name="home"
         options={{
-          // Menggunakan tabBarLabel untuk label di bawah ikon
           tabBarLabel: showTabBarLabel ? "Home" : undefined,
-          tabBarIcon: ({ color }) => (
-            <Icon source="home" size={28} color={color} />
+          tabBarIcon: ({ color, size }) => (
+            // Menggunakan ikon FontAwesome. Sesuaikan nama ikon dengan daftar FontAwesome.
+            <FontAwesome name="home" size={size ?? 28} color={color} />
           ),
         }}
       />
@@ -60,8 +65,9 @@ export default function TabLayout() {
         name="transaction"
         options={{
           tabBarLabel: showTabBarLabel ? "Transactions" : undefined,
-          tabBarIcon: ({ color }) => (
-            <Icon source="file-document" size={28} color={color} />
+          tabBarIcon: ({ color, size }) => (
+            // Contoh ikon FontAwesome untuk transaksi: "file-text" atau "exchange"
+            <FontAwesome name="truck" size={size ?? 28} color={color} />
           ),
         }}
       />
@@ -69,8 +75,9 @@ export default function TabLayout() {
         name="products"
         options={{
           tabBarLabel: showTabBarLabel ? "Product Management" : undefined,
-          tabBarIcon: ({ color }) => (
-            <Icon source="package-variant" size={28} color={color} />
+          tabBarIcon: ({ color, size }) => (
+            // Contoh ikon FontAwesome untuk produk: "dropbox" atau "cube"
+            <FontAwesome name="cube" size={size ?? 28} color={color} />
           ),
         }}
       />
@@ -78,8 +85,9 @@ export default function TabLayout() {
         name="user_advertisement"
         options={{
           tabBarLabel: showTabBarLabel ? "User Advertisement" : undefined,
-          tabBarIcon: ({ color }) => (
-            <Icon source="bullhorn" size={28} color={color} />
+          tabBarIcon: ({ color, size }) => (
+            // Contoh ikon FontAwesome untuk iklan: "bullhorn" atau "newspaper-o"
+            <FontAwesome name="bullhorn" size={size ?? 28} color={color} />
           ),
         }}
       />
@@ -87,8 +95,9 @@ export default function TabLayout() {
         name="setting"
         options={{
           tabBarLabel: showTabBarLabel ? "Setting" : undefined,
-          tabBarIcon: ({ color }) => (
-            <Icon source="account-cog-outline" size={28} color={color} />
+          tabBarIcon: ({ color, size }) => (
+            // Contoh ikon FontAwesome untuk pengaturan: "cog" atau "gear"
+            <FontAwesome name="cog" size={size ?? 28} color={color} />
           ),
         }}
       />

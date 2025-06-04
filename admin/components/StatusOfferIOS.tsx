@@ -1,4 +1,4 @@
-import React from "react";
+import React, { JSX } from 'react';
 import { Modal, Platform, TouchableOpacity, View } from "react-native";
 import { Picker } from "@react-native-picker/picker";
 import { ThemedCell } from "@/components/ThemedTable";

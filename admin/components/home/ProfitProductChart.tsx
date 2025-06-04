@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useRef } from "react"; // Import useEffect dan useRef
 import {
   ScrollView,
   Dimensions,
@@ -12,7 +12,6 @@ import {
   VictoryTheme,
   VictoryGroup,
   VictoryAxis,
-  VictoryTooltip,
 } from "victory-native";
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
@@ -23,8 +22,13 @@ const screenWidth = Dimensions.get("window").width;
 
 const maxWidth =
   Platform.OS === "web"
-    ? { width: screenWidth > 1000 ? 700 : screenWidth > 1500 ? 820 : 900 }
-    : { width: 500 };
+    ? {
+        width:
+          screenWidth > 1000
+            ? screenWidth / 2.3
+            : screenWidth / 1.1
+      }
+    : { width: screenWidth / 1.1 };
 
 type ProfitChartProps = {
   ProfitProduct: ProfitProduct[] | null;
@@ -38,18 +42,36 @@ const ProfitProductChart: React.FC<ProfitChartProps> = ({
   const colorScheme = useColorScheme();
   const products = ProfitProduct || [];
 
-  const productNames = products.map((p) => p.ProductName);
+  const hasValidData =
+    products.length > 0 &&
+    products.some((p) => p.TotalCapital > 0 || p.TotalRevenue > 0);
 
-  const capitalData = products.map((p) => ({
-    x: p.ProductName,
+  const displayProducts = hasValidData
+    ? products
+    : [{ Name: "Produk A", TotalCapital: 0, TotalRevenue: 0 }];
+
+  const productNames = displayProducts.map((p) => p.Name);
+
+  const formatCurrency = (num: number) => {
+    if (num >= 1000000) {
+      return `${(num / 1000000).toFixed(1).replace(/\.0$/, "")}M`;
+    }
+    if (num >= 1000) {
+      return `${(num / 1000).toFixed(1).replace(/\.0$/, "")}k`;
+    }
+    return num.toLocaleString("id-ID");
+  };
+
+  const capitalData = displayProducts.map((p) => ({
+    x: p.Name,
     y: p.TotalCapital,
-    label: `Modal: Rp ${p.TotalCapital.toLocaleString("id-ID")}`,
+    label: `${formatCurrency(p.TotalCapital)}`,
   }));
 
-  const incomeData = products.map((p) => ({
-    x: p.ProductName,
-    y: p.TotalIncome,
-    label: `Income: Rp ${p.TotalIncome.toLocaleString("id-ID")}`,
+  const incomeData = displayProducts.map((p) => ({
+    x: p.Name,
+    y: p.TotalRevenue,
+    label: `${formatCurrency(p.TotalRevenue)}`,
   }));
 
   const chartColors = {
@@ -58,13 +80,12 @@ const ProfitProductChart: React.FC<ProfitChartProps> = ({
     text: colorScheme === "dark" ? "#fff" : "#000",
   };
 
-  // --- Perhitungan untuk Label Sumbu Y Manual ---
   const allValues = [
     ...capitalData.map((d) => d.y),
     ...incomeData.map((d) => d.y),
   ];
-  const maxVal = allValues.length > 0 ? Math.max(...allValues) : 0;
-  const domainYMax = maxVal * 1.1;
+  const maxVal = allValues.length > 0 ? Math.max(...allValues) : 100;
+  const domainYMax = maxVal === 0 ? 100 : maxVal * 1.1;
   const minVal = 0;
 
   const numYTicks = 5;
@@ -76,7 +97,46 @@ const ProfitProductChart: React.FC<ProfitChartProps> = ({
   const plotAreaHeight = height - chartPadding.top - chartPadding.bottom;
 
   const tickLabelFontSize = 10;
-  // --- Akhir Perhitungan untuk Label Sumbu Y Manual ---
+
+  const minChartWidthPerProduct = screenWidth > 1000 ? 100 : 150;
+  const calculatedChartWidth = productNames.length * minChartWidthPerProduct;
+
+  const chartWidth = Math.max(
+    screenWidth - chartPadding.left - chartPadding.right - 60,
+    calculatedChartWidth
+  );
+
+  const isCentered = productNames.length <= 5;
+
+  const scrollViewRef = useRef<ScrollView>(null);
+  const containerWidthRef = useRef(0);
+
+  useEffect(() => {
+    if (
+      isCentered &&
+      scrollViewRef.current &&
+      containerWidthRef.current > 0 &&
+      chartWidth > 0
+    ) {
+      const visibleScrollViewWidth =
+        screenWidth -
+        (styles.themedViewContainer.padding * 2 || 0) -
+        styles.yAxisLabelsContainer.width;
+
+      if (chartWidth < visibleScrollViewWidth) {
+        const scrollXOffset = (chartWidth - visibleScrollViewWidth) / 2;
+        scrollViewRef.current.scrollTo({
+          x: scrollXOffset,
+          animated: true,
+          y: 0,
+        });
+      } else {
+        scrollViewRef.current.scrollTo({ x: 0, animated: true, y: 0 });
+      }
+    }
+  }, [isCentered, chartWidth, screenWidth]);
+
+  // --- END: Perubahan untuk Auto-Scroll ke Tengah ---
 
   return (
     <ThemedView
@@ -86,51 +146,34 @@ const ProfitProductChart: React.FC<ProfitChartProps> = ({
         { backgroundColor: colorScheme === "dark" ? "#1c1c1c" : "#f0f0f0" },
       ]}
     >
-      <ThemedText
-        style={[styles.title]} // Dipisahkan
-      >
-        Laporan Keuangan Produk
-      </ThemedText>
+      <ThemedText style={[styles.title]}>Product Financial Reports</ThemedText>
 
-      {/* Manual Legend */}
       <View style={styles.legendContainer}>
-        {/* Dipisahkan */}
         <View style={styles.legendItem}>
-
-          {/* Dipisahkan */}
           <View
             style={[
-              styles.legendColorBox, // Dipisahkan
+              styles.legendColorBox,
               { backgroundColor: chartColors.capital },
             ]}
           />
           <ThemedText style={[styles.legendText, { color: chartColors.text }]}>
-  
-            {/* Dipisahkan */}
             Modal
           </ThemedText>
         </View>
         <View style={styles.legendItem}>
-
-          {/* Dipisahkan */}
           <View
             style={[
-              styles.legendColorBox, // Dipisahkan
+              styles.legendColorBox,
               { backgroundColor: chartColors.income },
             ]}
           />
           <ThemedText style={[styles.legendText, { color: chartColors.text }]}>
-  
-            {/* Dipisahkan */}
             Income
           </ThemedText>
         </View>
       </View>
-      {/* End Manual Legend */}
 
-      {/* Kontainer untuk Sumbu Y Manual dan ScrollView (Chart + Sumbu X) */}
       <View style={styles.chartAndYAxisContainer}>
-        {/* Label Sumbu Y Utama */}
         <ThemedText
           style={[
             styles.yAxisMainLabel,
@@ -140,7 +183,6 @@ const ProfitProductChart: React.FC<ProfitChartProps> = ({
           Nominal (Rp)
         </ThemedText>
 
-        {/* Manual Y-Axis Labels */}
         <View style={[styles.yAxisLabelsContainer, { height: height }]}>
           {yTickValues
             .slice()
@@ -167,124 +209,100 @@ const ProfitProductChart: React.FC<ProfitChartProps> = ({
                     },
                   ]}
                 >
-                  {(value / 1000).toFixed(0)}k
+                  {formatCurrency(value)}
                 </ThemedText>
               );
             })}
         </View>
 
-        <ScrollView horizontal>
-          <VictoryChart
-            width={Math.max(screenWidth, productNames.length * 150)}
-            height={height}
-            domain={{ y: [minVal, domainYMax] }} // Ini bukan style, ini domain data
-            domainPadding={{ x: 50 }} // Ini bukan style, ini padding domain
-            theme={VictoryTheme.material} // Ini bukan style, ini tema
-            padding={chartPadding} // Ini bukan style, ini padding chart
-          >
-            {/* X-axis */}
-            <VictoryAxis
-              label="Nama Produk"
-              tickValues={productNames}
-              style={{
-                axisLabel: { padding: 40, fill: chartColors.text },
-                tickLabels: {
-                  textAnchor: "middle",
-                  fontSize: 10,
-                  fill: chartColors.text,
-                },
-              }}
-            />
-
-            {/* Y-axis */}
-            <VictoryAxis
-              dependentAxis
-              tickValues={yTickValues} // Ini bukan style, ini tick values
-              tickFormat={(y) => `${(y / 1000).toFixed(0)}k`} // Ini bukan style, ini format tick
-              style={{
-                tickLabels: { fill: chartColors.text },
-                axisLabel: {
-                  padding: 30,
-                  fill: chartColors.text,
-                  fontSize: 10,
-                },
-                grid: {
-                  stroke: colorScheme === "dark" ? "#444" : "#ccc",
-                  strokeDasharray: "5, 5",
-                },
-              }}
-            />
-
-            {/* Bar chart */}
-            <VictoryGroup
-              offset={50} // Ini bukan style, ini offset
-              colorScale={[chartColors.capital, chartColors.income]} // Ini bukan style, ini color scale
-              {...({} as any)}
+        <ScrollView
+          ref={scrollViewRef}
+          horizontal
+          contentContainerStyle={{
+            flexGrow: 1,
+            justifyContent: isCentered ? "center" : "flex-start",
+            alignItems: "flex-start",
+          }}
+          onLayout={(event) => {
+            containerWidthRef.current = event.nativeEvent.layout.width;
+            if (
+              isCentered &&
+              scrollViewRef.current &&
+              chartWidth > 0 &&
+              containerWidthRef.current > 0
+            ) {
+              const scrollXOffset =
+                (chartWidth - containerWidthRef.current) / 2;
+              if (scrollXOffset > 0) {
+                scrollViewRef.current.scrollTo({
+                  x: scrollXOffset,
+                  animated: false,
+                  y: 0,
+                });
+              } else {
+                scrollViewRef.current.scrollTo({ x: 0, animated: false, y: 0 });
+              }
+            }
+          }}
+        >
+          {hasValidData ? (
+            <VictoryChart
+              width={chartWidth}
+              height={height}
+              domain={{ y: [minVal, domainYMax] }}
+              domainPadding={{ x: 50 }}
+              theme={VictoryTheme.material}
+              padding={chartPadding}
             >
-              <VictoryBar
-                data={capitalData}
-                barWidth={20}
-                // Jika menggunakan tooltip, pastikan prop label dan labelComponent ada di sini
-                /*
-                labels={({ datum }) => datum.label}
-                labelComponent={
-                  <VictoryTooltip
-                    flyoutStyle={{
-                      fill: colorScheme === "dark" ? "#333" : "white",
-                      stroke: colorScheme === "dark" ? "#666" : "#ccc",
-                    }}
-                    style={{
-                      fontSize: 12,
-                      fill: chartColors.text,
-                    }}
-                    activateData={true}
-                    renderInPortal={true}
-                  />
-                }
-                events={[
-                  {
-                    target: "data",
-                    eventHandlers: {
-                      onPressIn: () => [{ mutation: (props) => ({ active: true }) }],
-                      onPressOut: () => [{ mutation: (props) => ({ active: undefined }) }],
-                    },
+              <VictoryAxis
+                tickValues={productNames}
+                style={{
+                  axisLabel: { padding: 40, fill: chartColors.text },
+                  tickLabels: {
+                    textAnchor: "middle",
+                    fontSize: 10,
+                    fill: chartColors.text,
+                    angle: 10,
                   },
-                ]}
-                */
+                }}
               />
-              <VictoryBar
-                data={incomeData}
-                barWidth={20}
-                // Jika menggunakan tooltip, pastikan prop label dan labelComponent ada di sini
-                /*
-                labels={({ datum }) => datum.label}
-                labelComponent={
-                  <VictoryTooltip
-                    flyoutStyle={{
-                      fill: colorScheme === "dark" ? "#333" : "white",
-                      stroke: colorScheme === "dark" ? "#666" : "#ccc",
-                    }}
-                    style={{
-                      fontSize: 12,
-                      fill: chartColors.text,
-                    }}
-                    activateData={true}
-                    renderInPortal={true}
-                  />
-                }
-                events={[
-                  {
-                    target: "data",
-                    eventHandlers: {
-                      onPressIn: () => [{ mutation: (props) => ({ active: true }) }],
-                      onPressOut: () => [{ mutation: (props) => ({ active: undefined }) }],
-                    },
+
+              <VictoryAxis
+                dependentAxis
+                tickValues={yTickValues}
+                tickFormat={(y) => `${(y / 1000).toFixed(0)}k`}
+                style={{
+                  tickLabels: { fill: chartColors.text },
+                  axisLabel: {
+                    padding: 30,
+                    fill: chartColors.text,
+                    fontSize: 10,
                   },
-                ]}
-                */
+                  grid: {
+                    stroke: colorScheme === "dark" ? "#444" : "#ccc",
+                    strokeDasharray: "5, 5",
+                  },
+                }}
               />
-            </VictoryGroup>
-          </VictoryChart>
+
+              <VictoryGroup
+                offset={50}
+                colorScale={[chartColors.capital, chartColors.income]}
+                {...({} as any)}
+              >
+                <VictoryBar data={capitalData} barWidth={20} />
+                <VictoryBar data={incomeData} barWidth={20} />
+              </VictoryGroup>
+            </VictoryChart>
+          ) : (
+            <View
+              style={[styles.noDataMessageContainer, { width: chartWidth }]}
+            >
+              <ThemedText style={styles.noDataMessageText}>
+                No product profit data available.
+              </ThemedText>
+            </View>
+          )}
         </ScrollView>
       </View>
     </ThemedView>
@@ -328,6 +346,7 @@ const styles = StyleSheet.create({
   yAxisLabelsContainer: {
     width: 60,
     position: "relative",
+    bottom: 8,
   },
   yAxisTickLabel: {
     fontSize: 10,
@@ -339,6 +358,17 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     transform: [{ rotate: "-90deg" }],
     width: 100,
+    textAlign: "center",
+  },
+  noDataMessageContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    height: 300,
+  },
+  noDataMessageText: {
+    fontSize: 16,
+    color: "#888",
     textAlign: "center",
   },
 });

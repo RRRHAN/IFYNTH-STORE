@@ -1,4 +1,3 @@
-// components/home/TotalTransactionUserTable.tsx
 import React, { useState, useMemo } from "react";
 import { ThemedView } from "@/components/ThemedView";
 import { ThemedText } from "@/components/ThemedText";
@@ -9,7 +8,7 @@ import { useColorScheme } from "@/hooks/useColorScheme";
 const { width } = Dimensions.get("window");
 
 type TotalTransactionUserTableProps = {
-  totalTransactionUser: TotalTransactionUser[];
+  totalTransactionUser: TotalTransactionUser[]; // This prop should always be an array, even if empty
 };
 
 const ITEMS_PER_PAGE = 5;
@@ -19,15 +18,24 @@ const TotalTransactionUserTable: React.FC<TotalTransactionUserTableProps> = ({
   const colorScheme = useColorScheme();
   const headerBackgroundColor = colorScheme === "dark" ? "#ffffff" : "#111827";
   const headerTextColor = colorScheme === "dark" ? "#000" : "#fff";
+  const rowBackgroundColor = colorScheme === "dark" ? "#1a1a1a" : "#f9f9f9";
 
-  // State untuk halaman saat ini
   const [currentPage, setCurrentPage] = useState(1);
 
-  // Hitung total halaman yang dibutuhkan
-  const totalPages = Math.ceil(totalTransactionUser.length / ITEMS_PER_PAGE);
+  // Ensure totalPages is at least 1, even if data is empty
+  const totalPages = Math.max(
+    1,
+    Math.ceil(totalTransactionUser.length / ITEMS_PER_PAGE)
+  );
 
-  // Ambil data untuk halaman saat ini
   const currentTableData = useMemo(() => {
+    // **CRITICAL FIX:** Ensure totalTransactionUser is an array before slicing
+    if (
+      !Array.isArray(totalTransactionUser) ||
+      totalTransactionUser.length === 0
+    ) {
+      return []; // Return an empty array if data is not an array or is empty
+    }
     const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
     const endIndex = startIndex + ITEMS_PER_PAGE;
     return totalTransactionUser.slice(startIndex, endIndex);
@@ -40,15 +48,6 @@ const TotalTransactionUserTable: React.FC<TotalTransactionUserTableProps> = ({
   const goToPreviousPage = () => {
     setCurrentPage((prevPage) => Math.max(prevPage - 1, 1));
   };
-
-  // Tampilkan tabel hanya jika ada data atau jika data lebih dari 5
-  if (totalTransactionUser.length === 0) {
-    return (
-      <ThemedView style={styles.noDataContainer}>
-        <ThemedText style={styles.noDataText}>No transaction data available.</ThemedText>
-      </ThemedView>
-    );
-  }
 
   return (
     <ThemedView
@@ -71,30 +70,72 @@ const TotalTransactionUserTable: React.FC<TotalTransactionUserTableProps> = ({
           Total Amount
         </ThemedText>
       </ThemedView>
-      {currentTableData.map((item, index) => {
-        const isLast = index === currentTableData.length - 1;
-        return (
-          <ThemedView
-            key={`${item.UserID}-${index}`}
-            style={[styles.row, isLast && styles.lastRow]}
-          >
-            <ThemedText style={styles.cell}>
-              {item.CustomerName}
-            </ThemedText>
-            <ThemedText style={styles.rowLastCell}>{item.PhoneNumber}</ThemedText>
-            <ThemedText style={styles.rowLastCell}>{item.TotalTransaction}</ThemedText>
-            <ThemedText style={styles.rowLastCell}>{item.TotalAmount}</ThemedText>
-          </ThemedView>
-        );
-      })}
+
+      {/* Conditional Data Rows or No Data Message */}
+      {currentTableData.length > 0 ? (
+        currentTableData.map((item, index) => {
+          const isLastVisibleRow = index === currentTableData.length - 1;
+          const isLastGlobalRow =
+            (currentPage - 1) * ITEMS_PER_PAGE + index ===
+            totalTransactionUser.length - 1;
+          const isLastRowStyled = isLastVisibleRow && isLastGlobalRow;
+
+          return (
+            <ThemedView
+              key={`${item.UserID}-${index}`}
+              style={[
+                styles.row,
+                { backgroundColor: rowBackgroundColor },
+                isLastRowStyled ? styles.lastRow : null,
+              ]}
+            >
+              <ThemedText style={styles.cell}>{item.CustomerName}</ThemedText>
+              <ThemedText style={styles.rowLastCell}>
+                {item.PhoneNumber}
+              </ThemedText>
+              <ThemedText style={styles.rowLastCell}>
+                {item.TotalTransaction}
+              </ThemedText>
+              <ThemedText style={styles.rowLastCell}>
+                Rp{item.TotalAmount.toLocaleString("id-ID")}
+              </ThemedText>
+            </ThemedView>
+          );
+        })
+      ) : (
+        <ThemedView
+          style={[styles.noDataRow, { backgroundColor: rowBackgroundColor }]}
+        >
+          <ThemedText style={styles.noDataText}>
+            No transaction data available.
+          </ThemedText>
+        </ThemedView>
+      )}
+
+      {/* Pagination Controls */}
       {totalTransactionUser.length > ITEMS_PER_PAGE && (
-        <ThemedView style={styles.paginationContainer}>
+        <ThemedView
+          style={[
+            styles.paginationContainer,
+            { backgroundColor: rowBackgroundColor },
+          ]}
+        >
           <TouchableOpacity
             onPress={goToPreviousPage}
             disabled={currentPage === 1}
-            style={[styles.paginationButton, currentPage === 1 && styles.disabledButton]}
+            style={[
+              styles.paginationButton,
+              currentPage === 1 && styles.disabledButton,
+            ]}
           >
-            <ThemedText style={[styles.paginationButtonText, currentPage === 1 && styles.disabledButtonText]}>Previous</ThemedText>
+            <ThemedText
+              style={[
+                styles.paginationButtonText,
+                currentPage === 1 && styles.disabledButtonText,
+              ]}
+            >
+              Previous
+            </ThemedText>
           </TouchableOpacity>
           <ThemedText style={styles.paginationText}>
             Page {currentPage} of {totalPages}
@@ -102,9 +143,19 @@ const TotalTransactionUserTable: React.FC<TotalTransactionUserTableProps> = ({
           <TouchableOpacity
             onPress={goToNextPage}
             disabled={currentPage === totalPages}
-            style={[styles.paginationButton, currentPage === totalPages && styles.disabledButton]}
+            style={[
+              styles.paginationButton,
+              currentPage === totalPages && styles.disabledButton,
+            ]}
           >
-            <ThemedText style={[styles.paginationButtonText, currentPage === totalPages && styles.disabledButtonText]}>Next</ThemedText>
+            <ThemedText
+              style={[
+                styles.paginationButtonText,
+                currentPage === totalPages && styles.disabledButtonText,
+              ]}
+            >
+              Next
+            </ThemedText>
           </TouchableOpacity>
         </ThemedView>
       )}
@@ -117,14 +168,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderRadius: 20,
     overflow: "hidden",
-    width:
-      width < 600
-        ? width - 20
-        : width < 1000
-        ? width - 40
-        : width < 1500
-        ? width - 700
-        : width - 1100,
+    width: width > 1000 ? width / 1.83 : width / 1.1,
   },
   tableTitle: {
     fontSize: 18,
@@ -141,6 +185,8 @@ const styles = StyleSheet.create({
     borderBottomColor: "#ccc",
   },
   lastRow: {
+    borderBottomLeftRadius: 20,
+    borderBottomRightRadius: 20,
     borderBottomWidth: 0,
   },
   cell: {
@@ -188,18 +234,14 @@ const styles = StyleSheet.create({
     fontSize: 16,
     marginHorizontal: 10,
   },
-  noDataContainer: {
-    padding: 20,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderRadius: 20,
-    borderWidth: 1,
-    borderColor: '#ccc',
-    marginTop: 20,
+  noDataRow: {
+    paddingVertical: 20,
+    alignItems: "center",
+    justifyContent: "center",
   },
   noDataText: {
     fontSize: 18,
-    color: '#888',
+    color: "#888",
   },
 });
 

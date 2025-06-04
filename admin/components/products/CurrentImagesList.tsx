@@ -3,6 +3,10 @@ import { View, Image, TouchableOpacity } from "react-native";
 import { ThemedText } from "@/components/ThemedText";
 import { IconButton } from "react-native-paper";
 import { BASE_URL } from "@/src/api/constants";
+
+// Impor FontAwesome
+import { FontAwesome } from "@expo/vector-icons";
+
 interface ProductImage {
   ProductID: string;
   URL: string;
@@ -32,12 +36,13 @@ export default function CurrentImagesList({
               style={styles.image}
             />
             <TouchableOpacity
-              style={styles.removeButton}
+              style={[styles.removeButton, styles.iconButtonContainer]}
               onPress={() => handleToggleImage(index)}
             >
-              <IconButton
-                icon={checkedImages[index] ? "check-circle" : "trash-can"}
+              <FontAwesome
+                name={checkedImages[index] ? "check-circle" : "trash"}
                 size={24}
+                color={checkedImages[index] ? "green" : "red"}
               />
             </TouchableOpacity>
           </View>

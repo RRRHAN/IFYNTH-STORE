@@ -5,10 +5,11 @@ import {
   View,
   Platform,
   KeyboardAvoidingView,
+  StyleSheet,
 } from "react-native";
 import { useRouter } from "expo-router";
 import { useState, useEffect } from "react";
-import { Checkbox, Provider as PaperProvider } from "react-native-paper";
+import { Provider as PaperProvider } from "react-native-paper";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { loginAdmin } from "@/src/api/admin";
 import ModalComponent from "@/components/ModalComponent";
@@ -17,6 +18,7 @@ import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
 import { ThemedTextInput } from "@/components/ThemedTextInput";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { FontAwesome } from "@expo/vector-icons";
 
 export default function Login() {
   const router = useRouter();
@@ -36,8 +38,6 @@ export default function Login() {
       setSuccessMessage(result.message);
       if (rememberMe) {
         await AsyncStorage.setItem("is_logged_in", "true");
-      } else {
-        await AsyncStorage.setItem("is_logged_in", "false");
       }
       setVisible(true);
       setIsLoggedIn(true);
@@ -50,18 +50,19 @@ export default function Login() {
   useEffect(() => {
     if (isLoggedIn) {
       router.replace("/home");
-      setTimeout(() => {}, 2000);
     }
-  }, [isLoggedIn]);
+  }, [isLoggedIn, router]);
 
   return (
     <PaperProvider>
       <KeyboardAvoidingView
         style={{ flex: 1 }}
         behavior={Platform.OS === "ios" ? "padding" : "height"}
-        keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 0} 
+        keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 0}
       >
-        <ScrollView contentContainerStyle={{ flexGrow: 1, justifyContent: 'center' }}>
+        <ScrollView
+          contentContainerStyle={{ flexGrow: 1, justifyContent: "center" }}
+        >
           <View style={[styles.container]}>
             <View style={styles.logoContainer}>
               <Image
@@ -128,31 +129,16 @@ export default function Login() {
                   },
                 ]}
               >
-                <ThemedView
-                  style={[
-                    styles.checkboxContainer,
-                    {
-                      backgroundColor:
-                        colorScheme === "dark"
-                          ? "rgba(42, 42, 42, 0)"
-                          : "rgba(207, 207, 207, 0)",
-                    },
-                  ]}
+                <TouchableOpacity
+                  style={styles.checkboxButton}
+                  onPress={() => setRememberMe(!rememberMe)}
                 >
-                  {Platform.OS === "web" ? (
-                    <Checkbox
-                      status={rememberMe ? "checked" : "unchecked"}
-                      onPress={() => setRememberMe(!rememberMe)}
-                      color="#2563eb"
-                    />
-                  ) : (
-                    <Checkbox.Android
-                      status={rememberMe ? "checked" : "unchecked"}
-                      onPress={() => setRememberMe(!rememberMe)}
-                      color="#2563eb"
-                    />
-                  )}
-
+                  <FontAwesome
+                    name={rememberMe ? "check-square" : "square-o"}
+                    size={24}
+                    color="#2563eb"
+                    style={styles.checkboxIcon}
+                  />
                   <ThemedText
                     style={[
                       styles.checkboxLabel,
@@ -161,7 +147,8 @@ export default function Login() {
                   >
                     Remember me
                   </ThemedText>
-                </ThemedView>
+                </TouchableOpacity>
+
                 <TouchableOpacity
                   style={[
                     {

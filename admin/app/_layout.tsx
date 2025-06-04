@@ -5,11 +5,10 @@ import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
 import { useEffect } from "react";
 import "react-native-reanimated";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { MyLightTheme, MyDarkTheme } from "@/constants/Theme";
-import { BASE_URL } from "@/src/api/constants";
 import { checkLoginStatus } from "@/src/api/admin";
+import * as Font from "expo-font";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -18,10 +17,16 @@ export default function RootLayout() {
   const colorScheme = useColorScheme();
   const [loaded] = useFonts({
     SpaceMono: require("../assets/fonts/SpaceMono-Regular.ttf"),
+    FontAwesome: require("@/assets/fonts/FontAwesome.ttf"),
   });
 
   useEffect(() => {
     const initApp = async () => {
+      await Font.loadAsync({
+        SpaceMono: require("../assets/fonts/SpaceMono-Regular.ttf"),
+        FontAwesome: require("@/assets/fonts/FontAwesome.ttf"),
+      });
+
       if (loaded) {
         await SplashScreen.hideAsync();
 
@@ -33,10 +38,6 @@ export default function RootLayout() {
     initApp();
   }, [loaded, router]);
 
-  if (!loaded) {
-    return null;
-  }
-
   return (
     <ThemeProvider value={colorScheme === "dark" ? MyDarkTheme : MyLightTheme}>
       <Stack>
@@ -47,6 +48,11 @@ export default function RootLayout() {
         <Stack.Screen name="detail_product" options={{ headerShown: false }} />
         <Stack.Screen name="edit_product" options={{ headerShown: false }} />
         <Stack.Screen name="message" options={{ headerShown: false }} />
+        <Stack.Screen name="index" options={{ headerShown: false }} />
+        <Stack.Screen name="personal" options={{ headerShown: false }} />
+        <Stack.Screen name="register" options={{ headerShown: false }} />
+        <Stack.Screen name="security" options={{ headerShown: false }} />
+        <Stack.Screen name="admin_activity" options={{ headerShown: false }} />
       </Stack>
       <StatusBar style="auto" />
     </ThemeProvider>

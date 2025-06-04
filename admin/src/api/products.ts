@@ -4,8 +4,8 @@ import { ProductData, UpdateProductData } from "../request/productReq";
 import { Platform } from "react-native";
 
 export const fetchProducts = async (): Promise<Product[]> => {
+  const token = await getAuthToken();
   try {
-    const token = await getAuthToken();
     const getAllUrl = `${BASE_URL}/api/product`;
 
     const response = await fetch(getAllUrl, {

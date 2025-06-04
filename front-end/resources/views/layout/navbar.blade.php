@@ -6,8 +6,11 @@
                 <img src="/assets/images/logo/logo.png" alt="logo__image" style="width: 220px">
             </a>
             <div class="search__wrp">
-                <input placeholder="Search for" aria-label="Search">
-                <button><i class="fa-solid fa-search"></i></button>
+                <form action="{{ route('products.getAll') }}" method="GET">
+                    <input type="search" name="keyword" placeholder="Search for" aria-label="Search"
+                        value="{{ request('keyword') }}">
+                    <button type="submit"><i class="fa-solid fa-search"></i></button>
+                </form>
             </div>
             <div class="account__wrap">
                 <div class="account d-flex align-items-center">
@@ -28,8 +31,8 @@
                 </div>
 
                 <div class="message-icon-wrapper" onclick="window.location.href='{{ route('fetchList') }}'">
-                        <i class="fa-solid fa-message"></i>
-                        <span class="message-badge" id="unreadCount">0</span>
+                    <i class="fa-solid fa-message"></i>
+                    <span class="message-badge" id="unreadCount">0</span>
                     </a>
                 </div>
             </div>
@@ -162,27 +165,27 @@
     });
 </script>
 <script>
-function fetchUnreadCount() {
-  fetch('/countUnread')
-    .then(response => {
-      if (!response.ok) throw new Error('Network response was not ok');
-      return response.json();
-    })
-    .then(data => {
-      console.log('Unread count:', data);
-      const unreadElem = document.getElementById('unreadCount');
-      if (unreadElem) {
-        unreadElem.textContent = data.data ?? 0;
-      }
-    })
-    .catch(error => {
-      console.error('Fetch error:', error);
-    });
-}
+    function fetchUnreadCount() {
+        fetch('/countUnread')
+            .then(response => {
+                if (!response.ok) throw new Error('Network response was not ok');
+                return response.json();
+            })
+            .then(data => {
+                console.log('Unread count:', data);
+                const unreadElem = document.getElementById('unreadCount');
+                if (unreadElem) {
+                    unreadElem.textContent = data.data ?? 0;
+                }
+            })
+            .catch(error => {
+                console.error('Fetch error:', error);
+            });
+    }
 
-// Panggil pertama kali saat halaman load
-fetchUnreadCount();
+    // Panggil pertama kali saat halaman load
+    fetchUnreadCount();
 
-// Set interval tiap 2 detik (2000 ms)
-setInterval(fetchUnreadCount, 2000);
+    // Set interval tiap 2 detik (2000 ms)
+    setInterval(fetchUnreadCount, 2000);
 </script>

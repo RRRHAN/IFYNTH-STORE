@@ -8,9 +8,8 @@ import {
   TouchableOpacity,
   KeyboardAvoidingView,
   Platform,
-  ScrollView,
 } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
+import { FontAwesome } from "@expo/vector-icons"; // Mengubah impor menjadi FontAwesome
 import { useRouter, useLocalSearchParams } from "expo-router";
 import { ThemedView } from "@/components/ThemedView";
 import { ThemedTextInput } from "@/components/ThemedTextInput";
@@ -29,10 +28,6 @@ export default function ChatScreen() {
   const [selectedItem, setSelectedItem] = useState(item);
   const [messages, setMessages] = useState<Message[]>([]);
   const [text, setText] = useState("");
-  const timeOnly = new Date(item.CreatedAt).toLocaleTimeString([], {
-    hour: "2-digit",
-    minute: "2-digit",
-  });
   const [thumbnailUrls, setThumbnailUrls] = useState<{ [key: string]: string }>(
     {}
   );
@@ -69,25 +64,28 @@ export default function ChatScreen() {
       if (selectedItem && selectedItem.ID) {
         try {
           const data = await fetchMessage(selectedItem.ID);
-          setMessages(data);
+          // Hanya update jika ada perubahan data
+          if (JSON.stringify(data) !== JSON.stringify(messages)) {
+            setMessages(data);
+          }
         } catch (error) {
-          console.error(error);
+          console.error("Failed to fetch messages:", error);
         }
       }
     };
 
-    loadMessages();
+    loadMessages(); // Muat pesan saat komponen pertama kali di-mount
 
     interval = setInterval(() => {
-      loadMessages();
+      loadMessages(); // Muat ulang setiap 3 detik
     }, 3000);
 
-    return () => clearInterval(interval);
-  }, [selectedItem]);
+    return () => clearInterval(interval); // Bersihkan interval saat komponen dilepas
+  }, [selectedItem, messages]);
 
   useEffect(() => {
     async function generateThumbnails() {
-      if (item.Files && item.Files.length > 0) {
+      if (item && item.Files && item.Files.length > 0) {
         const fileUrl = item.Files[0].URL;
         if (/\.(mp4|webm|ogg)$/i.test(fileUrl)) {
           try {
@@ -118,13 +116,19 @@ export default function ChatScreen() {
             [item.ID]: `${BASE_URL}/api${fileUrl}`,
           }));
         }
+      } else if (item && item.ID) {
+          setThumbnailUrls((prev) => ({
+            ...prev,
+            [item.ID]: "https://img.lovepik.com/free-png/20210919/lovepik-question-element-png-image_401016497_wh1200.png",
+          }));
       }
     }
-    generateThumbnails();
-  }, []);
+    if (item) {
+      generateThumbnails();
+    }
+  }, [item]);
 
   const renderItem = ({ item }: { item: Message }) => {
-    console.log("Rendered Item:", item);
     const isMe = item.Role === "ADMIN";
 
     return (
@@ -134,7 +138,7 @@ export default function ChatScreen() {
         {isMe && (
           <Image
             source={{
-              uri: "https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava1-bg.webp",
+              uri: "https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava1-bg.webp", // Avatar admin
             }}
             style={styles.avatarLeft}
           />
@@ -164,14 +168,16 @@ export default function ChatScreen() {
   };
 
   const thumbnailUrl =
-    thumbnailUrls[item.ID] ||
+    (item && thumbnailUrls[item.ID]) ||
     "https://img.lovepik.com/free-png/20210919/lovepik-question-element-png-image_401016497_wh1200.png";
+
   return (
     <SafeAreaView style={styles.container}>
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity onPress={handleBack}>
-          <Ionicons name="arrow-back" size={24} color="#333" />
+          {/* Mengganti MaterialCommunityIcons dengan FontAwesome */}
+          <FontAwesome name="arrow-left" size={24} color="#333" />
         </TouchableOpacity>
         <ThemedText style={styles.headerTitle}>Chat</ThemedText>
       </View>
@@ -207,7 +213,7 @@ export default function ChatScreen() {
       {/* Message Input */}
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : undefined}
-        keyboardVerticalOffset={80}
+        keyboardVerticalOffset={Platform.OS === "ios" ? 80 : 0}
       >
         <ThemedView style={styles.inputContainer}>
           <ThemedTextInput
@@ -215,9 +221,11 @@ export default function ChatScreen() {
             placeholder="Type a message"
             value={text}
             onChangeText={setText}
+            onSubmitEditing={handleSend}
+            returnKeyType="send"
           />
           <TouchableOpacity onPress={handleSend} style={styles.sendButton}>
-            <Ionicons name="send" size={20} color="#A9A9A9" />
+            <FontAwesome name="send" size={20} color="#A9A9A9" />
           </TouchableOpacity>
         </ThemedView>
       </KeyboardAvoidingView>

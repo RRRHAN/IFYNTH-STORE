@@ -24,10 +24,7 @@
     <link rel="stylesheet" href="/assets/css/responsive.css">
     <link rel="stylesheet" href="/assets/css/preloader.css" id="preloader-css">
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-    <!-- Skrip umum lainnya -->
-    <!-- Skrip umum lainnya -->
     @if (!Route::is('get.Cart'))
-        <!-- Cek apakah ini bukan halaman dengan route name 'shipper-form' -->
         <script src="/assets/js/swiper-bundle.min.js"></script>
     @endif
 </head>

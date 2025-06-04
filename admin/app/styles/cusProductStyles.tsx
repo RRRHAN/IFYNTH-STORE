@@ -1,4 +1,6 @@
 import { StyleSheet } from "react-native";
+import { Dimensions } from "react-native";
+const screenWidth = Dimensions.get("window").width;
 
 const styles = StyleSheet.create({
   center: {
@@ -64,6 +66,23 @@ const styles = StyleSheet.create({
   paginationText: {
     marginHorizontal: 15,
     fontSize: 16,
+  },
+  badgeContainer: {
+    position: "absolute",
+    right: screenWidth > 1000 ? 50 : screenWidth > 450 ? 25 : 0,
+    top: screenWidth > 1000 ? 10 : 60,
+    backgroundColor: "red",
+    borderRadius: 9,
+    width: 18,
+    height: 18,
+    justifyContent: "center",
+    alignItems: "center",
+    zIndex: 1,
+  },
+  badgeText: {
+    color: "white",
+    fontSize: 10,
+    fontWeight: "bold",
   },
 });
 

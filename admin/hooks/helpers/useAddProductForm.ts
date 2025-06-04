@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect } from "react";
 
 export const useProductForm = () => {
   const [name, setName] = useState<string>("");
@@ -13,8 +13,13 @@ export const useProductForm = () => {
 
   useEffect(() => {
     // Ubah ukuran berdasarkan kategori yang dipilih
-    if (category === "T-Shirt" || category === "Hoodie" || category === "Jacket") {
+    if (
+      category === "T-Shirt" ||
+      category === "Hoodie" ||
+      category === "Jacket"
+    ) {
       setSizes([
+        { size: "All Size", stock: 0 },
         { size: "S", stock: 0 },
         { size: "M", stock: 0 },
         { size: "L", stock: 0 },
@@ -22,6 +27,7 @@ export const useProductForm = () => {
       ]);
     } else if (category === "Pants") {
       setSizes([
+        { size: "All Size", stock: 0 },
         { size: "27", stock: 0 },
         { size: "28", stock: 0 },
         { size: "29", stock: 0 },
@@ -32,7 +38,7 @@ export const useProductForm = () => {
         { size: "34", stock: 0 },
       ]);
     } else {
-      setSizes([]);
+      setSizes([{ size: "All Size", stock: 0 }]);
     }
   }, [category]);
 

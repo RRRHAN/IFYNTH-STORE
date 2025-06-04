@@ -49,6 +49,7 @@ export type cusProduct = {
   CreatedAt: string;
   UpdatedAt: string;
   Files: CustomerProductFiles[];
+  UnreadCount: number;
 };
 
 export type CustomerProductFiles = {

@@ -38,6 +38,10 @@
                                                     href="#personal" role="tab">
                                                     <i class="fas fa-user me-2"></i> Personal Info
                                                 </a>
+                                                <a class="dash-link" id="address-tab" data-bs-toggle="pill"
+                                                    href="#address" role="tab">
+                                                    <i class="fa-solid fa-map-location-dot"></i> address
+                                                </a>
                                                 <a class="dash-link" id="security-tab" data-bs-toggle="pill"
                                                     href="#security" role="tab">
                                                     <i class="fas fa-lock me-2"></i> Security
@@ -66,7 +70,7 @@
                                             <div class="tab-content" id="settings-content">
                                                 @include('components.personal')
                                                 @include('components.changePassword')
-                                                @include('components.notifications')
+                                                @include('components.address')
                                                 @include('components.orderData')
                                                 @include('components.tableOffer')
                                                 @include('components.detailOfferModal')
@@ -83,13 +87,13 @@
         </div>
     </main>
     <script>
-    const products = @json($products);
-    const user = @json($user);
-    const transactions = @json($transactions);
+        const products = @json($products);
+        const user = @json($user);
+        const transactions = @json($transactions);
 
-    console.log("Products:", products);
-    console.log("User:", user);
-    console.log("Transactions:", transactions);
-</script>
+        console.log("Products:", products);
+        console.log("User:", user);
+        console.log("Transactions:", transactions);
+    </script>
 
 @stop

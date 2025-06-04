@@ -78,6 +78,15 @@ const styles = StyleSheet.create({
       textAlign: "center",
       fontSize: 14,
     },
+      checkboxButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 8,
+    paddingHorizontal: 0,
+  },
+  checkboxIcon: {
+    marginRight: 8,
+  },
   });
 
   export default styles;

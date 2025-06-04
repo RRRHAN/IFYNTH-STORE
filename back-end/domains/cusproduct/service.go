@@ -11,6 +11,7 @@ import (
 	"gorm.io/gorm"
 
 	"github.com/RRRHAN/IFYNTH-STORE/back-end/domains/message"
+	"github.com/RRRHAN/IFYNTH-STORE/back-end/domains/user"
 	"github.com/RRRHAN/IFYNTH-STORE/back-end/utils/config"
 	"github.com/RRRHAN/IFYNTH-STORE/back-end/utils/constants"
 	contextUtil "github.com/RRRHAN/IFYNTH-STORE/back-end/utils/context"
@@ -67,12 +68,6 @@ func (s *service) GetAllProducts(ctx context.Context, keyword string) ([]Product
 		userIDs = append(userIDs, p.UserID)
 	}
 
-	// Ambil nama user dari tabel users
-	type userNameMap struct {
-		ID   uuid.UUID
-		Name string
-	}
-
 	var users []userNameMap
 	if err := s.db.WithContext(ctx).
 		Table("customer").
@@ -88,12 +83,29 @@ func (s *service) GetAllProducts(ctx context.Context, keyword string) ([]Product
 		userNameMapData[u.ID] = u.Name
 	}
 
+	var unreads []Unread
+	err := s.db.Model(&message.Message{}).
+		Select("product_id, COUNT(*) as total").
+		Where("is_read = ? ", false).
+		Where("role = ? ", constants.CUSTOMER).
+		Group("product_id").
+		Scan(&unreads).Error
+	if err != nil {
+		return nil, err
+	}
+
+	mapUnreadCount := make(map[uuid.UUID]int, 0)
+	for _, unread := range unreads {
+		mapUnreadCount[unread.ProductID] = unread.Total
+	}
+
 	// Gabungkan hasil
 	var result []ProductWithCustomer
 	for _, p := range products {
 		result = append(result, ProductWithCustomer{
 			CustomerProduct: p,
 			CustomerName:    userNameMapData[p.UserID],
+			UnreadCount:     mapUnreadCount[p.ID],
 		})
 	}
 
@@ -148,7 +160,7 @@ func (s *service) GetProductByMessage(ctx context.Context, keyword string) ([]Cu
 		return nil, err
 	}
 
-	var results []Result
+	var results []Unread
 	err := s.db.Model(&message.Message{}).
 		Select("product_id, COUNT(*) as total").
 		Where("is_read = ? ", false).
@@ -204,14 +216,15 @@ func (s *service) AddProduct(ctx context.Context, req AddProductRequest) error {
 	}
 	// Product entry
 	product := CustomerProduct{
-		ID:          uuid.New(),
-		UserID:      token.Claims.UserID,
-		Name:        req.Name,
-		Description: req.Description,
-		Price:       req.Price,
-		Status:      "pending",
-		CreatedAt:   time.Now(),
-		UpdatedAt:   time.Now(),
+		ID:           uuid.New(),
+		UserID:       token.Claims.UserID,
+		Name:         req.Name,
+		Description:  req.Description,
+		Price:        req.Price,
+		Status:       "pending",
+		LastHandleBy: nil,
+		CreatedAt:    time.Now(),
+		UpdatedAt:    time.Now(),
 	}
 
 	// save to db
@@ -298,18 +311,45 @@ func (s *service) DeleteProduct(ctx context.Context, req DeleteProductRequest) e
 }
 
 func (s *service) UpdateStatus(ctx context.Context, req UpdateStatusRequest) error {
-	var product CustomerProduct
-
-	// Cek apakah produk dengan ID tersebut ada
-	if err := s.db.WithContext(ctx).First(&product, "id = ?", req.ProductID).Error; err != nil {
-		return fmt.Errorf("product not found: %v", err)
+	token, err := contextUtil.GetTokenClaims(ctx)
+	if err != nil {
+		return err
 	}
 
-	// Update status produk
-	product.Status = req.NewStatus
-	if err := s.db.WithContext(ctx).Save(&product).Error; err != nil {
-		return fmt.Errorf("failed to update product status: %v", err)
-	}
+	UserID := token.Claims.UserID
 
-	return nil
+	return s.db.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
+		var product CustomerProduct
+
+		// Cek apakah produk dengan ID tersebut ada
+		if err := tx.First(&product, "id = ?", req.ProductID).Error; err != nil {
+			return fmt.Errorf("product not found: %v", err)
+		}
+
+		// Buat activity log
+		activity := user.AdminActivity{
+			ID:      uuid.New(),
+			AdminID: UserID,
+			Description: fmt.Sprintf(
+				"update status of cusproduct_id %s from %s to %s",
+				product.ID.String(),
+				product.Status,
+				req.NewStatus,
+			),
+			CreatedAt: time.Now(),
+		}
+
+		if err := tx.Create(&activity).Error; err != nil {
+			return fmt.Errorf("failed to create admin activity: %w", err)
+		}
+
+		// Update status produk
+		product.LastHandleBy = &UserID
+		product.Status = req.NewStatus
+		if err := tx.Save(&product).Error; err != nil {
+			return fmt.Errorf("failed to update product status: %v", err)
+		}
+
+		return nil
+	})
 }

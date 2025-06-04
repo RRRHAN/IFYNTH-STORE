@@ -25,6 +25,7 @@ type Handler interface {
 	UpdateProduct(ctx *gin.Context)
 	GetProductCountByDepartment(ctx *gin.Context)
 	GetTotalCapital(ctx *gin.Context)
+	GetProductProfit(ctx *gin.Context)
 }
 
 type handler struct {
@@ -208,6 +209,16 @@ func (h *handler) GetProductCountByDepartment(ctx *gin.Context) {
 
 func (h *handler) GetTotalCapital(ctx *gin.Context) {
 	res, err := h.service.GetTotalCapital(ctx)
+	if err != nil {
+		respond.Error(ctx, apierror.FromErr(err))
+		return
+	}
+
+	respond.Success(ctx, http.StatusOK, res)
+}
+
+func (h *handler) GetProductProfit(ctx *gin.Context) {
+	res, err := h.service.GetProductProfit(ctx.Request.Context())
 	if err != nil {
 		respond.Error(ctx, apierror.FromErr(err))
 		return

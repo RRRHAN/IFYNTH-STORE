@@ -8,6 +8,7 @@ import {
   Modal,
   Platform,
   TouchableOpacity,
+  ScrollView,
 } from "react-native";
 import { IconButton } from "react-native-paper";
 import { useRouter } from "expo-router";
@@ -27,6 +28,7 @@ import ModalComponent from "@/components/ModalComponent";
 import ProductDetailModal from "@/app/detail_product";
 import { BASE_URL } from "@/src/api/constants";
 import { useColorScheme } from "@/hooks/useColorScheme";
+import { FontAwesome } from "@expo/vector-icons";
 
 const ProductsScreen = () => {
   const colorScheme = useColorScheme();
@@ -38,11 +40,11 @@ const ProductsScreen = () => {
         price: screenWidth * 0.15,
         stock: screenWidth * 0.1,
         category: screenWidth * 0.1,
-        department: screenWidth * 0.15,
+        department: screenWidth * 0.18,
         action: screenWidth * 0.12,
       }
     : {
-        image: screenWidth * 0.15,
+        image: screenWidth * 0.25,
         name: screenWidth * 0.15,
         price: screenWidth * 0.15,
         stock: screenWidth * 0.15,
@@ -69,7 +71,7 @@ const ProductsScreen = () => {
 
   // Pagination states
   const [currentPage, setCurrentPage] = useState(1);
-  const productsPerPage = 8;
+  const productsPerPage = screenWidth > 1000 ? 8 : 4;
   const totalPages = Math.ceil(products.length / productsPerPage);
 
   const getData = async () => {
@@ -81,7 +83,7 @@ const ProductsScreen = () => {
     } finally {
       setTimeout(() => {
         setLoading(false);
-      }, 1000);
+      }, 500);
     }
   };
 
@@ -168,18 +170,24 @@ const ProductsScreen = () => {
       </ThemedCell>
       <ThemedCell style={[{ width: columnWidths.action }]}>
         <IconButton
-          icon="eye"
+          // Gunakan ikon FontAwesome sebagai children
+          icon={({ color, size }) => (
+            <FontAwesome name="eye" size={size} color={color} /> // Ikon "eye" tersedia di FontAwesome
+          )}
           size={20}
-          iconColor="#00FFFF"
+          iconColor="#00FFFF" // Warna untuk ikon itu sendiri
           onPress={() => {
             setSelectedProduct(item);
             setIsProductModalVisible(true);
           }}
         />
         <IconButton
-          icon="pencil"
+          // Gunakan ikon FontAwesome sebagai children
+          icon={({ color, size }) => (
+            <FontAwesome name="edit" size={size} color={color} /> // Ikon "pencil" (atau "edit") tersedia
+          )}
           size={20}
-          iconColor="#4169E1"
+          iconColor="#4169E1" // Warna untuk ikon itu sendiri
           onPress={() => {
             setSelectedProduct(item);
             router.push({
@@ -189,9 +197,12 @@ const ProductsScreen = () => {
           }}
         />
         <IconButton
-          icon="delete"
+          // Gunakan ikon FontAwesome sebagai children
+          icon={({ color, size }) => (
+            <FontAwesome name="trash" size={size} color={color} /> // Ikon "trash" (atau "remove") tersedia
+          )}
           size={20}
-          iconColor="#FF0000"
+          iconColor="#FF0000" // Warna untuk ikon itu sendiri
           onPress={() => handleDelete(item.ID)}
         />
       </ThemedCell>
@@ -199,156 +210,340 @@ const ProductsScreen = () => {
   );
 
   return (
-    <ThemedView
-      style={[styles.center, { marginTop: Platform.OS === "web" ? 20 : 80 }]}
-    >
-      <Modal
-        animationType="slide"
-        transparent={true}
-        visible={isProductModalVisible}
-        onRequestClose={() => setIsProductModalVisible(false)}
-      >
-        <View
-          style={{
-            flex: 1,
-            justifyContent: "center",
-            alignItems: "center",
-            backgroundColor: "rgba(0, 0, 0, 0.7)",
+    <>
+      {Platform.OS === "web" ? (
+        <ScrollView
+          contentContainerStyle={{
+            paddingBottom: Platform.OS === "web" ? 100 : 150,
           }}
         >
-          {/* Tombol silang dengan React Native Paper */}
-          <TouchableOpacity
-            onPress={() => {
-              console.log("Tombol close diklik");
-              setIsProductModalVisible(false);
-            }}
-            style={{
-              position: "absolute",
-              top: Platform.OS === "web" ? 50 : 80,
-              left: 20,
-              backgroundColor: "white",
-              width: 40,
-              height: 40,
-              borderRadius: 20,
-              alignItems: "center",
-              justifyContent: "center",
-              zIndex: 10,
-              elevation: 10,
-            }}
+          <ThemedView
+            style={[
+              styles.center,
+              { marginTop: Platform.OS === "web" ? 20 : 80 },
+            ]}
           >
-            <ThemedText style={{ fontSize: 20, color: "black" }}>✕</ThemedText>
-          </TouchableOpacity>
-
-          {/* Konten modal */}
-          <ProductDetailModal product={selectedProduct} />
-        </View>
-      </Modal>
-      <ModalComponent
-        visible={visible}
-        hideModal={() => setVisible(false)}
-        message={errorMessage || successMessage}
-      />
-      <ThemedView style={styles.headerContainer}>
-        <ThemedText style={[styles.title]}>LIST PRODUCTS</ThemedText>
-        <IconButton
-          icon="plus"
-          size={24}
-          onPress={() => router.replace("/add_product")}
-        />
-      </ThemedView>
-      <ThemedTable>
-        <ThemedHeader style={[styles.row]}>
-          {!isMobile && (
-            <ThemedHeader style={[{ width: columnWidths.image }]}>
-              <ThemedText
-                type="subtitle"
-                style={[styles.header, { fontSize: fontSizeHeader }]}
+            <Modal
+              animationType="slide"
+              transparent={true}
+              visible={isProductModalVisible}
+              onRequestClose={() => setIsProductModalVisible(false)}
+            >
+              <View
+                style={{
+                  flex: 1,
+                  justifyContent: "center",
+                  alignItems: "center",
+                  backgroundColor: "rgba(0, 0, 0, 0.7)",
+                }}
               >
-                Product Images
+                {/* Tombol silang dengan FontAwesome */}
+                <TouchableOpacity
+                  onPress={() => {
+                    console.log("Tombol close diklik");
+                    setIsProductModalVisible(false);
+                  }}
+                  style={{
+                    position: "absolute",
+                    top: Platform.OS === "web" ? 50 : 80,
+                    left: 20,
+                    backgroundColor: "white",
+                    width: 40,
+                    height: 40,
+                    borderRadius: 20,
+                    alignItems: "center",
+                    justifyContent: "center",
+                    zIndex: 10,
+                    elevation: 10,
+                  }}
+                >
+                  <FontAwesome name="times" size={24} color="black" />
+                </TouchableOpacity>
+                <ProductDetailModal product={selectedProduct} />
+              </View>
+            </Modal>
+            <ModalComponent
+              visible={visible}
+              hideModal={() => setVisible(false)}
+              message={errorMessage || successMessage}
+            />
+            <ThemedView style={styles.headerContainer}>
+              <ThemedText style={[styles.title]}>LIST PRODUCTS</ThemedText>
+              <IconButton
+                // Gunakan ikon FontAwesome untuk "plus"
+                icon={({ color, size }) => (
+                  <FontAwesome name="plus" size={size} color={color} />
+                )}
+                size={24}
+                onPress={() => router.replace("/add_product")}
+              />
+            </ThemedView>
+            <ThemedTable>
+              <ThemedHeader style={[styles.row]}>
+                {!isMobile && (
+                  <ThemedHeader style={[{ width: columnWidths.image }]}>
+                    <ThemedText
+                      type="subtitle"
+                      style={[styles.header, { fontSize: fontSizeHeader }]}
+                    >
+                      Product Images
+                    </ThemedText>
+                  </ThemedHeader>
+                )}
+                <ThemedHeader style={[{ width: columnWidths.name }]}>
+                  <ThemedText
+                    type="subtitle"
+                    style={[styles.header, { fontSize: fontSizeHeader }]}
+                  >
+                    Product Name
+                  </ThemedText>
+                </ThemedHeader>
+                <ThemedHeader style={[{ width: columnWidths.price }]}>
+                  <ThemedText
+                    type="subtitle"
+                    style={[styles.header, { fontSize: fontSizeHeader }]}
+                  >
+                    Price
+                  </ThemedText>
+                </ThemedHeader>
+                <ThemedHeader style={[{ width: columnWidths.stock }]}>
+                  <ThemedText
+                    type="subtitle"
+                    style={[styles.header, { fontSize: fontSizeHeader }]}
+                  >
+                    Total Stock
+                  </ThemedText>
+                </ThemedHeader>
+                <ThemedHeader style={[{ width: columnWidths.category }]}>
+                  <ThemedText
+                    type="subtitle"
+                    style={[styles.header, { fontSize: fontSizeHeader }]}
+                  >
+                    Category
+                  </ThemedText>
+                </ThemedHeader>
+                <ThemedHeader style={[{ width: columnWidths.department }]}>
+                  <ThemedText
+                    type="subtitle"
+                    style={[styles.header, { fontSize: fontSizeHeader }]}
+                  >
+                    Department
+                  </ThemedText>
+                </ThemedHeader>
+                <ThemedHeader style={[{ width: columnWidths.action }]}>
+                  <ThemedText
+                    type="subtitle"
+                    style={[styles.header, { fontSize: fontSizeHeader }]}
+                  >
+                    Action
+                  </ThemedText>
+                </ThemedHeader>
+              </ThemedHeader>
+              <FlatList
+                data={currentProducts}
+                renderItem={renderItem}
+                keyExtractor={(item) => item.ID}
+                ListEmptyComponent={
+                  <ThemedText
+                    style={{ textAlign: "center", paddingVertical: 20 }}
+                  >
+                    No products found.
+                  </ThemedText>
+                }
+              />
+            </ThemedTable>
+            <View style={styles.paginationContainer}>
+              <IconButton
+                icon={({ color, size }) => (
+                  <FontAwesome name="chevron-left" size={size} color={color} />
+                )}
+                size={20}
+                onPress={() => paginate(currentPage - 1)}
+                disabled={currentPage === 1}
+                iconColor={colorScheme === "dark" ? "#ffffff" : "#111827"}
+              />
+              <ThemedText style={styles.paginationText}>
+                Page {currentPage} of {totalPages}
               </ThemedText>
+              <IconButton
+                icon={({ color, size }) => (
+                  <FontAwesome name="chevron-right" size={size} color={color} />
+                )}
+                size={20}
+                onPress={() => paginate(currentPage + 1)}
+                disabled={currentPage === totalPages}
+                iconColor={colorScheme === "dark" ? "#ffffff" : "#111827"}
+              />
+            </View>
+          </ThemedView>
+        </ScrollView>
+      ) : (
+        <ThemedView
+          style={[
+            styles.center,
+            { marginTop: 80 },
+          ]}
+        >
+          <Modal
+            animationType="slide"
+            transparent={true}
+            visible={isProductModalVisible}
+            onRequestClose={() => setIsProductModalVisible(false)}
+          >
+            <View
+              style={{
+                flex: 1,
+                justifyContent: "center",
+                alignItems: "center",
+                backgroundColor: "rgba(0, 0, 0, 0.7)",
+              }}
+            >
+              {/* Tombol silang dengan FontAwesome */}
+              <TouchableOpacity
+                onPress={() => {
+                  console.log("Tombol close diklik");
+                  setIsProductModalVisible(false);
+                }}
+                style={{
+                  position: "absolute",
+                  top: 80,
+                  left: 20,
+                  backgroundColor: "white",
+                  width: 40,
+                  height: 40,
+                  borderRadius: 20,
+                  alignItems: "center",
+                  justifyContent: "center",
+                  zIndex: 10,
+                  elevation: 10,
+                }}
+              >
+                <FontAwesome name="times" size={24} color="black" />
+                {/* Menggunakan "times" untuk silang */}
+              </TouchableOpacity>
+
+              {/* Konten modal */}
+              <ProductDetailModal product={selectedProduct} />
+            </View>
+          </Modal>
+          <ModalComponent
+            visible={visible}
+            hideModal={() => setVisible(false)}
+            message={errorMessage || successMessage}
+          />
+          <ThemedView style={styles.headerContainer}>
+            <ThemedText style={[styles.title]}>LIST PRODUCTS</ThemedText>
+            <IconButton
+              // Gunakan ikon FontAwesome untuk "plus"
+              icon={({ color, size }) => (
+                <FontAwesome name="plus" size={size} color={color} /> // Ikon "plus" tersedia di FontAwesome
+              )}
+              size={24}
+              // Default iconColor untuk IconButton paper adalah tema, jadi bisa diabaikan
+              // iconColor={colorScheme === "dark" ? "#ffffff" : "#111827"} // Sesuaikan jika perlu
+              onPress={() => router.replace("/add_product")}
+            />
+          </ThemedView>
+          <ThemedTable>
+            <ThemedHeader style={[styles.row]}>
+              {!isMobile && (
+                <ThemedHeader style={[{ width: columnWidths.image }]}>
+                  <ThemedText
+                    type="subtitle"
+                    style={[styles.header, { fontSize: fontSizeHeader }]}
+                  >
+                    Product Images
+                  </ThemedText>
+                </ThemedHeader>
+              )}
+              <ThemedHeader style={[{ width: columnWidths.name }]}>
+                <ThemedText
+                  type="subtitle"
+                  style={[styles.header, { fontSize: fontSizeHeader }]}
+                >
+                  Product Name
+                </ThemedText>
+              </ThemedHeader>
+              <ThemedHeader style={[{ width: columnWidths.price }]}>
+                <ThemedText
+                  type="subtitle"
+                  style={[styles.header, { fontSize: fontSizeHeader }]}
+                >
+                  Price
+                </ThemedText>
+              </ThemedHeader>
+              <ThemedHeader style={[{ width: columnWidths.stock }]}>
+                <ThemedText
+                  type="subtitle"
+                  style={[styles.header, { fontSize: fontSizeHeader }]}
+                >
+                  Total Stock
+                </ThemedText>
+              </ThemedHeader>
+              <ThemedHeader style={[{ width: columnWidths.category }]}>
+                <ThemedText
+                  type="subtitle"
+                  style={[styles.header, { fontSize: fontSizeHeader }]}
+                >
+                  Category
+                </ThemedText>
+              </ThemedHeader>
+              <ThemedHeader style={[{ width: columnWidths.department }]}>
+                <ThemedText
+                  type="subtitle"
+                  style={[styles.header, { fontSize: fontSizeHeader }]}
+                >
+                  Department
+                </ThemedText>
+              </ThemedHeader>
+              <ThemedHeader style={[{ width: columnWidths.action }]}>
+                <ThemedText
+                  type="subtitle"
+                  style={[styles.header, { fontSize: fontSizeHeader }]}
+                >
+                  Action
+                </ThemedText>
+              </ThemedHeader>
             </ThemedHeader>
-          )}
-          <ThemedHeader style={[{ width: columnWidths.name }]}>
-            <ThemedText
-              type="subtitle"
-              style={[styles.header, { fontSize: fontSizeHeader }]}
-            >
-              Product Name
+            <FlatList
+              data={currentProducts}
+              renderItem={renderItem}
+              keyExtractor={(item) => item.ID}
+              ListEmptyComponent={
+                <ThemedText
+                  style={{ textAlign: "center", paddingVertical: 20 }}
+                >
+                  No products found.
+                </ThemedText>
+              }
+            />
+          </ThemedTable>
+          <View style={styles.paginationContainer}>
+            <IconButton
+              icon={({ color, size }) => (
+                <FontAwesome name="chevron-left" size={size} color={color} />
+              )}
+              size={20}
+              onPress={() => paginate(currentPage - 1)}
+              disabled={currentPage === 1}
+              iconColor={colorScheme === "dark" ? "#ffffff" : "#111827"}
+            />
+            <ThemedText style={styles.paginationText}>
+              Page {currentPage} of {totalPages}
             </ThemedText>
-          </ThemedHeader>
-          <ThemedHeader style={[{ width: columnWidths.price }]}>
-            <ThemedText
-              type="subtitle"
-              style={[styles.header, { fontSize: fontSizeHeader }]}
-            >
-              Price
-            </ThemedText>
-          </ThemedHeader>
-          <ThemedHeader style={[{ width: columnWidths.stock }]}>
-            <ThemedText
-              type="subtitle"
-              style={[styles.header, { fontSize: fontSizeHeader }]}
-            >
-              Total Stock
-            </ThemedText>
-          </ThemedHeader>
-          <ThemedHeader style={[{ width: columnWidths.category }]}>
-            <ThemedText
-              type="subtitle"
-              style={[styles.header, { fontSize: fontSizeHeader }]}
-            >
-              Category
-            </ThemedText>
-          </ThemedHeader>
-          <ThemedHeader style={[{ width: columnWidths.department }]}>
-            <ThemedText
-              type="subtitle"
-              style={[styles.header, { fontSize: fontSizeHeader }]}
-            >
-              Department
-            </ThemedText>
-          </ThemedHeader>
-          <ThemedHeader style={[{ width: columnWidths.action }]}>
-            <ThemedText
-              type="subtitle"
-              style={[styles.header, { fontSize: fontSizeHeader }]}
-            >
-              Action
-            </ThemedText>
-          </ThemedHeader>
-        </ThemedHeader>
-        <FlatList
-          data={currentProducts}
-          renderItem={renderItem}
-          keyExtractor={(item) => item.ID}
-          ListEmptyComponent={
-            <ThemedText style={{ textAlign: "center", paddingVertical: 20 }}>
-              No products found.
-            </ThemedText>
-          }
-        />
-      </ThemedTable>
-      {/* Pagination Controls */}
-      <View style={styles.paginationContainer}>
-        <IconButton
-          icon="chevron-left"
-          size={30}
-          onPress={() => paginate(currentPage - 1)}
-          disabled={currentPage === 1}
-          iconColor={colorScheme === "dark" ? "#ffffff" : "#111827"}
-        />
-        <ThemedText style={styles.paginationText}>
-          Page {currentPage} of {totalPages}
-        </ThemedText>
-        <IconButton
-          icon="chevron-right"
-          size={30}
-          onPress={() => paginate(currentPage + 1)}
-          disabled={currentPage === totalPages}
-          iconColor={colorScheme === "dark" ? "#ffffff" : "#111827"}
-        />
-      </View>
-    </ThemedView>
+            <IconButton
+              icon={({ color, size }) => (
+                <FontAwesome name="chevron-right" size={size} color={color} />
+              )}
+              size={20}
+              onPress={() => paginate(currentPage + 1)}
+              disabled={currentPage === totalPages}
+              iconColor={colorScheme === "dark" ? "#ffffff" : "#111827"}
+            />
+          </View>
+        </ThemedView>
+      )}
+    </>
   );
 };
 

@@ -1,6 +1,8 @@
 CREATE TABLE IF NOT EXISTS customer_address (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     customer_id UUID NOT NULL,
+    recipients_name VARCHAR(255) NOT NULL,
+    recipients_number VARCHAR(255) NOT NULL,
     destination_id VARCHAR(255),
     address VARCHAR(255),
     zip_code VARCHAR(255),

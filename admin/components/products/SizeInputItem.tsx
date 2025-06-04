@@ -12,7 +12,7 @@ type Props = {
 };
 
 export default function SizeInputItem({ size, stock, onStockChange }: Props) {
-  const isDark = false; // Kalau mau detect dark mode, bisa tambahkan hook
+  const isDark = false;
 
   return (
     <View style={styles.sizeWrapper}>

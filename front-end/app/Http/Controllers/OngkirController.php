@@ -39,30 +39,34 @@ class OngkirController extends Controller
 
     public function getShippingCost(Request $request)
     {
-        $receiverDestinationId = $request->input('receiver_destination_id');
+        $client = new Client();
+        $addressId = $request->input('addressId');
         $weight = $request->input('weight');
         $itemValue = $request->input('item_value');
 
-        $apiKey = '5feEw06A622dbf37ec9fbf96Ri8SnpMK';
+        $token = session("api_token");
 
-        $response = Http::withHeaders([
-            'x-api-key' => $apiKey
-        ])->get('https://api-sandbox.collaborator.komerce.id/tariff/api/v1/calculate', [
-                    'shipper_destination_id' => '30711',
-                    'receiver_destination_id' => $receiverDestinationId,
-                    'weight' => $weight,
-                    'item_value' => $itemValue,
-                    'cod' => 'no'
-                ]);
+        $response = $client->request('GET', config('app.back_end_base_url') . '/api/ongkir/cost', [
+            'headers' => [
+                'Authorization' => 'Bearer ' . $token,
+                'Content-Type' => 'application/json',
+            ],
+            'body' => json_encode([
+                'addressId' => $addressId,
+                'weight' => $weight,
+                'ItemValue' => $itemValue,
+            ]),
+        ]);
 
-        if ($response->successful()) {
-            return response()->json($response->json());
+        if ($response->getStatusCode() == 201) {
+            $data = json_decode($response->getBody()->getContents(), true);
+            return response()->json($data);
         } else {
             return response()->json([
                 'error' => 'Failed to retrieve shipping cost',
-                'status' => $response->status(),
-                'message' => $response->body(),
-            ], $response->status());
+                'status' => $response->getStatusCode(),
+                'message' => $response->getBody()->getContents(),
+            ], $response->getStatusCode());
         }
     }
 }

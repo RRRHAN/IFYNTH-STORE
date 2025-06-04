@@ -7,8 +7,10 @@ CREATE TABLE IF NOT EXISTS product (
     department VARCHAR NOT NULL,
     category VARCHAR NOT NULL,
     price DECIMAL(10, 2) DEFAULT 0,
+    last_handle_by UUID,
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    FOREIGN KEY (last_handle_by) REFERENCES admin(id)
 );
 
 CREATE TABLE IF NOT EXISTS product_image (

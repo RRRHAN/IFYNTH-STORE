@@ -13,6 +13,7 @@ import {
   fetchTotalCapital,
   fetchTotalIncome,
   fetchTotalTransactionUser,
+  fetchProductProfit,
 } from "@/src/api/home";
 import ProductCountTable from "@/components/home/ProductCountTable";
 import TransactionCountTable from "@/components/home/TransactionCountTable";
@@ -21,9 +22,9 @@ import {
   TransactionCount,
   TransactionReport,
   TotalTransactionUser,
+  ProfitProduct,
 } from "@/src/types/home";
 import styles from "../styles/HomeStyles";
-import TransactionReportTable from "@/components/home/TransactionReportChart";
 import TotalCapitalTable from "@/components/home/TotalCapitalTable";
 import TotalIncomeTable from "@/components/home/TotalIncomeTable";
 import TotalTransactionUserTable from "@/components/home/TotalTransactionUserTable";
@@ -55,6 +56,9 @@ export default function HomeScreen() {
   const [totalTransactionUser, setTotalTransactionUser] = useState<
     TotalTransactionUser[] | null
   >(null);
+    const [ProfitProduct, setProfitProduct] = useState<
+    ProfitProduct[] | null
+  >(null);
   const [totalCapital, setTotalCapital] = useState<number | null>(null);
   const [totalIncome, setTotalIncome] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
@@ -72,34 +76,47 @@ export default function HomeScreen() {
       setHasError(false);
 
       const isLoggedIn = await checkLoginStatus(router);
-      if (!isLoggedIn) return;
+      if (!isLoggedIn) {
+        setLoading(false);
+        return;
+      }
 
       try {
         const products = await fetchProductCount();
         setProductCount(products);
-        await new Promise((resolve) => setTimeout(resolve, 300));
+        await new Promise((resolve) => setTimeout(resolve, 300)); // Simulate delay
 
         const transactions = await fetchTransactionCount();
         setTransactionCount(transactions);
-        await new Promise((resolve) => setTimeout(resolve, 300));
+        await new Promise((resolve) => setTimeout(resolve, 300)); // Simulate delay
 
         const reports = await fetchTransactionReports();
         setTransactionReport(reports);
-        await new Promise((resolve) => setTimeout(resolve, 300));
+        await new Promise((resolve) => setTimeout(resolve, 300)); // Simulate delay
 
         const capital = await fetchTotalCapital();
         setTotalCapital(capital);
-        await new Promise((resolve) => setTimeout(resolve, 300));
+        await new Promise((resolve) => setTimeout(resolve, 300)); // Simulate delay
 
         const income = await fetchTotalIncome();
         setTotalIncome(income);
-        await new Promise((resolve) => setTimeout(resolve, 300));
+        await new Promise((resolve) => setTimeout(resolve, 300)); // Simulate delay
 
         const usersData = await fetchTotalTransactionUser();
         setTotalTransactionUser(usersData);
+
+        const profitProduct = await fetchProductProfit();
+        setProfitProduct(profitProduct);
       } catch (err: any) {
         console.error("Failed to fetch home data", err);
         setHasError(true);
+        setProductCount([]);
+        setTransactionCount([]);
+        setTransactionReport([]);
+        setTotalCapital(0);
+        setTotalIncome(0);
+        setTotalTransactionUser([]);
+        setProfitProduct([]);
       } finally {
         setLoading(false);
       }
@@ -140,69 +157,62 @@ export default function HomeScreen() {
               }}
             >
               <View style={styles.overlayContent}>
-                {totalCapital && totalIncome && (
-                  <View style={styles.totalTablesContainer}>
-                    <TotalCapitalTable totalCapital={totalCapital} />
-                    <TotalIncomeTable totalIncome={totalIncome} />
-                  </View>
-                )}
+                <View style={styles.totalTablesContainer}>
+                  <TotalCapitalTable totalCapital={totalCapital || 0} />
+                  <TotalIncomeTable totalIncome={totalIncome || 0} />
+                </View>
 
-                {productCount && transactionCount && (
+                <View
+                  style={[
+                    styles.sectionRow,
+                    {
+                      flexDirection: width < 1000 ? "column" : "row",
+                      alignItems: width < 1000 ? "center" : "flex-start",
+                      justifyContent: width < 1000 ? "center" : "space-between",
+                      gap: width < 1000 ? 20 : 20,
+                    },
+                  ]}
+                >
+                  <View
+                    style={{
+                      flex: 1,
+                      gap: 20,
+                      backgroundColor: "rgba(255, 255, 255, 0)",
+                    }}
+                  >
+                    <View
+                      onLayout={(event) =>
+                        setProductTableHeight(event.nativeEvent.layout.height)
+                      }
+                    >
+                      <ProductCountTable productCount={productCount || []} />
+                    </View>
+
+                    <View
+                      onLayout={(event) => {
+                        setTransactionTableHeight(
+                          event.nativeEvent.layout.height
+                        );
+                      }}
+                    >
+                      <TransactionCountTable
+                        transactionCount={transactionCount || []}
+                      />
+                    </View>
+                  </View>
                   <View
                     style={[
-                      styles.sectionRow,
+                      styles.totalTablesContainer,
                       {
-                        flexDirection: width < 1000 ? "column" : "row",
-                        alignItems: width < 1000 ? "center" : "flex-start",
-                        justifyContent:
-                          width < 1000 ? "center" : "space-between",
-                        gap: width < 1000 ? 20 : 20,
+                        top: Platform.OS === "web" ? 0 : -485,
                       },
                     ]}
                   >
-                    <View
-                      style={{
-                        flex: 1,
-                        gap: 20,
-                        backgroundColor: "rgba(255, 255, 255, 0)",
-                      }}
-                    >
-                      <View
-                        onLayout={(event) =>
-                          setProductTableHeight(event.nativeEvent.layout.height)
-                        }
-                      >
-                        <ProductCountTable productCount={productCount} />
-                      </View>
-
-                      <View
-                        onLayout={(event) => {
-                          setTransactionTableHeight(
-                            event.nativeEvent.layout.height
-                          );
-                        }}
-                      >
-                        <TransactionCountTable
-                          transactionCount={transactionCount}
-                        />
-                      </View>
-                    </View>
-                    {totalTransactionUser && (
-                      <View
-                        style={[
-                          styles.totalTablesContainer,
-                          {
-                            top: Platform.OS === "web" ? 0 : -485,
-                          },
-                        ]}
-                      >
-                        <TotalTransactionUserTable
-                          totalTransactionUser={totalTransactionUser}
-                        />
-                      </View>
-                    )}
+                    <TotalTransactionUserTable
+                      totalTransactionUser={totalTransactionUser || []}
+                    />
                   </View>
-                )}
+                </View>
                 <View
                   style={[
                     styles.sectionRow,
@@ -222,17 +232,28 @@ export default function HomeScreen() {
                     }}
                   >
                     <MTransactionReportChart
-                      transactionReport={transactionReport}
+                      transactionReport={transactionReport || [] }
                       height={380}
                     />
                   </View>
+                  {Platform.OS === "web" && (
+                    <View
+                      style={{
+                        flex: 1,
+                        paddingTop: width < 1000 ? 40 : 20,
+                      }}
+                    >
+                      <ProfitProductChart
+                        ProfitProduct={ProfitProduct}
+                        height={320}
+                      />
+                    </View>
+                  )}
                 </View>
-                {(!productCount ||
-                  !transactionCount ||
-                  !totalCapital ||
-                  !totalIncome ||
-                  !totalTransactionUser) && (
-                  <ThemedText>Failed to load data</ThemedText>
+                {hasError && (
+                  <ThemedText style={styles.errorMessage}>
+                    Error loading some data. Please try again.
+                  </ThemedText>
                 )}
               </View>
             </ScrollView>

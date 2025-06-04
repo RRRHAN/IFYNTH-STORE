@@ -1,186 +1,137 @@
 <div class="tab-pane fade" id="my-order" role="tabpanel">
     <h5 class="mb-4">Recent My Orders</h5>
 
-    <div style="overflow-x: auto;">
-        <table class="table">
-            <thead>
-                <tr class="text-center align-middle">
-                    <th scope="col">No</th>
-                    <th scope="col">Transaction ID</th>
-                    <th scope="col">Payment Method</th>
-                    <th scope="col">Total Amount</th>
-                    <th scope="col">Status</th>
-                    <th scope="col">Action</th>
-                </tr>
-            </thead>
-            <tbody>
-                @forelse ($transactions ?? [] as $transaction)
-                    <tr class="text-center align-middle">
-                        <th scope="row">{{ $loop->iteration }}</th>
-                        <td>{{ $transaction['ID'] ?? null }}</td>
-                        <td>{{ $transaction['PaymentMethod'] ?? '-' }}</td>
-                        <td>Rp.{{ number_format($transaction['TotalAmount'] ?? 0) }}</td>
-                        <td>{{ ucfirst($transaction['Status'] ?? '-') }}</td>
-                        <td>
-                            <!-- Button trigger modal -->
-                            <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal"
-                                data-bs-target="#detailModal{{ $loop->iteration }}"
-                                data-transaction="{{ json_encode($transaction) }}" onclick="loadTransactionData(this)">
-                                Detail
-                            </button>
-                        </td>
-                    </tr>
+    @forelse ($transactions ?? [] as $transaction)
+        <div class="order-card shadow-sm">
+            <div class="order-header">
+                <div class="order-shop-info">
+                    <span class="star-badge">Star+</span>
+                    <span class="shop-name">IFYNTH Store</span>
+                </div>
+                <div class="order-status-msg mt-2 mt-md-0">
+                    @if ($transaction['Status'] === 'delivered' && ($transaction['IsReviewedByCustomer'] ?? false))
+                        The order has arrived at the destination address. Received by the person concerned. <span
+                            class="status-badge">HAS BEEN ASSESSED</span>
+                    @elseif ($transaction['Status'] === 'completed')
+                        Order has been completed.
+                    @elseif ($transaction['Status'] === 'cancelled')
+                        Order cancelled.
+                    @elseif ($transaction['Status'] === 'process')
+                        The order is in transit.
+                    @elseif ($transaction['Status'] === 'paid')
+                        The store has confirmed payment, the product is being processed.
+                    @elseif ($transaction['Status'] === 'pending')
+                        Payment placed, awaiting store confirmation.
+                    @elseif ($transaction['Status'] === 'draft')
+                        Waiting for payment.
+                    @else
+                        Status: {{ ucfirst($transaction['Status'] ?? '-') }}
+                    @endif
+                </div>
+            </div>
+
+            <div class="order-body">
+                @forelse ($transaction['TransactionDetails'] ?? [] as $key => $detail)
+                    {{-- Display only the first product by default, hide others --}}
+                    <div class="product-item-order {{ $key >= 1 ? 'hidden-product-item-order' : '' }}">
+                        {{-- Struktur HTML sudah dikembalikan ke tanpa product-main-info --}}
+                        <div class="product-img-wrapper">
+                            <img src="{{ url(config('app.back_end_base_url') . '/api' . ($detail['Product']['ProductImages'][0]['URL'] ?? '/placeholder.png')) }}"
+                                class="product-img" alt="{{ $detail['Product']['Name'] ?? 'Product Image' }}">
+                        </div>
+                        <div class="product-details-order">
+                            <div class="product-name">{{ $detail['Product']['Name'] ?? 'Nama Produk Tidak Diketahui' }}
+                            </div>
+                            <div class="product-variation">Variasi: {{ $detail['Size'] ?? 'Ukuran Tidak Diketahui' }}
+                                {{ $detail['Color'] ?? '' }}</div>
+                            <div class="product-quantity">x{{ $detail['Quantity'] ?? 1 }}</div>
+                        </div>
+                        <div class="product-price-info">
+                            @if (($detail['Product']['OriginalPrice'] ?? 0) > ($detail['Product']['Price'] ?? 0))
+                                <div class="original-price">
+                                    Rp{{ number_format($detail['Product']['OriginalPrice'] ?? 0) }}</div>
+                            @endif
+                            <div class="final-price">Rp{{ number_format($detail['Product']['Price'] ?? 0) }}</div>
+                            @if (count($transaction['TransactionDetails'] ?? []) > 1)
+                                <a href="{{ route('product.detail', ['id' => $detail['Product']['ID']]) }}"
+                                    class="btn btn-buy-again btn-sm mt-2">
+                                    Buy More
+                                </a>
+                            @endif
+                        </div>
+                    </div>
                 @empty
-                    <tr>
-                        <td colspan="6" class="text-center">No orders available.</td>
-                    </tr>
+                    <div class="text-center py-3 text-muted">There are no products in this order.</div>
                 @endforelse
-            </tbody>
-        </table>
-    </div>
-</div>
 
-@forelse ($transactions ?? [] as $transaction)
-    <div class="modal fade" id="detailModal{{ $loop->iteration }}" tabindex="-1" aria-labelledby="detailModalLabel"
-        aria-hidden="true">
-        <div class="modal-dialog modal-lg modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="detailModalLabel">Transaction Details</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <!-- Transaction Info -->
-                    <h6>Transaction Info</h6>
-                    <div class="row">
-                        <div class="col-md-6">
-                            <p><strong>Transaction ID:</strong> <span id="transactionID{{ $loop->iteration }}"></span>
-                            </p>
-                            <p><strong>Payment Method:</strong> <span id="paymentMethod{{ $loop->iteration }}"></span>
-                            </p>
-                            <p><strong>Total Amount:</strong> Rp. <span id="totalAmount{{ $loop->iteration }}"></span>
-                            </p>
-                        </div>
-                        <div class="col-md-6">
-                            <p><strong>Status:</strong> <span id="status{{ $loop->iteration }}"></span></p>
-                        </div>
+                {{-- Show "View All Products" button if there's more than one detail --}}
+                @if (count($transaction['TransactionDetails'] ?? []) > 1)
+                    <div class="text-center mt-3">
+                        <button class="btn btn-sm btn-outline-secondary view-more-btn" type="button">
+                            View All Products ({{ count($transaction['TransactionDetails']) - 1 }} more)
+                            <i class="fas fa-chevron-down ms-2"></i>
+                        </button>
                     </div>
-                    <hr>
-                    <!-- Products Info -->
-                    <h6>Products:</h6>
-                    <table class="table table-sm">
-                        <thead>
-                            <tr>
-                                <th>Name</th>
-                                <th>Total Price</th>
-                                <th>Size</th>
-                                <th>Quantity</th>
-                            </tr>
-                        </thead>
-                        <tbody id="productDetails{{ $loop->iteration }}"></tbody>
-                    </table>
-                    <hr>
-                    <!-- Shipping Address Info -->
-                    <h6>Shipping Address:</h6>
-                    <p><strong>Name:</strong> <span id="shippingName{{ $loop->iteration }}"></span></p>
-                    <p><strong>Phone:</strong> <span id="shippingPhone{{ $loop->iteration }}"></span></p>
-                    <p><strong>Address:</strong> <span id="shippingAddress{{ $loop->iteration }}"></span></p>
-                    <p><strong>Destination:</strong> <span id="shippingDestination{{ $loop->iteration }}"></span></p>
-                    <p><strong>Courir:</strong> <span id="shippingCourir{{ $loop->iteration }}"></span></p>
-                    <p><strong>Shipping Cost:</strong> Rp. <span id="shippingCost{{ $loop->iteration }}"></span></p>
-                    <!-- Payment Proof Image -->
-                    <h6>Payment Proof:</h6>
-                    <div class="text-center">
-                        <img id="paymentProofImage{{ $loop->iteration }}" class="img-fluid" alt="Payment Proof"
-                            style="max-width: 30%; height: auto; cursor: pointer;" onclick="openImageModal(this)">
-                    </div>
+                @endif
+            </div> {{-- End of order-body --}}
+
+            <div class="order-footer">
+                <div class="total-order-section">
+                    <span class="total-order-label">Order Total:</span>
+                    <span class="total-order-amount">Rp{{ number_format($transaction['TotalAmount'] ?? 0) }}</span>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <div class="seller-review-status">
+                    @if ($transaction['Status'] === 'delivered' && !($transaction['IsReviewedByCustomer'] ?? false))
+                        Waiting for the Seller to provide value
+                    @elseif ($transaction['Status'] === 'delivered' && ($transaction['IsReviewedByCustomer'] ?? false))
+                        You have provided value.
+                    @else
+                    @endif
+                </div>
+                <div class="order-actions">
+                    {{-- Tombol "Buy More" di footer HANYA jika ada 1 produk (tetap sama) --}}
+                    @if (count($transaction['TransactionDetails'] ?? []) == 1)
+                        @php
+                            $firstDetail = $transaction['TransactionDetails'][0] ?? null;
+                        @endphp
+                        @if ($firstDetail)
+                            <a href="{{ route('product.detail', ['id' => $firstDetail['Product']['ID']]) }}"
+                                class="btn btn-buy-again">
+                                Buy More
+                            </a>
+                        @endif
+                    @endif
+
+                    {{-- Tombol "Pay Now" (tetap sama) --}}
+                    @if ($transaction['Status'] === 'draft')
+                        <button class="btn btn-primary pay-now-btn" data-bs-toggle="modal"
+                            data-bs-target="#paymentModal" data-transaction-id="{{ $transaction['ID'] }}"
+                            data-total-amount="{{ number_format($transaction['TotalAmount'] ?? 0) }}"
+                            data-payment-method="{{ $transaction['PaymentMethod'] ?? 'Bank Transfer' }}">
+                            Pay Now
+                        </button>
+                    @endif
+                    @if ($transaction['Status'] !== 'cancelled')
+                        <button class="btn btn-secondary shipping-address-btn" data-bs-toggle="modal"
+                            data-bs-target="#shippingAddressModal" data-transaction-id="{{ $transaction['ID'] }}"
+                            data-recipient-name="{{ $transaction['ShippingAddress']['Name'] ?? 'N/A' }}"
+                            data-phone-number="{{ $transaction['ShippingAddress']['PhoneNumber'] ?? 'N/A' }}"
+                            data-address="{{ $transaction['ShippingAddress']['Address'] ?? 'N/A' }}"
+                            data-zip-code="{{ $transaction['ShippingAddress']['ZipCode'] ?? 'N/A' }}"
+                            data-destination-label="{{ $transaction['ShippingAddress']['DestinationLabel'] ?? 'N/A' }}"
+                            data-courier="{{ $transaction['ShippingAddress']['Courir'] ?? 'N/A' }}"
+                            data-status="{{ $transaction['Status'] ?? 'N/A' }}">
+                            Shipping Address
+                        </button>
+                    @endif
                 </div>
             </div>
         </div>
-    </div>
-@empty
-@endforelse
-
-<!-- Modal for Viewing Large Image -->
-<div class="modal fade" id="imageModal" tabindex="-1" aria-labelledby="imageModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="imageModalLabel">Payment Proof Image</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body text-center">
-                <img id="largeImage" class="img-fluid" src="" alt="Large Payment Proof Image">
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-            </div>
+    @empty
+        <div class="alert alert-secondary text-center" role="alert">
+            No orders available.
         </div>
-    </div>
+    @endforelse
 </div>
 
-<script>
-    function loadTransactionData(button) {
-        // Ambil data transaksi dari atribut data
-        let transaction = JSON.parse(button.getAttribute('data-transaction'));
-        let iteration = button.getAttribute('data-bs-target').replace('#detailModal', '');
-
-        // Populate the transaction details in modal
-        document.getElementById('transactionID' + iteration).textContent = transaction.ID;
-        document.getElementById('paymentMethod' + iteration).textContent = transaction.PaymentMethod || '-';
-        document.getElementById('totalAmount' + iteration).textContent = transaction.TotalAmount ? transaction
-            .TotalAmount.toLocaleString() : '0';
-        document.getElementById('status' + iteration).textContent = transaction.Status ? transaction.Status.charAt(0)
-            .toUpperCase() + transaction.Status.slice(1) : '-';
-
-        // Populate the products in the table
-        let productDetailsHTML = '';
-        if (transaction.TransactionDetails && transaction.TransactionDetails.length > 0) {
-            transaction.TransactionDetails.forEach(detail => {
-                productDetailsHTML += `
-                    <tr>
-                        <td>${detail.Product.Name || '-'}</td>
-                        <td>Rp. ${detail.Product.Price && detail.Quantity ? (detail.Product.Price * detail.Quantity).toLocaleString() : '0'}</td>
-                        <td>${detail.Size || '-'}</td>
-                        <td>${detail.Quantity || '-'}</td>
-                    </tr>
-                `;
-            });
-        } else {
-            productDetailsHTML = '<tr><td colspan="3">No products available.</td></tr>';
-        }
-        document.getElementById('productDetails' + iteration).innerHTML = productDetailsHTML;
-
-        // Populate the shipping address info
-        document.getElementById('shippingName' + iteration).textContent = transaction.ShippingAddress.Name || '-';
-        document.getElementById('shippingPhone' + iteration).textContent = transaction.ShippingAddress.PhoneNumber ||
-            '-';
-        document.getElementById('shippingAddress' + iteration).textContent = transaction.ShippingAddress.Address || '-';
-        document.getElementById('shippingCourir' + iteration).textContent = transaction.ShippingAddress.Courir || '-';
-        document.getElementById('shippingDestination' + iteration).textContent =
-            (transaction.ShippingAddress.DestinationLabel || '') +
-            (transaction.ShippingAddress.ZipCode ? ' - ' + transaction.ShippingAddress.ZipCode : '') || '-';
-
-        document.getElementById('shippingCost' + iteration).textContent = transaction.ShippingAddress.ShippingCost ?
-            transaction.ShippingAddress.ShippingCost.toLocaleString() : '0';
-
-        // Populate the payment proof image
-        let baseUrl = "{{ url(config('app.back_end_base_url')) }}"
-        let paymentProofImage = transaction.PaymentProof ? baseUrl + `/api${transaction.PaymentProof}` : '';
-        document.getElementById('paymentProofImage' + iteration).src = paymentProofImage;
-    }
-
-    function openImageModal(imageElement) {
-        // Ambil URL gambar dari elemen yang diklik
-        let imageUrl = imageElement.src;
-
-        // Set gambar ke dalam modal
-        document.getElementById('largeImage').src = imageUrl;
-
-        // Tampilkan modal untuk gambar besar
-        new bootstrap.Modal(document.getElementById('imageModal')).show();
-    }
-</script>
+@include('components.detailOrderModal')

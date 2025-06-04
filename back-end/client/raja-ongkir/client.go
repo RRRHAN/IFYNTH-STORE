@@ -46,7 +46,7 @@ func (c *client) SearchDestination(keyword string) (*DefaultResponse[[]Destinati
 }
 
 func (c *client) GetShippingCost(input GetShippingCostReq) (*DefaultResponse[[]ShippingCost], error) {
-	var res DefaultResponse[[]ShippingCost]
+	var tempRes DefaultResponse[ShippingCostResponse]
 	_, err := c.resty.R().
 		SetQueryParams(map[string]string{
 			"shipper_destination_id":  "30711",
@@ -55,12 +55,15 @@ func (c *client) GetShippingCost(input GetShippingCostReq) (*DefaultResponse[[]S
 			"item_value":              input.ItemValue,
 			"cod":                     "no",
 		}).
-		SetResult(&res).
+		SetResult(&tempRes).
 		Get("/calculate")
 
 	if err != nil {
 		return nil, err
 	}
 
-	return &res, nil
+	all := append(tempRes.Data.CalculateReguler, tempRes.Data.CalculateCargo...)
+	all = append(all, tempRes.Data.CalculateInstant...)
+
+	return &DefaultResponse[[]ShippingCost]{Data: all}, nil
 }

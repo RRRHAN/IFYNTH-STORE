@@ -32,7 +32,7 @@ func (s *service) GetAdderess(ctx context.Context) (res []CustomerAddress, err e
 		return nil, err
 	}
 
-	err = s.db.Where("user_id = ?", token.Claims.UserID).Find(&res).Error
+	err = s.db.Where("customer_id = ?", token.Claims.UserID).Find(&res).Error
 	if err != nil {
 		return nil, err
 	}
@@ -48,8 +48,10 @@ func (s *service) InsertAddress(ctx context.Context, input AddressReq) (res *Cus
 	}
 
 	res = &CustomerAddress{
-		UserID:           token.Claims.UserID,
+		CustomerID:       token.Claims.UserID,
 		DestinationID:    input.DestinationID,
+		RecipientsName:   input.RecipientsName,
+		RecipientsNumber: input.RecipientsNumber,
 		Address:          input.Address,
 		ZipCode:          input.ZipCode,
 		DestinationLabel: input.DestinationLabel,
@@ -64,12 +66,15 @@ func (s *service) InsertAddress(ctx context.Context, input AddressReq) (res *Cus
 }
 
 func (s *service) UpdateAddress(ctx context.Context, addressId uuid.UUID, input AddressReq) (res *CustomerAddress, err error) {
+	res = &CustomerAddress{}
 	err = s.db.First(res, addressId).Error
 	if err != nil {
 		return nil, err
 	}
 
 	res.DestinationID = input.DestinationID
+	res.RecipientsName = input.RecipientsName
+	res.RecipientsNumber = input.RecipientsNumber
 	res.Address = input.Address
 	res.ZipCode = input.ZipCode
 	res.DestinationLabel = input.DestinationLabel

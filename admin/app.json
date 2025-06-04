@@ -13,7 +13,7 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/images/logo.png",
+        "foregroundImage": "./assets/images/icon-store.png",
         "backgroundColor": "#151718"
       },
       "package": "com.devanadindra.admin"
@@ -50,7 +50,6 @@
       "eas": {
         "projectId": "75d851ad-6ea7-4c80-a5fb-63f468da01f8"
       }
-    },
-    "output": "export"
+    }
   }
 }

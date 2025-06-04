@@ -2252,7 +2252,6 @@ input {
     height: 50px;
 }
 
-
 .top__header .top__wrapper .account__wrap .cart .cart__icon {
     width: 51px;
     height: 48px;
@@ -4512,3 +4511,494 @@ input {
     height: 25px;
     border-radius: 50%;
 }
+.address-card {
+    border: 1px solid #dee2e6;
+    border-radius: 0.375rem;
+    margin-bottom: 1rem;
+}
+
+.address-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+    border-bottom: 1px solid #dee2e6;
+    background-color: #f8f9fa;
+    /* Light grey background for header */
+}
+
+.address-body {
+    padding: 1rem;
+}
+
+.address-info {
+    margin-bottom: 0.5rem;
+}
+
+.address-actions {
+    display: flex;
+    gap: 0.5rem;
+    /* Space between buttons */
+}
+
+.badge-primary-outline {
+    color: #0d6efd;
+    border: 1px solid #0d6efd;
+    background-color: transparent;
+    padding: 0.35em 0.65em;
+    border-radius: 0.375rem;
+    font-size: 0.75em;
+    font-weight: 700;
+    vertical-align: middle;
+}
+
+.address-item {
+    border: 1px solid #e9ecef;
+    border-radius: 0.25rem;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    background-color: #fff;
+}
+
+.address-item-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+}
+
+.address-item-details {
+    font-size: 0.9rem;
+    color: #6c757d;
+}
+
+.address-item-actions {
+    display: flex;
+    gap: 0.75rem;
+    font-size: 0.9rem;
+}
+
+.address-item-actions a {
+    text-decoration: none;
+    color: #0d6efd;
+}
+
+.address-item-actions a:hover {
+    text-decoration: underline;
+}
+
+.main-address-tag {
+    display: inline-block;
+    padding: 0.25em 0.6em;
+    font-size: 0.75em;
+    font-weight: 700;
+    line-height: 1;
+    color: #0d6efd;
+    background-color: #e0f2fe;
+    /* Light blue background */
+    border-radius: 0.25rem;
+    margin-top: 0.5rem;
+}
+
+/* Order Data */
+/* Custom Styles to match the image */
+.order-card {
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    margin-bottom: 1.5rem;
+    background-color: #fff;
+}
+
+.order-header {
+    padding: 1rem 1.25rem;
+    border-bottom: 1px solid #eee;
+    background-color: #fcfcfc;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    /* Allow items to wrap on smaller screens */
+}
+
+.order-shop-info {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+.shop-name {
+    font-weight: 600;
+    color: #333;
+}
+
+.order-body {
+    padding: 1rem 1.25rem;
+    /* --- INI PENTING UNTUK JARAK VERTIKAL ANTAR PRODUK --- */
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    /* -------------------------------------------------- */
+}
+
+.product-item-order {
+    display: flex;
+    flex-direction: row; /* <-- PASTIKAN INI atau biarkan default (row) */
+    gap: 1rem; /* Jarak HORIZONTAL antar gambar, detail, dan harga */
+    align-items: flex-start;
+    overflow: hidden;
+}
+
+/* Hapus juga ini jika sudah pakai gap di .order-body */
+/* .product-item:last-child {
+    margin-bottom: 0;
+} */
+
+.hidden-product-item-order {
+    display: none;
+}
+
+.product-img-wrapper {
+    flex-shrink: 0; /* <-- TAMBAHKAN INI */
+    width: 80px;
+    height: 80px;
+    border: 1px solid #eee;
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.product-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.product-details-order {
+    flex-grow: 1;
+    /* --- INI PENTING UNTUK LAYOUT VERTIKAL NAMA, VARIASI, QTY --- */
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    /* ----------------------------------------------------------- */
+}
+
+.product-name {
+    font-size: 1rem;
+    font-weight: 500;
+    /* Hapus margin-bottom jika .product-details pakai gap */
+    /* margin-bottom: 0.25rem; */
+    color: #333;
+}
+
+.product-variation {
+    font-size: 0.85rem;
+    color: #6c757d;
+    /* Hapus margin-bottom jika .product-details pakai gap */
+    /* margin-bottom: 0.25rem; */
+}
+
+.product-quantity {
+    font-size: 0.85rem;
+    color: #6c757d;
+}
+
+.product-price-info {
+    text-align: right;
+    min-width: 120px;
+    flex-shrink: 0; /* <-- TAMBAHKAN INI */
+    margin-left: auto; /* <-- TAMBAHKAN INI */
+}
+
+.original-price {
+    font-size: 0.85rem;
+    color: #999;
+    text-decoration: line-through;
+}
+
+.final-price {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--black);
+    /* Red for discounted price */
+}
+
+.order-footer {
+    padding: 1rem 1.25rem;
+    border-top: 1px solid #eee;
+    background-color: #fcfcfc;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+}
+
+.total-order-section {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.total-order-label {
+    font-size: 1rem;
+    margin-right: 1rem;
+    color: #333;
+}
+
+.total-order-amount {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--black);
+    /* Red for total price */
+}
+
+.order-actions {
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+}
+
+.order-actions .btn {
+    font-size: 0.9rem;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+}
+
+.btn-buy-again {
+    background-color: var(--black);
+    color: #fff;
+    border-color: var(--black);
+}
+
+.btn-buy-again:hover {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+    color: #fff;
+}
+
+.seller-review-status {
+    font-size: 0.85rem;
+    color: #6c757d;
+    margin-bottom: 1rem;
+    text-align: right;
+}
+
+/* Star+ Badge */
+.star-badge {
+    background-color: #f9d8d8;
+    /* Light red */
+    color: #e63946;
+    /* Darker red */
+    font-weight: 600;
+    padding: 0.25em 0.5em;
+    border-radius: 4px;
+    font-size: 0.8rem;
+}
+
+/* KONTEN BARU: Container untuk gambar dan detail */
+.product-main-info {
+    display: flex; /* Default: gambar dan detail sejajar (row) */
+    flex-direction: row;
+    gap: 1rem;
+    align-items: flex-start;
+    flex-grow: 1; /* Biarkan tumbuh untuk mengisi ruang */
+}
+
+/* Responsive adjustments */
+@media (max-width: 767.98px) {
+    .product-item-order {
+        display: grid;
+        grid-template-areas:
+            "img-area price-area"
+            "details-area details-area";
+        grid-template-columns: 80px 1fr;
+        grid-template-rows: auto auto;
+        gap: 0.5rem 1rem;
+        align-items: flex-start;
+    }
+
+    .product-img-wrapper {
+        grid-area: img-area; /* Tetapkan ke area 'img-area' */
+        width: 80px; /* Pertahankan ukurannya */
+        height: 80px;
+    }
+
+    .product-details-order {
+        grid-area: details-area;
+        flex-direction: column;
+        margin-top: 0;
+    }
+
+    .product-price-info {
+        grid-area: price-area;
+        text-align: right;
+        min-width: unset;
+        align-self: start;
+    }
+    .order-actions {
+        justify-content: flex-start;
+        width: 100%;
+    }
+}
+
+/* End Order Data */
+
+/* shipping address modal */
+/* Basic timeline styling to match the screenshot */
+.timeline-container {
+    position: relative;
+    padding-left: 20px;
+    /* Space for the line and dots */
+}
+
+.timeline-container::before {
+    content: "";
+    position: absolute;
+    left: 8px;
+    /* Position the line */
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background-color: #e0e0e0;
+}
+
+.timeline-item {
+    position: relative;
+    margin-bottom: 15px;
+    padding-left: 15px;
+}
+
+.timeline-item::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 5px;
+    /* Adjust vertical position of the dot */
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background-color: #e0e0e0;
+    /* Default dot color */
+    border: 2px solid #fff;
+    /* White border for dot */
+}
+
+.timeline-item.active-status::before {
+    background-color: #28a745;
+    /* Green for active/delivered status */
+}
+
+.timeline-item .status-time {
+    font-size: 0.85em;
+    color: #6c757d;
+}
+
+.timeline-item .status-text {
+    font-weight: 500;
+    color: #333;
+}
+
+/* Container Utama Timeline */
+.order-tracking-section {
+    padding: 20px;
+}
+
+.progress-bar-container {
+    position: relative;
+    padding-left: 50px; /* Sesuaikan padding untuk ruang garis dan ikon */
+    /* Hapus aturan ::before global untuk garis di sini, jika ada */
+}
+
+/* Setiap Langkah dalam Timeline */
+.progress-step {
+    display: flex; /* Menggunakan Flexbox untuk tata letak horizontal */
+    align-items: center; /* Pusatkan item secara vertikal */
+    margin-bottom: 25px; /* Jarak antar langkah */
+    position: relative; /* Penting untuk positioning pseudo-element dan ikon */
+    z-index: 2; /* Pastikan langkah di atas garis */
+    color: #888; /* Warna teks default (tidak aktif) */
+    font-weight: normal;
+    transition: all 0.3s ease; /* Transisi halus */
+}
+
+/* GARIS TIMELINE (SEGMEN ANTAR ICON) */
+.progress-step::after {
+    content: "";
+    position: absolute;
+    left: 15px; /* Posisi horizontal garis agar pas di tengah ikon (5px (posisi ikon) + 10px (setengah lebar ikon)) */
+    top: 30px; /* Mulai dari bawah lingkaran ikon (tinggi ikon 30px) */
+    bottom: -25px; /* Perpanjangan garis ke bawah, menghubungkan ke langkah berikutnya */
+    width: 2px; /* Ketebalan garis */
+    background-color: #444; /* Warna garis default (tidak aktif) */
+    z-index: 1; /* Pastikan garis di belakang ikon */
+    transition: background-color 0.3s ease;
+}
+
+/* Sembunyikan garis setelah langkah terakhir */
+.progress-bar-container .progress-step:last-child::after {
+    display: none;
+}
+
+/* ICON (LINGKARAN PADA GARIS TIMELINE) */
+.progress-step .step-icon {
+    width: 30px;
+    height: 30px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #333;
+    border-radius: 50%;
+    border: 2px solid #555;
+    color: #ccc;
+    font-size: 1.2em;
+    flex-shrink: 0;
+    z-index: 3; /* Pastikan ikon di atas garis */
+    margin-right: 15px; /* Jarak antara ikon dan teks */
+    /* Posisi ikon secara absolut agar tepat di tengah garis vertikal */
+    position: absolute;
+    left: 0px; /* Sesuaikan ini: 0px akan membuat ikon mulai di padding-left container (50px).
+                  Untuk centering, mungkin perlu offset negatif agar pas di garis 15px.
+                  Jika garis di 15px, dan ikon 30px, maka ikon harus dimulai dari 15px - 15px = 0px. */
+    top: 50%; /* Pusatkan ikon secara vertikal relatif terhadap .progress-step */
+    transform: translateY(
+        -50%
+    ); /* Penyesuaian untuk centering vertikal sempurna */
+
+    transition: background-color 0.3s ease, border-color 0.3s ease,
+        color 0.3s ease;
+}
+
+/* KONTEN TEKS (LABEL DAN WAKTU) */
+/* Karena step-icon sekarang absolute, teks tidak akan terdorong oleh margin-right ikon.
+   Kita perlu memberikan margin-left pada kontainer teks (atau pada .step-label itu sendiri)
+   untuk memberikan jarak dari garis dan ikon. */
+.progress-step .step-label {
+    flex-grow: 1;
+    font-size: 1em;
+    /* Tambahkan margin kiri agar teks tidak menempel ke ikon/garis */
+    margin-left: 45px; /* Lebar ikon (30px) + jarak yang diinginkan (15px) */
+}
+
+.progress-step .step-time {
+    font-size: 0.85em;
+    margin-left: 10px;
+    white-space: nowrap;
+    color: #aaa;
+}
+
+/* Styling untuk STATUS AKTIF */
+.progress-step.active {
+    color: #ffffff;
+    font-weight: bold;
+}
+
+.progress-step.active .step-icon {
+    background-color: #007bff;
+    border-color: #007bff;
+    color: #ffffff;
+}
+
+/* Warna GARIS PUTIH ANTAR ICON AKTIF */
+/* Ketika suatu langkah aktif, garis di bawahnya akan menjadi putih */
+.progress-step.active::after {
+    background-color: #ffffff; /* Garis putih untuk segmen aktif */
+}
+
+/* end shipping address modal */

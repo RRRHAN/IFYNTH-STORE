@@ -1,5 +1,5 @@
 import { BASE_URL, getAuthToken } from "./constants";
-import { DepartentCount, TotalTransactionUser, TransactionCount, TransactionReport } from "../types/home";
+import { DepartentCount, ProfitProduct, TotalTransactionUser, TransactionCount, TransactionReport } from "../types/home";
 
 export const fetchProductCount = async (): Promise<DepartentCount[]> => {
   const token = await getAuthToken();
@@ -94,6 +94,24 @@ export const fetchTotalIncome = async (): Promise<number> => {
 export const fetchTotalTransactionUser = async (): Promise<TotalTransactionUser[]> => {
   const token = await getAuthToken();
   const getAllUrl = `${BASE_URL}/api/transaction/totalTransactionUser`;
+
+  const response = await fetch(getAllUrl, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  if (!response.ok) {
+    throw new Error(`HTTP error! status: ${response.status}`);
+  }
+
+  const result = await response.json();
+  return result.data;
+};
+
+export const fetchProductProfit = async (): Promise<ProfitProduct[]> => {
+  const token = await getAuthToken();
+  const getAllUrl = `${BASE_URL}/api/product/productProfit`;
 
   const response = await fetch(getAllUrl, {
     headers: {

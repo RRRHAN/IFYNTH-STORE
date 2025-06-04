@@ -3,7 +3,6 @@ package user
 import (
 	"time"
 
-	"github.com/RRRHAN/IFYNTH-STORE/back-end/domains/address"
 	"github.com/google/uuid"
 )
 
@@ -22,8 +21,8 @@ type Admin struct {
 	Username    string `gorm:"unique"`
 	Password    string
 	PhoneNumber string
-	CreatedAt   time.Time
-	UpdatedAt   time.Time
+	CreatedAt   time.Time `gorm:"autoCreateTime"`
+	UpdatedAt   time.Time `gorm:"autoUpdateTime"`
 }
 
 func (Admin) TableName() string {
@@ -37,11 +36,21 @@ type Customer struct {
 	Username    string `gorm:"unique"`
 	Password    string
 	Email       string
-	Address     []address.CustomerAddress `gorm:"foreignKey:UserID"`
-	CreatedAt   time.Time
-	UpdatedAt   time.Time
+	CreatedAt   time.Time `gorm:"autoCreateTime"`
+	UpdatedAt   time.Time `gorm:"autoUpdateTime"`
 }
 
 func (Customer) TableName() string {
 	return "customer"
+}
+
+type AdminActivity struct {
+	ID          uuid.UUID `gorm:"type:uuid;default:gen_random_uuid();primaryKey"`
+	AdminID     uuid.UUID
+	Description string
+	CreatedAt   time.Time `gorm:"autoCreateTime"`
+}
+
+func (AdminActivity) TableName() string {
+	return "admin_activity"
 }

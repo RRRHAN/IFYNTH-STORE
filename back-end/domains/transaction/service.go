@@ -3,16 +3,22 @@ package transaction
 import (
 	"context"
 	"fmt"
+	"math"
 	"net/http"
 	"os"
 	"path/filepath"
+	"strconv"
 	"time"
 
 	"github.com/google/uuid"
 	"gorm.io/gorm"
 
+	rajaongkir "github.com/RRRHAN/IFYNTH-STORE/back-end/client/raja-ongkir"
+	"github.com/RRRHAN/IFYNTH-STORE/back-end/domains/address"
 	"github.com/RRRHAN/IFYNTH-STORE/back-end/domains/cart"
+	"github.com/RRRHAN/IFYNTH-STORE/back-end/domains/ongkir"
 	"github.com/RRRHAN/IFYNTH-STORE/back-end/domains/product"
+	"github.com/RRRHAN/IFYNTH-STORE/back-end/domains/user"
 	apierror "github.com/RRRHAN/IFYNTH-STORE/back-end/utils/api-error"
 	"github.com/RRRHAN/IFYNTH-STORE/back-end/utils/config"
 	contextUtil "github.com/RRRHAN/IFYNTH-STORE/back-end/utils/context"
@@ -32,14 +38,16 @@ type Service interface {
 }
 
 type service struct {
-	authConfig config.Auth
-	db         *gorm.DB
+	authConfig    config.Auth
+	db            *gorm.DB
+	ongkirService ongkir.Service
 }
 
-func NewService(config *config.Config, db *gorm.DB) Service {
+func NewService(config *config.Config, db *gorm.DB, rajaOngkirClient rajaongkir.Client) Service {
 	return &service{
-		authConfig: config.Auth,
-		db:         db,
+		authConfig:    config.Auth,
+		db:            db,
+		ongkirService: ongkir.NewService(rajaOngkirClient, db),
 	}
 }
 
@@ -71,6 +79,9 @@ func (s *service) GetTransactionsByUserID(ctx context.Context) ([]Transaction, e
 		Preload("TransactionDetails.Product", func(db *gorm.DB) *gorm.DB {
 			return db.Select("id", "name", "price")
 		}).
+		Preload("TransactionDetails.Product.ProductImages", func(db *gorm.DB) *gorm.DB {
+			return db.Select("id", "product_id", "url").Order("id ASC")
+		}).
 		Where("user_id = ?", token.Claims.UserID).
 		Find(&transactions)
 
@@ -99,15 +110,37 @@ func (s *service) AddTransaction(ctx context.Context, req AddTransactionRequest)
 		return fmt.Errorf("no items in cart: %w", err)
 	}
 
+	var customerAddress address.CustomerAddress
+	if err := s.db.First(&customerAddress, "id = ?", req.CustomerAddressID).Error; err != nil {
+		return fmt.Errorf("failed to fetch customer address data: %w", err)
+	}
+
+	costs, err := s.ongkirService.GetShippingCost(context.Background(), ongkir.GetShippingCostReq{
+		AddressId: customerAddress.ID,
+		Weight:    strconv.Itoa(int(math.Ceil(user_cart.TotalWeight / 1000))),
+		ItemValue: strconv.Itoa(int(math.Ceil(user_cart.TotalPrice))),
+	})
+
+	if err != nil {
+		return err
+	}
+
+	if req.CourierIndex < 0 || req.CourierIndex >= len(costs) {
+		return fmt.Errorf("invalid courier index: %d, available options: %d", req.CourierIndex, len(costs))
+	}
+
+	selected := costs[req.CourierIndex]
+
 	tx := s.db.WithContext(ctx).Begin()
 
 	transaction := Transaction{
 		ID:            uuid.New(),
 		UserID:        user_cart.UserID,
-		TotalAmount:   user_cart.TotalPrice + req.ShippingCost,
-		PaymentMethod: req.PaymentMethod,
+		TotalAmount:   user_cart.TotalPrice + float64(selected.ShippingCost),
+		PaymentMethod: "bank transfer",
 		PaymentProof:  "",
 		Status:        "draft",
+		LastHandleBy:  nil,
 		CreatedAt:     time.Now(),
 		UpdatedAt:     time.Now(),
 	}
@@ -137,13 +170,13 @@ func (s *service) AddTransaction(ctx context.Context, req AddTransactionRequest)
 	shipping := ShippingAddress{
 		ID:               uuid.New(),
 		TransactionID:    transaction.ID,
-		Name:             req.Name,
-		PhoneNumber:      req.PhoneNumber,
-		Address:          req.Address,
-		ZipCode:          req.ZipCode,
-		DestinationLabel: req.DestinationLabel,
-		Courir:           req.Courir,
-		ShippingCost:     req.ShippingCost,
+		Name:             customerAddress.RecipientsName,
+		PhoneNumber:      customerAddress.RecipientsNumber,
+		Address:          customerAddress.Address,
+		ZipCode:          customerAddress.ZipCode,
+		DestinationLabel: customerAddress.DestinationLabel,
+		Courir:           selected.ShippingName + "-" + selected.ServiceName,
+		ShippingCost:     float64(selected.ShippingCost),
 		CreatedAt:        time.Now(),
 		UpdatedAt:        time.Now(),
 	}
@@ -167,36 +200,61 @@ func (s *service) AddTransaction(ctx context.Context, req AddTransactionRequest)
 }
 
 func (s *service) UpdateStatus(ctx context.Context, req UpdateStatusRequest) error {
-	var transaction Transaction
-
-	if err := s.db.WithContext(ctx).First(&transaction, "id = ?", req.TransactionID).Error; err != nil {
-		return fmt.Errorf("transaction not found: %v", err)
+	token, err := contextUtil.GetTokenClaims(ctx)
+	if err != nil {
+		return err
 	}
+	userID := token.Claims.UserID
 
-	if req.NewStatus == "paid" {
-		var details []TransactionDetails
-		if err := s.db.WithContext(ctx).
-			Where("transaction_id = ?", transaction.ID).
-			Find(&details).Error; err != nil {
-			return fmt.Errorf("failed to fetch transaction details: %w", err)
+	return s.db.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
+		var transaction Transaction
+
+		if err := tx.First(&transaction, "id = ?", req.TransactionID).Error; err != nil {
+			return fmt.Errorf("transaction not found: %v", err)
 		}
 
-		for _, detail := range details {
-			err := s.db.WithContext(ctx).Model(&product.ProductStockDetail{}).
-				Where("product_id = ? AND size = ?", detail.ProductID, detail.Size).
-				UpdateColumn("stock", gorm.Expr("stock - ?", detail.Quantity)).Error
-			if err != nil {
-				return fmt.Errorf("failed to update stock: %w", err)
+		// Jika status baru "paid", update stock
+		if req.NewStatus == "paid" {
+			var details []TransactionDetails
+			if err := tx.Where("transaction_id = ?", transaction.ID).Find(&details).Error; err != nil {
+				return fmt.Errorf("failed to fetch transaction details: %w", err)
+			}
+
+			for _, detail := range details {
+				if err := tx.Model(&product.ProductStockDetail{}).
+					Where("product_id = ? AND size = ?", detail.ProductID, detail.Size).
+					UpdateColumn("stock", gorm.Expr("stock - ?", detail.Quantity)).Error; err != nil {
+					return fmt.Errorf("failed to update stock: %w", err)
+				}
 			}
 		}
-	}
 
-	transaction.Status = req.NewStatus
-	if err := s.db.WithContext(ctx).Save(&transaction).Error; err != nil {
-		return fmt.Errorf("failed to update transaction status: %v", err)
-	}
+		// Buat activity log
+		activity := user.AdminActivity{
+			ID:      uuid.New(),
+			AdminID: userID,
+			Description: fmt.Sprintf(
+				"update status of transaction_id %s from %s to %s",
+				transaction.ID.String(),
+				transaction.Status,
+				req.NewStatus,
+			),
+			CreatedAt: time.Now(),
+		}
 
-	return nil
+		if err := tx.Create(&activity).Error; err != nil {
+			return fmt.Errorf("failed to create admin activity: %w", err)
+		}
+
+		// Update transaksi
+		transaction.LastHandleBy = &userID
+		transaction.Status = req.NewStatus
+		if err := tx.Save(&transaction).Error; err != nil {
+			return fmt.Errorf("failed to update transaction status: %v", err)
+		}
+
+		return nil
+	})
 }
 
 func (s *service) GetTransactionCountByStatus(ctx context.Context) ([]StatusCount, error) {
@@ -294,8 +352,8 @@ func (s *service) PayTransaction(ctx context.Context, input PayTransactionReq) e
 		return err
 	}
 
-	var transaction *Transaction
-	err = s.db.First(transaction, input.TransactionId).Error
+	transaction := &Transaction{}
+	err = s.db.First(transaction, "id = ?", input.TransactionId).Error
 	if err != nil {
 		return err
 	}

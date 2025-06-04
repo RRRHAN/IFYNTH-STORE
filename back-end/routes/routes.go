@@ -68,6 +68,7 @@ func NewDependency(
 		user.PATCH("/updateCustomer", mw.JWT(constants.CUSTOMER), userHandler.UpdateProfile)
 		user.PATCH("/password", mw.JWT(constants.ADMIN, constants.CUSTOMER), userHandler.ChangePassword)
 		user.GET("/get-personal", mw.JWT(constants.ADMIN, constants.CUSTOMER), userHandler.GetPersonal)
+		user.GET("/adminLog", mw.JWT(constants.ADMIN), userHandler.GetAdminActivity)
 		user.GET("/check-jwt", mw.JWT(constants.ADMIN, constants.CUSTOMER), func(ctx *gin.Context) {
 			respond.Success(ctx, http.StatusOK, "JWT is valid")
 		})
@@ -82,6 +83,7 @@ func NewDependency(
 		product.PUT("/update/:id", mw.JWT(constants.ADMIN), productHandler.UpdateProduct)
 		product.GET("/count", mw.JWT(constants.ADMIN), productHandler.GetProductCountByDepartment)
 		product.GET("/totalCapital", mw.JWT(constants.ADMIN), productHandler.GetTotalCapital)
+		product.GET("/productProfit", mw.JWT(constants.ADMIN), productHandler.GetProductProfit)
 	}
 
 	cart := api.Group("/cart")
@@ -121,7 +123,7 @@ func NewDependency(
 		transaction.GET("/report", mw.JWT(constants.ADMIN), transactionHandler.GetTotalAmountByDate)
 		transaction.GET("/totalIncome", mw.JWT(constants.ADMIN), transactionHandler.GetTotalIncome)
 		transaction.GET("/totalTransactionUser", mw.JWT(constants.ADMIN), transactionHandler.GetTotalTransactionByCustomer)
-		transaction.POST("/pay", mw.JWT(constants.ADMIN), transactionHandler.PayTransaction)
+		transaction.POST("/pay", mw.JWT(constants.CUSTOMER), transactionHandler.PayTransaction)
 	}
 
 	address := api.Group("/address")

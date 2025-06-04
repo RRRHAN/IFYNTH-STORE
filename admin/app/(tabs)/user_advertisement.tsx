@@ -8,6 +8,7 @@ import {
   Modal,
   Platform,
   TouchableOpacity,
+  ScrollView,
 } from "react-native";
 import { IconButton } from "react-native-paper";
 import { useRouter } from "expo-router";
@@ -29,6 +30,7 @@ import { generateVideoThumbnailJS } from "@/hooks/helpers/ThumbnailProcessor";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import * as VideoThumbnails from "expo-video-thumbnails";
 import StatusOfferIOS from "@/components/StatusOfferIOS";
+import { FontAwesome } from "@expo/vector-icons";
 
 const UserAdvertisementScreen = () => {
   const colorScheme = useColorScheme();
@@ -70,7 +72,7 @@ const UserAdvertisementScreen = () => {
 
   // Pagination states
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 10; // Maximum 10 data per slide
+  const itemsPerPage = screenWidth > 1000 ? 8 : 4;
   const totalPages = Math.ceil(offers.length / itemsPerPage);
 
   const getData = async () => {
@@ -87,7 +89,7 @@ const UserAdvertisementScreen = () => {
     } finally {
       setTimeout(() => {
         setLoading(false);
-      }, 1000);
+      }, 500);
     }
   };
 
@@ -123,7 +125,6 @@ const UserAdvertisementScreen = () => {
               }
             } catch (error) {
               console.warn("Failed to generate thumbnail for video", error);
-              // fallback ke fileUrl as image
               setThumbnailUrls((prev) => ({
                 ...prev,
                 [item.ID]: `${BASE_URL}/api${fileUrl}`,
@@ -267,7 +268,9 @@ const UserAdvertisementScreen = () => {
 
         <ThemedCell style={[{ width: columnWidths.action }]}>
           <IconButton
-            icon="eye"
+            icon={({ color, size }) => (
+              <FontAwesome name="eye" size={size} color={color} />
+            )}
             size={20}
             iconColor="#00FFFF"
             onPress={() => {
@@ -276,7 +279,9 @@ const UserAdvertisementScreen = () => {
             }}
           />
           <IconButton
-            icon="message"
+            icon={({ color, size }) => (
+              <FontAwesome name="comment" size={size} color={color} />
+            )}
             size={20}
             iconColor="#4169E1"
             onPress={() => {
@@ -287,145 +292,309 @@ const UserAdvertisementScreen = () => {
               });
             }}
           />
+          {item.UnreadCount > 0 && (
+            <View style={styles.badgeContainer}>
+              <ThemedText style={styles.badgeText}>
+                {item.UnreadCount}
+              </ThemedText>
+            </View>
+          )}
         </ThemedCell>
       </ThemedRow>
     );
   };
 
   return (
-    <ThemedView
-      style={[styles.center, { marginTop: Platform.OS === "web" ? 20 : 80 }]}
-    >
-      <Modal
-        animationType="slide"
-        transparent={true}
-        visible={isProductModalVisible}
-        onRequestClose={() => setIsProductModalVisible(false)}
-      >
-        <View
-          style={{
-            flex: 1,
-            justifyContent: "center",
-            alignItems: "center",
-            backgroundColor: "rgba(0, 0, 0, 0.7)",
+    <>
+      {Platform.OS == "web" ? (
+        <ScrollView
+          contentContainerStyle={{
+            paddingBottom: Platform.OS === "web" ? 100 : 150,
           }}
         >
-          <TouchableOpacity
-            onPress={() => {
-              console.log("Tombol close diklik");
-              setIsProductModalVisible(false);
-            }}
-            style={{
-              position: "absolute",
-              top: Platform.OS === "web" ? 50 : 80,
-              left: 20,
-              backgroundColor: "white",
-              width: 40,
-              height: 40,
-              borderRadius: 20,
-              alignItems: "center",
-              justifyContent: "center",
-              zIndex: 10,
-              elevation: 10,
-            }}
+          <ThemedView
+            style={[
+              styles.center,
+              { marginTop: Platform.OS === "web" ? 20 : 80 },
+            ]}
           >
-            <ThemedText style={{ fontSize: 20, color: "black" }}>✕</ThemedText>
-          </TouchableOpacity>
-
-          <OfferDetailModal product={selectedProduct} />
-        </View>
-      </Modal>
-      <ThemedView style={styles.headerContainer}>
-        <ThemedText style={[styles.title]}>LIST USER ADVERTISEMENT</ThemedText>
-      </ThemedView>
-      <ThemedTable>
-        <ThemedHeader style={[styles.row]}>
-          {!isMobile && (
-            <ThemedHeader style={[{ width: columnWidths.image }]}>
-              <ThemedText
-                type="subtitle"
-                style={[styles.header, { fontSize: fontSizeHeader }]}
+            <Modal
+              animationType="slide"
+              transparent={true}
+              visible={isProductModalVisible}
+              onRequestClose={() => setIsProductModalVisible(false)}
+            >
+              <View
+                style={{
+                  flex: 1,
+                  justifyContent: "center",
+                  alignItems: "center",
+                  backgroundColor: "rgba(0, 0, 0, 0.7)",
+                }}
               >
-                Product Images
-              </ThemedText>
-            </ThemedHeader>
-          )}
-          <ThemedHeader style={[{ width: columnWidths.name }]}>
-            <ThemedText
-              type="subtitle"
-              style={[styles.header, { fontSize: fontSizeHeader }]}
-            >
-              Customer Name
-            </ThemedText>
-          </ThemedHeader>
-          <ThemedHeader style={[{ width: columnWidths.name }]}>
-            <ThemedText
-              type="subtitle"
-              style={[styles.header, { fontSize: fontSizeHeader }]}
-            >
-              Product Name
-            </ThemedText>
-          </ThemedHeader>
-          {!isMobile && (
-            <ThemedHeader style={[{ width: columnWidths.price }]}>
-              <ThemedText
-                type="subtitle"
-                style={[styles.header, { fontSize: fontSizeHeader }]}
-              >
-                Price
-              </ThemedText>
-            </ThemedHeader>
-          )}
-          <ThemedHeader style={[{ width: columnWidths.status }]}>
-            <ThemedText
-              type="subtitle"
-              style={[styles.header, { fontSize: fontSizeHeader }]}
-            >
-              Status
-            </ThemedText>
-          </ThemedHeader>
-          <ThemedHeader style={[{ width: columnWidths.action }]}>
-            <ThemedText
-              type="subtitle"
-              style={[styles.header, { fontSize: fontSizeHeader }]}
-            >
-              Action
-            </ThemedText>
-          </ThemedHeader>
-        </ThemedHeader>
-        <FlatList
-          data={currentOffers} // Use paginated data
-          renderItem={renderItem}
-          keyExtractor={(item) => item.ID}
-          ListEmptyComponent={
-            <ThemedText style={{ textAlign: "center", padding: 20 }}>
-              No advertisements found.
-            </ThemedText>
-          }
-        />
-      </ThemedTable>
+                <TouchableOpacity
+                  onPress={() => {
+                    setIsProductModalVisible(false);
+                  }}
+                  style={{
+                    position: "absolute",
+                    top: Platform.OS === "web" ? 50 : 80,
+                    left: 20,
+                    backgroundColor: "white",
+                    width: 40,
+                    height: 40,
+                    borderRadius: 20,
+                    alignItems: "center",
+                    justifyContent: "center",
+                    zIndex: 10,
+                    elevation: 10,
+                  }}
+                >
+                  {/* Gunakan ikon FontAwesome untuk tombol close modal */}
+                  <FontAwesome name="times" size={24} color="black" />
+                </TouchableOpacity>
 
-      {/* Pagination Controls */}
-      <View style={styles.paginationContainer}>
-        <IconButton
-          icon="chevron-left"
-          size={30}
-          onPress={() => paginate(currentPage - 1)}
-          disabled={currentPage === 1}
-          iconColor={colorScheme === "dark" ? "#ffffff" : "#111827"}
-        />
-        <ThemedText style={styles.paginationText}>
-          Page {currentPage} of {totalPages}
-        </ThemedText>
-        <IconButton
-          icon="chevron-right"
-          size={30}
-          onPress={() => paginate(currentPage + 1)}
-          disabled={currentPage === totalPages}
-          iconColor={colorScheme === "dark" ? "#ffffff" : "#111827"}
-        />
-      </View>
-    </ThemedView>
+                <OfferDetailModal product={selectedProduct} />
+              </View>
+            </Modal>
+            <ThemedView style={styles.headerContainer}>
+              <ThemedText style={[styles.title]}>
+                LIST USER ADVERTISEMENT
+              </ThemedText>
+            </ThemedView>
+            <ThemedTable>
+              <ThemedHeader style={[styles.row]}>
+                {!isMobile && (
+                  <ThemedHeader style={[{ width: columnWidths.image }]}>
+                    <ThemedText
+                      type="subtitle"
+                      style={[styles.header, { fontSize: fontSizeHeader }]}
+                    >
+                      Product Images
+                    </ThemedText>
+                  </ThemedHeader>
+                )}
+                <ThemedHeader style={[{ width: columnWidths.name }]}>
+                  <ThemedText
+                    type="subtitle"
+                    style={[styles.header, { fontSize: fontSizeHeader }]}
+                  >
+                    Customer Name
+                  </ThemedText>
+                </ThemedHeader>
+                <ThemedHeader style={[{ width: columnWidths.name }]}>
+                  <ThemedText
+                    type="subtitle"
+                    style={[styles.header, { fontSize: fontSizeHeader }]}
+                  >
+                    Product Name
+                  </ThemedText>
+                </ThemedHeader>
+                {!isMobile && (
+                  <ThemedHeader style={[{ width: columnWidths.price }]}>
+                    <ThemedText
+                      type="subtitle"
+                      style={[styles.header, { fontSize: fontSizeHeader }]}
+                    >
+                      Price
+                    </ThemedText>
+                  </ThemedHeader>
+                )}
+                <ThemedHeader style={[{ width: columnWidths.status }]}>
+                  <ThemedText
+                    type="subtitle"
+                    style={[styles.header, { fontSize: fontSizeHeader }]}
+                  >
+                    Status
+                  </ThemedText>
+                </ThemedHeader>
+                <ThemedHeader style={[{ width: columnWidths.action }]}>
+                  <ThemedText
+                    type="subtitle"
+                    style={[styles.header, { fontSize: fontSizeHeader }]}
+                  >
+                    Action
+                  </ThemedText>
+                </ThemedHeader>
+              </ThemedHeader>
+              <FlatList
+                data={currentOffers}
+                renderItem={renderItem}
+                keyExtractor={(item) => item.ID}
+                ListEmptyComponent={
+                  <ThemedText style={{ textAlign: "center", padding: 20 }}>
+                    No advertisements found.
+                  </ThemedText>
+                }
+              />
+            </ThemedTable>
+
+            {/* Pagination Controls */}
+            <View style={styles.paginationContainer}>
+              <IconButton
+                icon={({ color, size }) => (
+                  <FontAwesome name="chevron-left" size={size} color={color} />
+                )}
+                size={20}
+                onPress={() => paginate(currentPage - 1)}
+                disabled={currentPage === 1}
+                iconColor={colorScheme === "dark" ? "#ffffff" : "#111827"}
+              />
+              <ThemedText style={styles.paginationText}>
+                Page {currentPage} of {totalPages}
+              </ThemedText>
+              <IconButton
+                icon={({ color, size }) => (
+                  <FontAwesome name="chevron-right" size={size} color={color} />
+                )}
+                size={20}
+                onPress={() => paginate(currentPage + 1)}
+                disabled={currentPage === totalPages}
+                iconColor={colorScheme === "dark" ? "#ffffff" : "#111827"}
+              />
+            </View>
+          </ThemedView>
+        </ScrollView>
+      ) : (
+        <ThemedView style={[styles.center, { marginTop: 80 }]}>
+          <Modal
+            animationType="slide"
+            transparent={true}
+            visible={isProductModalVisible}
+            onRequestClose={() => setIsProductModalVisible(false)}
+          >
+            <View
+              style={{
+                flex: 1,
+                justifyContent: "center",
+                alignItems: "center",
+                backgroundColor: "rgba(0, 0, 0, 0.7)",
+              }}
+            >
+              <TouchableOpacity
+                onPress={() => {
+                  setIsProductModalVisible(false);
+                }}
+                style={{
+                  position: "absolute",
+                  top: 80,
+                  left: 20,
+                  backgroundColor: "white",
+                  width: 40,
+                  height: 40,
+                  borderRadius: 20,
+                  alignItems: "center",
+                  justifyContent: "center",
+                  zIndex: 10,
+                  elevation: 10,
+                }}
+              >
+                {/* Gunakan ikon FontAwesome untuk tombol close modal */}
+                <FontAwesome name="times" size={24} color="black" />
+              </TouchableOpacity>
+
+              <OfferDetailModal product={selectedProduct} />
+            </View>
+          </Modal>
+          <ThemedView style={styles.headerContainer}>
+            <ThemedText style={[styles.title]}>
+              LIST USER ADVERTISEMENT
+            </ThemedText>
+          </ThemedView>
+          <ThemedTable>
+            <ThemedHeader style={[styles.row]}>
+              {!isMobile && (
+                <ThemedHeader style={[{ width: columnWidths.image }]}>
+                  <ThemedText
+                    type="subtitle"
+                    style={[styles.header, { fontSize: fontSizeHeader }]}
+                  >
+                    Product Images
+                  </ThemedText>
+                </ThemedHeader>
+              )}
+              <ThemedHeader style={[{ width: columnWidths.name }]}>
+                <ThemedText
+                  type="subtitle"
+                  style={[styles.header, { fontSize: fontSizeHeader }]}
+                >
+                  Customer Name
+                </ThemedText>
+              </ThemedHeader>
+              <ThemedHeader style={[{ width: columnWidths.name }]}>
+                <ThemedText
+                  type="subtitle"
+                  style={[styles.header, { fontSize: fontSizeHeader }]}
+                >
+                  Product Name
+                </ThemedText>
+              </ThemedHeader>
+              {!isMobile && (
+                <ThemedHeader style={[{ width: columnWidths.price }]}>
+                  <ThemedText
+                    type="subtitle"
+                    style={[styles.header, { fontSize: fontSizeHeader }]}
+                  >
+                    Price
+                  </ThemedText>
+                </ThemedHeader>
+              )}
+              <ThemedHeader style={[{ width: columnWidths.status }]}>
+                <ThemedText
+                  type="subtitle"
+                  style={[styles.header, { fontSize: fontSizeHeader }]}
+                >
+                  Status
+                </ThemedText>
+              </ThemedHeader>
+              <ThemedHeader style={[{ width: columnWidths.action }]}>
+                <ThemedText
+                  type="subtitle"
+                  style={[styles.header, { fontSize: fontSizeHeader }]}
+                >
+                  Action
+                </ThemedText>
+              </ThemedHeader>
+            </ThemedHeader>
+            <FlatList
+              data={currentOffers}
+              renderItem={renderItem}
+              keyExtractor={(item) => item.ID}
+              ListEmptyComponent={
+                <ThemedText style={{ textAlign: "center", padding: 20 }}>
+                  No advertisements found.
+                </ThemedText>
+              }
+            />
+          </ThemedTable>
+
+          {/* Pagination Controls */}
+          <View style={styles.paginationContainer}>
+            <IconButton
+              icon={({ color, size }) => (
+                <FontAwesome name="chevron-left" size={size} color={color} />
+              )}
+              size={20}
+              onPress={() => paginate(currentPage - 1)}
+              disabled={currentPage === 1}
+              iconColor={colorScheme === "dark" ? "#ffffff" : "#111827"}
+            />
+            <ThemedText style={styles.paginationText}>
+              Page {currentPage} of {totalPages}
+            </ThemedText>
+            <IconButton
+              icon={({ color, size }) => (
+                <FontAwesome name="chevron-right" size={size} color={color} />
+              )}
+              size={20}
+              onPress={() => paginate(currentPage + 1)}
+              disabled={currentPage === totalPages}
+              iconColor={colorScheme === "dark" ? "#ffffff" : "#111827"}
+            />
+          </View>
+        </ThemedView>
+      )}
+    </>
   );
 };
 

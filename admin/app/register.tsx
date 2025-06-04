@@ -12,20 +12,27 @@ import { ThemedView } from "@/components/ThemedView";
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedTextInput } from "@/components/ThemedTextInput";
 import ModalComponent from "@/components/ModalComponent";
+import { IconButton } from "react-native-paper";
+import { useRouter } from "expo-router";
 import { register } from "@/src/api/admin";
 import { PaperProvider } from "react-native-paper";
 
+// Import FontAwesome
+import { FontAwesome } from "@expo/vector-icons";
+
 export default function RegisterScreen() {
+  const router = useRouter();
   const [username, setUsername] = useState("");
   const [fullName, setFullName] = useState("");
   const [password, setPassword] = useState("");
-  const [confirmPassword, setconfirmPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
   const [visible, setVisible] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
 
   const handleRegister = async () => {
+    // Basic client-side validation
     if (
       !username ||
       !fullName ||
@@ -38,13 +45,23 @@ export default function RegisterScreen() {
       setVisible(true);
       return;
     }
-    const phoneRegex = /^[0-9]{10,15}$/;
-    if (!phoneRegex.test(phoneNumber)) {
-      setErrorMessage("Please enter a valid phone number");
+
+    if (password !== confirmPassword) {
+      setErrorMessage("Passwords do not match!");
       setSuccessMessage("");
       setVisible(true);
       return;
     }
+
+    const phoneRegex = /^[0-9]{10,15}$/; // Standard phone number regex
+    if (!phoneRegex.test(phoneNumber)) {
+      setErrorMessage("Please enter a valid phone number (10-15 digits).");
+      setSuccessMessage("");
+      setVisible(true);
+      return;
+    }
+
+    // Call API to register
     const result = await register({
       Username: username,
       Name: fullName,
@@ -57,15 +74,17 @@ export default function RegisterScreen() {
       setSuccessMessage(result.message);
       setErrorMessage("");
     } else {
-      setSuccessMessage(result.message);
-      setErrorMessage("");
+      setErrorMessage(
+        result.message || "Registration failed due to an unknown error."
+      );
+      setSuccessMessage("");
     }
 
-    // Reset form
     setUsername("");
     setFullName("");
     setPassword("");
-    setconfirmPassword(""), setPhoneNumber("");
+    setConfirmPassword("");
+    setPhoneNumber("");
     setVisible(true);
   };
 
@@ -77,8 +96,20 @@ export default function RegisterScreen() {
         keyboardVerticalOffset={Platform.OS === "ios" ? 80 : 0}
       >
         <TouchableWithoutFeedback>
-          <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+          <ScrollView
+            contentContainerStyle={{ flexGrow: 1, justifyContent: "center" }}
+          >
             <ThemedView style={styles.container}>
+              <IconButton
+                icon={({ color, size }) => (
+                  <FontAwesome name="arrow-left" size={size} color={color} />
+                )}
+                size={30}
+                onPress={() => router.replace("/setting")}
+                style={{
+                  top: 20,
+                }}
+              />
               <ThemedText style={styles.title}>Create Account</ThemedText>
 
               <ThemedText style={styles.label}>Username</ThemedText>
@@ -107,7 +138,7 @@ export default function RegisterScreen() {
               <ThemedTextInput
                 style={styles.input}
                 value={confirmPassword}
-                onChangeText={setconfirmPassword}
+                onChangeText={setConfirmPassword}
                 secureTextEntry
               />
 
@@ -119,7 +150,23 @@ export default function RegisterScreen() {
                 keyboardType="phone-pad"
               />
 
-              <TouchableOpacity style={styles.btn} onPress={handleRegister}>
+              <TouchableOpacity
+                style={[
+                  styles.btn,
+                  {
+                    flexDirection: "row",
+                    alignItems: "center",
+                    justifyContent: "center",
+                  },
+                ]}
+                onPress={handleRegister}
+              >
+                <FontAwesome
+                  name="user-plus"
+                  size={20}
+                  color="white"
+                  style={{ marginRight: 10 }}
+                />
                 <Text style={styles.btnText}>Create Account</Text>
               </TouchableOpacity>
               <ModalComponent
@@ -136,14 +183,20 @@ export default function RegisterScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 20 },
+  container: {
+    flex: 1,
+    padding: 20,
+  },
   title: {
     fontSize: 24,
     fontWeight: "bold",
     marginBottom: 20,
     textAlign: "center",
   },
-  label: { marginTop: 10, fontSize: 16 },
+  label: {
+    marginTop: 10,
+    fontSize: 16,
+  },
   input: {
     borderWidth: 1,
     borderColor: "#ccc",
@@ -157,7 +210,10 @@ const styles = StyleSheet.create({
     backgroundColor: "#005BBB",
     paddingVertical: 14,
     borderRadius: 8,
-    alignItems: "center",
   },
-  btnText: { color: "white", fontWeight: "600", fontSize: 18 },
+  btnText: {
+    color: "white",
+    fontWeight: "600",
+    fontSize: 18,
+  },
 });
