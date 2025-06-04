@@ -23,6 +23,7 @@ app = Flask(__name__)
 
 ai_bp = Blueprint("ai", __name__)
 
+
 def preprocess_image(img_path):
     img = image.load_img(img_path, target_size=(224, 224))
     img_array = image.img_to_array(img) / 255.0
@@ -39,11 +40,11 @@ def respond_errors(error, http_status):
 
 @ai_bp.route("/predict-image", methods=["POST"])
 def predict():
-    
+
     errors = []
     if "image" not in request.files:
         errors.append("no image uploaded")
-        return respond_errors(errors,400)
+        return respond_errors(errors, 400)
 
     uploaded_file = request.files["image"]
     original_filename = secure_filename(uploaded_file.filename)
@@ -65,16 +66,18 @@ def predict():
         )
 
     except Exception as e:
-        return respond_errors([str(e)],500)
+        return respond_errors([str(e)], 500)
 
     finally:
         if os.path.exists(temp_path):
             os.remove(temp_path)
 
+
 @ai_bp.route("/health-check", methods=["GET"])
 def health_check():
-    return respond_success("server running properly",200)
+    return respond_success("server running properly", 200)
+
 
 app.register_blueprint(ai_bp, url_prefix="/ai")
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(debug=True, host="0.0.0.0", port=5000)
