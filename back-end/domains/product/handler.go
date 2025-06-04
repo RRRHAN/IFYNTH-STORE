@@ -26,6 +26,7 @@ type Handler interface {
 	GetProductCountByDepartment(ctx *gin.Context)
 	GetTotalCapital(ctx *gin.Context)
 	GetProductProfit(ctx *gin.Context)
+	GetProductsByImage(ctx *gin.Context)
 }
 
 type handler struct {
@@ -45,7 +46,11 @@ func (h *handler) GetAllProducts(ctx *gin.Context) {
 	department, _ := ctx.GetQuery("department")
 	category, _ := ctx.GetQuery("category")
 
-	res, err := h.service.GetAllProducts(ctx, keyword, department, category)
+	res, err := h.service.GetAllProducts(ctx, GetAllProductReq{
+		Keyword:    keyword,
+		Department: department,
+		Category:   category,
+	})
 	if err != nil {
 		respond.Error(ctx, apierror.FromErr(err))
 		return
@@ -219,6 +224,23 @@ func (h *handler) GetTotalCapital(ctx *gin.Context) {
 
 func (h *handler) GetProductProfit(ctx *gin.Context) {
 	res, err := h.service.GetProductProfit(ctx.Request.Context())
+	if err != nil {
+		respond.Error(ctx, apierror.FromErr(err))
+		return
+	}
+
+	respond.Success(ctx, http.StatusOK, res)
+}
+
+func (h *handler) GetProductsByImage(ctx *gin.Context) {
+
+	image, err := ctx.FormFile("image")
+	if err != nil {
+		respond.Error(ctx, apierror.FromErr(err))
+		return
+	}
+
+	res, err := h.service.GetProductsByImage(ctx, image)
 	if err != nil {
 		respond.Error(ctx, apierror.FromErr(err))
 		return

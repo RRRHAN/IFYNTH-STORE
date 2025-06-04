@@ -12,15 +12,16 @@ import (
 
 	"gorm.io/gorm"
 
+	"github.com/RRRHAN/IFYNTH-STORE/back-end/client/ai"
 	"github.com/RRRHAN/IFYNTH-STORE/back-end/domains/user"
-	"github.com/RRRHAN/IFYNTH-STORE/back-end/utils/config"
 	contextUtil "github.com/RRRHAN/IFYNTH-STORE/back-end/utils/context"
 	fileutils "github.com/RRRHAN/IFYNTH-STORE/back-end/utils/file"
 	"github.com/google/uuid"
 )
 
 type Service interface {
-	GetAllProducts(ctx context.Context, keyword string, department string, category string) ([]Product, error)
+	GetAllProducts(ctx context.Context, input GetAllProductReq) ([]Product, error)
+	GetProductsByImage(ctx context.Context, image *multipart.FileHeader) ([]Product, error)
 	GetProductByID(ctx context.Context, id uuid.UUID) (*Product, error)
 	AddProduct(ctx context.Context, req AddProductRequest) error
 	UpdateProduct(ctx context.Context, productID string, req UpdateProductRequest, images []*multipart.FileHeader) error
@@ -31,37 +32,38 @@ type Service interface {
 }
 
 type service struct {
-	authConfig config.Auth
-	db         *gorm.DB
+	db       *gorm.DB
+	aiClient ai.Client
 }
 
-func NewService(config *config.Config, db *gorm.DB) Service {
+func NewService(db *gorm.DB, aiClient ai.Client) Service {
 	return &service{
-		authConfig: config.Auth,
-		db:         db,
+		db:       db,
+		aiClient: aiClient,
 	}
 }
 
-func (s *service) GetAllProducts(ctx context.Context, keyword string, department string, category string) ([]Product, error) {
+func (s *service) GetAllProducts(ctx context.Context, input GetAllProductReq) ([]Product, error) {
 	var products []Product
 
 	query := s.db.WithContext(ctx).Model(&Product{}).Preload("ProductImages").Preload("StockDetails").Preload("ProductCapital")
 
-	if keyword != "" {
-		// Search name OR description
+	if input.Keyword != "" {
 		query = query.Where(
-			"name ILIKE ? OR description ILIKE ?",
-			"%"+keyword+"%",
-			"%"+keyword+"%",
+			"name ILIKE ? OR description ILIKE ? OR department ILIKE ? OR category ILIKE ? ",
+			"%"+input.Keyword+"%",
+			"%"+input.Keyword+"%",
+			"%"+input.Keyword+"%",
+			"%"+input.Keyword+"%",
 		)
 	}
 
-	if department != "" {
-		query = query.Where("department = ?", department)
+	if input.Department != "" {
+		query = query.Where("department = ?", input.Department)
 	}
 
-	if category != "" {
-		query = query.Where("category = ?", category)
+	if input.Category != "" {
+		query = query.Where("category = ?", input.Category)
 	}
 
 	if err := query.Order("created_at DESC").Find(&products).Error; err != nil {
@@ -488,4 +490,15 @@ func (s *service) GetProductProfit(ctx context.Context) ([]ProductProfit, error)
 	}
 
 	return productProfits, nil
+}
+
+func (s *service) GetProductsByImage(ctx context.Context, image *multipart.FileHeader) ([]Product, error) {
+	aiRes, err := s.aiClient.PredictImage(ctx, image)
+	if err != nil {
+		return nil, err
+	}
+
+	return s.GetAllProducts(ctx, GetAllProductReq{
+		Keyword: aiRes.Prediction,
+	})
 }
