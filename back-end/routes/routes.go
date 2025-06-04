@@ -10,7 +10,6 @@ import (
 	"github.com/RRRHAN/IFYNTH-STORE/back-end/domains/address"
 	"github.com/RRRHAN/IFYNTH-STORE/back-end/domains/cart"
 	"github.com/RRRHAN/IFYNTH-STORE/back-end/domains/cusproduct"
-	imageclassifier "github.com/RRRHAN/IFYNTH-STORE/back-end/domains/image-classifier"
 	"github.com/RRRHAN/IFYNTH-STORE/back-end/domains/message"
 	"github.com/RRRHAN/IFYNTH-STORE/back-end/domains/ongkir"
 	"github.com/RRRHAN/IFYNTH-STORE/back-end/domains/product"
@@ -27,11 +26,9 @@ func NewDependency(
 	conf *config.Config,
 	mw middlewares.Middlewares,
 	db *gorm.DB,
-	predictor imageclassifier.Predictor,
 	userHandler user.Handler,
 	productHandler product.Handler,
 	cartHandler cart.Handler,
-	imageClassifierHandler imageclassifier.Handler,
 	cusproductHandler cusproduct.Handler,
 	messageHandler message.Handler,
 	transactionHandler transaction.Handler,
@@ -96,12 +93,6 @@ func NewDependency(
 
 	}
 
-	imageClassifier := api.Group("/image-classifier")
-	{
-		imageClassifier.POST("/predict", mw.JWT(constants.ADMIN, constants.CUSTOMER), imageClassifierHandler.Predict)
-
-	}
-
 	cusproduct := api.Group("/cusproduct")
 	{
 		cusproduct.POST("/", mw.JWT(constants.CUSTOMER), cusproductHandler.AddProduct)
@@ -156,9 +147,8 @@ func NewDependency(
 	})
 
 	return &Dependency{
-		handler:   router,
-		db:        db,
-		predictor: predictor,
+		handler: router,
+		db:      db,
 	}
 }
 

@@ -13,7 +13,6 @@ import (
 	"github.com/RRRHAN/IFYNTH-STORE/back-end/domains/address"
 	"github.com/RRRHAN/IFYNTH-STORE/back-end/domains/cart"
 	"github.com/RRRHAN/IFYNTH-STORE/back-end/domains/cusproduct"
-	imageclassifier "github.com/RRRHAN/IFYNTH-STORE/back-end/domains/image-classifier"
 	"github.com/RRRHAN/IFYNTH-STORE/back-end/domains/message"
 	"github.com/RRRHAN/IFYNTH-STORE/back-end/domains/ongkir"
 	"github.com/RRRHAN/IFYNTH-STORE/back-end/domains/product"
@@ -37,12 +36,6 @@ var productSet = wire.NewSet(
 var cartSet = wire.NewSet(
 	cart.NewService,
 	cart.NewHandler,
-)
-
-var imageClassifierSet = wire.NewSet(
-	imageclassifier.NewPredictor,
-	imageclassifier.NewService,
-	imageclassifier.NewHandler,
 )
 
 var cusproductSet = wire.NewSet(
@@ -80,7 +73,6 @@ func initializeDependency(config *config.Config) (*routes.Dependency, error) {
 		userSet,
 		productSet,
 		cartSet,
-		imageClassifierSet,
 		cusproductSet,
 		messageSet,
 		transactionSet,

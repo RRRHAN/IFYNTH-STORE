@@ -13,6 +13,7 @@ type Config struct {
 	Host        string      `envconfig:"host"`
 	Port        int         `envconfig:"port" validate:"number,required"`
 	Environment Environment `envconfig:"environment" validate:"oneof=DEVELOPMENT TEST STAGING PRODUCTION"`
+	AIBaseUrl   string      `envconfig:"ai_base_url"`
 	Version     string      `envconfig:"version" default:"development"`
 	Database    Database    `envconfig:"database"`
 	Logger      Logger      `envconfig:"logger"`

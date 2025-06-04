@@ -33,6 +33,7 @@ services:
       - "7777:7777"
     depends_on:
       - db
+      - ai
     env_file:
       - .env
     volumes:
@@ -47,6 +48,15 @@ services:
       - postgres_data:/var/lib/postgresql/data
     ports:
       - "${POSTGRES_PORT:-5432}:5432"
+  
+  ai:
+    build: ./ai
+    container_name: ai
+    working_dir: /app
+    ports:
+      - "5000:5000"
+    env_file:
+      - .env
 
 volumes:
   postgres_data:

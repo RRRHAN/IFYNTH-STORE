@@ -12,7 +12,6 @@ import (
 	"github.com/RRRHAN/IFYNTH-STORE/back-end/domains/address"
 	"github.com/RRRHAN/IFYNTH-STORE/back-end/domains/cart"
 	"github.com/RRRHAN/IFYNTH-STORE/back-end/domains/cusproduct"
-	"github.com/RRRHAN/IFYNTH-STORE/back-end/domains/image-classifier"
 	"github.com/RRRHAN/IFYNTH-STORE/back-end/domains/message"
 	"github.com/RRRHAN/IFYNTH-STORE/back-end/domains/ongkir"
 	"github.com/RRRHAN/IFYNTH-STORE/back-end/domains/product"
@@ -38,18 +37,12 @@ func initializeDependency(config2 *config.Config) (*routes.Dependency, error) {
 	}
 	service := user.NewService(config2, db)
 	middlewaresMiddlewares := middlewares.NewMiddlewares(config2, service)
-	predictor, err := imageclassifier.NewPredictor(config2)
-	if err != nil {
-		return nil, err
-	}
 	validate := validator.New()
 	handler := user.NewHandler(service, validate)
 	productService := product.NewService(config2, db)
 	productHandler := product.NewHandler(productService, validate)
 	cartService := cart.NewService(config2, db)
 	cartHandler := cart.NewHandler(cartService, validate)
-	imageclassifierService := imageclassifier.NewService(db, predictor)
-	imageclassifierHandler := imageclassifier.NewHandler(imageclassifierService, validate)
 	cusproductService := cusproduct.NewService(config2, db)
 	cusproductHandler := cusproduct.NewHandler(cusproductService, validate)
 	messageService := message.NewService(config2, db)
@@ -61,7 +54,7 @@ func initializeDependency(config2 *config.Config) (*routes.Dependency, error) {
 	client := rajaongkir.NewRajaOngkirClient(config2)
 	ongkirService := ongkir.NewService(client, db)
 	ongkirHandler := ongkir.NewHandler(ongkirService, validate)
-	dependency := routes.NewDependency(config2, middlewaresMiddlewares, db, predictor, handler, productHandler, cartHandler, imageclassifierHandler, cusproductHandler, messageHandler, transactionHandler, addressHandler, ongkirHandler)
+	dependency := routes.NewDependency(config2, middlewaresMiddlewares, db, handler, productHandler, cartHandler, cusproductHandler, messageHandler, transactionHandler, addressHandler, ongkirHandler)
 	return dependency, nil
 }
 
@@ -72,8 +65,6 @@ var userSet = wire.NewSet(user.NewService, user.NewHandler)
 var productSet = wire.NewSet(product.NewService, product.NewHandler)
 
 var cartSet = wire.NewSet(cart.NewService, cart.NewHandler)
-
-var imageClassifierSet = wire.NewSet(imageclassifier.NewPredictor, imageclassifier.NewService, imageclassifier.NewHandler)
 
 var cusproductSet = wire.NewSet(cusproduct.NewService, cusproduct.NewHandler)
 
