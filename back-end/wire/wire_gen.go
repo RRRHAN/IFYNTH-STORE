@@ -7,6 +7,7 @@
 package wireinject
 
 import (
+	"github.com/RRRHAN/IFYNTH-STORE/back-end/client/ai"
 	"github.com/RRRHAN/IFYNTH-STORE/back-end/client/raja-ongkir"
 	"github.com/RRRHAN/IFYNTH-STORE/back-end/database"
 	"github.com/RRRHAN/IFYNTH-STORE/back-end/domains/address"
@@ -39,8 +40,8 @@ func initializeDependency(config2 *config.Config) (*routes.Dependency, error) {
 	middlewaresMiddlewares := middlewares.NewMiddlewares(config2, service)
 	validate := validator.New()
 	handler := user.NewHandler(service, validate)
-		client := rajaongkir.NewRajaOngkirClient(config2)
-	productService := product.NewService(config2, db)
+	client := ai.NewClient(config2)
+	productService := product.NewService(db, client)
 	productHandler := product.NewHandler(productService, validate)
 	cartService := cart.NewService(config2, db)
 	cartHandler := cart.NewHandler(cartService, validate)
@@ -48,11 +49,12 @@ func initializeDependency(config2 *config.Config) (*routes.Dependency, error) {
 	cusproductHandler := cusproduct.NewHandler(cusproductService, validate)
 	messageService := message.NewService(config2, db)
 	messageHandler := message.NewHandler(messageService, validate)
-	transactionService := transaction.NewService(config2, db, client)
+	rajaongkirClient := rajaongkir.NewRajaOngkirClient(config2)
+	transactionService := transaction.NewService(config2, db, rajaongkirClient)
 	transactionHandler := transaction.NewHandler(transactionService, validate)
 	addressService := address.NewService(db)
 	addressHandler := address.NewHandler(addressService, validate)
-	ongkirService := ongkir.NewService(client, db)
+	ongkirService := ongkir.NewService(rajaongkirClient, db)
 	ongkirHandler := ongkir.NewHandler(ongkirService, validate)
 	dependency := routes.NewDependency(config2, middlewaresMiddlewares, db, handler, productHandler, cartHandler, cusproductHandler, messageHandler, transactionHandler, addressHandler, ongkirHandler)
 	return dependency, nil

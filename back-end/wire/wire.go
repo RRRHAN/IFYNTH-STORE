@@ -8,6 +8,7 @@ import (
 	_ "github.com/google/subcommands"
 	"github.com/google/wire"
 
+	"github.com/RRRHAN/IFYNTH-STORE/back-end/client/ai"
 	rajaongkir "github.com/RRRHAN/IFYNTH-STORE/back-end/client/raja-ongkir"
 	"github.com/RRRHAN/IFYNTH-STORE/back-end/database"
 	"github.com/RRRHAN/IFYNTH-STORE/back-end/domains/address"
@@ -79,6 +80,7 @@ func initializeDependency(config *config.Config) (*routes.Dependency, error) {
 		rajaongkir.NewRajaOngkirClient,
 		ongkirSet,
 		addressSet,
+		ai.NewClient,
 	)
 
 	return nil, nil

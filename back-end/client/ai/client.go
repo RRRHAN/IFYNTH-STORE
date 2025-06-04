@@ -19,7 +19,7 @@ type client struct {
 	resty *resty.Client
 }
 
-func NewRajaOngkirClient(conf *config.Config) Client {
+func NewClient(conf *config.Config) Client {
 	c := resty.New().
 		SetBaseURL(conf.AIBaseUrl)
 
