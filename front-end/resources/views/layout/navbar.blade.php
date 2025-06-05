@@ -1,5 +1,5 @@
 <!-- Header area start here -->
-<div class="top__header top-header-one pt-30 pb-30">
+<div class="top__header top-header-one pt-30">
     <div class="container">
         <div class="top__wrapper d-flex justify-content-between align-items-center">
             <a href="/landing" class="main__logo">
@@ -12,11 +12,13 @@
                     <button type="submit"><i class="fa-solid fa-search"></i></button>
                 </form>
             </div>
-            <form id="search-image-form" action="{{ route('products.getByImage') }}" method="POST" enctype="multipart/form-data" title="search product by similar image">
+            <form id="search-image-form" action="{{ route('products.getByImage') }}" method="POST"
+                enctype="multipart/form-data" title="search product by similar image">
                 @csrf
-                <label for="search-image-upload" class="btn btn-secondary mb-2">
+                <label for="search-image-upload" class="btn btn-secondary mb-2 label-text">
                     Search Similar Image
                 </label>
+                <label class="fa-solid fa-camera label-icon fa-2x" for="search-image-upload"></label>
                 <input id="search-image-upload" type="file" name="image" accept="image/*" style="display: none;" />
             </form>
             <div class="account__wrap">
@@ -200,9 +202,51 @@
     setInterval(fetchUnreadCount, 2000);
 </script>
 <script>
-  document.getElementById('search-image-upload').addEventListener('change', function () {
-    if (this.files.length > 0) {
-      document.getElementById('search-image-form').submit();
-    }
-  });
+    document.getElementById('search-image-upload').addEventListener('change', function() {
+        if (this.files.length > 0) {
+            document.getElementById('search-image-form').submit();
+        }
+    });
 </script>
+<style>
+    #search-image-form {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 8px 16px;
+        border-radius: 6px;
+        font-size: 14px;
+        white-space: nowrap;
+        transition: all 0.3s ease;
+    }
+
+    #search-image-form .fa-search {
+        margin-right: 8px;
+    }
+
+    #search-image-form .label-icon {
+        display: none;
+    }
+
+    @media (max-width: 768px) {
+        #search-image-form {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            padding: 20px;
+        }
+
+        #search-image-form .label-text {
+            display: none;
+        }
+
+        #search-image-form .label-icon {
+            display: block;
+        }
+
+        #search-image-form .fa-search {
+            margin: 0;
+            font-size: 18px;
+        }
+    }
+</style>
