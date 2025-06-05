@@ -29,11 +29,4 @@ migrate:
 migrate-down:
 	migrate -path ./migrations -database postgres://${BACKEND_DATABASE_USERNAME}:${BACKEND_DATABASE_PASSWORD}@${BACKEND_DATABASE_HOST}:${BACKEND_DATABASE_PORT}/${BACKEND_DATABASE_NAME}?sslmode=disable down ${N}
 
-#########################
-### Sync Dependencies ###
-#########################
-
-sync-model:
-	cp ../image-classifier/dist/predict predict
-	cp ../image-classifier/classes.json classes.json
 	

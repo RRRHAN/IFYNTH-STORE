@@ -40,3 +40,9 @@ type UpdateProductRequest struct {
 type DeleteProductRequest struct {
 	ProductID string `json:"product_id"`
 }
+
+type GetAllProductReq struct {
+	Keyword    string
+	Department string
+	Category   string
+}

@@ -13,12 +13,12 @@ type Config struct {
 	Host        string      `envconfig:"host"`
 	Port        int         `envconfig:"port" validate:"number,required"`
 	Environment Environment `envconfig:"environment" validate:"oneof=DEVELOPMENT TEST STAGING PRODUCTION"`
+	AIBaseUrl   string      `envconfig:"ai_base_url"`
 	Version     string      `envconfig:"version" default:"development"`
 	Database    Database    `envconfig:"database"`
 	Logger      Logger      `envconfig:"logger"`
 	Auth        Auth        `envconfig:"auth"`
 	RateLimiter RateLimiter `envconfig:"rate_limiter"`
-	FeatureFlag FeatureFlag `envconfig:"feature_flag"`
 	RajaOngkir  RajaOngkir  `envconfig:"raja_ongkir"`
 }
 
@@ -54,10 +54,6 @@ type Basic struct {
 type RateLimiter struct {
 	Rps    int `envconfig:"rps" default:"10"`
 	Bursts int `envconfig:"bursts" default:"5"`
-}
-
-type FeatureFlag struct {
-	ImageClassifier bool `envconfig:"image_classifier" default:"false"`
 }
 
 type RajaOngkir struct {

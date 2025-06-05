@@ -10,7 +10,6 @@ import (
 	"github.com/RRRHAN/IFYNTH-STORE/back-end/domains/address"
 	"github.com/RRRHAN/IFYNTH-STORE/back-end/domains/cart"
 	"github.com/RRRHAN/IFYNTH-STORE/back-end/domains/cusproduct"
-	imageclassifier "github.com/RRRHAN/IFYNTH-STORE/back-end/domains/image-classifier"
 	"github.com/RRRHAN/IFYNTH-STORE/back-end/domains/message"
 	"github.com/RRRHAN/IFYNTH-STORE/back-end/domains/ongkir"
 	"github.com/RRRHAN/IFYNTH-STORE/back-end/domains/product"
@@ -27,11 +26,9 @@ func NewDependency(
 	conf *config.Config,
 	mw middlewares.Middlewares,
 	db *gorm.DB,
-	predictor imageclassifier.Predictor,
 	userHandler user.Handler,
 	productHandler product.Handler,
 	cartHandler cart.Handler,
-	imageClassifierHandler imageclassifier.Handler,
 	cusproductHandler cusproduct.Handler,
 	messageHandler message.Handler,
 	transactionHandler transaction.Handler,
@@ -87,6 +84,7 @@ func NewDependency(
 		product.GET("/count", mw.JWT(constants.ADMIN), productHandler.GetProductCountByDepartment)
 		product.GET("/totalCapital", mw.JWT(constants.ADMIN), productHandler.GetTotalCapital)
 		product.GET("/productProfit", mw.JWT(constants.ADMIN), productHandler.GetProductProfit)
+		product.POST("/get-by-image", mw.JWT(constants.ADMIN), productHandler.GetProductsByImage)
 	}
 
 	cart := api.Group("/cart")
@@ -95,12 +93,6 @@ func NewDependency(
 		cart.PUT("/", mw.JWT(constants.CUSTOMER), cartHandler.UpdateCartQuantity)
 		cart.DELETE("/delete", mw.JWT(constants.CUSTOMER), cartHandler.DeleteFromCart)
 		cart.GET("/", mw.JWT(constants.CUSTOMER), cartHandler.GetCartByUserID)
-
-	}
-
-	imageClassifier := api.Group("/image-classifier")
-	{
-		imageClassifier.POST("/predict", mw.JWT(constants.ADMIN, constants.CUSTOMER), imageClassifierHandler.Predict)
 
 	}
 
@@ -159,9 +151,8 @@ func NewDependency(
 	})
 
 	return &Dependency{
-		handler:   router,
-		db:        db,
-		predictor: predictor,
+		handler: router,
+		db:      db,
 	}
 }
 
