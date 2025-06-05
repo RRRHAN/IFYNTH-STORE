@@ -20,6 +20,7 @@ type Handler interface {
 	GetTotalIncome(ctx *gin.Context)
 	GetTotalTransactionByCustomer(ctx *gin.Context)
 	PayTransaction(ctx *gin.Context)
+	GetTransactionsByTransactionID(ctx *gin.Context)
 }
 
 type handler struct {
@@ -157,4 +158,16 @@ func (h *handler) PayTransaction(ctx *gin.Context) {
 	}
 
 	respond.Success(ctx, http.StatusOK, nil)
+}
+
+func (h *handler) GetTransactionsByTransactionID(ctx *gin.Context) {
+	transactionID := ctx.Param("id")
+
+	transactions, err := h.service.GetTransactionByTransactionID(ctx, transactionID)
+	if err != nil {
+		respond.Error(ctx, apierror.FromErr(err))
+		return
+	}
+
+	respond.Success(ctx, http.StatusOK, transactions)
 }

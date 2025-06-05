@@ -108,7 +108,7 @@ export default function SecurityScreen() {
           size={20}
           color="white"
           style={{ marginRight: 8 }}
-        />{" "}
+        />
         {/* Menggunakan "lock" atau "key" */}
         <Text style={styles.btnText}>Change Password</Text>
       </TouchableOpacity>

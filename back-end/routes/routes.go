@@ -133,6 +133,7 @@ func NewDependency(
 		transaction.GET("/totalIncome", mw.JWT(constants.ADMIN), transactionHandler.GetTotalIncome)
 		transaction.GET("/totalTransactionUser", mw.JWT(constants.ADMIN), transactionHandler.GetTotalTransactionByCustomer)
 		transaction.POST("/pay", mw.JWT(constants.CUSTOMER), transactionHandler.PayTransaction)
+		transaction.GET("/:id", mw.JWT(constants.ADMIN, constants.CUSTOMER), transactionHandler.GetTransactionsByTransactionID)
 	}
 
 	address := api.Group("/address")

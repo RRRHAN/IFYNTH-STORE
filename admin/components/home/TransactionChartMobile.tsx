@@ -236,7 +236,7 @@ const MTransactionReportChart: React.FC<TransactionChartProps> = ({
               ]}
             >
               <ThemedText style={styles.tooltipText}>
-                {tooltipData.date}: Rp{" "}
+                {tooltipData.date}: Rp
                 {tooltipData.value.toLocaleString("id-ID")}
               </ThemedText>
               <TouchableOpacity

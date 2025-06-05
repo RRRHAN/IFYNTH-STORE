@@ -35,6 +35,7 @@ type Service interface {
 	GetTotalIncome(ctx context.Context) (float64, error)
 	GetTotalTransactionByCustomer(ctx context.Context) ([]ResultByCustomer, error)
 	PayTransaction(ctx context.Context, input PayTransactionReq) error
+	GetTransactionByTransactionID(ctx context.Context, transactionID string) (*Transaction, error)
 }
 
 type service struct {
@@ -90,6 +91,27 @@ func (s *service) GetTransactionsByUserID(ctx context.Context) ([]Transaction, e
 	}
 
 	return transactions, nil
+}
+
+func (s *service) GetTransactionByTransactionID(ctx context.Context, transactionID string) (*Transaction, error) {
+	var transaction Transaction
+
+	result := s.db.
+		Preload("ShippingAddress").
+		Preload("TransactionDetails.Product", func(db *gorm.DB) *gorm.DB {
+			return db.Select("id", "name", "price")
+		}).
+		Preload("TransactionDetails.Product.ProductImages", func(db *gorm.DB) *gorm.DB {
+			return db.Select("id", "product_id", "url").Order("id ASC")
+		}).
+		Where("id = ?", transactionID).
+		First(&transaction)
+
+	if result.Error != nil {
+		return nil, result.Error
+	}
+
+	return &transaction, nil
 }
 
 func (s *service) AddTransaction(ctx context.Context, req AddTransactionRequest) error {
