@@ -41,7 +41,7 @@ func (c *client) PredictImage(ctx context.Context, fileHeader *multipart.FileHea
 		SetFileReader("image", fileHeader.Filename, file).
 		SetResult(&res).
 		SetError(&res).
-		Get("/ai/predict-image")
+		Post("/ai/predict-image")
 
 	if err != nil {
 		return nil, err
