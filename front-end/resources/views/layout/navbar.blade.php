@@ -12,6 +12,13 @@
                     <button type="submit"><i class="fa-solid fa-search"></i></button>
                 </form>
             </div>
+            <form id="search-image-form" action="{{ route('products.getByImage') }}" method="POST" enctype="multipart/form-data" title="search product by similar image">
+                @csrf
+                <label for="search-image-upload" class="btn btn-secondary mb-2">
+                    Search Similar Image
+                </label>
+                <input id="search-image-upload" type="file" name="image" accept="image/*" style="display: none;" />
+            </form>
             <div class="account__wrap">
                 <div class="account d-flex align-items-center">
                     <div class="user__icon">
@@ -57,6 +64,9 @@
             <ul class="main-menu nav">
                 <li class="nav-item">
                     <a class="nav-link" href="/landing">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/catalog">Catalog</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="{{ route('products.getAll', ['department' => 'IFY']) }}">I Found You</a>
@@ -188,4 +198,11 @@
 
     // Set interval tiap 2 detik (2000 ms)
     setInterval(fetchUnreadCount, 2000);
+</script>
+<script>
+  document.getElementById('search-image-upload').addEventListener('change', function () {
+    if (this.files.length > 0) {
+      document.getElementById('search-image-form').submit();
+    }
+  });
 </script>

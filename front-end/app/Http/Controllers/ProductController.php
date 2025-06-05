@@ -145,6 +145,59 @@ class ProductController extends Controller
         }
     }
 
+    public function getByImage(Request $request)
+{
+    $page = $request->query('page', 1);
+    $perPage = 8;
+    $token = session('api_token');
+
+    try {
+        // Make sure file is uploaded
+        if (!$request->hasFile('image') || !$request->file('image')->isValid()) {
+            return redirect()->back()->with('error', 'Please upload a valid image.');
+        }
+
+        $image = $request->file('image');
+
+        $response = Http::withHeaders([
+            'Authorization' => 'Bearer ' . $token
+        ])->attach(
+            'image',                      
+            file_get_contents($image),
+            $image->getClientOriginalName()
+        )->post(config('app.back_end_base_url') . '/api/product/get-by-image');
+
+        if (in_array('Unauthorized!', $response->json('errors') ?? [])) {
+            return redirect()->route('login')->with('error', 'Session expired. Please log in again.');
+        }
+
+        if ($response->successful() && $response->json('errors') === null) {
+            $allProducts = collect($response->json('data'));
+
+            $total = $allProducts->count();
+            $products = $allProducts->slice(($page - 1) * $perPage, $perPage)->values();
+            $totalPages = ceil($total / $perPage);
+
+            $pagination = [
+                'total_pages' => $totalPages,
+                'current_page' => $page,
+                'perPage' => $perPage,
+                'total' => $total,
+            ];
+
+            return view('catalog', [
+                'products' => $products,
+                'pagination' => $pagination,
+            ]);
+        } else {
+            return redirect()->back()->with('error', 'Failed to fetch products.');
+        }
+    } catch (\Exception $e) {
+        return redirect()->back()->with('error', 'An error occurred while fetching products.');
+    }
+}
+
+
     public function detailProduct($id)
     {
         Log::info('ID yang diterima:', ['id' => $id]);

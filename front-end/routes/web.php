@@ -60,6 +60,7 @@ Route::controller(UserController::class)->group(function () {
 // Route product
 Route::controller(ProductController::class)->group(function () {
     Route::get('/catalog', 'fetchAll')->name('products.getAll');
+    Route::post('/catalog', 'getByImage')->name('products.getByImage');
     Route::get('/product/detail/{id}', 'detailProduct')->name('product.detail');
 });
 
