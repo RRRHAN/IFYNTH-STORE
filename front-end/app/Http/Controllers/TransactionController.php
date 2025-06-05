@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Session;
 use GuzzleHttp\Client;
+use Illuminate\Validation\ValidationException;
 
 class TransactionController extends Controller
 {
@@ -14,17 +15,17 @@ class TransactionController extends Controller
         session()->flash('preloader', false);
         $token = session("api_token");
 
-        $validatedData = $request->validate([
-            'addressId' => 'required',
-            'courierIndex' => 'required',
-        ]);
-
         try {
+            $validatedData = $request->validate([
+                'addressId' => 'required',
+                'courierIndex' => 'required',
+            ]);
+
             $response = Http::withHeaders([
                 'Authorization' => 'Bearer ' . $token,
             ])->post(config('app.back_end_base_url') . '/api/transaction', [
-                        'CustomerAddressID' => $validatedData['addressId'],
-                        'CourierIndex' => (int) $validatedData['courierIndex'],
+                        'CustomerAddressID' => $request['addressId'],
+                        'CourierIndex' => (int) $request['courierIndex'],
                     ]);
 
             $responseBody = $response->json();
@@ -42,8 +43,13 @@ class TransactionController extends Controller
                 session()->flash('error', $errors[0]);
                 return redirect()->back();
             }
+        } catch (ValidationException $e) { // Catch ValidationException
+            $errors = $e->errors(); // Get validation error messages
+            $firstError = array_values($errors)[0][0] ?? 'Validation failed.'; // Get the first error message
+            session()->flash('error', $firstError);
+            return redirect()->back()->withErrors($errors); // Also return errors for display on the form
         } catch (\Exception $e) {
-            session()->flash('error', $e->getMessage());
+            session()->flash('error', 'An unexpected error occurred: ' . $e->getMessage());
             return redirect()->back();
         }
     }

@@ -37,5 +37,6 @@
         @endforelse
 
     </div>
-    @include('components.addressModal')
-    @include('components.updateAddressModal')
+</div>
+@include('components.addressModal')
+@include('components.updateAddressModal')

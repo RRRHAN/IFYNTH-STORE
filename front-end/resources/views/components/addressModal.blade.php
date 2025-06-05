@@ -56,7 +56,6 @@
             </div>
         </div>
     </div>
-</div>
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         const searchInput = document.getElementById('searchDestination_modal');
