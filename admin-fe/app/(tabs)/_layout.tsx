@@ -7,7 +7,7 @@ import { IconSymbol } from "@/components/ui/IconSymbol";
 import TabBarBackground from "@/components/ui/TabBarBackground";
 import { Colors } from "@/constants/Colors";
 import { useColorScheme } from "@/hooks/useColorScheme";
-import { ArrowRightLeft, Home, User, Package } from "lucide-react-native";
+import { ArrowRightLeft, Home, User, Package, Truck } from "lucide-react-native";
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
@@ -37,7 +37,7 @@ export default function TabLayout() {
         name="transaction"
         options={{
           title: "",
-          tabBarIcon: ({ color }) => <ArrowRightLeft color={color} size={24} />,
+          tabBarIcon: ({ color }) => <Truck color={color} size={24} />,
         }}
       />
       <Tabs.Screen
@@ -45,6 +45,13 @@ export default function TabLayout() {
         options={{
           title: "",
           tabBarIcon: ({ color }) => <Package color={color} size={24} />,
+        }}
+      />
+      <Tabs.Screen
+        name="user_advertisement"
+        options={{
+          title: "",
+          tabBarIcon: ({ color }) => <ArrowRightLeft color={color} size={24} />,
         }}
       />
       <Tabs.Screen

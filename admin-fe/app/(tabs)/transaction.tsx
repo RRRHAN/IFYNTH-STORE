@@ -91,7 +91,7 @@ const TransactionsScreen = () => {
         initialStatus[item.ID] = item.Status as TransactionStatus;
       });
       setSelectedStatus(initialStatus);
-      setCurrentPage(1); // Reset to first page when new data is fetched
+      setCurrentPage(1);
     } catch (err) {
       console.error("Failed to fetch transactions:", err);
     } finally {

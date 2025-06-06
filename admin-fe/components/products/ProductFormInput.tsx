@@ -1,13 +1,8 @@
 import React from "react";
 import { Platform } from "react-native";
-
-// Gluestack UI Imports (assuming these are from your local 'ui' alias)
 import { Text } from "../ui/text";
 import { Input, InputField } from "../ui/input";
 import { Box } from "../ui/box";
-
-// You'll need useColorScheme if you want to apply dark mode classes conditionally
-import { useColorScheme } from "nativewind";
 
 interface ProductFormInputsProps {
   name: string;
@@ -61,7 +56,7 @@ export default function ProductFormInputs({
           </Input>
         </Box>
 
-        <Box className="flex-1"> {/* Gluestack Box with Tailwind flex-1 */}
+        <Box className="flex-1">
           <Text className="mb-1">Product Weight</Text>
           <Input
             variant="outline"

@@ -37,13 +37,11 @@ function darkenColor(hexColor: string) {
 
   return `rgb(${r},${g},${b})`;
 }
-
-// NavButton components now uses Gluestack Button and Tailwind
 function NavButton({
   title,
   onPress,
   icon,
-  color = "rgba(85, 85, 85, 0.56)", // Default color
+  color = "rgba(85, 85, 85, 0.56)",
 }: {
   title: string;
   onPress: (event: GestureResponderEvent) => void;

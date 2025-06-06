@@ -61,7 +61,7 @@ export default function AddProductScreen() {
       !category
     ) {
       showModal({
-        title: "Add Product Success!",
+        title: "Validation Error",
         message: "All fields are required.",
         type: "error",
         autoClose: true,
@@ -73,10 +73,13 @@ export default function AddProductScreen() {
     const stockDetails = sizes;
 
     if (stockDetails.length === 0) {
-      Alert.alert(
-        "Validation Error",
-        "At least one size should have stock greater than 0."
-      );
+      showModal({
+        title: "Validation Error",
+        message: "At least one size should have stock greater than 0..",
+        type: "error",
+        autoClose: true,
+        duration: 1500,
+      });
       return;
     }
 
@@ -156,7 +159,13 @@ export default function AddProductScreen() {
   };
   return (
     <ScrollView
-      style={[styles.container, { backgroundColor: isDark ? "#000" : "#fff", top: Platform.OS === "web" ? 0 : 20 }]}
+      style={[
+        styles.container,
+        {
+          backgroundColor: isDark ? "#000" : "#fff",
+          top: Platform.OS === "web" ? 0 : 20,
+        },
+      ]}
       contentContainerStyle={{ paddingBottom: 30 }}
     >
       <Box className="w-full max-w-xl flex-row justify-start mb-4 px-4">

@@ -8,15 +8,24 @@ import { BASE_URL } from "@/src/api/constants";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useColorScheme } from "nativewind";
 import React, { useEffect, useState } from "react";
-import { ActivityIndicator, Dimensions, Image, Platform, ScrollView } from "react-native";
-
-// Import semua tipe yang relevan dari src/types/transaction
+import {
+  ActivityIndicator,
+  Dimensions,
+  Image,
+  Platform,
+  ScrollView,
+} from "react-native";
+import {
+  Modal,
+  ModalBackdrop,
+  ModalContent,
+  ModalHeader,
+  ModalBody,
+} from "@/components/ui/modal";
 import { Transaction } from "@/src/types/transaction";
-
-import { fetchTransactionById } from "@/src/api/transaction"; // Asumsi ini adalah fungsi API Anda
-import { ArrowLeft } from "lucide-react-native";
-
-// Fungsi helper untuk mengubah huruf pertama menjadi kapital
+import { fetchTransactionById } from "@/src/api/transaction";
+import { ArrowLeft, X } from "lucide-react-native";
+import { TouchableOpacity } from "react-native";
 const ucfirst = (str: string) => {
   if (!str) return "";
   return str.charAt(0).toUpperCase() + str.slice(1);
@@ -36,7 +45,11 @@ const TransactionDetailScreen: React.FC = () => {
   const { colorScheme } = useColorScheme();
   const router = useRouter();
   const { id } = useLocalSearchParams();
-
+  const [showFullScreenImageModal, setShowFullScreenImageModal] =
+    useState(false);
+  const [fullScreenImageUrl, setFullScreenImageUrl] = useState<string | null>(
+    null
+  );
   const [transaction, setTransaction] = useState<Transaction | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -66,30 +79,41 @@ const TransactionDetailScreen: React.FC = () => {
     }
   }, [id]);
 
-  // Helper functions untuk styling
   const getTextColor = (baseColor: string) => {
-    return colorScheme === "dark" ? `text-${baseColor}-100` : `text-${baseColor}-900`;
+    return colorScheme === "dark"
+      ? `text-${baseColor}-100`
+      : `text-${baseColor}-900`;
   };
   const getSubtitleColor = (baseColor: string) => {
-    return colorScheme === "dark" ? `text-${baseColor}-400` : `text-${baseColor}-600`;
+    return colorScheme === "dark"
+      ? `text-${baseColor}-400`
+      : `text-${baseColor}-600`;
   };
   const getBackgroundColor = (baseColor: string) => {
-    // Memperbaiki agar sesuai dengan properti Tailwind
-    // Menggunakan nilai 800 untuk dark dan 50 untuk light agar lebih kontras
-    if (baseColor === "white") return colorScheme === "dark" ? "bg-neutral-800" : "bg-white";
-    if (baseColor === "gray") return colorScheme === "dark" ? "bg-neutral-700" : "bg-gray-100";
-    return ""; // Fallback
+    if (baseColor === "white")
+      return colorScheme === "dark" ? "bg-neutral-800" : "bg-white";
+    if (baseColor === "gray")
+      return colorScheme === "dark" ? "bg-neutral-700" : "bg-gray-100";
+    return "";
   };
   const getBorderColor = (baseColor: string) => {
-    return colorScheme === "dark" ? `border-${baseColor}-700` : `border-${baseColor}-200`;
+    return colorScheme === "dark"
+      ? `border-${baseColor}-700`
+      : `border-${baseColor}-200`;
   };
 
-  // Gunakan useWindowDimensions untuk responsivitas yang lebih akurat
+  const handleImageClick = (imageUrl: string) => {
+    setFullScreenImageUrl(imageUrl);
+    setShowFullScreenImageModal(true);
+  };
+
+  const handleCloseFullScreenImageModal = () => {
+    setShowFullScreenImageModal(false);
+    setFullScreenImageUrl(null);
+  };
+
   const { width: screenWidth } = Dimensions.get("window");
   const isMobileView = screenWidth < 768;
-
-
-  // --- Penanganan state Loading / Error / No Data ---
   if (loading) {
     return (
       <Box className="flex-1 justify-center items-center bg-background-0 dark:bg-neutral-900">
@@ -129,16 +153,13 @@ const TransactionDetailScreen: React.FC = () => {
       </Box>
     );
   }
-
-  // --- Render Transaction Details (Ketika data sudah tersedia) ---
   return (
     <Box className="flex-1 bg-background-0 dark:bg-neutral-900">
-      {/* Header Statis Atas (Tombol Kembali) */}
       <Box
         className={`w-full max-w-xl self-center px-4 py-4
-          ${getBackgroundColor("white")}`} // Border bottom akan ditambahkan di Order Header
+          ${getBackgroundColor("white")}`}
         style={{
-          paddingTop: Platform.OS === "android" ? 40 : 16, // Adjust for Android status bar
+          paddingTop: Platform.OS === "android" ? 40 : 16,
         }}
       >
         <Button
@@ -157,11 +178,11 @@ const TransactionDetailScreen: React.FC = () => {
           </ButtonText>
         </Button>
       </Box>
-
-      {/* Header Statis Kedua (IFYNTH Store & Status Transaksi) */}
       <Box
         className={`
-          w-full max-w-xl self-center px-5 py-4 border-b ${getBorderColor("neutral")}
+          w-full max-w-xl self-center px-5 py-4 border-b ${getBorderColor(
+            "neutral"
+          )}
           ${getBackgroundColor("gray")}
           flex-row justify-between items-center flex-wrap
         `}
@@ -173,14 +194,16 @@ const TransactionDetailScreen: React.FC = () => {
           >
             <BadgeText>Star+</BadgeText>
           </Badge>
-          <Text className={`font-semibold ${getTextColor("gray")}`}>IFYNTH Store</Text>
+          <Text className={`font-semibold ${getTextColor("gray")}`}>
+            IFYNTH Store
+          </Text>
         </Box>
         <Box className="mt-2 md:mt-0">
           {transaction.Status === "delivered" ? (
             <Text className={`${getSubtitleColor("neutral")}`}>
-              The order has arrived at the destination address. Received by
-              the person concerned.
-              <Badge size="sm" action="success" className="ml-2"> {/* Added ml-2 for spacing */}
+              The order has arrived at the destination address. Received by the
+              person concerned.
+              <Badge size="sm" action="success" className="ml-2">
                 <BadgeText>HAS BEEN ASSESSED</BadgeText>
               </Badge>
             </Text>
@@ -215,30 +238,19 @@ const TransactionDetailScreen: React.FC = () => {
           )}
         </Box>
       </Box>
-
-
-      {/* Scrollable Content */}
       <ScrollView
-        className="flex-1" // Agar ScrollView mengambil sisa ruang vertikal
+        className="flex-1"
         contentContainerStyle={{
-          alignItems: "center", // Untuk memusatkan Box utama
-          paddingBottom: Platform.OS === "web" ? 100 : 20, // Sesuaikan padding bawah sesuai kebutuhan
+          alignItems: "center",
+          paddingBottom: Platform.OS === "web" ? 100 : 20,
         }}
       >
-        {/* Main Content Box: Ini akan di-scroll */}
         <Box
           className={`
             rounded-lg shadow-md w-full max-w-xl
             ${getBackgroundColor("white")} border ${getBorderColor("neutral")}
           `}
-          // Hapus mb-6 dari sini karena sudah ada di header statis kedua
-          // Tambahkan border-top jika diperlukan, tapi ini sudah diatasi oleh rounded-lg
         >
-          {/* Bagian ini sebelumnya adalah Order Header, sekarang hanya bagian dalamnya */}
-          {/* Hapus bagian Order Header dari sini, karena sudah di atas */}
-          {/* Sekarang dimulai dari Transaction Info */}
-
-          {/* --- Bagian Detail Transaksi Tambahan --- */}
           <Box className="p-5 flex-col gap-3 border-b border-neutral-200 dark:border-neutral-700">
             <Heading size="sm" className={`mb-2 ${getTextColor("gray")}`}>
               Transaction Info
@@ -248,7 +260,8 @@ const TransactionDetailScreen: React.FC = () => {
               {transaction.ID}
             </Text>
             <Text className={`${getSubtitleColor("neutral")}`}>
-              <Text className="font-semibold">User ID:</Text> {transaction.UserID}
+              <Text className="font-semibold">User ID:</Text>{" "}
+              {transaction.UserID}
             </Text>
             <Text className={`${getSubtitleColor("neutral")}`}>
               <Text className="font-semibold">Payment Method: </Text>
@@ -259,11 +272,23 @@ const TransactionDetailScreen: React.FC = () => {
                 <Text className={`${getSubtitleColor("neutral")} mb-1`}>
                   <Text className="font-semibold">Payment Proof: </Text>
                 </Text>
-                <Image
-                  source={{ uri: `${BASE_URL}/api${transaction.PaymentProof}` }}
-                  className="w-full h-48 rounded-md"
-                  resizeMode="contain"
-                />
+                <TouchableOpacity
+                  onPress={() =>
+                    handleImageClick(
+                      `${BASE_URL}/api${transaction.PaymentProof}`
+                    )
+                  }
+                  activeOpacity={0.7}
+                  className="w-full h-48 rounded-md overflow-hidden"
+                >
+                  <Image
+                    source={{
+                      uri: `${BASE_URL}/api${transaction.PaymentProof}`,
+                    }}
+                    className="w-full h-full"
+                    resizeMode="contain"
+                  />
+                </TouchableOpacity>
               </Box>
             )}
             <Text className={`${getSubtitleColor("neutral")}`}>
@@ -309,9 +334,6 @@ const TransactionDetailScreen: React.FC = () => {
               {number_format(transaction.ShippingAddress.ShippingCost)}
             </Text>
           </Box>
-          {/* --- Akhir Bagian Detail Transaksi Tambahan --- */}
-
-          {/* Order Body (Display all products) */}
           <Box className="p-5 flex-col gap-4">
             <Heading size="sm" className={`mb-2 ${getTextColor("gray")}`}>
               Products in Order
@@ -347,13 +369,21 @@ const TransactionDetailScreen: React.FC = () => {
                       />
                     </Box>
                     <Box className="flex-grow flex-col gap-1">
-                      <Text className={`text-base font-medium ${getTextColor("gray")}`}>
+                      <Text
+                        className={`text-base font-medium ${getTextColor(
+                          "gray"
+                        )}`}
+                      >
                         {detail.Product?.Name ?? "Nama Produk Tidak Diketahui"}
                       </Text>
-                      <Text className={`text-sm ${getSubtitleColor("neutral")}`}>
+                      <Text
+                        className={`text-sm ${getSubtitleColor("neutral")}`}
+                      >
                         Variasi: {detail.Size ?? "Ukuran Tidak Diketahui"}
                       </Text>
-                      <Text className={`text-sm ${getSubtitleColor("neutral")}`}>
+                      <Text
+                        className={`text-sm ${getSubtitleColor("neutral")}`}
+                      >
                         x{detail.Quantity ?? 1}
                       </Text>
                     </Box>
@@ -368,8 +398,6 @@ const TransactionDetailScreen: React.FC = () => {
           </Box>
         </Box>
       </ScrollView>
-
-      {/* Footer Statis: Order Total */}
       <Box
         className={`
           w-full max-w-xl self-center p-5 border-t ${getBorderColor("neutral")}
@@ -378,12 +406,60 @@ const TransactionDetailScreen: React.FC = () => {
         `}
       >
         <Box className="flex-row items-center">
-          <Text className={`text-base mr-4 ${getTextColor("gray")}`}>Order Total:</Text>
+          <Text className={`text-base mr-4 ${getTextColor("gray")}`}>
+            Order Total:
+          </Text>
           <Text className={`text-xl font-bold ${getTextColor("gray")}`}>
             Rp{number_format(transaction.TotalAmount ?? 0)}
           </Text>
         </Box>
       </Box>
+      <Modal
+        isOpen={showFullScreenImageModal}
+        onClose={handleCloseFullScreenImageModal}
+        size="full"
+      >
+        <ModalBackdrop />
+        <ModalContent
+          className={`flex-1 ${
+            colorScheme === "dark" ? "bg-black" : "bg-white"
+          }`}
+        >
+          <ModalHeader className="w-full">
+            <Button
+              variant="link"
+              onPress={handleCloseFullScreenImageModal}
+              className="absolute top-4 right-4 z-10 p-0"
+            >
+              <ButtonIcon
+                as={X}
+                size="xl"
+                className={`${
+                  colorScheme === "dark" ? "text-white" : "text-gray-800"
+                }`}
+              />
+            </Button>
+          </ModalHeader>
+          <ModalBody className="flex-1 w-full">
+            {fullScreenImageUrl ? (
+              <Image
+                source={{ uri: fullScreenImageUrl }}
+                className="w-80% h-80"
+                resizeMode="contain"
+                alt="Payment Proof Full Screen"
+              />
+            ) : (
+              <Text
+                className={`${
+                  colorScheme === "dark" ? "text-white" : "text-gray-800"
+                }`}
+              >
+                Image not available.
+              </Text>
+            )}
+          </ModalBody>
+        </ModalContent>
+      </Modal>
     </Box>
   );
 };

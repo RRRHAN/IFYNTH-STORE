@@ -95,7 +95,7 @@ const LogsScreen = () => {
     } catch (err: any) {
       console.error("Failed to fetch logs:", err);
       setError(err.message || "Failed to load admin activities.");
-      setActivity([]); // Clear activity on error
+      setActivity([]);
     } finally {
       setTimeout(() => {
         setLoading(false);

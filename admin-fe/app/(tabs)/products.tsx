@@ -58,7 +58,6 @@ const ProductTable = () => {
     setSelectedProduct(product);
     setShowProductDetailModal(true);
   };
-
   const isMobileLayout = screenWidth < MOBILE_BREAKPOINT;
 
   const getData = async () => {
@@ -367,7 +366,17 @@ const ProductTable = () => {
                           className="w-5 h-5 text-blue-500"
                         />
                       </Button>
-                      <Button variant="link" className="p-0">
+                      <Button
+                        onPress={() => {
+                          setSelectedProduct(product);
+                          router.push({
+                            pathname: "/edit_product",
+                            params: { item: JSON.stringify(product) },
+                          });
+                        }}
+                        variant="link"
+                        className="p-0"
+                      >
                         <ButtonIcon
                           as={SquarePen}
                           className="w-5 h-5 text-green-500"
@@ -466,8 +475,6 @@ const ProductTable = () => {
                     </Button>
                   </ModalHeader>
                   <ModalBody className="p-0">
-                    {/* ProductDetailModal handles its own padding */}
-                    {/* Pass the selected product to the dedicated content component */}
                     <ProductDetailModal product={selectedProduct} />
                   </ModalBody>
                   <ModalFooter className="w-full border-t border-gray-200 dark:border-gray-700 pt-2">
