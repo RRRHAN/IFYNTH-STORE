@@ -27,6 +27,11 @@ import { useColorScheme } from "nativewind";
 import ProductCountTable from "@/components/home/product-count-table";
 import TransactionCountTable from "@/components/home/transaction-count-table";
 import MTransactionReportChart from "@/components/home/MTransactionReportChart";
+import {
+  dummyProfitProducts,
+  dummyTransactionReports,
+  dummyTotalTransactionUsers,
+} from "@/components/DataDummy/home";
 
 const { width } = Dimensions.get("window");
 
@@ -171,7 +176,7 @@ export default function HomeScreen() {
 
       <Box className="w-full max-w-8xl mt-4 px-4">
          <MTransactionReportChart
-            transactionReport={transactionReport}
+            transactionReport={dummyTransactionReports}
             height={380}
          />
       </Box>

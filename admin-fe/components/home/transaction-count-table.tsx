@@ -1,4 +1,3 @@
-// components/transaction-count-card.tsx
 import React from 'react';
 import { Dimensions, ScrollView, ActivityIndicator, StyleSheet } from 'react-native';
 import { Box } from '../ui/box';
@@ -81,7 +80,7 @@ const TransactionCountCard: React.FC<TransactionCountCardProps> = ({
         tableRowEvenClass = 'bg-purple-600';
         tableRowOddClass = 'bg-purple-500';
         break;
-    case 'dark': // Default
+    case 'dark':
     default:
       backgroundColorClass = 'bg-neutral-900';
       textColorClass = 'text-neutral-50';
@@ -95,7 +94,6 @@ const TransactionCountCard: React.FC<TransactionCountCardProps> = ({
 
   const tableContentTextColorClass = textColorClass;
 
-  // Helper untuk mendapatkan warna badge berdasarkan status
   const getBadgeAction = (status: string) => {
     switch (status.toLowerCase()) {
       case 'completed':
@@ -116,8 +114,6 @@ const TransactionCountCard: React.FC<TransactionCountCardProps> = ({
         return 'muted';
     }
   };
-
-  // Render loading, error, or no data states first
   if (isLoading) {
     return (
       <Box
@@ -154,7 +150,6 @@ const TransactionCountCard: React.FC<TransactionCountCardProps> = ({
       </Box>
     );
   }
-
   return (
     <Box
       className={`
@@ -166,7 +161,6 @@ const TransactionCountCard: React.FC<TransactionCountCardProps> = ({
       `}
       style={{ width: width < 768 ? width * 0.88 : width * 0.4}}
     >
-      {/* Header Card */}
       <Text
         className={`
           ${subtitleColorClass} text-sm mb-2
@@ -181,8 +175,6 @@ const TransactionCountCard: React.FC<TransactionCountCardProps> = ({
       >
         Total Statuses: {transactionCounts ? transactionCounts.length : 0}
       </Heading>
-
-      {/* Tabel Transaction Counts */}
       {transactionCounts && transactionCounts.length > 0 ? (
         <ScrollView style={{ flexGrow: 1 }}>
           <Table className="w-full">
@@ -214,7 +206,7 @@ const TransactionCountCard: React.FC<TransactionCountCardProps> = ({
                 </TableRow>
               ))}
             </TableBody>
-            <TableCaption className={`${subtitleColorClass} mt-2`}>
+            <TableCaption className={`${subtitleColorClass} mt-2  rounded-full`}>
               Count of transactions by status.
             </TableCaption>
           </Table>

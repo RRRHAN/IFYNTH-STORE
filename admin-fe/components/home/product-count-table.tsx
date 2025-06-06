@@ -1,22 +1,20 @@
-// components/product-count-card.tsx
 import React from 'react';
-import { Dimensions, ScrollView, ActivityIndicator, StyleSheet } from 'react-native'; // Tambahkan ActivityIndicator
+import { Dimensions, ScrollView, ActivityIndicator, StyleSheet } from 'react-native';
 import { Box } from '../ui/box';
 import { Text } from '../ui/text';
 import { Heading } from '../ui/heading';
 import { useColorScheme } from 'nativewind';
-// Import komponen Table Gluestack UI
 import { Table, TableHeader, TableBody, TableHead, TableRow, TableData, TableCaption } from "@/components/ui/table";
 
-import { DepartmentCount } from '@/src/types/home'; // Pastikan DepartmentCount diimpor dari sini
+import { DepartmentCount } from '@/src/types/home';
 
 const { width } = Dimensions.get('window');
 
 interface ProductCountTableProps {
-  productCounts: DepartmentCount[] | null; // Menerima array data departemen
+  productCounts: DepartmentCount[] | null;
   cardTitle?: string;
-  isLoading?: boolean; // Menambahkan prop untuk indikator loading
-  hasError?: boolean; // Menambahkan prop untuk indikator error
+  isLoading?: boolean;
+  hasError?: boolean;
   variant?: 'dark' | 'light' | 'primary' | 'secondary' | 'accent';
 }
 
@@ -28,8 +26,6 @@ const ProductCountTable: React.FC<ProductCountTableProps> = ({
   variant = 'accent'
 }) => {
   const { colorScheme } = useColorScheme();
-
-  // Logika untuk menentukan kelas background berdasarkan variant
   let backgroundColorClass = '';
   let textColorClass = '';
   let subtitleColorClass = '';
@@ -75,7 +71,7 @@ const ProductCountTable: React.FC<ProductCountTableProps> = ({
         tableRowEvenClass = 'bg-purple-600';
         tableRowOddClass = 'bg-purple-500';
         break;
-    case 'dark': // Default
+    case 'dark':
     default:
       backgroundColorClass = 'bg-neutral-900';
       textColorClass = 'text-neutral-50';
@@ -87,10 +83,8 @@ const ProductCountTable: React.FC<ProductCountTableProps> = ({
       break;
   }
 
-  // Determine text color for table content based on main card text color
   const tableContentTextColorClass = textColorClass;
 
-  // Render loading, error, or no data states first
   if (isLoading) {
     return (
       <Box
@@ -139,7 +133,6 @@ const ProductCountTable: React.FC<ProductCountTableProps> = ({
       `}
       style={{ width: width < 768 ? width * 0.88 : width * 0.4 }}
     >
-      {/* Header Card */}
       <Text
         className={`
           ${subtitleColorClass} text-sm mb-2
@@ -155,7 +148,6 @@ const ProductCountTable: React.FC<ProductCountTableProps> = ({
         Total Departments: {productCounts ? productCounts.length : 0}
       </Heading>
 
-      {/* Tabel Produk per Departemen */}
       {productCounts && productCounts.length > 0 ? (
         <ScrollView style={{ flexGrow: 1 }}> 
           <Table className="w-full">
@@ -181,7 +173,7 @@ const ProductCountTable: React.FC<ProductCountTableProps> = ({
                 </TableRow>
               ))}
             </TableBody>
-            <TableCaption className={`${subtitleColorClass} mt-2`}>
+            <TableCaption className={`${subtitleColorClass} mt-2 rounded-full`}>
               Product counts by department.
             </TableCaption>
           </Table>
