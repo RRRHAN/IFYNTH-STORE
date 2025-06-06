@@ -60,9 +60,6 @@ export default function LoginScreen() {
     if (!password) {
       setPasswordError("Password is required.");
       isValid = false;
-    } else if (password.length < 5) {
-      setPasswordError("Password must be at least 5 characters long.");
-      isValid = false;
     }
 
     if (!isValid) {
@@ -134,10 +131,8 @@ export default function LoginScreen() {
   const subtitleTextColorClass = 'text-neutral-600 dark:text-neutral-400';
   const labelTextColorClass = 'text-neutral-800 dark:text-white';
   const inputFieldClass = 'text-neutral-900 placeholder-neutral-500 border-neutral-400 dark:text-white dark:placeholder-neutral-500 dark:border-neutral-700';
-  const helperTextColorClass = 'text-neutral-600 dark:text-neutral-400';
   const checkboxIndicatorClass = 'bg-neutral-300 border-neutral-500 group-hover:bg-neutral-400 group-active:bg-neutral-400 dark:bg-neutral-700 dark:border-neutral-500 dark:group-hover:bg-neutral-600 dark:group-active:bg-neutral-600';
   const checkboxLabelClass = 'text-neutral-700 group-hover:text-neutral-900 group-active:text-neutral-900 dark:text-neutral-300 dark:group-hover:text-neutral-200 dark:group-active:text-neutral-200';
-  const linkTextColorClass = 'text-blue-700 dark:text-blue-500';
 
   return (
     <KeyboardAvoidingView
@@ -155,10 +150,10 @@ export default function LoginScreen() {
           <Image
             source={require("@/assets/images/logo.png")}
             alt="App Logo"
-            className="w-20 h-20 mb-4"
+            className="mb-4"
+            style={{ width: Platform.OS === "web" ? 400 : 300, height: Platform.OS === "web" ? 70 : 50}}
           />
         </Box>
-
         <Box
           className={`
             ${cardBackgroundClass}
@@ -170,7 +165,6 @@ export default function LoginScreen() {
             mb-12
           `}
         >
-          {/* Header Card */}
           <Box className="items-center mb-6">
             <Heading className={`${headingTextColorClass} text-3xl font-bold mb-2`}>Login</Heading>
             <Text className={`${subtitleTextColorClass} text-base text-center`}>
@@ -179,7 +173,6 @@ export default function LoginScreen() {
           </Box>
 
           <VStack space="xl" className="w-full">
-            {/* Form Input Username */}
             <FormControl isInvalid={!!usernameError} isRequired={true}>
               <FormControlLabel>
                 <FormControlLabelText className={`${labelTextColorClass} text-sm font-medium`}>
@@ -206,8 +199,6 @@ export default function LoginScreen() {
                 </FormControlError>
               )}
             </FormControl>
-
-            {/* Form Input Password */}
             <FormControl isInvalid={!!passwordError} isRequired={true}>
               <FormControlLabel>
                 <FormControlLabelText className={`${labelTextColorClass} text-sm font-medium`}>
@@ -232,14 +223,7 @@ export default function LoginScreen() {
                   </FormControlErrorText>
                 </FormControlError>
               )}
-              <FormControlHelper>
-                <FormControlHelperText className={`${helperTextColorClass} text-xs`}>
-                  Must be at least 5 characters.
-                </FormControlHelperText>
-              </FormControlHelper>
             </FormControl>
-
-            {/* Checkbox Remember Me */}
             <Box className="flex-row justify-between items-center w-full group">
               <Checkbox
                 value="rememberMe"
@@ -256,8 +240,6 @@ export default function LoginScreen() {
                 </CheckboxLabel>
               </Checkbox>
             </Box>
-
-            {/* Tombol Login */}
             <Button
               size="md"
               variant="solid"

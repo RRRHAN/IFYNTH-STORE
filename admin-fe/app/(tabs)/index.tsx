@@ -91,7 +91,6 @@ export default function HomeScreen() {
       } catch (err: any) {
         console.error("Failed to fetch home data", err);
         setHasError(true);
-        // Setel ke array kosong atau nilai default yang sesuai saat error
         setProductCount([]);
         setTransactionCount([]);
         setTransactionReport([]);
@@ -113,7 +112,6 @@ export default function HomeScreen() {
   const cardVariantP = colorScheme === "dark" ? "accent" : "secondary";
 
   return (
-    // ScrollView utama untuk seluruh halaman
     <ScrollView
       style={{ flex: 1 }}
       className="bg-background-0 dark:bg-neutral-900"
@@ -124,14 +122,11 @@ export default function HomeScreen() {
         width: '100%',
       }}
     >
-      {/* Judul Dashboard */}
       <Box className="w-full mb-6 items-center px-4" style={{ top: Platform.OS === "web" ? 0 : 0 }}>
         <Heading className="text-xl font-bold text-neutral-800 dark:text-neutral-100">
           Dashboard Overview
         </Heading>
       </Box>
-
-      {/* Bagian Kartu Pendapatan/Modal (MyRevenueCard) */}
       <Box
         className="flex-row flex-wrap justify-center w-full max-w-8xl"
         style={{ paddingHorizontal: 16 }}
@@ -150,12 +145,12 @@ export default function HomeScreen() {
         />
       </Box>
       <Box
-        className="flex-row flex-wrap justify-center w-full max-w-8xl" // max-w-8xl atau nilai yang sesuai
+        className="flex-row flex-wrap justify-center w-full max-w-8xl"
         style={{
-            flexDirection: width < 1000 ? "column" : "row", // Ubah jadi kolom di layar kecil, baris di layar besar
-            alignItems: width < 1000 ? "center" : "flex-start", // Pusatkan di kolom, mulai di baris
-            paddingHorizontal: 10, // Padding horizontal
-            marginTop: 20, // Jarak dari bagian atas
+            flexDirection: width < 768 ? "column" : "row",
+            alignItems: width < 1000 ? "center" : "flex-start",
+            paddingHorizontal: 10,
+            marginTop: 20,
         }}
       >
         <ProductCountTable

@@ -2,32 +2,24 @@ import { useGlobalModal } from "@/context/ModalContext";
 import { changePassword } from "@/src/api/admin";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
-import { Platform } from "react-native"; // Hanya Platform yang diperlukan dari react-native
-
-// Gluestack UI components
+import { Platform } from "react-native";
 import { Box } from "@/components/ui/box";
 import { Button, ButtonIcon, ButtonText } from "@/components/ui/button";
 import { Heading } from "@/components/ui/heading";
 import { Input, InputField } from "@/components/ui/input";
 import { Text } from "@/components/ui/text";
-
-// Icons from Lucide (lebih modern dari FontAwesome di Gluestack)
 import { ArrowLeft, Lock } from "lucide-react-native";
 import { useColorScheme } from "nativewind";
 
 export default function SecurityScreen() {
   const router = useRouter();
   const { showModal } = useGlobalModal();
-  const { colorScheme } = useColorScheme(); // Ambil skema warna
+  const { colorScheme } = useColorScheme();
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  // const [visible, setVisible] = useState(false); // Tidak digunakan di kode yang diberikan
-  // const [errorMessage, setErrorMessage] = useState(""); // Dikelola oleh useGlobalModal
-  // const [successMessage, setSuccessMessage] = useState(""); // Dikelola oleh useGlobalModal
 
   const handleChangePassword = async () => {
-    // Validasi input
     if (!currentPassword || !newPassword || !confirmPassword) {
       showModal({
         title: "Update password failed!",
@@ -49,8 +41,6 @@ export default function SecurityScreen() {
       });
       return;
     }
-
-    // Panggil API
     const result = await changePassword(
       currentPassword,
       newPassword,
@@ -65,7 +55,6 @@ export default function SecurityScreen() {
         autoClose: true,
         duration: 1500,
       });
-      // Reset form
       setCurrentPassword("");
       setNewPassword("");
       setConfirmPassword("");
@@ -77,14 +66,12 @@ export default function SecurityScreen() {
         autoClose: true,
         duration: 1500,
       });
-      // Reset form (opsional, tergantung UX yang diinginkan)
       setCurrentPassword("");
       setNewPassword("");
       setConfirmPassword("");
     }
   };
 
-  // Helper untuk kelas warna berdasarkan tema
   const textColorClass = colorScheme === "dark" ? "text-white" : "text-gray-900";
   const labelColorClass = colorScheme === "dark" ? "text-gray-300" : "text-gray-700";
   const inputBorderClass = colorScheme === "dark" ? "border-gray-700" : "border-gray-300";
@@ -94,14 +81,11 @@ export default function SecurityScreen() {
 
   return (
     <Box className={`flex-1 p-5 items-center ${mainBgClass}`}>
-      {/* Tombol Kembali (BackButton) */}
       <Box
         className="w-full max-w-sm flex-row justify-start"
         style={{
-          // Sesuaikan posisi tombol kembali, terutama untuk platform web
-          // Atau gunakan Header dari Expo Router untuk posisi otomatis
           position: Platform.OS === "web" ? "relative" : "absolute",
-          top: Platform.OS === "web" ? 0 : 40, // Top for non-web, adjust as needed for safe area
+          top: Platform.OS === "web" ? 0 : 40,
           left: Platform.OS === "web" ? 0 : 20,
           zIndex: 10,
         }}
@@ -114,18 +98,15 @@ export default function SecurityScreen() {
         >
           <ButtonIcon
             as={ArrowLeft}
-            size="lg" // Sesuaikan ukuran ikon Gluestack
+            size="lg"
             className={`${colorScheme === "dark" ? "text-gray-400" : "text-gray-600"}`}
           />
         </Button>
       </Box>
-
-      {/* Konten Utama dalam Card */}
       <Box
         className={`w-full max-w-sm p-5 rounded-lg shadow-md border ${inputBorderClass} ${inputBgClass}`}
         style={{
-          // Berikan sedikit margin top agar tidak tertutup tombol kembali di mobile/native
-          marginTop: Platform.OS === "web" ? 0 : 100, // Adjust as needed
+          marginTop: Platform.OS === "web" ? 0 : 100,
         }}
       >
         <Heading size="xl" className={`mb-5 text-center ${textColorClass}`}>
@@ -180,7 +161,7 @@ export default function SecurityScreen() {
         <Button
           action="primary"
           onPress={handleChangePassword}
-          className="mt-6 py-3 rounded-lg flex-row items-center justify-center bg-blue-600 hover:bg-blue-700 active:bg-blue-800"
+          className="mt-6 py-2 rounded-lg flex-row items-center justify-center bg-blue-600 hover:bg-blue-700 active:bg-blue-800"
         >
           <ButtonIcon as={Lock} size="md" className="mr-2 text-white" />
           <ButtonText className="text-white text-base font-semibold">

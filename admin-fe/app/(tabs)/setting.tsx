@@ -3,9 +3,7 @@ import { FontAwesome } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useRouter } from "expo-router";
 import { useEffect, useState } from "react";
-import {
-  GestureResponderEvent
-} from "react-native";
+import { GestureResponderEvent } from "react-native";
 
 // Gluestack UI components
 import { Box } from "@/components/ui/box";
@@ -16,8 +14,6 @@ import { Text } from "@/components/ui/text";
 import { VStack } from "@/components/ui/vstack";
 
 import { useColorScheme } from "nativewind";
-
-// Helper function to darken color - necessary if custom hex colors are used
 function darkenColor(hexColor: string) {
   let color = hexColor.replace("#", "");
   if (color.length === 3) {
@@ -62,19 +58,13 @@ function NavButton({
       onPressIn={() => setPressed(true)}
       onPressOut={() => setPressed(false)}
       style={{ backgroundColor: buttonBgColor }}
-      className={`
-        py-3 rounded-lg my-2 flex-row items-center justify-center w-full
+      className={`rounded-lg my-2 flex-row items-center justify-center w-full
         ${color === "#ef4444" ? "bg-red-600" : "bg-neutral-600"}
         ${colorScheme === "dark" ? "dark:bg-neutral-700" : ""}
       `}
     >
       {icon && (
-        <FontAwesome
-          name={icon}
-          size={20}
-          color="white"
-          className="mr-2"
-        />
+        <FontAwesome name={icon} size={20} color="white" className="mr-2" />
       )}
       <ButtonText className="text-white text-base font-semibold">
         {title}
@@ -112,9 +102,11 @@ export default function SettingScreen() {
     loadUsername();
   }, []);
 
-  const mainTextColorClass = colorScheme === "dark" ? "text-white" : "text-gray-900";
+  const mainTextColorClass =
+    colorScheme === "dark" ? "text-white" : "text-gray-900";
   const cardBgClass = colorScheme === "dark" ? "bg-neutral-800" : "bg-white";
-  const cardBorderClass = colorScheme === "dark" ? "border-neutral-700" : "border-gray-200";
+  const cardBorderClass =
+    colorScheme === "dark" ? "border-neutral-700" : "border-gray-200";
 
   return (
     <Box
