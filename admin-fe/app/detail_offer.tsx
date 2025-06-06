@@ -88,13 +88,13 @@ export default function OfferDetailModal({ product }: OfferDetailModalProps) {
     <ScrollView
     pointerEvents="box-none"
       contentContainerStyle={{
-        paddingBottom: Platform.OS === "web" ? 100 : 150,
+        paddingBottom: Platform.OS === "web" ? 100 : 250,
       }}
       onContentSizeChange={(contentWidth, contentHeight) => {
         setContentTotalHeight(contentHeight);
       }}
     >
-      <View style={[styles.imageDetailRow, { marginTop: Platform.OS === "web" ? 20 : 100}]}>
+      <View style={[styles.imageDetailRow]}>
         <View style={styles.imageSection}>
           {isVideo(selectedMedia!) ? (
             <VideoView

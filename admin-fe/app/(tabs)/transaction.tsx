@@ -461,7 +461,7 @@ const TransactionsScreen = () => {
                                 style={{
                                   backgroundColor: badgeStyleProps.bgColor,
                                   borderColor: badgeStyleProps.badgeBorderColor,
-                                  flexGrow: 1, // Allow badge to take available space
+                                  flexGrow: 1,
                                   justifyContent: "center",
                                 }}
                               >
@@ -545,7 +545,6 @@ const TransactionsScreen = () => {
               size="sm"
               color={colorScheme === "dark" ? "#D1D5DB" : "#4B5563"}
             />
-            <ButtonText>Previous</ButtonText>
           </Button>
 
           <Text className={`${paginationTextColor} text-base mx-4`}>
@@ -560,7 +559,6 @@ const TransactionsScreen = () => {
             disabled={currentPage === totalPages || totalPages === 0}
             className="ml-2"
           >
-            <ButtonText>Next</ButtonText>
             <Icon
               as={ChevronRight}
               size="sm"
@@ -569,13 +567,11 @@ const TransactionsScreen = () => {
           </Button>
         </Box>
       </Box>
-
-      {/* Gluestack UI Modal for Status Picker */}
       <Modal
         isOpen={isStatusPickerModalVisible}
         onClose={() => {
           setStatusPickerModalVisible(false);
-          setCurrentEditingItemId(null); // Reset editing item when modal closes
+          setCurrentEditingItemId(null);
         }}
       >
         <ModalBackdrop />

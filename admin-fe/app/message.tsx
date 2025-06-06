@@ -1,20 +1,26 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react"; // <-- Tambahkan useMemo
 import {
-  View,
-  Text,
-  Image,
   FlatList,
-  SafeAreaView,
-  TouchableOpacity,
-  KeyboardAvoidingView,
   Platform,
+  KeyboardAvoidingView,
 } from "react-native";
-import { FontAwesome } from "@expo/vector-icons"; // Mengubah impor menjadi FontAwesome
 import { useRouter, useLocalSearchParams } from "expo-router";
-import { ThemedView } from "@/components/ThemedView";
-import { ThemedTextInput } from "@/components/ThemedTextInput";
-import { ThemedText } from "@/components/ThemedText";
-import styles from "./styles/messageStyles";
+
+// Gluestack UI components
+import { Box } from "@/components/ui/box";
+import { Text } from "@/components/ui/text";
+import { Image } from "@/components/ui/image";
+import { Button, ButtonIcon } from "@/components/ui/button";
+import { Input, InputField, InputSlot } from "@/components/ui/input";
+import { Heading } from "@/components/ui/heading";
+import { HStack } from "@/components/ui/hstack";
+import { VStack } from "@/components/ui/vstack";
+
+// Icons from Lucide
+import { ArrowLeft, Send } from "lucide-react-native";
+import { useColorScheme } from "nativewind";
+
+// Imports dari project Anda
 import { addMessage, fetchMessage } from "@/src/api/message";
 import { Message } from "@/src/types/message";
 import { BASE_URL } from "@/src/api/constants";
@@ -24,13 +30,30 @@ import * as VideoThumbnails from "expo-video-thumbnails";
 export default function ChatScreen() {
   const router = useRouter();
   const params = useLocalSearchParams();
-  const item = params.item ? JSON.parse(params.item as string) : null;
-  const [selectedItem, setSelectedItem] = useState(item);
+
+  const stableItem = useMemo(() => {
+    try {
+      return params.item ? JSON.parse(params.item as string) : null;
+    } catch (e) {
+      console.error("Failed to parse item from params:", e);
+      return null;
+    }
+  }, [params.item]);
+
+  const [selectedItem, setSelectedItem] = useState(stableItem);
   const [messages, setMessages] = useState<Message[]>([]);
   const [text, setText] = useState("");
   const [thumbnailUrls, setThumbnailUrls] = useState<{ [key: string]: string }>(
     {}
   );
+  const { colorScheme } = useColorScheme();
+
+  // Helper untuk warna teks berdasarkan tema
+  const getDynamicTextColor = () => colorScheme === "dark" ? "text-white" : "text-gray-900";
+  const getSubduedTextColor = () => colorScheme === "dark" ? "text-gray-300" : "text-gray-600";
+  const getMainBgClass = () => colorScheme === "dark" ? "bg-neutral-900" : "bg-white";
+  const getHeaderBgClass = () => colorScheme === "dark" ? "bg-neutral-800" : "bg-gray-100";
+  const getBorderColorClass = () => colorScheme === "dark" ? "border-neutral-700" : "border-gray-200";
 
   const handleBack = () => {
     router.replace("/user_advertisement");
@@ -46,12 +69,16 @@ export default function ChatScreen() {
         Role: "ADMIN",
       });
 
-      // Clear input field
       setText("");
 
-      // Fetch updated messages from backend
       const updatedMessages = await fetchMessage(selectedItem.ID);
-      setMessages(updatedMessages);
+      setMessages(prevMessages => {
+        if (JSON.stringify(updatedMessages) !== JSON.stringify(prevMessages)) {
+          return updatedMessages;
+        }
+        return prevMessages;
+      });
+
     } catch (error) {
       console.error("Failed to send message:", error);
     }
@@ -64,171 +91,190 @@ export default function ChatScreen() {
       if (selectedItem && selectedItem.ID) {
         try {
           const data = await fetchMessage(selectedItem.ID);
-          // Hanya update jika ada perubahan data
-          if (JSON.stringify(data) !== JSON.stringify(messages)) {
-            setMessages(data);
-          }
+          setMessages(prevMessages => {
+            if (JSON.stringify(data) !== JSON.stringify(prevMessages)) {
+              return data;
+            }
+            return prevMessages;
+          });
         } catch (error) {
           console.error("Failed to fetch messages:", error);
         }
       }
     };
 
-    loadMessages(); // Muat pesan saat komponen pertama kali di-mount
+    if (selectedItem && selectedItem.ID) {
+      loadMessages();
+      interval = setInterval(() => {
+        loadMessages();
+      }, 3000);
+    }
 
-    interval = setInterval(() => {
-      loadMessages(); // Muat ulang setiap 3 detik
-    }, 3000);
-
-    return () => clearInterval(interval); // Bersihkan interval saat komponen dilepas
-  }, [selectedItem, messages]);
+    // Cleanup interval
+    return () => {
+      if (interval) {
+        clearInterval(interval);
+      }
+    };
+  }, [selectedItem]);
 
   useEffect(() => {
     async function generateThumbnails() {
-      if (item && item.Files && item.Files.length > 0) {
-        const fileUrl = item.Files[0].URL;
+      if (stableItem && stableItem.Files && stableItem.Files.length > 0) {
+        const fileUrl = stableItem.Files[0].URL;
+        const mediaUrl = `${BASE_URL}/api${fileUrl}`;
+
         if (/\.(mp4|webm|ogg)$/i.test(fileUrl)) {
           try {
-            const mediaUrl = `${BASE_URL}/api${fileUrl}`;
+            let uri: string;
             if (Platform.OS === "web") {
-              const url = await generateVideoThumbnailJS(mediaUrl);
-              setThumbnailUrls((prev) => ({ ...prev, [item.ID]: url }));
+              uri = await generateVideoThumbnailJS(mediaUrl);
             } else {
-              const { uri } = await VideoThumbnails.getThumbnailAsync(
-                mediaUrl,
-                { time: 1000 }
-              );
-              setThumbnailUrls((prev) => ({
-                ...prev,
-                [item.ID]: uri,
-              }));
+              const result = await VideoThumbnails.getThumbnailAsync(mediaUrl, { time: 1000 });
+              uri = result.uri;
             }
+            setThumbnailUrls((prev) => ({ ...prev, [stableItem.ID]: uri }));
           } catch (error) {
             console.warn("Failed to generate thumbnail for video", error);
             setThumbnailUrls((prev) => ({
               ...prev,
-              [item.ID]: `${BASE_URL}/api${fileUrl}`,
+              [stableItem.ID]: `${BASE_URL}/api${fileUrl}`,
             }));
           }
         } else {
           setThumbnailUrls((prev) => ({
             ...prev,
-            [item.ID]: `${BASE_URL}/api${fileUrl}`,
+            [stableItem.ID]: `${BASE_URL}/api${fileUrl}`,
           }));
         }
-      } else if (item && item.ID) {
+      } else if (stableItem && stableItem.ID) {
           setThumbnailUrls((prev) => ({
             ...prev,
-            [item.ID]: "https://img.lovepik.com/free-png/20210919/lovepik-question-element-png-image_401016497_wh1200.png",
+            [stableItem.ID]: "https://img.lovepik.com/free-png/20210919/lovepik-question-element-png-image_401016497_wh1200.png",
           }));
       }
     }
-    if (item) {
+    // Panggil generateThumbnails hanya jika 'stableItem' berubah dan valid
+    if (stableItem && stableItem.ID) {
       generateThumbnails();
     }
-  }, [item]);
+  }, [stableItem]); // <-- Dependency array yang tepat: 'stableItem'
 
-  const renderItem = ({ item }: { item: Message }) => {
-    const isMe = item.Role === "ADMIN";
+  const renderItem = ({ item: messageItem }: { item: Message }) => {
+    const isMe = messageItem.Role === "ADMIN";
+    const avatarUrlMe = "https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava1-bg.webp";
+    const avatarUrlOther = "https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava6-bg.webp";
 
     return (
-      <ThemedView
-        style={[styles.messageContainer, !isMe && styles.messageContainerRight]}
+      <HStack
+        className={`my-2 px-3 ${isMe ? "justify-end" : "justify-start"} items-end`}
       >
-        {isMe && (
+        {!isMe && (
           <Image
-            source={{
-              uri: "https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava1-bg.webp", // Avatar admin
-            }}
-            style={styles.avatarLeft}
+            source={{ uri: avatarUrlOther }}
+            className="w-8 h-8 rounded-full mr-2"
+            alt="User Avatar"
           />
         )}
-        <ThemedView
-          style={[
-            styles.bubble,
-            !isMe ? styles.bubbleRight : styles.bubbleLeft,
-          ]}
+        <Box
+          className={`
+            max-w-[70%] p-3 rounded-lg
+            ${isMe ? `bg-blue-500 rounded-br-none` : `bg-gray-200 rounded-bl-none`}
+            ${isMe ? "text-white" : getDynamicTextColor()}
+            ${isMe ? "" : `${colorScheme === 'dark' ? 'dark:bg-neutral-700' : ''}`}
+          `}
         >
-          <Text>{item.Message}</Text>
-          <Text style={!isMe ? styles.timeLeft : styles.timeRight}>
-            {new Date(item.CreatedAt).toLocaleTimeString([], {
+          <Text className={`${isMe ? 'text-white' : getDynamicTextColor()}`}>
+            {messageItem.Message}
+          </Text>
+          <Text className={`text-xs mt-1 ${isMe ? 'text-blue-200' : getSubduedTextColor()}`}>
+            {new Date(messageItem.CreatedAt).toLocaleTimeString([], {
               hour: "2-digit",
               minute: "2-digit",
             })}
           </Text>
-        </ThemedView>
-        {!isMe && (
+        </Box>
+        {isMe && (
           <Image
-            source={{ uri: "https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava6-bg.webp" }}
-            style={styles.avatarRight}
+            source={{ uri: avatarUrlMe }}
+            className="w-8 h-8 rounded-full ml-2"
+            alt="Admin Avatar"
           />
         )}
-      </ThemedView>
+      </HStack>
     );
   };
 
+  // Gunakan stableItem di sini
   const thumbnailUrl =
-    (item && thumbnailUrls[item.ID]) ||
+    (stableItem && thumbnailUrls[stableItem.ID]) ||
     "https://img.lovepik.com/free-png/20210919/lovepik-question-element-png-image_401016497_wh1200.png";
 
   return (
-    <SafeAreaView style={styles.container}>
+    <Box className={`flex-1 ${getMainBgClass()}`}>
       {/* Header */}
-      <View style={styles.header}>
-        <TouchableOpacity onPress={handleBack}>
-          {/* Mengganti MaterialCommunityIcons dengan FontAwesome */}
-          <FontAwesome name="arrow-left" size={24} color="#333" />
-        </TouchableOpacity>
-        <ThemedText style={styles.headerTitle}>Chat</ThemedText>
-      </View>
-      {/* Chat - Scrollable */}
-      <>
-        {/* Menampilkan data produk di atas */}
-        {selectedItem && (
-          <View style={styles.fixedItemContainer}>
-            <View style={styles.itemContent}>
-              <Image
-                source={{
-                  uri: thumbnailUrl,
-                }}
-                style={styles.image}
-              />
-              <View style={styles.textContainer}>
-                <Text style={styles.itemTitle}>{selectedItem.Name}</Text>
-                <Text>Rp.{selectedItem.Price}</Text>
-              </View>
-            </View>
-          </View>
-        )}
-        {/* Menampilkan pesan chat */}
-        <FlatList
-          data={messages}
-          renderItem={renderItem}
-          keyExtractor={(chat) => chat.ID.toString()}
-          inverted
-          contentContainerStyle={{ paddingBottom: 120 }}
-        />
-      </>
+      <HStack className={`items-center p-4 border-b ${getBorderColorClass()} ${getHeaderBgClass()}`}>
+        <Button variant="link" onPress={handleBack} className="p-0">
+          <ButtonIcon as={ArrowLeft} size="lg" className={`${getSubduedTextColor()}`} />
+        </Button>
+        <Heading size="lg" className={`flex-1 text-center mr-10 ${getDynamicTextColor()}`}>
+          Chat
+        </Heading>
+      </HStack>
+
+      {/* Fixed Item Container (Product Info) */}
+      {selectedItem && ( // Gunakan selectedItem yang sudah stabil
+        <Box className={`p-3 border-b ${getBorderColorClass()} ${getHeaderBgClass()}`}>
+          <HStack className="items-center gap-3">
+            <Image
+              source={{ uri: thumbnailUrl }}
+              className="w-16 h-16 rounded-md object-cover"
+              alt="Product Thumbnail"
+            />
+            <VStack className="flex-1">
+              <Text className={`font-semibold text-base ${getDynamicTextColor()}`}>{selectedItem.Name}</Text>
+              <Text className={`text-sm ${getSubduedTextColor()}`}>Rp. {selectedItem.Price.toLocaleString()}</Text>
+            </VStack>
+          </HStack>
+        </Box>
+      )}
+
+      {/* Chat Messages */}
+      <FlatList
+        data={messages}
+        renderItem={renderItem}
+        keyExtractor={(chat) => chat.ID.toString()}
+        inverted
+        contentContainerStyle={{ paddingBottom: Platform.OS === 'ios' ? 10 : 80 }}
+        className="flex-1"
+      />
 
       {/* Message Input */}
       <KeyboardAvoidingView
-        behavior={Platform.OS === "ios" ? "padding" : undefined}
-        keyboardVerticalOffset={Platform.OS === "ios" ? 80 : 0}
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 0}
+        className={`border-t ${getBorderColorClass()} ${getHeaderBgClass()}`}
       >
-        <ThemedView style={styles.inputContainer}>
-          <ThemedTextInput
-            style={styles.textInput}
-            placeholder="Type a message"
-            value={text}
-            onChangeText={setText}
-            onSubmitEditing={handleSend}
-            returnKeyType="send"
-          />
-          <TouchableOpacity onPress={handleSend} style={styles.sendButton}>
-            <FontAwesome name="send" size={20} color="#A9A9A9" />
-          </TouchableOpacity>
-        </ThemedView>
+        <HStack className="p-3 items-center">
+          <Input
+            variant="outline"
+            size="md"
+            className={`flex-1 mr-2 ${getBorderColorClass()} ${getMainBgClass()}`}
+          >
+            <InputField
+              placeholder="Type a message"
+              value={text}
+              onChangeText={setText}
+              onSubmitEditing={handleSend}
+              returnKeyType="send"
+              className={`${getDynamicTextColor()}`}
+            />
+          </Input>
+          <Button onPress={handleSend} className="bg-blue-500 rounded-full w-10 h-10 justify-center items-center">
+            <ButtonIcon as={Send} size="md" className="text-white" />
+          </Button>
+        </HStack>
       </KeyboardAvoidingView>
-    </SafeAreaView>
+    </Box>
   );
 }

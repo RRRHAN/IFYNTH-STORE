@@ -102,7 +102,7 @@ const UserAdvertisementScreen = () => {
   const getTableRowBgClass = () =>
     colorScheme === "dark" ? "bg-neutral-700" : "bg-white";
   const getTableRowOddBgClass = () =>
-    colorScheme === "dark" ? "bg-neutral-750" : "bg-gray-50";
+    colorScheme === "dark" ? "bg-neutral-800" : "bg-gray-50";
 
   const getTableRowHoverBgClass = () =>
     colorScheme === "dark" ? "hover:bg-neutral-600" : "hover:bg-gray-50";
@@ -372,8 +372,6 @@ const UserAdvertisementScreen = () => {
             </Text>
           </Box>
         )}
-
-        {/* Kolom Status (menggunakan metode TransactionsScreen) */}
         <Box
           style={{ width: columnWidths.status }}
           className="py-3 px-4 flex justify-center items-center"
@@ -432,8 +430,6 @@ const UserAdvertisementScreen = () => {
             )}
           </Box>
         </Box>
-
-        {/* Action Buttons */}
         <Box
           style={{ width: columnWidths.action }}
           className="flex-row justify-around items-center px-2"
@@ -479,27 +475,20 @@ const UserAdvertisementScreen = () => {
 
   return (
     <Box className={`flex-1 ${getMainBgClass()}`}>
-      {/* Header Statis (Judul) */}
       <Box
         className={`w-full px-4 py-4 flex-row items-center justify-between
-          ${getTableHeaderBgClass()} border-b ${getBorderColorClass()}
         `}
         style={{ paddingTop: Platform.OS === "android" ? 40 : 16 }}
       >
         <Box className="w-8" />
-        <Heading
-          size="xl"
-          className={`flex-1 text-center ${getDynamicTextColor()}`}
-        >
+        <Heading size="xl" className={`flex-1 text-center`}>
           LIST USER ADVERTISEMENT
         </Heading>
         <Box className="w-8" />
       </Box>
-
-      {/* Tabel */}
       <Box
         className={`relative flex flex-col flex-1 w-full overflow-hidden rounded-lg shadow-md
-          ${getTableHeaderBgClass()} self-center mt-4
+           self-center mt-4 ${getTableHeaderBgClass()}
         `}
         style={{ maxWidth: screenWidth * 0.9 }}
       >
@@ -509,7 +498,6 @@ const UserAdvertisementScreen = () => {
           className="flex-1"
         >
           <VStack style={{ minWidth: effectiveTableContentWidth }}>
-            {/* Header Tabel */}
             <HStack
               className={`border-b ${getBorderColorClass()} py-3 ${getTableHeaderBgClass()}`}
             >
@@ -568,8 +556,6 @@ const UserAdvertisementScreen = () => {
                 </Text>
               </Box>
             </HStack>
-
-            {/* Konten Tabel */}
             {currentOffers.length === 0 ? (
               <Box className="py-8 items-center justify-center">
                 <Text className={`${getLoadingTextColorClass()} text-base`}>
@@ -632,7 +618,7 @@ const UserAdvertisementScreen = () => {
         <ModalContent
           className={`flex-1 ${getMainBgClass()} rounded-lg shadow-md`}
         >
-          <ModalHeader className="w-full border-b ${getBorderColorClass()} p-4">
+          <ModalHeader className={`w-full border-b ${getBorderColorClass()} p-4`}>
             <Box className="w-full flex-row justify-between items-center">
               <Heading size="lg" className={`${getDynamicTextColor()}`}>
                 Offer Details

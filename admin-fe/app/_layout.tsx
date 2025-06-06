@@ -31,6 +31,7 @@ export default function RootLayout() {
           <Stack.Screen name="personal" options={{ headerShown: false }}/>
           <Stack.Screen name="admin_activity" options={{ headerShown: false }}/>
           <Stack.Screen name="edit_product" options={{ headerShown: false }}/>
+          <Stack.Screen name="message" options={{ headerShown: false }}/>
           <Stack.Screen name="+not-found" />
         </Stack>
         <StatusBar style="auto" />

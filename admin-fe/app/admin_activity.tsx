@@ -21,7 +21,7 @@ import { useColorScheme } from "nativewind";
 
 import { fetchAdminActivity } from "@/src/api/admin";
 import { AdminActivity } from "@/src/types/setting";
-import { useRouter } from "expo-router"; // Pindahkan useRouter ke sini
+import { useRouter } from "expo-router";
 
 const LogsScreen = () => {
   const { colorScheme } = useColorScheme();
