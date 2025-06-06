@@ -27,6 +27,7 @@ import { useColorScheme } from "nativewind";
 import ProductCountTable from "@/components/home/product-count-table";
 import TransactionCountTable from "@/components/home/transaction-count-table";
 import MTransactionReportChart from "@/components/home/MTransactionReportChart";
+import TotalTransactionUserTable from "@/components/home/TotalTransactionUserTable";
 import {
   dummyProfitProducts,
   dummyTransactionReports,
@@ -178,6 +179,11 @@ export default function HomeScreen() {
          <MTransactionReportChart
             transactionReport={dummyTransactionReports}
             height={380}
+         />
+      </Box>
+      <Box className="w-full max-w-8xl mt-4 px-4">
+         <TotalTransactionUserTable
+            totalTransactionUser={dummyTotalTransactionUsers}
          />
       </Box>
       {loading && (
