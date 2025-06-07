@@ -115,50 +115,59 @@ const ProductTable = () => {
     });
   };
 
-const openImagePicker = async () => {
-  const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
-  if (!permissionResult.granted) {
-    Alert.alert("Permission required", "Permission to access media library is required!");
-    return;
-  }
-
-  const pickerResult = await ImagePicker.launchImageLibraryAsync({
-    mediaTypes: ImagePicker.MediaTypeOptions.Images,
-    allowsEditing: true,
-    quality: 1,
-  });
-
-  if (!pickerResult.canceled) {
-    try {
-      const localUri = pickerResult.assets[0].uri;
-      // On Android, ensure the URI starts with 'file://'
-      const uri = Platform.OS === "android" && !localUri.startsWith("file://") ? "file://" + localUri : localUri;
-
-      // Extract filename
-      const filename = uri.split("/").pop() ?? "photo.jpg";
-
-      // Infer MIME type from filename extension
-      const match = /\.(\w+)$/.exec(filename);
-      const type = match ? `image/${match[1].toLowerCase()}` : "image/jpeg";
-
-      // Convert the local file URI to a Blob
-      const response = await fetch(uri);
-      const blob = await response.blob();
-
-      // Prepare FormData and append the image blob with filename and type
-      const formData = new FormData();
-      formData.append("image", blob, filename);
-
-      // Call your API function with the formData
-      const data = await fetchProductsByImage(formData);
-      setProducts(data);
-      setSearchValue("");
-    } catch (error) {
-      Alert.alert("Upload failed", `${error}`);
+  const openImagePicker = async () => {
+    const permissionResult =
+      await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (!permissionResult.granted) {
+      Alert.alert(
+        "Permission required",
+        "Permission to access media library is required!"
+      );
+      return;
     }
-  }
-};
 
+    const pickerResult = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      quality: 1,
+    });
+
+    if (!pickerResult.canceled) {
+      try {
+        const localUri = pickerResult.assets[0].uri;
+        const filename = localUri.split("/").pop() ?? "image.jpg";
+        const match = /\.(\w+)$/.exec(filename);
+        const type = match ? `image/${match[1].toLowerCase()}` : "image/jpeg";
+
+        const formData = new FormData();
+
+        if (Platform.OS === "web") {
+          const response = await fetch(localUri);
+          const blob = await response.blob();
+          formData.append("image", blob, filename);
+        } else {
+          const uri =
+            Platform.OS === "android" && !localUri.startsWith("file://")
+              ? "file://" + localUri
+              : localUri;
+
+          formData.append("image", {
+            uri,
+            name: filename,
+            type,
+          } as any);
+        }
+
+        const data = await fetchProductsByImage(formData);
+
+        // Call your success function
+        setProducts(data);
+        setSearchValue("");
+      } catch (err) {
+        Alert.alert("Upload error", `${err}`);
+      }
+    }
+  };
 
   useEffect(() => {
     getData();
