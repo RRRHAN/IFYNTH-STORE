@@ -3,10 +3,11 @@ import { BASE_URL, getAuthToken } from "./constants";
 import { ProductData, UpdateProductData } from "../request/productReq";
 import { Platform } from "react-native";
 
-export const fetchProducts = async (): Promise<Product[]> => {
+export const fetchProducts = async (keyword: string = ""): Promise<Product[]> => {
   const token = await getAuthToken();
   try {
-    const getAllUrl = `${BASE_URL}/api/product`;
+    const query = keyword ? `?keyword=${encodeURIComponent(keyword)}` : "";
+    const getAllUrl = `${BASE_URL}/api/product${query}`;
 
     const response = await fetch(getAllUrl, {
       headers: {
@@ -194,13 +195,7 @@ export const updateProduct = async (productData: UpdateProductData) => {
     formData.append("removedImages", JSON.stringify(productData.removedImages));
   }
 
-  console.log(productData);
   formData.append("stockDetails", JSON.stringify(productData.sizes));
-
-  console.log("FormData contents:");
-  for (const pair of formData.entries()) {
-    console.log(`${pair[0]}:`, pair[1]);
-  }
 
   try {
     const updateUrl = `${BASE_URL}/api/product/update/${productData.productId}`;

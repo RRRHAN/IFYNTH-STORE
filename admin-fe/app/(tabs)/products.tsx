@@ -28,7 +28,7 @@ import { VStack } from "@/components/ui/vstack";
 import { BASE_URL } from "@/src/api/constants";
 import { deleteProduct, fetchProducts } from "@/src/api/products";
 import { Product } from "@/src/types/product";
-import { useRouter } from "expo-router";
+import { useRouter, useLocalSearchParams } from "expo-router";
 import { Eye, PlusIcon, SquarePen, Trash, X } from "lucide-react-native";
 import { useColorScheme } from "nativewind";
 import ProductDetailModal from "../detail_product";
@@ -49,6 +49,9 @@ const ProductTable = () => {
     null
   );
   const [showProductDetailModal, setShowProductDetailModal] = useState(false);
+  const { keyword } = useLocalSearchParams();
+  const initialKeyword = Array.isArray(keyword) ? keyword[0] : keyword ?? "";
+  const [searchValue, setSearchValue] = useState(initialKeyword);
 
   const handleDeleteProduct = (productId: string) => {
     setProductIdToDelete(productId);
@@ -62,7 +65,7 @@ const ProductTable = () => {
 
   const getData = async () => {
     try {
-      const data = await fetchProducts();
+      const data = await fetchProducts(initialKeyword);
       setProducts(data);
     } catch (err) {
       console.error("Failed to fetch products:", err);
@@ -72,9 +75,18 @@ const ProductTable = () => {
     }
   };
 
+  const onSubmit = () => {
+    // Redirect to /products with keyword as query param
+    router.push({
+      pathname: "/products",
+      params: { keyword: searchValue },
+    });
+  };
+
   useEffect(() => {
     getData();
-  }, []);
+    setSearchValue(initialKeyword);
+  }, [initialKeyword]);
 
   const colWidths = useMemo(() => {
     if (isMobileLayout) {
@@ -160,8 +172,12 @@ const ProductTable = () => {
             className="w-full h-10 px-3 py-2 border border-slate-300 rounded-lg focus:border-blue-500 hover:border-slate-400 shadow-sm"
           >
             <InputField
+              value={searchValue}
+              onChangeText={setSearchValue}
               placeholder="Search for product..."
               className="text-slate-700 text-sm placeholder:text-slate-400 dark:text-neutral-200 dark:placeholder:text-neutral-400"
+              onSubmitEditing={onSubmit} 
+              returnKeyType="search"
             />
             <InputSlot className="pr-2">
               <Button variant="link" className="p-0">
