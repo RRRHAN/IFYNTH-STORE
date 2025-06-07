@@ -5002,3 +5002,22 @@ input {
 }
 
 /* end shipping address modal */
+
+    #search-image-form {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 8px 16px;
+        border-radius: 6px;
+        font-size: 14px;
+        white-space: nowrap;
+        transition: all 0.3s ease;
+    }
+
+    #search-image-form .fa-search {
+        margin-right: 8px;
+    }
+
+    #search-image-form .label-icon {
+        display: none;
+    }
