@@ -52,7 +52,7 @@ export const fetchProductsByImage = async (formData: FormData): Promise<Product[
     console.log("Fetched product by image data:", result.data);
     return result.data;
   } catch (error) {
-    console.error("Failed to fetch products by iamge:", error);
+    console.error("Failed to fetch products by image:", error);
     return [];
   }
 };
