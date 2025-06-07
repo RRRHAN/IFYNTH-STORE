@@ -6,7 +6,10 @@ import {
   StyleSheet,
   useWindowDimensions,
   View,
+  Pressable,
+  Alert,
 } from "react-native";
+import { FontAwesome } from "@expo/vector-icons";
 
 import { Box } from "@/components/ui/box";
 import { Button, ButtonIcon, ButtonText } from "@/components/ui/button";
@@ -26,12 +29,17 @@ import {
 import { Text } from "@/components/ui/text";
 import { VStack } from "@/components/ui/vstack";
 import { BASE_URL } from "@/src/api/constants";
-import { deleteProduct, fetchProducts } from "@/src/api/products";
+import {
+  deleteProduct,
+  fetchProducts,
+  fetchProductsByImage,
+} from "@/src/api/products";
 import { Product } from "@/src/types/product";
 import { useRouter, useLocalSearchParams } from "expo-router";
 import { Eye, PlusIcon, SquarePen, Trash, X } from "lucide-react-native";
 import { useColorScheme } from "nativewind";
 import ProductDetailModal from "../detail_product";
+import * as ImagePicker from "expo-image-picker";
 
 const MOBILE_BREAKPOINT = 768;
 
@@ -75,6 +83,30 @@ const ProductTable = () => {
     }
   };
 
+  const CameraIconWithTooltip = () => {
+    return Platform.OS === "web" ? (
+      <div title="Search product by similar image">
+        <Pressable onPress={openImagePicker} style={{ cursor: "pointer" }}>
+          <FontAwesome
+            name="camera"
+            size={20}
+            color="white"
+            style={{ margin: 24 }}
+          />
+        </Pressable>
+      </div>
+    ) : (
+      <Pressable onPress={openImagePicker} style={{ cursor: "pointer" }}>
+        <FontAwesome
+          name="camera"
+          size={20}
+          color="white"
+          style={{ margin: 24 }}
+        />
+      </Pressable>
+    );
+  };
+
   const onSubmit = () => {
     // Redirect to /products with keyword as query param
     router.push({
@@ -82,6 +114,51 @@ const ProductTable = () => {
       params: { keyword: searchValue },
     });
   };
+
+const openImagePicker = async () => {
+  const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
+  if (!permissionResult.granted) {
+    Alert.alert("Permission required", "Permission to access media library is required!");
+    return;
+  }
+
+  const pickerResult = await ImagePicker.launchImageLibraryAsync({
+    mediaTypes: ImagePicker.MediaTypeOptions.Images,
+    allowsEditing: true,
+    quality: 1,
+  });
+
+  if (!pickerResult.canceled) {
+    try {
+      const localUri = pickerResult.assets[0].uri;
+      // On Android, ensure the URI starts with 'file://'
+      const uri = Platform.OS === "android" && !localUri.startsWith("file://") ? "file://" + localUri : localUri;
+
+      // Extract filename
+      const filename = uri.split("/").pop() ?? "photo.jpg";
+
+      // Infer MIME type from filename extension
+      const match = /\.(\w+)$/.exec(filename);
+      const type = match ? `image/${match[1].toLowerCase()}` : "image/jpeg";
+
+      // Convert the local file URI to a Blob
+      const response = await fetch(uri);
+      const blob = await response.blob();
+
+      // Prepare FormData and append the image blob with filename and type
+      const formData = new FormData();
+      formData.append("image", blob, filename);
+
+      // Call your API function with the formData
+      const data = await fetchProductsByImage(formData);
+      setProducts(data);
+      setSearchValue("");
+    } catch (error) {
+      Alert.alert("Upload failed", `${error}`);
+    }
+  }
+};
+
 
   useEffect(() => {
     getData();
@@ -165,6 +242,7 @@ const ProductTable = () => {
             </Text>
           </VStack>
         </HStack>
+        <Box>{CameraIconWithTooltip()}</Box>
         <Box className="flex-1 max-w-sm ml-4">
           <Input
             variant="outline"
@@ -176,7 +254,7 @@ const ProductTable = () => {
               onChangeText={setSearchValue}
               placeholder="Search for product..."
               className="text-slate-700 text-sm placeholder:text-slate-400 dark:text-neutral-200 dark:placeholder:text-neutral-400"
-              onSubmitEditing={onSubmit} 
+              onSubmitEditing={onSubmit}
               returnKeyType="search"
             />
             <InputSlot className="pr-2">

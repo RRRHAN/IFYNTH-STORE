@@ -28,6 +28,35 @@ export const fetchProducts = async (keyword: string = ""): Promise<Product[]> =>
   }
 };
 
+export const fetchProductsByImage = async (formData: FormData): Promise<Product[]> => {
+  const token = await getAuthToken();
+  try {
+    const url = `${BASE_URL}/api/product/get-by-image`;
+
+    const response = await fetch(
+          url,
+          {
+            method: "POST",
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+            body: formData,
+          }
+        );
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const result = await response.json();
+    console.log("Fetched product by image data:", result.data);
+    return result.data;
+  } catch (error) {
+    console.error("Failed to fetch products by iamge:", error);
+    return [];
+  }
+};
+
 export const addProduct = async (productData: ProductData) => {
   const authToken = await getAuthToken();
   const formData = new FormData();
