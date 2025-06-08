@@ -1,4 +1,3 @@
-<div class="tab-pane fade show active" id="personal" role="tabpanel">
     <h5 class="mb-4">Personal Information</h5>
     <form action="{{ route('update.profile') }}" method="POST">
         @csrf
@@ -28,4 +27,3 @@
         <button type="submit" class="btn btn-secondary mt-2">Save
             Changes</button>
     </form>
-</div>

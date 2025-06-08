@@ -1,5 +1,3 @@
- <!-- Security -->
- <div class="tab-pane fade" id="security" role="tabpanel">
      <h5 class="mb-4">Security Settings</h5>
      <form action="{{ route('change.password') }}" method="POST">
          @csrf
@@ -19,4 +17,3 @@
          <button type="submit" class="btn btn-secondary">Save
              Changes</button>
      </form>
- </div>

@@ -12,6 +12,7 @@ class AddressController extends Controller
 
     public function addAddress(Request $request)
     {
+        session()->flash('preloader', false);
         $token = session('api_token');
 
         $response = Http::withHeaders([
@@ -33,6 +34,7 @@ class AddressController extends Controller
 
     public function getAddress(Request $request): Collection
     {
+        session()->flash('preloader', false);
         $token = session('api_token');
 
         $response = Http::withHeaders([
@@ -48,6 +50,7 @@ class AddressController extends Controller
 
     public function deleteAddress($id)
     {
+        session()->flash('preloader', false);
         $token = session('api_token');
 
         $response = Http::withHeaders([
@@ -63,6 +66,7 @@ class AddressController extends Controller
 
     public function updateAddress($id, Request $request)
     {
+        session()->flash('preloader', false);
         $token = session('api_token');
 
         $response = Http::withHeaders([
