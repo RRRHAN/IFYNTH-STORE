@@ -180,8 +180,8 @@ const TransactionCountCard: React.FC<TransactionCountCardProps> = ({
           <Table className="w-full">
             <TableHeader className={tableHeaderClass}>
               <TableRow>
-                <TableHead className={`py-2 px-3 font-bold text-left ${textColorClass} w-[60%]`}>Status</TableHead>
-                <TableHead className={`py-2 px-3 font-bold text-right ${textColorClass} w-[40%]`}>Count</TableHead>
+                <TableHead className={`py-2 px-3 font-bold text-left ${textColorClass} w-[60%] ${tableRowOddClass}`}>Status</TableHead>
+                <TableHead className={`py-2 px-3 font-bold text-right ${textColorClass} w-[40%] ${tableRowOddClass}`}>Count</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -206,13 +206,13 @@ const TransactionCountCard: React.FC<TransactionCountCardProps> = ({
                 </TableRow>
               ))}
             </TableBody>
-            <TableCaption className={`${subtitleColorClass} mt-2  rounded-full`}>
+            <TableCaption className={`${subtitleColorClass} mt-2  rounded-full ${tableRowOddClass}`}>
               Count of transactions by status.
             </TableCaption>
           </Table>
         </ScrollView>
       ) : (
-        <Text className={`${subtitleColorClass} text-base text-center mt-4`}>
+        <Text className={`${subtitleColorClass} text-base text-center mt-4 ${tableRowOddClass}`}>
           No transaction count data available.
         </Text>
       )}

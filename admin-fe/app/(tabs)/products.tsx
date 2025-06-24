@@ -108,7 +108,6 @@ const ProductTable = () => {
   };
 
   const onSubmit = () => {
-    // Redirect to /products with keyword as query param
     router.push({
       pathname: "/products",
       params: { keyword: searchValue },
@@ -555,7 +554,6 @@ const ProductTable = () => {
               >
                 <ModalBackdrop />
                 <ModalContent className="max-w-[800px] max-h-[90%] w-full bg-white dark:bg-neutral-800 rounded-lg">
-                  {/* Apply background */}
                   <ModalHeader className="border-b border-gray-200 dark:border-gray-700 pb-2">
                     <Heading
                       size="lg"
