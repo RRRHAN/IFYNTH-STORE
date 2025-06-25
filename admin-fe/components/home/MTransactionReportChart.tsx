@@ -146,7 +146,6 @@ const MTransactionReportChart: React.FC<TransactionChartProps> = ({
       </Heading>
 
       <Box className="flex-row">
-        {/* Y-Axis Labels */}
         <Box
           className={`w-10 justify-between mr-1 px-1 ${getChartBgColorClass()}`}
           onLayout={(event) => setYAxisContainerHeight(event.nativeEvent.layout.height)}

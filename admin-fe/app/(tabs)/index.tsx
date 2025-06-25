@@ -1,7 +1,12 @@
 // HomeScreen.tsx
 import React, { useEffect, useState } from "react";
 import { Box } from "@/components/ui/box";
-import { Dimensions, ScrollView, Platform, ActivityIndicator } from "react-native";
+import {
+  Dimensions,
+  ScrollView,
+  Platform,
+  ActivityIndicator,
+} from "react-native";
 import { useRouter } from "expo-router";
 import MyRevenueCard from "@/components/home/income-card";
 import { Text } from "@/components/ui/text";
@@ -124,11 +129,14 @@ export default function HomeScreen() {
       contentContainerStyle={{
         paddingTop: Platform.OS === "web" ? 50 : 50,
         paddingBottom: Platform.OS === "web" ? 100 : 150,
-        alignItems: 'center',
-        width: '100%',
+        alignItems: "center",
+        width: "100%",
       }}
     >
-      <Box className="w-full mb-6 items-center px-4" style={{ top: Platform.OS === "web" ? 0 : 0 }}>
+      <Box
+        className="w-full mb-6 items-center px-4"
+        style={{ top: Platform.OS === "web" ? 0 : 0 }}
+      >
         <Heading className="text-xl font-bold text-neutral-800 dark:text-neutral-100">
           Dashboard Overview
         </Heading>
@@ -153,10 +161,10 @@ export default function HomeScreen() {
       <Box
         className="flex-row flex-wrap justify-center w-full max-w-8xl"
         style={{
-            flexDirection: width < 768 ? "column" : "row",
-            alignItems: width < 1000 ? "center" : "flex-start",
-            paddingHorizontal: 10,
-            marginTop: 20,
+          flexDirection: width < 768 ? "column" : "row",
+          alignItems: width < 1000 ? "center" : "flex-start",
+          paddingHorizontal: 10,
+          marginTop: 20,
         }}
       >
         <ProductCountTable
@@ -175,31 +183,63 @@ export default function HomeScreen() {
         />
       </Box>
 
-      <Box className="w-full max-w-8xl mt-4 px-4">
-         <MTransactionReportChart
-            transactionReport={dummyTransactionReports}
-            height={380}
-         />
+      <Box
+        className="w-full max-w-8xl mt-4 px-4"
+        style={{
+          alignItems: "center",
+        }}
+      >
+        <MTransactionReportChart
+          transactionReport={dummyTransactionReports}
+          height={380}
+        />
       </Box>
-      <Box className="w-full max-w-8xl mt-4 px-4">
-         <TotalTransactionUserTable
-            totalTransactionUser={dummyTotalTransactionUsers}
-         />
+      <Box
+        className="w-full max-w-8xl mt-4 px-4"
+        style={{
+          alignItems: "center",
+        }}
+      >
+        <TotalTransactionUserTable
+          totalTransactionUser={dummyTotalTransactionUsers}
+        />
       </Box>
       {loading && (
-        <Box className="absolute inset-0 flex-1 justify-center items-center z-50"
-             style={{ backgroundColor: colorScheme === "dark" ? "rgba(0,0,0,0.8)" : "rgba(255,255,255,0.8)" }}>
-          <ActivityIndicator size="large" color={colorScheme === "dark" ? "#ffffff" : "#111827"} />
-          <Text className={`mt-2 ${colorScheme === 'dark' ? 'text-neutral-300' : 'text-neutral-700'}`}>Loading dashboard data...</Text>
+        <Box
+          className="absolute inset-0 flex-1 justify-center items-center z-50"
+          style={{
+            backgroundColor:
+              colorScheme === "dark"
+                ? "rgba(0,0,0,0.8)"
+                : "rgba(255,255,255,0.8)",
+          }}
+        >
+          <ActivityIndicator
+            size="large"
+            color={colorScheme === "dark" ? "#ffffff" : "#111827"}
+          />
+          <Text
+            className={`mt-2 ${
+              colorScheme === "dark" ? "text-neutral-300" : "text-neutral-700"
+            }`}
+          >
+            Loading dashboard data...
+          </Text>
         </Box>
       )}
-
-      {/* Global Error Overlay */}
       {hasError && !loading && (
-        <Box className="absolute inset-0 flex-1 justify-center items-center z-50"
-             style={{ backgroundColor: colorScheme === "dark" ? "rgba(0,0,0,0.9)" : "rgba(255,255,255,0.9)" }}>
+        <Box
+          className="absolute inset-0 flex-1 justify-center items-center z-50"
+          style={{
+            backgroundColor:
+              colorScheme === "dark"
+                ? "rgba(0,0,0,0.9)"
+                : "rgba(255,255,255,0.9)",
+          }}
+        >
           <Text className="text-red-500 dark:text-red-300 text-center text-lg px-4">
-            Failed to load data. Please check your internet connection and try again.
+            Failed to load data. Please check your internet connection and try
+            again.
           </Text>
         </Box>
       )}

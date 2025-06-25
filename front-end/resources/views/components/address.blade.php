@@ -1,4 +1,3 @@
-<div class="tab-pane fade" id="address" role="tabpanel">
     <div class="container mt-4">
         <div class="d-flex justify-content-between align-items-center mb-3">
             <h5 class="text-dark">My Address</h5>
@@ -35,8 +34,6 @@
                 No addresses available.
             </div>
         @endforelse
-
     </div>
-</div>
 @include('components.addressModal')
 @include('components.updateAddressModal')

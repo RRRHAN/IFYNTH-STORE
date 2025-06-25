@@ -18,7 +18,7 @@
                 <label for="search-image-upload" class="btn btn-secondary mb-2 label-text">
                     Search Similar Image
                 </label>
-                <label class="fa-solid fa-camera label-icon fa-2x" for="search-image-upload"></label>
+                <label class="fa-solid fa-camera label-icon" for="search-image-upload"></label>
                 <input id="search-image-upload" type="file" name="image" accept="image/*" style="display: none;" />
             </form>
             <div class="account__wrap">
@@ -207,45 +207,3 @@
         }
     });
 </script>
-<style>
-    #search-image-form {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        padding: 8px 16px;
-        border-radius: 6px;
-        font-size: 14px;
-        white-space: nowrap;
-        transition: all 0.3s ease;
-    }
-
-    #search-image-form .fa-search {
-        margin-right: 8px;
-    }
-
-    #search-image-form .label-icon {
-        display: none;
-    }
-
-    @media (max-width: 768px) {
-        #search-image-form {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            padding: 20px;
-        }
-
-        #search-image-form .label-text {
-            display: none;
-        }
-
-        #search-image-form .label-icon {
-            display: block;
-        }
-
-        #search-image-form .fa-search {
-            margin: 0;
-            font-size: 18px;
-        }
-    }
-</style>

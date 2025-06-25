@@ -1,4 +1,3 @@
-<div class="tab-pane fade" id="my-offer" role="tabpanel">
     <h5 class="mb-4">Recent my-offer</h5>
 
     <div style="overflow-x: auto;">
@@ -27,12 +26,13 @@
                                     <video width="80" height="80"
                                         style="object-fit: cover; border-radius: 8px; pointer-events: none;" muted
                                         preload="metadata">
-                                        <source src="{{ url(config('app.back_end_base_url').'/api' . $file) }}" type="video/mp4">
+                                        <source src="{{ url(config('app.back_end_base_url') . '/api' . $file) }}"
+                                            type="video/mp4">
                                         Your browser does not support the video tag.
                                     </video>
                                 @else
-                                    <img src="{{ url(config('app.back_end_base_url').'/api' . $file) }}" alt="image" width="80"
-                                        height="80" style="object-fit: cover; border-radius: 8px;">
+                                    <img src="{{ url(config('app.back_end_base_url') . '/api' . $file) }}" alt="image"
+                                        width="80" height="80" style="object-fit: cover; border-radius: 8px;">
                                 @endif
                             @else
                                 <p>No image available</p>
@@ -50,7 +50,7 @@
                                 data-description="{{ $product['Description'] ?? '-' }}"
                                 data-status="{{ ucfirst($product['Status'] ?? '-') }}"
                                 data-images='@json(collect($product['Files'] ?? [])->map(function ($file) {
-                                        return url(config('app.back_end_base_url').'/api' . ($file['URL'] ?? ''));
+                                        return url(config('app.back_end_base_url') . '/api' . ($file['URL'] ?? ''));
                                     }))'>
                                 <i class="fas fa-eye"></i>
                             </a>
@@ -73,4 +73,3 @@
             </tbody>
         </table>
     </div>
-</div>

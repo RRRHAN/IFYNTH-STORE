@@ -36,7 +36,7 @@ class TransactionController extends Controller
 
             if ($response->status() === 201) {
                 Session::forget('total_cart');
-                session()->flash('success', 'Transaction added successfully!');
+                session()->flash('success', 'Transaction successfully created. make payment immediately in account settings order data');
                 return redirect()->back();
             } else {
                 $errors = $response->json()['errors'] ?? ['Failed to add transaction'];

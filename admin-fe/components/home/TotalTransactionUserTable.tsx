@@ -6,7 +6,6 @@ import { Text } from "@/components/ui/text";
 import { Heading } from "@/components/ui/heading";
 import { Button, ButtonIcon } from "@/components/ui/button";
 import { HStack } from "@/components/ui/hstack";
-import { VStack } from "@/components/ui/vstack";
 import { ChevronLeft, ChevronRight } from "lucide-react-native";
 import { TotalTransactionUser } from "@/src/types/home";
 
@@ -164,8 +163,6 @@ const TotalTransactionUserTable: React.FC<TotalTransactionUserTableProps> = ({
           </Text>
         </Box>
       )}
-
-      {/* Pagination Controls */}
       {totalTransactionUser.length > ITEMS_PER_PAGE && (
         <HStack
           className={`flex-row justify-center items-center py-3 border-t ${getBorderColorClass()}`}

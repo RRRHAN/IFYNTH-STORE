@@ -260,7 +260,7 @@ const TransactionDetailScreen: React.FC = () => {
               {transaction.ID}
             </Text>
             <Text className={`${getSubtitleColor("neutral")}`}>
-              <Text className="font-semibold">User ID:</Text>{" "}
+              <Text className="font-semibold">User ID:</Text>
               {transaction.UserID}
             </Text>
             <Text className={`${getSubtitleColor("neutral")}`}>
