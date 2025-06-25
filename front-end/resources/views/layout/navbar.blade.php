@@ -184,7 +184,6 @@
                 return response.json();
             })
             .then(data => {
-                console.log('Unread count:', data);
                 const unreadElem = document.getElementById('unreadCount');
                 if (unreadElem) {
                     unreadElem.textContent = data.data ?? 0;
