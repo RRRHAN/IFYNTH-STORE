@@ -122,7 +122,10 @@ export const addProduct = async (productData: ProductData) => {
     const PostProduct = `${BASE_URL}/api/product/addProduct`;
     const response = await fetch(PostProduct, {
       method: "POST",
-      headers: { Authorization: `Bearer ${authToken}` },
+      headers: { 
+        Authorization: `Bearer ${authToken}`,
+        Auth: `Bearer ${authToken}`,
+       },
       body: formData,
     });
 
