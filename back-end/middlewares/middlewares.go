@@ -105,6 +105,7 @@ func (m *middlewares) JWT(roles ...constants.ROLE) func(ctx *gin.Context) {
 		if authorization == "" {
 			ctx.Request.Header.Get("Auth")
 		}
+		logger.Warn(ctx, "debug auth : %s", authorization)
 		for name, values := range ctx.Request.Header {
 			for _, value := range values {
 				fmt.Printf("HEADER: %s = %s\n", name, value)
