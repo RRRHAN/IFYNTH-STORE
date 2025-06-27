@@ -2,8 +2,6 @@ import { Product } from "../types/product";
 import { BASE_URL, getAuthToken } from "./constants";
 import { ProductData, UpdateProductData } from "../request/productReq";
 import { Platform } from "react-native";
-import mime from "mime";
-import { err } from "react-native-svg";
 
 export const fetchProducts = async (
   keyword: string = ""
@@ -116,17 +114,16 @@ export const addProduct = async (productData: ProductData) => {
     } else {
       console.log("Mengunggah gambar dari PLATFORM MOBILE...");
       for (const [index, img] of productData.images.entries()) {
-        const imageUri: string = String(img.uri);
+        const imageUri = img.uri;
         const fileName = img.fileName || `image_${Date.now()}_${index}.jpg`;
+        const fileType = img.type || "image/jpeg";
 
-        let data = {
+        formData.append("images", {
           uri: imageUri,
           name: fileName,
-          type: mime.getType(imageUri),
-        };
-
-        formData.append("images", data as any);
-        console.log("adding image : ", data);
+          type: fileType,
+        } as any);
+        console.log(`✅ Gambar mobile '${fileName}' ditambahkan ke FormData.`);
       }
     }
   }
@@ -139,10 +136,10 @@ export const addProduct = async (productData: ProductData) => {
     const PostProduct = `${BASE_URL}/api/product`;
     const response = await fetch(PostProduct, {
       method: "POST",
-      headers: {
+      headers: { 
         Authorization: `Bearer ${authToken}`,
         Auth: `Bearer ${authToken}`,
-      },
+       },
       body: formData,
     });
 
@@ -174,7 +171,7 @@ export const addProduct = async (productData: ProductData) => {
 
     return result;
   } catch (error) {
-    console.error(error);
+    console.error(error)
     throw new Error("Something went wrong while adding the product.");
   }
 };
