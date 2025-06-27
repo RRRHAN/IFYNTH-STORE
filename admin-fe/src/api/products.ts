@@ -3,16 +3,26 @@ import { BASE_URL, getAuthToken } from "./constants";
 import { ProductData, UpdateProductData } from "../request/productReq";
 import { Platform } from "react-native";
 
-export const fetchProducts = async (keyword: string = ""): Promise<Product[]> => {
+export const fetchProducts = async (
+  keyword: string = ""
+): Promise<Product[]> => {
   const token = await getAuthToken();
   try {
     const query = keyword ? `?keyword=${encodeURIComponent(keyword)}` : "";
     const getAllUrl = `${BASE_URL}/api/product${query}`;
 
+    const headers: Record<string, string> = {
+      "Content-Type": "application/json",
+    };
+
+    if (Platform.OS === "ios") {
+      headers["Auth"] = `Bearer ${token}`;
+    } else {
+      headers["Authorization"] = `Bearer ${token}`;
+    }
+
     const response = await fetch(getAllUrl, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
+      headers: headers,
     });
 
     if (!response.ok) {
@@ -28,21 +38,28 @@ export const fetchProducts = async (keyword: string = ""): Promise<Product[]> =>
   }
 };
 
-export const fetchProductsByImage = async (formData: FormData): Promise<Product[]> => {
+export const fetchProductsByImage = async (
+  formData: FormData
+): Promise<Product[]> => {
   const token = await getAuthToken();
   try {
     const url = `${BASE_URL}/api/product/get-by-image`;
 
-    const response = await fetch(
-          url,
-          {
-            method: "POST",
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-            body: formData,
-          }
-        );
+    const headers: Record<string, string> = {
+      "Content-Type": "application/json",
+    };
+
+    if (Platform.OS === "ios") {
+      headers["Auth"] = `Bearer ${token}`;
+    } else {
+      headers["Authorization"] = `Bearer ${token}`;
+    }
+
+    const response = await fetch(url, {
+      method: "POST",
+      headers: headers,
+      body: formData,
+    });
 
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
@@ -108,7 +125,9 @@ export const addProduct = async (productData: ProductData) => {
     const PostProduct = `${BASE_URL}/api/product/addProduct`;
     const response = await fetch(PostProduct, {
       method: "POST",
-      headers: { Authorization: `Bearer ${authToken}` },
+      headers: {
+        Authorization: `Bearer ${authToken}`,
+      },
       body: formData,
     });
 
@@ -148,12 +167,20 @@ export const deleteProduct = async (productId: string) => {
   const token = await getAuthToken();
   const deleteUrl = `${BASE_URL}/api/product/${productId}`;
 
+  const headers: Record<string, string> = {
+    "Content-Type": "application/json",
+  };
+
+  if (Platform.OS === "ios") {
+    headers["Auth"] = `Bearer ${token}`;
+  } else {
+    headers["Authorization"] = `Bearer ${token}`;
+  }
+
   try {
     const response = await fetch(deleteUrl, {
       method: "DELETE",
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
+      headers: headers,
     });
 
     if (!response.ok) {
@@ -200,7 +227,6 @@ export const updateProduct = async (productData: UpdateProductData) => {
         );
       }
     } else {
-      // Platform adalah 'ios' atau 'android' (mobile)
       console.log("Mengunggah gambar dari PLATFORM MOBILE...");
       for (const [index, img] of productData.images.entries()) {
         const imageUri = img.uri;

@@ -1,9 +1,5 @@
 import React, { useState, useEffect, useMemo } from "react"; // <-- Tambahkan useMemo
-import {
-  FlatList,
-  Platform,
-  KeyboardAvoidingView,
-} from "react-native";
+import { FlatList, Platform, KeyboardAvoidingView } from "react-native";
 import { useRouter, useLocalSearchParams } from "expo-router";
 
 // Gluestack UI components
@@ -49,11 +45,16 @@ export default function ChatScreen() {
   const { colorScheme } = useColorScheme();
 
   // Helper untuk warna teks berdasarkan tema
-  const getDynamicTextColor = () => colorScheme === "dark" ? "text-white" : "text-gray-900";
-  const getSubduedTextColor = () => colorScheme === "dark" ? "text-gray-300" : "text-gray-600";
-  const getMainBgClass = () => colorScheme === "dark" ? "bg-neutral-900" : "bg-white";
-  const getHeaderBgClass = () => colorScheme === "dark" ? "bg-neutral-800" : "bg-gray-100";
-  const getBorderColorClass = () => colorScheme === "dark" ? "border-neutral-700" : "border-gray-200";
+  const getDynamicTextColor = () =>
+    colorScheme === "dark" ? "text-white" : "text-gray-900";
+  const getSubduedTextColor = () =>
+    colorScheme === "dark" ? "text-gray-300" : "text-gray-600";
+  const getMainBgClass = () =>
+    colorScheme === "dark" ? "bg-neutral-900" : "bg-white";
+  const getHeaderBgClass = () =>
+    colorScheme === "dark" ? "bg-neutral-800" : "bg-gray-100";
+  const getBorderColorClass = () =>
+    colorScheme === "dark" ? "border-neutral-700" : "border-gray-200";
 
   const handleBack = () => {
     router.replace("/user_advertisement");
@@ -72,13 +73,12 @@ export default function ChatScreen() {
       setText("");
 
       const updatedMessages = await fetchMessage(selectedItem.ID);
-      setMessages(prevMessages => {
+      setMessages((prevMessages) => {
         if (JSON.stringify(updatedMessages) !== JSON.stringify(prevMessages)) {
           return updatedMessages;
         }
         return prevMessages;
       });
-
     } catch (error) {
       console.error("Failed to send message:", error);
     }
@@ -91,7 +91,7 @@ export default function ChatScreen() {
       if (selectedItem && selectedItem.ID) {
         try {
           const data = await fetchMessage(selectedItem.ID);
-          setMessages(prevMessages => {
+          setMessages((prevMessages) => {
             if (JSON.stringify(data) !== JSON.stringify(prevMessages)) {
               return data;
             }
@@ -130,7 +130,9 @@ export default function ChatScreen() {
             if (Platform.OS === "web") {
               uri = await generateVideoThumbnailJS(mediaUrl);
             } else {
-              const result = await VideoThumbnails.getThumbnailAsync(mediaUrl, { time: 1000 });
+              const result = await VideoThumbnails.getThumbnailAsync(mediaUrl, {
+                time: 1000,
+              });
               uri = result.uri;
             }
             setThumbnailUrls((prev) => ({ ...prev, [stableItem.ID]: uri }));
@@ -148,10 +150,11 @@ export default function ChatScreen() {
           }));
         }
       } else if (stableItem && stableItem.ID) {
-          setThumbnailUrls((prev) => ({
-            ...prev,
-            [stableItem.ID]: "https://img.lovepik.com/free-png/20210919/lovepik-question-element-png-image_401016497_wh1200.png",
-          }));
+        setThumbnailUrls((prev) => ({
+          ...prev,
+          [stableItem.ID]:
+            "https://img.lovepik.com/free-png/20210919/lovepik-question-element-png-image_401016497_wh1200.png",
+        }));
       }
     }
     // Panggil generateThumbnails hanya jika 'stableItem' berubah dan valid
@@ -162,12 +165,16 @@ export default function ChatScreen() {
 
   const renderItem = ({ item: messageItem }: { item: Message }) => {
     const isMe = messageItem.Role === "ADMIN";
-    const avatarUrlMe = "https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava1-bg.webp";
-    const avatarUrlOther = "https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava6-bg.webp";
+    const avatarUrlMe =
+      "https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava1-bg.webp";
+    const avatarUrlOther =
+      "https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava6-bg.webp";
 
     return (
       <HStack
-        className={`my-2 px-3 ${isMe ? "justify-end" : "justify-start"} items-end`}
+        className={`my-2 px-3 ${
+          isMe ? "justify-end" : "justify-start"
+        } items-end`}
       >
         {!isMe && (
           <Image
@@ -179,15 +186,27 @@ export default function ChatScreen() {
         <Box
           className={`
             max-w-[70%] p-3 rounded-lg
-            ${isMe ? `bg-blue-500 rounded-br-none` : `bg-gray-200 rounded-bl-none`}
+            ${
+              isMe
+                ? `bg-blue-500 rounded-br-none`
+                : `bg-gray-200 rounded-bl-none`
+            }
             ${isMe ? "text-white" : getDynamicTextColor()}
-            ${isMe ? "" : `${colorScheme === 'dark' ? 'dark:bg-neutral-700' : ''}`}
+            ${
+              isMe
+                ? ""
+                : `${colorScheme === "dark" ? "dark:bg-neutral-700" : ""}`
+            }
           `}
         >
-          <Text className={`${isMe ? 'text-white' : getDynamicTextColor()}`}>
+          <Text className={`${isMe ? "text-white" : getDynamicTextColor()}`}>
             {messageItem.Message}
           </Text>
-          <Text className={`text-xs mt-1 ${isMe ? 'text-blue-200' : getSubduedTextColor()}`}>
+          <Text
+            className={`text-xs mt-1 ${
+              isMe ? "text-blue-200" : getSubduedTextColor()
+            }`}
+          >
             {new Date(messageItem.CreatedAt).toLocaleTimeString([], {
               hour: "2-digit",
               minute: "2-digit",
@@ -211,20 +230,34 @@ export default function ChatScreen() {
     "https://img.lovepik.com/free-png/20210919/lovepik-question-element-png-image_401016497_wh1200.png";
 
   return (
-    <Box className={`flex-1 ${getMainBgClass()}`}>
+    <Box
+      className={`flex-1 ${getMainBgClass()}`}
+      style={[{ paddingTop: Platform.OS === "web" ? 0 : 50 }]}
+    >
       {/* Header */}
-      <HStack className={`items-center p-4 border-b ${getBorderColorClass()} ${getHeaderBgClass()}`}>
+      <HStack
+        className={`items-center p-4 border-b ${getBorderColorClass()} ${getHeaderBgClass()}`}
+      >
         <Button variant="link" onPress={handleBack} className="p-0">
-          <ButtonIcon as={ArrowLeft} size="lg" className={`${getSubduedTextColor()}`} />
+          <ButtonIcon
+            as={ArrowLeft}
+            size="lg"
+            className={`${getSubduedTextColor()}`}
+          />
         </Button>
-        <Heading size="lg" className={`flex-1 text-center mr-10 ${getDynamicTextColor()}`}>
+        <Heading
+          size="lg"
+          className={`flex-1 text-center mr-10 ${getDynamicTextColor()}`}
+        >
           Chat
         </Heading>
       </HStack>
 
       {/* Fixed Item Container (Product Info) */}
       {selectedItem && ( // Gunakan selectedItem yang sudah stabil
-        <Box className={`p-3 border-b ${getBorderColorClass()} ${getHeaderBgClass()}`}>
+        <Box
+          className={`p-3 border-b ${getBorderColorClass()} ${getHeaderBgClass()}`}
+        >
           <HStack className="items-center gap-3">
             <Image
               source={{ uri: thumbnailUrl }}
@@ -232,8 +265,14 @@ export default function ChatScreen() {
               alt="Product Thumbnail"
             />
             <VStack className="flex-1">
-              <Text className={`font-semibold text-base ${getDynamicTextColor()}`}>{selectedItem.Name}</Text>
-              <Text className={`text-sm ${getSubduedTextColor()}`}>Rp. {selectedItem.Price.toLocaleString()}</Text>
+              <Text
+                className={`font-semibold text-base ${getDynamicTextColor()}`}
+              >
+                {selectedItem.Name}
+              </Text>
+              <Text className={`text-sm ${getSubduedTextColor()}`}>
+                Rp. {selectedItem.Price.toLocaleString()}
+              </Text>
             </VStack>
           </HStack>
         </Box>
@@ -245,7 +284,9 @@ export default function ChatScreen() {
         renderItem={renderItem}
         keyExtractor={(chat) => chat.ID.toString()}
         inverted
-        contentContainerStyle={{ paddingBottom: Platform.OS === 'ios' ? 10 : 80 }}
+        contentContainerStyle={{
+          paddingBottom: Platform.OS === "ios" ? 10 : 80,
+        }}
         className="flex-1"
       />
 
@@ -270,7 +311,10 @@ export default function ChatScreen() {
               className={`${getDynamicTextColor()}`}
             />
           </Input>
-          <Button onPress={handleSend} className="bg-blue-500 rounded-full w-10 h-10 justify-center items-center">
+          <Button
+            onPress={handleSend}
+            className="bg-blue-500 rounded-full w-10 h-10 justify-center items-center"
+          >
             <ButtonIcon as={Send} size="md" className="text-white" />
           </Button>
         </HStack>

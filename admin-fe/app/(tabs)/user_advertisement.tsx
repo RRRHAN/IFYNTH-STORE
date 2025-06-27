@@ -478,7 +478,7 @@ const UserAdvertisementScreen = () => {
       <Box
         className={`w-full px-4 py-4 flex-row items-center justify-between
         `}
-        style={{ paddingTop: Platform.OS === "android" ? 40 : 16 }}
+        style={{ paddingTop: Platform.OS === "android" ? 40 : Platform.OS === "ios" ? 50 : 16 }}
       >
         <Box className="w-8" />
         <Heading size="xl" className={`flex-1 text-center`}>
@@ -486,8 +486,8 @@ const UserAdvertisementScreen = () => {
         </Heading>
         <Box className="w-8" />
       </Box>
-      <Box
-        className={`relative flex flex-col flex-1 w-full overflow-hidden rounded-lg shadow-md
+      <HStack
+        className={`relative flex w-full overflow-hidden rounded-lg shadow-md
            self-center mt-4 ${getTableHeaderBgClass()}
         `}
         style={{ maxWidth: screenWidth * 0.9 }}
@@ -572,7 +572,7 @@ const UserAdvertisementScreen = () => {
             )}
           </VStack>
         </ScrollView>
-      </Box>
+      </HStack>
 
       <HStack className="flex-row justify-center items-center mt-6 mb-12 w-full max-w-xl self-center">
         <Button

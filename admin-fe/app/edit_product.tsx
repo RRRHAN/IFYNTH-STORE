@@ -133,7 +133,13 @@ export default function EditProductScreen() {
 
   return (
     <ScrollView
-      style={[styles.container, { backgroundColor: isDark ? "#000" : "#fff", top: Platform.OS === "web" ? 0 : 20 }]}
+      style={[
+        styles.container,
+        {
+          backgroundColor: isDark ? "#000" : "#fff",
+          paddingTop: Platform.OS === "web" ? 0 : 70,
+        },
+      ]}
       contentContainerStyle={{ paddingBottom: 30 }}
     >
       <Box className="w-full max-w-xl flex-row justify-start mb-4 px-4">
@@ -145,15 +151,12 @@ export default function EditProductScreen() {
         >
           <Icon
             as={ArrowLeft}
-            size="lg"
+            size="xl"
             color={theme === "dark" ? "#D1D5DB" : "#4B5563"}
           />
-          <ButtonText className="ml-2 text-base text-neutral-800 dark:text-neutral-200">
-            Back to Products List
-          </ButtonText>
         </Button>
+        <ThemedText style={[styles.title]}>Edit Product</ThemedText>
       </Box>
-      <ThemedText style={[styles.title]}>Edit Product</ThemedText>
 
       <ProductFormInputs
         name={name}

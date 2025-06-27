@@ -190,7 +190,7 @@ export default function HomeScreen() {
         }}
       >
         <MTransactionReportChart
-          transactionReport={dummyTransactionReports}
+          transactionReport={transactionReport}
           height={380}
         />
       </Box>
@@ -201,7 +201,7 @@ export default function HomeScreen() {
         }}
       >
         <TotalTransactionUserTable
-          totalTransactionUser={dummyTotalTransactionUsers}
+          totalTransactionUser={totalTransactionUser}
         />
       </Box>
       {loading && (
