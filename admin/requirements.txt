@@ -1,6 +1,0 @@
-victory-native version 36.6.11
-"react-native-image-picker": "^8.2.0",
-
-deploay update
-vercel --prod
-    "@expo/webpack-config": "^19.0.1",
