@@ -86,6 +86,12 @@ func (h *handler) AddProduct(ctx *gin.Context) {
 		return
 	}
 
+	err = json.Unmarshal([]byte(input.StockDetailsStr), &input.StockDetails)
+	if err != nil {
+		respond.Error(ctx, apierror.FromErr(err))
+		return
+	}
+
 	// Validate image files
 	for _, file := range input.Images {
 		if !fileutils.IsValidImage(file) {

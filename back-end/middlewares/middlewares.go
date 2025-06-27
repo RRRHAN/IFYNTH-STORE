@@ -106,13 +106,6 @@ func (m *middlewares) JWT(roles ...constants.ROLE) func(ctx *gin.Context) {
 			authorization = ctx.Request.Header.Get(constants.AUTH)
 		}
 		authorizationSplit := strings.Split(authorization, " ")
-		logger.Warn(ctx, "debug auth : %s", authorization)
-		logger.Warn(ctx, "debug auth len : %d", len(authorizationSplit))
-		for name, values := range ctx.Request.Header {
-			for _, value := range values {
-				fmt.Printf("HEADER: %s = %s\n", name, value)
-			}
-		}
 		if len(authorizationSplit) < 2 {
 			respond.Error(ctx, apierror.Unauthorized())
 			return
