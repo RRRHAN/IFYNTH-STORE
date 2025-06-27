@@ -154,7 +154,6 @@ export default function AddProductScreen() {
         type: "error",
         confirmButtonText: "Close",
       });
-      console.error("Error adding product:", error);
     }
   };
   return (

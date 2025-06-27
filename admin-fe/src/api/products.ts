@@ -84,7 +84,6 @@ export const addProduct = async (productData: ProductData) => {
         );
       }
     } else {
-      // Platform adalah 'ios' atau 'android' (mobile)
       console.log("Mengunggah gambar dari PLATFORM MOBILE...");
       for (const [index, img] of productData.images.entries()) {
         const imageUri = img.uri;
@@ -113,7 +112,6 @@ export const addProduct = async (productData: ProductData) => {
       body: formData,
     });
 
-    // --- TAMBAHKAN LOG INI ---
     console.log("HTTP Status Code:", response.status);
     const responseText = await response.text();
     console.log("Raw Server Response:", responseText);
@@ -128,7 +126,6 @@ export const addProduct = async (productData: ProductData) => {
         `Server returned non-JSON response or parse error: ${responseText}`
       );
     }
-    // --- AKHIR LOG TAMBAHAN ---
 
     if (!response.ok) {
       console.error(
