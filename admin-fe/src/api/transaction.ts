@@ -19,8 +19,6 @@ export const fetchTransactions = async (): Promise<Transaction[]> => {
 
     const result = await response.json();
 
-    console.log("Transaction fetch result:", result);
-
     return result.data as Transaction[];
   } catch (error) {
     console.error("Failed to fetch transactions:", error);
@@ -61,7 +59,6 @@ export const handleStatusChange = async (
 export const fetchTransactionById = async (transactionId: string): Promise<Transaction> => {
   try {
     const token = await getAuthToken();
-    console.log("Token yang digunakan:", token);
     
     const url = `${BASE_URL}/api/transaction/${transactionId}`;
 
@@ -76,8 +73,6 @@ export const fetchTransactionById = async (transactionId: string): Promise<Trans
     }
 
     const result = await response.json();
-
-    console.log("Transaction fetch result:", result);
 
     return result.data as Transaction;
   } catch (error) {

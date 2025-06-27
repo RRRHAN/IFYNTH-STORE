@@ -32,8 +32,6 @@ import {
 } from "@/components/ui/table";
 import { Text } from "@/components/ui/text";
 import { Tooltip, TooltipContent, TooltipText } from "@/components/ui/tooltip";
-
-// --- Other Imports ---
 import {
   fetchTransactions,
   handleStatusChange,
@@ -160,9 +158,8 @@ const TransactionsScreen = () => {
     "bg-gray-50 dark:bg-neutral-700 text-neutral-800 dark:text-neutral-200";
   const paginationTextColor = "text-neutral-800 dark:text-white";
 
-  // Using the refined VALID_STATUS_TRANSITIONS for Picker items
   const VALID_STATUS_TRANSITIONS = {
-    draft: ["draft", "pending"],
+    draft: ["draft"],
     pending: ["pending", "paid", "cancelled"],
     paid: ["paid", "process", "cancelled"],
     process: ["process", "delivered", "cancelled"],
@@ -185,7 +182,6 @@ const TransactionsScreen = () => {
   }
 
   const paginate = (pageNumber: number) => {
-    // Ensure page number is within valid range
     if (pageNumber >= 1 && pageNumber <= totalPages) {
       setCurrentPage(pageNumber);
     }
@@ -301,7 +297,8 @@ const TransactionsScreen = () => {
                   const isInteractionDisabled = [
                     "delivered",
                     "cancelled",
-                    "completed", // Added 'completed' as disabled state
+                    "completed",
+                    "draft",
                   ].includes(currentItemStatus);
 
                   return (

@@ -154,7 +154,6 @@ export default function AddProductScreen() {
         type: "error",
         confirmButtonText: "Close",
       });
-      console.error("Error adding product:", error);
     }
   };
   return (
@@ -163,7 +162,7 @@ export default function AddProductScreen() {
         styles.container,
         {
           backgroundColor: isDark ? "#000" : "#fff",
-          top: Platform.OS === "web" ? 0 : 20,
+          paddingTop: Platform.OS === "web" ? 0 : 70,
         },
       ]}
       contentContainerStyle={{ paddingBottom: 30 }}
@@ -177,15 +176,12 @@ export default function AddProductScreen() {
         >
           <Icon
             as={ArrowLeft}
-            size="lg"
+            size="xl"
             color={theme === "dark" ? "#D1D5DB" : "#4B5563"}
           />
-          <ButtonText className="ml-2 text-base text-neutral-800 dark:text-neutral-200">
-            Back to Products List
-          </ButtonText>
         </Button>
+        <ThemedText style={[styles.title]}>Add Product</ThemedText>
       </Box>
-      <ThemedText style={[styles.title]}>Add Product</ThemedText>
 
       <ProductFormInputs
         name={name}

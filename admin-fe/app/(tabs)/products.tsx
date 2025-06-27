@@ -159,7 +159,6 @@ const ProductTable = () => {
 
         const data = await fetchProductsByImage(formData);
 
-        // Call your success function
         setProducts(data);
         setSearchValue("");
       } catch (err) {
@@ -227,10 +226,10 @@ const ProductTable = () => {
 
   return (
     <Box
-      className={`flex-1 p-4 ${mainBackgroundClass}`}
-      style={{ top: Platform.OS === "web" ? 0 : 20 }}
+      className={`flex-1 justify-center items-center ${mainBackgroundClass}`}
     >
-      <HStack className="w-full justify-between items-center mb-6 mt-2 px-3">
+      <HStack className="w-full justify-between items-center mb-6 mt-2 px-3"
+      style={{ paddingTop: Platform.OS === "android" ? 40 : Platform.OS === "ios" ? 40 : 16 }}>
         <HStack className="items-center">
           <Button
             size="md"

@@ -33,11 +33,6 @@ import ProductCountTable from "@/components/home/product-count-table";
 import TransactionCountTable from "@/components/home/transaction-count-table";
 import MTransactionReportChart from "@/components/home/MTransactionReportChart";
 import TotalTransactionUserTable from "@/components/home/TotalTransactionUserTable";
-import {
-  dummyProfitProducts,
-  dummyTransactionReports,
-  dummyTotalTransactionUsers,
-} from "@/components/DataDummy/home";
 
 const { width } = Dimensions.get("window");
 
@@ -190,7 +185,7 @@ export default function HomeScreen() {
         }}
       >
         <MTransactionReportChart
-          transactionReport={dummyTransactionReports}
+          transactionReport={transactionReport}
           height={380}
         />
       </Box>
@@ -201,7 +196,7 @@ export default function HomeScreen() {
         }}
       >
         <TotalTransactionUserTable
-          totalTransactionUser={dummyTotalTransactionUsers}
+          totalTransactionUser={totalTransactionUser}
         />
       </Box>
       {loading && (

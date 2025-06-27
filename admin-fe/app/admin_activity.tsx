@@ -41,7 +41,6 @@ const LogsScreen = () => {
   const dataPerPage = screenWidth > 1000 ? 12 : 10;
   const totalPages = Math.ceil((activity?.length || 0) / dataPerPage);
 
-  // Helper functions for styling
   const getTextColor = (baseColor: string) =>
     colorScheme === "dark" ? `text-${baseColor}-100` : `text-${baseColor}-900`;
   const getTableHeaderBgClass = () =>
@@ -121,7 +120,6 @@ const LogsScreen = () => {
 
   const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
 
-  // --- Penanganan state Loading / Error ---
   if (loading) {
     return (
       <Box className="flex-1 justify-center items-center bg-neutral-900 dark:bg-neutral-900">
@@ -160,19 +158,17 @@ const LogsScreen = () => {
       key={item.UserID + item.CreatedAt + index}
       className={`py-3 items-center border-b ${getBorderColorClass()} ${getTableRowBgClass()} ${getTableRowHoverBgClass()}`}
     >
-      {/* Kolom No */}
       <Box
-        style={{ width: columnWidths.no }} // <-- Perbaikan di sini
+        style={{ width: columnWidths.no }}
         className="justify-center items-center px-2"
       >
         <Text className={`${getTextColor("gray")} text-sm`}>
           {indexOfFirstProduct + index + 1}
         </Text>
       </Box>
-      {/* Kolom Admin ID (Opsional) */}
       {showAdminIdColumn && (
         <Box
-          style={{ width: columnWidths.userId }} // <-- Perbaikan di sini
+          style={{ width: columnWidths.userId }}
           className="justify-center items-center px-2"
         >
           <Text className={`${getTextColor("gray")} text-sm`}>
@@ -180,25 +176,22 @@ const LogsScreen = () => {
           </Text>
         </Box>
       )}
-      {/* Kolom Admin Name */}
       <Box
-        style={{ width: columnWidths.name }} // <-- Perbaikan di sini
+        style={{ width: columnWidths.name }}
         className="justify-center items-center px-2"
       >
         <Text className={`${getTextColor("gray")} text-sm`}>{item.Name}</Text>
       </Box>
-      {/* Kolom Activity */}
       <Box
-        style={{ width: columnWidths.activity }} // <-- Perbaikan di sini
+        style={{ width: columnWidths.activity }}
         className="justify-center items-center px-2"
       >
         <Text className={`${getTextColor("gray")} text-sm text-center`}>
           {item.Description}
         </Text>
       </Box>
-      {/* Kolom Time */}
       <Box
-        style={{ width: columnWidths.time }} // <-- Perbaikan di sini
+        style={{ width: columnWidths.time }}
         className="justify-center items-center px-2"
       >
         <Text className={`${getTextColor("gray")} text-sm text-center`}>
@@ -209,8 +202,10 @@ const LogsScreen = () => {
   );
 
   return (
-    <Box className={`flex-1 ${getTableHeaderBgClass()}`}>
-      {/* Header Statis (Tombol Kembali & Judul) */}
+    <Box
+      className={`flex-1 ${getTableHeaderBgClass()}`}
+      style={{ paddingTop: Platform.OS === "web" ? 0 : 40 }}
+    >
       <Box
         className={`w-full px-4 py-4 flex-row items-center justify-between
           ${getTableHeaderBgClass()} border-b ${getBorderColorClass()}
@@ -235,29 +230,33 @@ const LogsScreen = () => {
         >
           ADMIN ACTIVITIES
         </Heading>
-        {/* Placeholder untuk menyamakan spasi, jika tombol kembali ada di kiri */}
         <Box className="w-10" />
       </Box>
-
-      {/* Tabel */}
       <Box
         className={`relative flex flex-col w-full h-full overflow-hidden rounded-lg shadow-md
           ${getTableHeaderBgClass()}
         `}
+        style={Platform.OS !== "web" ? { height: 600 } : {}}
       >
-        <ScrollView
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={{
-            paddingBottom: Platform.OS === "web" ? 100 : 150,
-          }}
-        >
-          <VStack style={{ minWidth: screenWidth }}>
-            {/* Header Tabel */}
-            <HStack
-              className={`border-b ${getBorderColorClass()} py-3 ${getTableHeaderBgClass()}`}
+        <VStack style={{ minWidth: screenWidth }}>
+          <HStack
+            className={`border-b ${getBorderColorClass()} py-3 ${getTableHeaderBgClass()}`}
+          >
+            <Box
+              style={{ width: columnWidths.no }}
+              className="justify-center items-center px-2"
             >
+              <Text
+                className={`text-xs font-semibold leading-none uppercase ${getTextColor(
+                  "neutral"
+                )}`}
+              >
+                No
+              </Text>
+            </Box>
+            {showAdminIdColumn && (
               <Box
-                style={{ width: columnWidths.no }} // <-- Perbaikan di sini
+                style={{ width: columnWidths.userId }}
                 className="justify-center items-center px-2"
               >
                 <Text
@@ -265,69 +264,60 @@ const LogsScreen = () => {
                     "neutral"
                   )}`}
                 >
-                  No
+                  Admin ID
                 </Text>
               </Box>
-              {showAdminIdColumn && (
-                <Box
-                  style={{ width: columnWidths.userId }} // <-- Perbaikan di sini
-                  className="justify-center items-center px-2"
-                >
-                  <Text
-                    className={`text-xs font-semibold leading-none uppercase ${getTextColor(
-                      "neutral"
-                    )}`}
-                  >
-                    Admin ID
-                  </Text>
-                </Box>
-              )}
-              <Box
-                style={{ width: columnWidths.name }} // <-- Perbaikan di sini
-                className="justify-center items-center px-2"
+            )}
+            <Box
+              style={{ width: columnWidths.name }}
+              className="justify-center items-center px-2"
+            >
+              <Text
+                className={`text-xs font-semibold leading-none uppercase ${getTextColor(
+                  "neutral"
+                )}`}
               >
-                <Text
-                  className={`text-xs font-semibold leading-none uppercase ${getTextColor(
-                    "neutral"
-                  )}`}
-                >
-                  Admin Name
-                </Text>
-              </Box>
-              <Box
-                style={{ width: columnWidths.activity }} // <-- Perbaikan di sini
-                className="justify-center items-center px-2"
+                Admin Name
+              </Text>
+            </Box>
+            <Box
+              style={{ width: columnWidths.activity }}
+              className="justify-center items-center px-2"
+            >
+              <Text
+                className={`text-xs font-semibold leading-none uppercase ${getTextColor(
+                  "neutral"
+                )}`}
               >
-                <Text
-                  className={`text-xs font-semibold leading-none uppercase ${getTextColor(
-                    "neutral"
-                  )}`}
-                >
-                  Activity
-                </Text>
-              </Box>
-              <Box
-                style={{ width: columnWidths.time }} // <-- Perbaikan di sini
-                className="justify-center items-center px-2"
+                Activity
+              </Text>
+            </Box>
+            <Box
+              style={{ width: columnWidths.time }}
+              className="justify-center items-center px-2"
+            >
+              <Text
+                className={`text-xs font-semibold leading-none uppercase ${getTextColor(
+                  "neutral"
+                )}`}
               >
-                <Text
-                  className={`text-xs font-semibold leading-none uppercase ${getTextColor(
-                    "neutral"
-                  )}`}
-                >
-                  Time
-                </Text>
-              </Box>
-            </HStack>
-
-            {/* Konten Tabel */}
-            {currentActivities.length === 0 ? (
-              <Box className="py-8 items-center justify-center">
-                <Text className={`${getLoadingTextColorClass()} text-base`}>
-                  No logs found.
-                </Text>
-              </Box>
-            ) : (
+                Time
+              </Text>
+            </Box>
+          </HStack>
+          {currentActivities.length === 0 ? (
+            <Box className="py-8 items-center justify-center">
+              <Text className={`${getLoadingTextColorClass()} text-base`}>
+                No logs found.
+              </Text>
+            </Box>
+          ) : (
+            <ScrollView
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={{
+                paddingBottom: Platform.OS === "web" ? 100 : 30,
+              }}
+            >
               <FlatList
                 data={currentActivities}
                 renderItem={renderItem}
@@ -336,12 +326,10 @@ const LogsScreen = () => {
                 }
                 scrollEnabled={false}
               />
-            )}
-          </VStack>
-        </ScrollView>
+            </ScrollView>
+          )}
+        </VStack>
       </Box>
-
-      {/* Pagination */}
       <HStack className="justify-center items-center mt-4 pb-8">
         <Button
           variant="link"

@@ -10,6 +10,8 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     marginBottom: 15,
     textAlign: "center",
+    marginLeft: 80,
+    marginTop: 10,
   },
   input: {
     height: 45,

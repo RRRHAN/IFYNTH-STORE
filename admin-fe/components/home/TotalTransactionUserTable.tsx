@@ -12,7 +12,8 @@ import { TotalTransactionUser } from "@/src/types/home";
 const { width: screenWidth } = Dimensions.get("window");
 
 type TotalTransactionUserTableProps = {
-  totalTransactionUser: TotalTransactionUser[];
+  // Izinkan totalTransactionUser menjadi null atau undefined
+  totalTransactionUser?: TotalTransactionUser[] | null;
 };
 
 const ITEMS_PER_PAGE = 5;
@@ -46,11 +47,13 @@ const TotalTransactionUserTable: React.FC<TotalTransactionUserTableProps> = ({
   const getDynamicTextColor = () =>
     colorScheme === "dark" ? "text-white" : "text-gray-900";
   const getPaginationButtonBgClass = (disabled: boolean) => {
-    if (disabled) return colorScheme === "dark" ? "bg-gray-700" : "bg-gray-300";
+    if (disabled)
+      return colorScheme === "dark" ? "bg-gray-700" : "bg-gray-300";
     return "bg-blue-600";
   };
   const getPaginationButtonTextColorClass = (disabled: boolean) => {
-    if (disabled) return colorScheme === "dark" ? "text-gray-400" : "text-gray-600";
+    if (disabled)
+      return colorScheme === "dark" ? "text-gray-400" : "text-gray-600";
     return "text-white";
   };
   const getPaginationTextColorClass = () =>
@@ -60,15 +63,16 @@ const TotalTransactionUserTable: React.FC<TotalTransactionUserTableProps> = ({
   const getNoDataTextColorClass = () =>
     colorScheme === "dark" ? "text-gray-400" : "text-gray-800";
 
-
   const [currentPage, setCurrentPage] = useState(1);
 
-  const totalPages = useMemo(() => Math.max(
-    1,
-    Math.ceil(totalTransactionUser.length / ITEMS_PER_PAGE)
-  ), [totalTransactionUser.length]);
+  // Pastikan totalTransactionUser dihitung dengan aman, asumsikan array kosong jika null/undefined
+  const totalPages = useMemo(
+    () => Math.max(1, Math.ceil((totalTransactionUser?.length || 0) / ITEMS_PER_PAGE)),
+    [totalTransactionUser?.length]
+  );
 
   const currentTableData = useMemo(() => {
+    // Tangani kasus ketika totalTransactionUser adalah null atau undefined
     if (
       !Array.isArray(totalTransactionUser) ||
       totalTransactionUser.length === 0
@@ -96,41 +100,91 @@ const TotalTransactionUserTable: React.FC<TotalTransactionUserTableProps> = ({
     }
   }, [screenWidth]);
 
-  const columnWidths = useMemo(() => ({
-    name: tableWidth * 0.25,
-    phoneNumber: tableWidth * 0.25,
-    totalTransaction: tableWidth * 0.25,
-    totalAmount: tableWidth * 0.25,
-  }), [tableWidth]);
+  const columnWidths = useMemo(
+    () => ({
+      name: tableWidth * 0.25,
+      phoneNumber: tableWidth * 0.25,
+      totalTransaction: tableWidth * 0.25,
+      totalAmount: tableWidth * 0.25,
+    }),
+    [tableWidth]
+  );
 
+  // Perbaiki logika penanganan "no data"
+  // Tampilkan pesan "No transaction data available." jika tidak ada data untuk ditampilkan sama sekali
+  if (!totalTransactionUser || totalTransactionUser.length === 0) {
+    return (
+      <Box
+        className={`border rounded-xl overflow-hidden ${getBorderColorClass()}`}
+        style={{ width: tableWidth, backgroundColor: getTableHeaderBgClass() }}
+      >
+        <Heading className={`text-xl font-bold text-center mt-3 pb-2 border-b-2 ${getBorderColorClass()} ${getHeaderTextColorClass()}`}>
+          Total Transaction Customer
+        </Heading>
+        <Box
+          className={`py-5 justify-center items-center`}
+          style={{ backgroundColor: getNoDataBgClass() }}
+        >
+          <Text className={`text-lg ${getNoDataTextColorClass()}`}>
+            No transaction data available.
+          </Text>
+        </Box>
+      </Box>
+    );
+  }
 
   return (
     <Box
       className={`border rounded-xl overflow-hidden ${getBorderColorClass()}`}
       style={{ width: tableWidth, backgroundColor: getTableHeaderBgClass() }}
     >
-      <Heading className={`text-xl font-bold text-center mt-3 pb-2 border-b-2 ${getBorderColorClass()} ${getHeaderTextColorClass()}`}>
+      <Heading
+        className={`text-xl font-bold text-center mt-3 pb-2 border-b-2 ${getBorderColorClass()} ${getHeaderTextColorClass()}`}
+      >
         Total Transaction Customer
       </Heading>
 
       {/* Header Baris */}
-      <HStack className={`py-2 border-b ${getBorderColorClass()} ${getTableHeaderBgClass()}`}>
-        <Box style={{ width: columnWidths.name }} className={`flex-1 justify-center items-center border-r-2 ${getBorderColorClass()}`}>
-          <Text className={`font-bold text-base ${getHeaderTextColorClass()}`}>Name</Text>
+      <HStack
+        className={`py-2 border-b ${getBorderColorClass()} ${getTableHeaderBgClass()}`}
+      >
+        <Box
+          style={{ width: columnWidths.name }}
+          className={`flex-1 justify-center items-center border-r-2 ${getBorderColorClass()}`}
+        >
+          <Text className={`font-bold text-base ${getHeaderTextColorClass()}`}>
+            Name
+          </Text>
         </Box>
-        <Box style={{ width: columnWidths.phoneNumber }} className={`flex-1 justify-center items-center border-r-2 ${getBorderColorClass()}`}>
-          <Text className={`font-bold text-base ${getHeaderTextColorClass()}`}>Phone Number</Text>
+        <Box
+          style={{ width: columnWidths.phoneNumber }}
+          className={`flex-1 justify-center items-center border-r-2 ${getBorderColorClass()}`}
+        >
+          <Text className={`font-bold text-base ${getHeaderTextColorClass()}`}>
+            Phone Number
+          </Text>
         </Box>
-        <Box style={{ width: columnWidths.totalTransaction }} className={`flex-1 justify-center items-center border-r-2 ${getBorderColorClass()} `}>
-          <Text className={`font-bold text-base ${getHeaderTextColorClass()}`}>Total Transaction</Text>
+        <Box
+          style={{ width: columnWidths.totalTransaction }}
+          className={`flex-1 justify-center items-center border-r-2 ${getBorderColorClass()} `}
+        >
+          <Text className={`font-bold text-base ${getHeaderTextColorClass()}`}>
+            Total Transaction
+          </Text>
         </Box>
-        <Box style={{ width: columnWidths.totalAmount }} className="flex-1 justify-center items-center">
-          <Text className={`font-bold text-base ${getHeaderTextColorClass()}`}>Total Amount</Text>
+        <Box
+          style={{ width: columnWidths.totalAmount }}
+          className="flex-1 justify-center items-center"
+        >
+          <Text className={`font-bold text-base ${getHeaderTextColorClass()}`}> {/* FIXED: Corrected function name */}
+            Total Amount
+          </Text>
         </Box>
       </HStack>
       {currentTableData.length > 0 ? (
         currentTableData.map((item, index) => {
-          const rowBackgroundColor = index % 2 === 0 ? getTableRowBgClass() : getTableRowOddBgClass();
+          const rowBackgroundColor =
+            index % 2 === 0 ? getTableRowBgClass() : getTableRowOddBgClass();
 
           return (
             <HStack
@@ -138,17 +192,37 @@ const TotalTransactionUserTable: React.FC<TotalTransactionUserTableProps> = ({
               className={`py-2 border-b ${getTableRowBorderColorClass(index)}`}
               style={{ backgroundColor: rowBackgroundColor }}
             >
-              <Box style={{ width: columnWidths.name }} className={`flex-1 justify-center items-center border-r-2 ${getBorderColorClass()}`}>
-                <Text className={`text-base ${getDynamicTextColor()}`}>{item.CustomerName}</Text>
+              <Box
+                style={{ width: columnWidths.name }}
+                className={`flex-1 justify-center items-center border-r-2 ${getBorderColorClass()}`}
+              >
+                <Text className={`text-base ${getDynamicTextColor()}`}>
+                  {item.CustomerName}
+                </Text>
               </Box>
-              <Box style={{ width: columnWidths.phoneNumber }} className={`flex-1 justify-center items-center border-r-2 ${getBorderColorClass()}`}>
-                <Text className={`text-base ${getDynamicTextColor()}`}>{item.PhoneNumber}</Text>
+              <Box
+                style={{ width: columnWidths.phoneNumber }}
+                className={`flex-1 justify-center items-center border-r-2 ${getBorderColorClass()}`}
+              >
+                <Text className={`text-base ${getDynamicTextColor()}`}>
+                  {item.PhoneNumber}
+                </Text>
               </Box>
-              <Box style={{ width: columnWidths.totalTransaction }} className={`flex-1 justify-center items-center border-r-2 ${getBorderColorClass()}`}>
-                <Text className={`text-base ${getDynamicTextColor()}`}>{item.TotalTransaction}</Text>
+              <Box
+                style={{ width: columnWidths.totalTransaction }}
+                className={`flex-1 justify-center items-center border-r-2 ${getBorderColorClass()}`}
+              >
+                <Text className={`text-base ${getDynamicTextColor()}`}>
+                  {item.TotalTransaction}
+                </Text>
               </Box>
-              <Box style={{ width: columnWidths.totalAmount }} className="flex-1 justify-center items-center">
-                <Text className={`text-base ${getDynamicTextColor()}`}>Rp{item.TotalAmount.toLocaleString("id-ID")}</Text>
+              <Box
+                style={{ width: columnWidths.totalAmount }}
+                className="flex-1 justify-center items-center"
+              >
+                <Text className={`text-base ${getDynamicTextColor()}`}>
+                  Rp{item.TotalAmount.toLocaleString("id-ID")}
+                </Text>
               </Box>
             </HStack>
           );
@@ -163,7 +237,8 @@ const TotalTransactionUserTable: React.FC<TotalTransactionUserTableProps> = ({
           </Text>
         </Box>
       )}
-      {totalTransactionUser.length > ITEMS_PER_PAGE && (
+      {/* Tampilkan paginasi hanya jika ada lebih dari 1 halaman */}
+      {totalPages > 1 && (
         <HStack
           className={`flex-row justify-center items-center py-3 border-t ${getBorderColorClass()}`}
           style={{ backgroundColor: getNoDataBgClass() }}
@@ -171,12 +246,16 @@ const TotalTransactionUserTable: React.FC<TotalTransactionUserTableProps> = ({
           <Button
             onPress={goToPreviousPage}
             isDisabled={currentPage === 1}
-            className={`px-3 py-1 rounded-lg mx-1 ${getPaginationButtonBgClass(currentPage === 1)}`}
+            className={`px-3 py-1 rounded-lg mx-1 ${getPaginationButtonBgClass(
+              currentPage === 1
+            )}`}
           >
             <ButtonIcon
               as={ChevronLeft}
               size="md"
-              className={`${getPaginationButtonTextColorClass(currentPage === 1)}`}
+              className={`${getPaginationButtonTextColorClass(
+                currentPage === 1
+              )}`}
             />
           </Button>
           <Text className={`text-base mx-2 ${getPaginationTextColorClass()}`}>
@@ -185,12 +264,16 @@ const TotalTransactionUserTable: React.FC<TotalTransactionUserTableProps> = ({
           <Button
             onPress={goToNextPage}
             isDisabled={currentPage === totalPages}
-            className={`px-3 py-1 rounded-lg mx-1 ${getPaginationButtonBgClass(currentPage === totalPages)}`}
+            className={`px-3 py-1 rounded-lg mx-1 ${getPaginationButtonBgClass(
+              currentPage === totalPages
+            )}`}
           >
             <ButtonIcon
               as={ChevronRight}
               size="md"
-              className={`${getPaginationButtonTextColorClass(currentPage === totalPages)}`}
+              className={`${getPaginationButtonTextColorClass(
+                currentPage === totalPages
+              )}`}
             />
           </Button>
         </HStack>

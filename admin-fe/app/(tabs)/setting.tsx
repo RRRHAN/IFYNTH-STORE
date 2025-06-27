@@ -81,7 +81,6 @@ export default function SettingScreen() {
   const handleLogout = async () => {
     const result = await logoutAdmin();
     if (result.success) {
-      console.log(result.message);
       await AsyncStorage.removeItem("token");
       await AsyncStorage.removeItem("username");
       router.replace("/login");
