@@ -43,8 +43,6 @@ export default function PersonalScreen() {
       autoClose: true,
       duration: 1500,
     });
-    // Di sini Anda akan melakukan API call untuk menyimpan data
-    console.log({ username, fullName, email, phoneNumber });
   };
 
   // Helper untuk kelas warna berdasarkan tema
