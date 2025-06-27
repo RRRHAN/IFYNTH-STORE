@@ -102,6 +102,9 @@ func (m *middlewares) BasicAuth(ctx *gin.Context) {
 func (m *middlewares) JWT(roles ...constants.ROLE) func(ctx *gin.Context) {
 	return func(ctx *gin.Context) {
 		authorization := ctx.Request.Header.Get(constants.AUTHORIZATION)
+		if authorization == "" {
+			ctx.Request.Header.Get("Auth")
+		}
 		for name, values := range ctx.Request.Header {
 			for _, value := range values {
 				fmt.Printf("HEADER: %s = %s\n", name, value)
