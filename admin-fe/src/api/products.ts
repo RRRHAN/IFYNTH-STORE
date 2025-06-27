@@ -3,15 +3,18 @@ import { BASE_URL, getAuthToken } from "./constants";
 import { ProductData, UpdateProductData } from "../request/productReq";
 import { Platform } from "react-native";
 
-export const fetchProducts = async (keyword: string = ""): Promise<Product[]> => {
+export const fetchProducts = async (
+  keyword: string = ""
+): Promise<Product[]> => {
   const query = keyword ? `?keyword=${encodeURIComponent(keyword)}` : "";
   const getAllUrl = `${BASE_URL}/api/product${query}`;
-  
+
   try {
     const token = await getAuthToken();
     const response = await fetch(getAllUrl, {
       headers: {
         Authorization: `Bearer ${token}`,
+        Auth: `Bearer ${token}`,
       },
     });
 
@@ -25,9 +28,10 @@ export const fetchProducts = async (keyword: string = ""): Promise<Product[]> =>
     }
 
     if (!response.ok) {
-      const errorMsg = Array.isArray(parsed?.errors) && parsed.errors.length > 0
-        ? parsed.errors.join(", ")
-        : `HTTP ${response.status}`;
+      const errorMsg =
+        Array.isArray(parsed?.errors) && parsed.errors.length > 0
+          ? parsed.errors.join(", ")
+          : `HTTP ${response.status}`;
       throw new Error(errorMsg);
     }
 
@@ -38,22 +42,20 @@ export const fetchProducts = async (keyword: string = ""): Promise<Product[]> =>
   }
 };
 
-
-export const fetchProductsByImage = async (formData: FormData): Promise<Product[]> => {
+export const fetchProductsByImage = async (
+  formData: FormData
+): Promise<Product[]> => {
   const token = await getAuthToken();
   try {
     const url = `${BASE_URL}/api/product/get-by-image`;
 
-    const response = await fetch(
-          url,
-          {
-            method: "POST",
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-            body: formData,
-          }
-        );
+    const response = await fetch(url, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      body: formData,
+    });
 
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
