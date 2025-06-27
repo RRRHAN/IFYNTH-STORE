@@ -119,7 +119,7 @@ export const addProduct = async (productData: ProductData) => {
   });
 
   try {
-    const PostProduct = `${BASE_URL}/api/product/addProduct`;
+    const PostProduct = `${BASE_URL}/api/product`;
     const response = await fetch(PostProduct, {
       method: "POST",
       headers: { 
