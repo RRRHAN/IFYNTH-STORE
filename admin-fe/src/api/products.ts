@@ -4,29 +4,40 @@ import { ProductData, UpdateProductData } from "../request/productReq";
 import { Platform } from "react-native";
 
 export const fetchProducts = async (keyword: string = ""): Promise<Product[]> => {
-  const token = await getAuthToken();
+  const query = keyword ? `?keyword=${encodeURIComponent(keyword)}` : "";
+  const getAllUrl = `${BASE_URL}/api/product${query}`;
+  
   try {
-    const query = keyword ? `?keyword=${encodeURIComponent(keyword)}` : "";
-    const getAllUrl = `${BASE_URL}/api/product${query}`;
-
+    const token = await getAuthToken();
     const response = await fetch(getAllUrl, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
     });
 
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+    const raw = await response.text();
+    let parsed: any = {};
+
+    try {
+      parsed = JSON.parse(raw);
+    } catch (e) {
+      console.warn("Response is not valid JSON:", raw);
     }
 
-    const result = await response.json();
-    console.log("Fetched product data:", result.data);
-    return result.data;
-  } catch (error) {
-    console.error("Failed to fetch products:", error);
+    if (!response.ok) {
+      const errorMsg = Array.isArray(parsed?.errors) && parsed.errors.length > 0
+        ? parsed.errors.join(", ")
+        : `HTTP ${response.status}`;
+      throw new Error(errorMsg);
+    }
+
+    return parsed.data;
+  } catch (err: any) {
+    console.error("Failed to fetch products:", err?.message || err);
     return [];
   }
 };
+
 
 export const fetchProductsByImage = async (formData: FormData): Promise<Product[]> => {
   const token = await getAuthToken();

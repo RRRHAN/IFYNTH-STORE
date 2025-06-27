@@ -102,6 +102,7 @@ func (m *middlewares) BasicAuth(ctx *gin.Context) {
 func (m *middlewares) JWT(roles ...constants.ROLE) func(ctx *gin.Context) {
 	return func(ctx *gin.Context) {
 		authorization := ctx.Request.Header.Get(constants.AUTHORIZATION)
+		logger.Warn(ctx, "debug auth : %s", authorization)
 		authorizationSplit := strings.Split(authorization, " ")
 		if len(authorizationSplit) < 2 {
 			respond.Error(ctx, apierror.Unauthorized())
