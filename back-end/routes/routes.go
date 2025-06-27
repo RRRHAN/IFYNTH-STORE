@@ -78,7 +78,7 @@ func NewDependency(
 	{
 		product.GET("/", mw.JWT(constants.ADMIN, constants.CUSTOMER), productHandler.GetAllProducts)
 		product.GET("/detail/:id", mw.JWT(constants.ADMIN, constants.CUSTOMER), productHandler.GetProductByID)
-		product.POST("/addProduct", mw.JWT(constants.ADMIN), productHandler.AddProduct)
+		product.POST("/", mw.JWT(constants.ADMIN), productHandler.AddProduct)
 		product.DELETE("/:id", mw.JWT(constants.ADMIN), productHandler.DeleteProduct)
 		product.PUT("/update/:id", mw.JWT(constants.ADMIN), productHandler.UpdateProduct)
 		product.GET("/count", mw.JWT(constants.ADMIN), productHandler.GetProductCountByDepartment)
