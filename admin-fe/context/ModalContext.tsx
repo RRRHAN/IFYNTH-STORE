@@ -229,7 +229,7 @@ export const GlobalModalProvider: React.FC<GlobalModalProviderProps> = ({
             </ModalCloseButton>
           </ModalHeader>
           <ModalBody>
-            <Text size="md" className="text-typography-500"> {/* <--- Perbesar ukuran teks menjadi 'md' */}
+            <Text size="md" className="text-typography-500">
               {modalMessage}
             </Text>
           </ModalBody>
@@ -253,10 +253,8 @@ export const GlobalModalProvider: React.FC<GlobalModalProviderProps> = ({
           </ModalFooter>
         </ModalContent>
       </Modal>
-
-      {/* LOADING OVERLAY GLOBAL */}
       {isLoading && (
-        <Modal isOpen={true} size="xs"> {/* <--- Perkecil ukuran modal loading menjadi 'xs' */}
+        <Modal isOpen={true} size="xs">
           <ModalBackdrop />
           <ModalContent className="bg-transparent shadow-none items-center justify-center">
             <Spinner color="$white" size="large" />

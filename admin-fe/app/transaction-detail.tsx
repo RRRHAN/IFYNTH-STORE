@@ -156,29 +156,6 @@ const TransactionDetailScreen: React.FC = () => {
   return (
     <Box className="flex-1 bg-background-0 dark:bg-neutral-900">
       <Box
-        className={`w-full max-w-xl self-center px-4 py-4
-          ${getBackgroundColor("white")}`}
-        style={{
-          paddingTop: Platform.OS === "android" ? 40 : 16,
-        }}
-      >
-        <Button
-          variant="link"
-          action="secondary"
-          onPress={() => router.push("/(tabs)/transaction")}
-          className="p-0"
-        >
-          <ButtonIcon
-            as={ArrowLeft}
-            size="lg"
-            color={colorScheme === "dark" ? "#D1D5DB" : "#4B5563"}
-          />
-          <ButtonText className="ml-2 text-base text-neutral-800 dark:text-neutral-200">
-            Back to Transactions List
-          </ButtonText>
-        </Button>
-      </Box>
-      <Box
         className={`
           w-full max-w-xl self-center px-5 py-4 border-b ${getBorderColor(
             "neutral"
@@ -186,15 +163,30 @@ const TransactionDetailScreen: React.FC = () => {
           ${getBackgroundColor("gray")}
           flex-row justify-between items-center flex-wrap
         `}
+        style={{
+          paddingTop: Platform.OS === "web" ? 16 : 50,
+        }}
       >
         <Box className="flex-row items-center gap-3">
+          <Button
+            variant="link"
+            action="secondary"
+            onPress={() => router.push("/(tabs)/transaction")}
+            className="p-0"
+          >
+            <ButtonIcon
+              as={ArrowLeft}
+              size="lg"
+              color={colorScheme === "dark" ? "#D1D5DB" : "#4B5563"}
+            />
+          </Button>
           <Badge
             size="sm"
             className="bg-yellow-500 text-white font-bold px-2 py-1 rounded-sm text-xs"
           >
             <BadgeText>Star+</BadgeText>
           </Badge>
-          <Text className={`font-semibold ${getTextColor("gray")}`}>
+          <Text className={`font-semibold`}>
             IFYNTH Store
           </Text>
         </Box>
@@ -252,7 +244,7 @@ const TransactionDetailScreen: React.FC = () => {
           `}
         >
           <Box className="p-5 flex-col gap-3 border-b border-neutral-200 dark:border-neutral-700">
-            <Heading size="sm" className={`mb-2 ${getTextColor("gray")}`}>
+            <Heading size="sm" className={`mb-2`}>
               Transaction Info
             </Heading>
             <Text className={`${getSubtitleColor("neutral")}`}>
@@ -302,7 +294,7 @@ const TransactionDetailScreen: React.FC = () => {
           </Box>
 
           <Box className="p-5 flex-col gap-3 border-b border-neutral-200 dark:border-neutral-700">
-            <Heading size="sm" className={`mb-2 ${getTextColor("gray")}`}>
+            <Heading size="sm" className={`mb-2`}>
               Shipping Address
             </Heading>
             <Text className={`${getSubtitleColor("neutral")}`}>
@@ -335,7 +327,7 @@ const TransactionDetailScreen: React.FC = () => {
             </Text>
           </Box>
           <Box className="p-5 flex-col gap-4">
-            <Heading size="sm" className={`mb-2 ${getTextColor("gray")}`}>
+            <Heading size="sm" className={`mb-2`}>
               Products in Order
             </Heading>
             {transaction.TransactionDetails &&
@@ -370,9 +362,7 @@ const TransactionDetailScreen: React.FC = () => {
                     </Box>
                     <Box className="flex-grow flex-col gap-1">
                       <Text
-                        className={`text-base font-medium ${getTextColor(
-                          "gray"
-                        )}`}
+                        className={`text-base font-medium`}
                       >
                         {detail.Product?.Name ?? "Nama Produk Tidak Diketahui"}
                       </Text>
@@ -406,10 +396,10 @@ const TransactionDetailScreen: React.FC = () => {
         `}
       >
         <Box className="flex-row items-center">
-          <Text className={`text-base mr-4 ${getTextColor("gray")}`}>
+          <Text className={`text-base mr-4`}>
             Order Total:
           </Text>
-          <Text className={`text-xl font-bold ${getTextColor("gray")}`}>
+          <Text className={`text-xl font-bold`}>
             Rp{number_format(transaction.TotalAmount ?? 0)}
           </Text>
         </Box>

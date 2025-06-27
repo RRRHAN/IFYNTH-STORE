@@ -4,7 +4,6 @@ import { BASE_URL, getAuthToken } from "./constants";
 export const fetchTransactions = async (): Promise<Transaction[]> => {
   try {
     const token = await getAuthToken();
-    console.log("Token yang digunakan:", token);
     const getAllUrl = `${BASE_URL}/api/transaction/all`;
 
     const response = await fetch(getAllUrl, {
