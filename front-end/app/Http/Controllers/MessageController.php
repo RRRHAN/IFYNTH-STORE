@@ -140,7 +140,7 @@ public function fetchListJson(Request $request)
             return response()->json(['error' => 'Failed to fetch list.'], 500);
         }
     } catch (\Exception $e) {
-        \Log::error('Fetch unread counts error: ' . $e->getMessage());
+        Log::error('Fetch unread counts error: ' . $e->getMessage());
         return response()->json(['error' => 'An error occurred.'], 500);
     }
 }

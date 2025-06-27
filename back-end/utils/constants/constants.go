@@ -2,6 +2,7 @@ package constants
 
 const ERROR_CHANNEL = "errChannel"
 const AUTHORIZATION = "Authorization"
+const AUTH = "Auth"
 
 const DOCUMENTATION_PASSPHRASE = "documentation-passphrase"
 

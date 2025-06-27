@@ -1,5 +1,4 @@
 // src/constants.js
-import { Platform } from 'react-native';
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export const BASE_URL = (() => {
@@ -11,6 +10,7 @@ export const getAuthToken = async (): Promise<string | null> => {
     const token = await AsyncStorage.getItem("auth_token");
     return token;
   } catch (error) {
-    throw new Error("Failed to fetch auth token.");
+    console.error("Failed to fetch auth token:", error);
+    return null;
   }
 };

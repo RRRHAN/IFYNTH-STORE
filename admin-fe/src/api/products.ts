@@ -25,15 +25,26 @@ export const fetchProducts = async (
       headers: headers,
     });
 
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+    const raw = await response.text();
+    let parsed: any = {};
+
+    try {
+      parsed = JSON.parse(raw);
+    } catch (e) {
+      console.warn("Response is not valid JSON:", raw);
     }
 
-    const result = await response.json();
-    console.log("Fetched product data:", result.data);
-    return result.data;
-  } catch (error) {
-    console.error("Failed to fetch products:", error);
+    if (!response.ok) {
+      const errorMsg =
+        Array.isArray(parsed?.errors) && parsed.errors.length > 0
+          ? parsed.errors.join(", ")
+          : `HTTP ${response.status}`;
+      throw new Error(errorMsg);
+    }
+
+    return parsed.data;
+  } catch (err: any) {
+    console.error("Failed to fetch products:", err?.message || err);
     return [];
   }
 };
@@ -125,9 +136,10 @@ export const addProduct = async (productData: ProductData) => {
     const PostProduct = `${BASE_URL}/api/product/addProduct`;
     const response = await fetch(PostProduct, {
       method: "POST",
-      headers: {
+      headers: { 
         Authorization: `Bearer ${authToken}`,
-      },
+        Auth: `Bearer ${authToken}`,
+       },
       body: formData,
     });
 
