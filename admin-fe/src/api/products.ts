@@ -1,5 +1,5 @@
 import { Product } from "../types/product";
-import { BASE_URL, getAuthToken } from "./constants";
+import { BASE_URL, BASE_URLS, getAuthToken } from "./constants";
 import { ProductData, UpdateProductData } from "../request/productReq";
 import { Platform } from "react-native";
 
@@ -11,15 +11,10 @@ export const fetchProducts = async (
     const query = keyword ? `?keyword=${encodeURIComponent(keyword)}` : "";
     const getAllUrl = `${BASE_URL}/api/product${query}`;
 
-    const headers: Record<string, string> = {
-      "Content-Type": "application/json",
-    };
-
-    if (Platform.OS === "ios") {
-      headers["Auth"] = `Bearer ${token}`;
-    } else {
-      headers["Authorization"] = `Bearer ${token}`;
-    }
+    const headers: Record<string, string> =
+      Platform.OS === "ios"
+        ? { Auth: `Bearer ${token}` }
+        : { Authorization: `Bearer ${token}` };
 
     const response = await fetch(getAllUrl, {
       headers: headers,
@@ -56,15 +51,10 @@ export const fetchProductsByImage = async (
   try {
     const url = `${BASE_URL}/api/product/get-by-image`;
 
-    const headers: Record<string, string> = {
-      "Content-Type": "application/json",
-    };
-
-    if (Platform.OS === "ios") {
-      headers["Auth"] = `Bearer ${token}`;
-    } else {
-      headers["Authorization"] = `Bearer ${token}`;
-    }
+    const headers: Record<string, string> =
+      Platform.OS === "ios"
+        ? { Auth: `Bearer ${token}` }
+        : { Authorization: `Bearer ${token}` };
 
     const response = await fetch(url, {
       method: "POST",
@@ -86,7 +76,7 @@ export const fetchProductsByImage = async (
 };
 
 export const addProduct = async (productData: ProductData) => {
-  const authToken = await getAuthToken();
+  const token = await getAuthToken();
   const formData = new FormData();
 
   formData.append("name", productData.name);
@@ -99,17 +89,11 @@ export const addProduct = async (productData: ProductData) => {
 
   if (productData.images.length > 0) {
     if (Platform.OS === "web") {
-      console.log("Mengunggah gambar dari PLATFORM WEB...");
       for (const [index, img] of productData.images.entries()) {
         const imageUri = img.uri;
         const response = await fetch(imageUri);
         const blob = await response.blob();
         formData.append("images", blob, img.fileName || `image${index}.jpg`);
-        console.log(
-          `✅ Gambar web '${
-            img.fileName || `image${index}.jpg`
-          }' ditambahkan ke FormData.`
-        );
       }
     } else {
       console.log("Mengunggah gambar dari PLATFORM MOBILE...");
@@ -123,23 +107,22 @@ export const addProduct = async (productData: ProductData) => {
           name: fileName,
           type: fileType,
         } as any);
-        console.log(`✅ Gambar mobile '${fileName}' ditambahkan ke FormData.`);
       }
     }
   }
 
-  productData.sizes.forEach((size) => {
-    formData.append("stock_details", JSON.stringify(size));
-  });
+  formData.append("stockDetails", JSON.stringify(productData.sizes));
+
+  const headers: Record<string, string> =
+    Platform.OS === "ios"
+      ? { Auth: `Bearer ${token}` }
+      : { Authorization: `Bearer ${token}` };
 
   try {
-    const PostProduct = `${BASE_URL}/api/product`;
+    const PostProduct = `${BASE_URL}/api/product/`;
     const response = await fetch(PostProduct, {
       method: "POST",
-      headers: { 
-        Authorization: `Bearer ${authToken}`,
-        Auth: `Bearer ${authToken}`,
-       },
+      headers: headers,
       body: formData,
     });
 
@@ -179,15 +162,10 @@ export const deleteProduct = async (productId: string) => {
   const token = await getAuthToken();
   const deleteUrl = `${BASE_URL}/api/product/${productId}`;
 
-  const headers: Record<string, string> = {
-    "Content-Type": "application/json",
-  };
-
-  if (Platform.OS === "ios") {
-    headers["Auth"] = `Bearer ${token}`;
-  } else {
-    headers["Authorization"] = `Bearer ${token}`;
-  }
+  const headers: Record<string, string> =
+    Platform.OS === "ios"
+      ? { Auth: `Bearer ${token}` }
+      : { Authorization: `Bearer ${token}` };
 
   try {
     const response = await fetch(deleteUrl, {
@@ -213,7 +191,7 @@ export const deleteProduct = async (productId: string) => {
 };
 
 export const updateProduct = async (productData: UpdateProductData) => {
-  const authToken = await getAuthToken();
+  const token = await getAuthToken();
   const formData = new FormData();
 
   formData.append("name", productData.name);
@@ -226,20 +204,13 @@ export const updateProduct = async (productData: UpdateProductData) => {
 
   if (productData.images.length > 0) {
     if (Platform.OS === "web") {
-      console.log("Mengunggah gambar dari PLATFORM WEB...");
       for (const [index, img] of productData.images.entries()) {
         const imageUri = img.uri;
         const response = await fetch(imageUri);
         const blob = await response.blob();
         formData.append("images", blob, img.fileName || `image${index}.jpg`);
-        console.log(
-          `✅ Gambar web '${
-            img.fileName || `image${index}.jpg`
-          }' ditambahkan ke FormData.`
-        );
       }
     } else {
-      console.log("Mengunggah gambar dari PLATFORM MOBILE...");
       for (const [index, img] of productData.images.entries()) {
         const imageUri = img.uri;
         const fileName = img.fileName || `image_${Date.now()}_${index}.jpg`;
@@ -250,7 +221,6 @@ export const updateProduct = async (productData: UpdateProductData) => {
           name: fileName,
           type: fileType,
         } as any);
-        console.log(`✅ Gambar mobile '${fileName}' ditambahkan ke FormData.`);
       }
     }
   }
@@ -261,13 +231,16 @@ export const updateProduct = async (productData: UpdateProductData) => {
 
   formData.append("stockDetails", JSON.stringify(productData.sizes));
 
+  const headers: Record<string, string> =
+    Platform.OS === "ios"
+      ? { Auth: `Bearer ${token}` }
+      : { Authorization: `Bearer ${token}` };
+
   try {
     const updateUrl = `${BASE_URL}/api/product/update/${productData.productId}`;
     const response = await fetch(updateUrl, {
       method: "PUT",
-      headers: {
-        Authorization: `Bearer ${authToken}`,
-      },
+      headers: headers,
       body: formData,
     });
 

@@ -203,11 +203,10 @@ export const GlobalModalProvider: React.FC<GlobalModalProviderProps> = ({
     >
       {children}
 
-      {/* Modal Umum (Sukses/Error/Info) */}
       <Modal
         isOpen={isOpen}
         onClose={hideModal}
-        size="xs" // <--- Perkecil ukuran modal menjadi 'xs'
+        size="sm"
       >
         <ModalBackdrop />
         <ModalContent>

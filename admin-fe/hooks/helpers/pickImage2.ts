@@ -12,7 +12,6 @@ export type SelectedImage = {
   base64?: string;
 };
 
-// Helper function untuk mendapatkan ekstensi dari base64
 const getExtensionFromBase64 = (base64: string): string | null => {
   const match = base64.match(/^data:image\/(png|jpeg|jpg);base64,/i);
   if (match && match[1]) {
@@ -21,7 +20,7 @@ const getExtensionFromBase64 = (base64: string): string | null => {
   return null;
 };
 
-export const pickImage = async (
+export const pickImage2 = async (
   setImages: React.Dispatch<React.SetStateAction<any[]>>,
   showModal: (options: {
     title: string;
@@ -36,7 +35,6 @@ export const pickImage = async (
     duration?: number;
   }) => void
 ) => {
-  console.log("📸 Memanggil ImagePicker...");
 
   try {
     const result = await ImagePicker.launchImageLibraryAsync({
@@ -54,8 +52,6 @@ export const pickImage = async (
         const extension = asset.fileName
           ? asset.fileName.split(".").pop()?.toLowerCase()
           : getExtensionFromBase64(asset.uri);
-        console.log("🔍 Cek asset:", asset);
-        console.log("📄 Ekstensi:", extension);
         return extension && allowedExtensions.includes(extension);
       })
       .map((asset) => {

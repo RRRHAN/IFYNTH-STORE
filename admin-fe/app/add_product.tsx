@@ -8,7 +8,8 @@ import { Box } from "@/components/ui/box";
 import { Button, ButtonText } from "@/components/ui/button";
 import { Icon } from "@/components/ui/icon";
 import { handleStockChange } from "@/hooks/helpers/handleStockChange";
-import { pickImage } from "@/hooks/helpers/pickImage2";
+import { pickImage2 } from "@/hooks/helpers/pickImage2";
+import { pickImage1 } from "@/hooks/helpers/pickImage";
 import { useProductForm } from "@/hooks/helpers/useAddProductForm";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { addProduct } from "@/src/api/products";
@@ -58,14 +59,13 @@ export default function AddProductScreen() {
       !capital ||
       !weight ||
       !department ||
-      !category
+      !category ||
+      !images || images.length === 0
     ) {
       showModal({
         title: "Validation Error",
         message: "All fields are required.",
         type: "error",
-        autoClose: true,
-        duration: 1500,
       });
       return;
     }
@@ -77,8 +77,6 @@ export default function AddProductScreen() {
         title: "Validation Error",
         message: "At least one size should have stock greater than 0..",
         type: "error",
-        autoClose: true,
-        duration: 1500,
       });
       return;
     }
@@ -102,8 +100,9 @@ export default function AddProductScreen() {
           title: "Add Product Success!",
           message: result.message || "You have successfully added product.",
           type: "success",
-          autoClose: true,
-          duration: 1500,
+          onConfirm: () => {
+            router.push("/products");
+          },
         });
         setName("");
         setDescription("");
@@ -230,7 +229,7 @@ export default function AddProductScreen() {
 
       <ActionButtons
         pickImage={() => {
-          pickImage(setImages, showModal);
+          pickImage2(setImages, showModal);
         }}
         handleAddProduct={handleAddProduct}
         styles={styles}

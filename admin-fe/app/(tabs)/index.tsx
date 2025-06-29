@@ -92,8 +92,6 @@ export default function HomeScreen() {
         const usersData = await fetchTotalTransactionUser();
         setTotalTransactionUser(usersData);
 
-        const profitProductData = await fetchProductProfit();
-        setProfitProduct(profitProductData);
       } catch (err: any) {
         console.error("Failed to fetch home data", err);
         setHasError(true);
@@ -103,7 +101,6 @@ export default function HomeScreen() {
         setTotalCapital(0);
         setTotalIncome(0);
         setTotalTransactionUser([]);
-        setProfitProduct([]);
         setPercentageChange(0);
       } finally {
         setLoading(false);
