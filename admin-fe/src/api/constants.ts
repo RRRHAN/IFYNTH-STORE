@@ -2,7 +2,7 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Platform } from "react-native";
 
-export const BASE_URL = (() => {
+export const BASE_URLS = (() => {
   if (Platform.OS === "android") {
     return "http://10.0.2.2:7777";
   } else if (Platform.OS === "ios") {
@@ -12,7 +12,7 @@ export const BASE_URL = (() => {
   }
 })();
 
-export const BASE_URLS = (() => {
+export const BASE_URL = (() => {
   return "https://ifynth.raihan-firm.com";
 })();
 

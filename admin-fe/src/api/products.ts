@@ -111,7 +111,7 @@ export const addProduct = async (productData: ProductData) => {
     }
   }
 
-  formData.append("stockDetails", JSON.stringify(productData.sizes));
+formData.append("stock_details", JSON.stringify(productData.sizes));
 
   const headers: Record<string, string> =
     Platform.OS === "ios"
