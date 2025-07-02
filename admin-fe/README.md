@@ -1,3 +1,18 @@
+# ⚠️ Known Issue: "Add Product" Feature on Mobile App
+
+We are currently experiencing technical issues with the **Add Product** feature on the mobile application.
+
+🛠️ **Issue**: This feature is **not working on the mobile app** due to a technical problem in our React Native implementation.  
+✅ **Web Access**: You can still use the **web version** to add new products. It works correctly on both desktop and mobile browsers.
+
+📱 This issue only affects the **mobile app**, which is built using React Native and used across various operating systems (iOS and Android).
+
+We are actively investigating the issue and working on a fix.  
+We apologize for the inconvenience and truly appreciate your patience and support.
+
+— The Development Team
+
+
 # Welcome to your Expo app 👋
 
 This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
