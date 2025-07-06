@@ -13,7 +13,6 @@ import (
 	"github.com/google/uuid"
 
 	apierror "github.com/RRRHAN/IFYNTH-STORE/back-end/utils/api-error"
-	fileutils "github.com/RRRHAN/IFYNTH-STORE/back-end/utils/file"
 	"github.com/RRRHAN/IFYNTH-STORE/back-end/utils/respond"
 )
 
@@ -78,37 +77,6 @@ func (h *handler) GetProductByID(ctx *gin.Context) {
 }
 
 func (h *handler) AddProduct(ctx *gin.Context) {
-
-	var input AddProductRequest
-	err := ctx.ShouldBind(&input)
-	if err != nil {
-		respond.Error(ctx, apierror.FromErr(err))
-		return
-	}
-
-	err = json.Unmarshal([]byte(input.StockDetailsStr), &input.StockDetails)
-	if err != nil {
-		respond.Error(ctx, apierror.FromErr(err))
-		return
-	}
-
-	// Validate image files
-	for _, file := range input.Images {
-		if !fileutils.IsValidImage(file) {
-			ctx.JSON(http.StatusBadRequest, gin.H{
-				"error": fmt.Sprintf("Invalid image format: %s", file.Filename),
-			})
-		}
-	}
-
-	// Call the service to add the product
-	if err := h.service.AddProduct(ctx.Request.Context(), input); err != nil {
-		respond.Error(ctx, apierror.FromErr(err))
-		return
-	}
-
-	// Return success response
-	respond.Success(ctx, http.StatusCreated, "Product and images added successfully")
 }
 
 func (h *handler) DeleteProduct(ctx *gin.Context) {

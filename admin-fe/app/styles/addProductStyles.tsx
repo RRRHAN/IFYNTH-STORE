@@ -1,4 +1,5 @@
 import { StyleSheet, Dimensions } from "react-native";
+const { width } = Dimensions.get("window");
 
 const styles = StyleSheet.create({
   container: {
@@ -44,12 +45,12 @@ const styles = StyleSheet.create({
     marginRight: 10,
   },
   pickerContainer: {
-    flexDirection: "row", // Arrange pickers side by side
-    justifyContent: "space-between", // Space them equally
+    flexDirection: "row",
+    justifyContent: "space-between",
     marginBottom: 20,
   },
   pickerWrapper: {
-    width: "48%", // Ensure both pickers share the space equally
+    width: "48%",
   },
   inputLabel: {
     fontSize: 14,
@@ -69,7 +70,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   sizeWrapper: {
-    width: "23%",
+    width: width > 500 ? "23%" : "45%",
     marginBottom: 10,
   },
   imageContainer: {

@@ -31,12 +31,11 @@ func main() {
 
 	// Setup CORS
 	c := cors.New(cors.Options{
-		AllowedOrigins: []string{"*"},                                     // Izinkan origin frontend
-		AllowedHeaders: []string{"Authorization", "Content-Type"},         // Izinkan header Authorization dan Content-Type
-		AllowedMethods: []string{"GET", "POST", "PUT", "DELETE", "PATCH"}, // Metode yang diizinkan
+		AllowedOrigins: []string{"*"},
+		AllowedHeaders: []string{"Authorization", "Content-Type"},
+		AllowedMethods: []string{"GET", "POST", "PUT", "DELETE", "PATCH"},
 	})
 
-	// Ambil handler yang sudah disediakan dependency
 	handler := dependency.GetHandler()
 
 	// Apply CORS middleware
@@ -48,18 +47,15 @@ func main() {
 
 	server := &http.Server{
 		Addr:    fmt.Sprintf("%s:%d", conf.Host, conf.Port),
-		Handler: handlerWithCORS, // Gunakan handler yang sudah di-wrap dengan CORS
+		Handler: handlerWithCORS,
 	}
 
-	// Initializing the server in a goroutine so that
-	// it won't block the graceful shutdown handling below
 	go func() {
 		if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 			panic(fmt.Sprintf("Error listen and serve : %v\n", err))
 		}
 	}()
 
-	// Listen for the interrupt signal.
 	<-ctx.Done()
 
 	// Restore default behavior on the interrupt signal and notify user of shutdown.

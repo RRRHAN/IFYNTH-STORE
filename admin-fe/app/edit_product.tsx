@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { View, Alert, ScrollView, Platform } from "react-native";
 import { useColorScheme } from "@/hooks/useColorScheme";
-import { pickImage } from "@/hooks/helpers/pickImage2";
+import { pickImage2 } from "@/hooks/helpers/pickImage2";
 import styles from "./styles/addProductStyles";
 import { updateProduct } from "@/src/api/products";
 import { ThemedText } from "@/components/ThemedText";
@@ -87,8 +87,9 @@ export default function EditProductScreen() {
           title: "Update Success!",
           message: result.message || "Product updated successfully.",
           type: "success",
-          autoClose: true,
-          duration: 1500,
+          onConfirm: () => {
+            router.push("/products");
+          },
         });
       } else {
         showModal({
@@ -211,7 +212,7 @@ export default function EditProductScreen() {
       />
 
       <ActionButtons
-        pickImage={() => pickImage(setImages, showModal)}
+        pickImage={() => pickImage2(setImages, showModal)}
         handleUpdateProduct={handleUpdateProduct}
         styles={styles}
       />

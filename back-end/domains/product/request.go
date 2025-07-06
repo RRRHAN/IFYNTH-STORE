@@ -46,4 +46,6 @@ type GetAllProductReq struct {
 	Keyword    string
 	Department string
 	Category   string
+	Page       int
+	Limit      int
 }

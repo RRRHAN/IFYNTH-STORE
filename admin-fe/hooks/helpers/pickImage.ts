@@ -45,18 +45,31 @@ const requestAndroidPermissions = async () => {
   return true; // iOS tidak perlu
 };
 
-export const pickImage = async (
+export const pickImage1 = async (
   setImages: React.Dispatch<React.SetStateAction<any[]>>,
-  setErrorMessage: (msg: string) => void,
-  setVisible: (visible: boolean) => void
+  showModal: (options: {
+    title: string;
+    message: string;
+    type: "success" | "error" | "info";
+    onConfirm?: () => void;
+    onCancel?: () => void;
+    showCancelButton?: boolean;
+    confirmButtonText?: string;
+    cancelButtonText?: string;
+    autoClose?: boolean;
+    duration?: number;
+  }) => void
 ) => {
   console.log("📸 Memanggil launchImageLibrary...");
 
   const permissionGranted = await requestAndroidPermissions();
   if (!permissionGranted) {
-    console.log("❌ Permission ditolak");
-    setErrorMessage("Izin dibutuhkan untuk mengakses galeri.");
-    setVisible(true);
+    showModal({
+      title: "Add Product Image Failed!",
+      message: "Izin dibutuhkan untuk mengakses galeri.",
+      type: "error",
+      confirmButtonText: "Close",
+    });
     return;
   } else {
     console.log("✅ Permission disetujui");
@@ -76,10 +89,12 @@ export const pickImage = async (
     }
 
     if (result.errorCode) {
-      console.log("❗ Error Code:", result.errorCode);
-      console.log("❗ Error Message:", result.errorMessage);
-      setErrorMessage("Gagal mengakses galeri: " + result.errorMessage);
-      setVisible(true);
+      showModal({
+        title: "Add Product Image Failed!",
+        message: "Gagal mengakses galeri: " + result.errorMessage,
+        type: "error",
+        confirmButtonText: "Close",
+      });
       return;
     }
 
@@ -113,18 +128,23 @@ export const pickImage = async (
       console.log("🎯 Gambar terpilih:", selectedImages);
 
       if (selectedImages.length === 0) {
-        console.log("⚠️ Tidak ada gambar yang valid.");
-        setErrorMessage("Hanya gambar JPG, JPEG, atau PNG yang diizinkan.");
-        setVisible(true);
+        showModal({
+          title: "Add Product Image Failed!",
+          message: "Hanya gambar JPG, JPEG, atau PNG yang diizinkan.",
+          type: "error",
+          confirmButtonText: "Close",
+        });
         return;
       }
 
       setImages((prevImages) => [...prevImages, ...selectedImages]);
     }
   } catch (err) {
-    console.log("💥 Terjadi error saat memanggil launchImageLibrary:", err);
-    setErrorMessage("Terjadi kesalahan.");
-    setVisible(true);
+            showModal({
+          title: "Add Product Image Failed!",
+          message: "Terjadi kesalahan.",
+          type: "error",
+          confirmButtonText: "Close",
+        });
   }
 };
-

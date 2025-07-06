@@ -8,3 +8,15 @@ type ProductProfit struct {
 	TotalCapital float64
 	TotalRevenue float64
 }
+
+type PaginatedProductsResponse struct {
+	Data       []Product      `json:"data"`
+	Pagination PaginationMeta `json:"pagination"`
+}
+
+type PaginationMeta struct {
+	Total       int `json:"total"`
+	PerPage     int `json:"per_page"`
+	CurrentPage int `json:"current_page"`
+	TotalPages  int `json:"total_pages"`
+}
