@@ -77,6 +77,24 @@ func (h *handler) GetProductByID(ctx *gin.Context) {
 }
 
 func (h *handler) AddProduct(ctx *gin.Context) {
+	var req AddProductRequest
+
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		respond.Error(ctx, apierror.FromErr(err))
+		return
+	}
+
+	if err := h.validate.Struct(&req); err != nil {
+		respond.Error(ctx, apierror.FromErr(err))
+		return
+	}
+
+	if err := h.service.AddProduct(ctx, req); err != nil {
+		respond.Error(ctx, apierror.FromErr(err))
+		return
+	}
+
+	respond.Success(ctx, http.StatusCreated, gin.H{"message": "Product and images added successfully"})
 }
 
 func (h *handler) DeleteProduct(ctx *gin.Context) {
